@@ -1,0 +1,12 @@
+syntax = "proto2";
+package mav_msgs.msgs;
+import "vector3d.proto";
+
+message CommandVelocityTrajectory
+{
+  required gazebo.msgs.Vector3d   velocity  = 1;
+  required gazebo.msgs.Vector3d   acceleration = 2;
+  required gazebo.msgs.Vector3d   jerk = 3;
+  required gazebo.msgs.Vector3d   snap  = 4;
+  required float                  yaw_rate = 5;
+}

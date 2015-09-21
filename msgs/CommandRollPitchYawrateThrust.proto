@@ -1,0 +1,10 @@
+syntax = "proto2";
+package mav_msgs.msgs;
+
+message CommandRollPitchYawrateThrust
+{
+  required float                  roll = 1;
+  required float                  pitch = 2;
+  required float                  yaw_rate = 3;
+  required float                  thrust = 4;
+}
