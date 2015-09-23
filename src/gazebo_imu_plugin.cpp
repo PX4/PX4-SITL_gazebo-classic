@@ -247,11 +247,11 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   math::Quaternion C_W_I = T_W_I.rot;
 
   // Copy math::Quaternion to gazebo::msgs::Quaternion
-  gazebo::msgs::Quaternion orientation;
-  orientation.set_x(C_W_I.x);
-  orientation.set_y(C_W_I.y);
-  orientation.set_z(C_W_I.z);
-  orientation.set_w(C_W_I.w);
+  gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
+  orientation->set_x(C_W_I.x);
+  orientation->set_y(C_W_I.y);
+  orientation->set_z(C_W_I.z);
+  orientation->set_w(C_W_I.w);
 
   math::Vector3 velocity_current_W = link_->GetWorldLinearVel();
 
@@ -273,16 +273,16 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   addNoise(&linear_acceleration_I, &angular_velocity_I, dt);
 
   // Copy Eigen::Vector3d to gazebo::msgs::Vector3d
-  gazebo::msgs::Vector3d linear_acceleration;
-  linear_acceleration.set_x(linear_acceleration_I[0]);
-  linear_acceleration.set_y(linear_acceleration_I[1]);
-  linear_acceleration.set_z(linear_acceleration_I[2]);
+  gazebo::msgs::Vector3d* linear_acceleration = new gazebo::msgs::Vector3d();
+  linear_acceleration->set_x(linear_acceleration_I[0]);
+  linear_acceleration->set_y(linear_acceleration_I[1]);
+  linear_acceleration->set_z(linear_acceleration_I[2]);
 
   // Copy Eigen::Vector3d to gazebo::msgs::Vector3d
-  gazebo::msgs::Vector3d angular_velocity;
-  angular_velocity.set_x(angular_velocity_I[0]);
-  angular_velocity.set_y(angular_velocity_I[1]);
-  angular_velocity.set_z(angular_velocity_I[2]);
+  gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
+  angular_velocity->set_x(angular_velocity_I[0]);
+  angular_velocity->set_y(angular_velocity_I[1]);
+  angular_velocity->set_z(angular_velocity_I[2]);
 
   // Fill IMU message.
   // ADD HEaders
@@ -294,9 +294,10 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   // imu_message_.orientation.x = 0;
   // imu_message_.orientation.y = 0;
   // imu_message_.orientation.z = 0;
-  imu_message_.set_allocated_orientation(&orientation);
-  imu_message_.set_allocated_linear_acceleration(&linear_acceleration);
-  imu_message_.set_allocated_angular_velocity(&angular_velocity);
+  
+  imu_message_.set_allocated_orientation(orientation);
+  imu_message_.set_allocated_linear_acceleration(linear_acceleration);
+  imu_message_.set_allocated_angular_velocity(angular_velocity);
 
   imu_pub_->Publish(imu_message_);
 

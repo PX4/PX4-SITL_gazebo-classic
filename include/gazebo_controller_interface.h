@@ -54,8 +54,7 @@ class GazeboControllerInterface : public ModelPlugin {
         received_first_referenc_(false),
         namespace_(kDefaultNamespace),
         motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
-        command_motor_speed_sub_topic_(kDefaultCommandMotorSpeedSubTopic),
-        node_handle_(NULL){}
+        command_motor_speed_sub_topic_(kDefaultCommandMotorSpeedSubTopic) {}
   ~GazeboControllerInterface();
 
   void InitializeParams();
