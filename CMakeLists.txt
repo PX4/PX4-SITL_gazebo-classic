@@ -29,6 +29,7 @@ target_link_libraries(hello_world ${GAZEBO_LIBRARIES})
 
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES})
+add_dependencies(rotors_gazebo_controller_interface mav_msgs)
 
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 target_link_libraries(rotors_gazebo_motor_model mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES})
@@ -41,3 +42,7 @@ add_dependencies(rotors_gazebo_multirotor_base_plugin mav_msgs)
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 target_link_libraries(rotors_gazebo_imu_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES})
 add_dependencies(rotors_gazebo_imu_plugin mav_msgs)
+
+add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp)
+target_link_libraries(rotors_gazebo_mavlink_interface mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES})
+add_dependencies(rotors_gazebo_mavlink_interface mav_msgs)

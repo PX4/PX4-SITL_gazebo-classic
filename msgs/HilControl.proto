@@ -1,0 +1,17 @@
+syntax = "proto2";
+package mavlink.msgs;
+
+message HilControl
+{
+  required uint64 time_usec  		= 1;
+  required float roll_ailerons		= 2;
+  required float pitch_elevator		= 3;
+  required float yaw_rudder		= 4;
+  required float throttle		= 5;
+  optional float aux1			= 6;
+  optional float aux2			= 7;
+  optional float aux3			= 8;
+  optional float aux4			= 9;
+  required uint32 mode			= 10;
+  required uint32 nav_mode		= 11;
+}

@@ -1,0 +1,20 @@
+syntax = "proto2";
+package mavlink.msgs;
+
+message HilGps
+{
+  required uint64 time_usec  			= 1;
+  required int32 fix_type			= 2;
+  required int32 lat				= 3;
+  required int32 lon				= 4;
+  required int32 alt				= 5;
+  required uint32 eph				= 6;
+  required uint32 epv				= 7;
+  required uint32 vel				= 8;
+  required int32 vn				= 9;
+  required int32 ve				= 10;
+  required int32 vd				= 11;
+  required uint32 cog				= 12;
+  optional uint32 satellites_visible		= 13;
+}
+

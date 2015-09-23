@@ -1,0 +1,22 @@
+syntax = "proto2";
+package mavlink.msgs;
+
+message HilSensor
+{
+  required uint64 time_usec  		= 1;
+  required float xacc				= 2;
+  required float yacc				= 3;
+  required float zacc				= 4;
+  required float xgyro				= 5;
+  required float ygyro				= 6;
+  required float zgyro				= 7;
+  required float xmag				= 8;
+  required float ymag				= 9;
+  required float zmag				= 10;
+  required float abs_pressure		= 11;
+  required float diff_pressure		= 12;
+  optional float pressure_alt		= 13;
+  optional float temperature		= 14;		
+  required uint32 fields_updated	= 15;
+}
+
