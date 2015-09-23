@@ -8,6 +8,8 @@ foreach(ITR ${GAZEBO_INCLUDE_DIRS})
 endforeach()
 
 set (msgs
+  Imu.proto
+  Float.proto
   CommandAttitudeThrust.proto
   CommandMotorSpeed.proto
   CommandRateThrust.proto
@@ -15,6 +17,7 @@ set (msgs
   CommandTrajectory.proto
   CommandVelocityTrajectory.proto
   MotorSpeed.proto
+  ${PROTOBUF_IMPORT_DIRS}/quaternion.proto
   ${PROTOBUF_IMPORT_DIRS}/vector3d.proto
   ${PROTOBUF_IMPORT_DIRS}/vector2d.proto
   ${PROTOBUF_IMPORT_DIRS}/header.proto

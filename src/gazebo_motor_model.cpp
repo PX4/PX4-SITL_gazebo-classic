@@ -30,6 +30,8 @@ GazeboMotorModel::~GazeboMotorModel() {
 void GazeboMotorModel::InitializeParams() {}
 
 void GazeboMotorModel::Publish() {
+  turning_velocity_msg_.set_data(joint_->GetVelocity(0));
+  motor_velocity_pub_->Publish(turning_velocity_msg_);
 }
 
 void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -41,6 +43,8 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
     gzerr << "[gazebo_motor_model] Please specify a robotNamespace.\n";
+  node_handle_ = transport::NodePtr(new transport::Node());
+  node_handle_->Init(namespace_);
 
   if (_sdf->HasElement("jointName"))
     joint_name_ = _sdf->GetElement("jointName")->Get<std::string>();
@@ -93,6 +97,11 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   getSdfParam<double>(_sdf, "timeConstantDown", time_constant_down_, time_constant_down_);
   getSdfParam<double>(_sdf, "rotorVelocitySlowdownSim", rotor_velocity_slowdown_sim_, 10);
 
+  /*
+  std::cout << "Subscribing to: " << motor_test_sub_topic_ << std::endl;
+  motor_sub_ = node_handle_->Subscribe<mav_msgs::msgs::MotorSpeed>(motor_test_sub_topic_, &GazeboMotorModel::testProto, this);
+  */
+
   // Set the maximumForce on the joint. This is deprecated from V5 on, and the joint won't move.
 #if GAZEBO_MAJOR_VERSION < 5
   joint_->SetMaxForce(0, max_force_);
@@ -101,11 +110,24 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 
+  command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>(command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
+  motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>(motor_speed_pub_topic_);
+
   // Create the first order filter.
   rotor_velocity_filter_.reset(new FirstOrderFilter<double>(time_constant_up_, time_constant_down_, ref_motor_rot_vel_));
-  printf("Motor control\n");
-
 }
+
+// Protobuf test
+/*
+void GazeboMotorModel::testProto(MotorSpeedPtr &msg) {
+  std::cout << "Received message" << std::endl;
+  std::cout << msg->motor_speed_size()<< std::endl;
+  for(int i; i < msg->motor_speed_size(); i++){
+    std::cout << msg->motor_speed(i) <<" ";
+  }
+  std::cout << std::endl;
+}
+*/
 
 // This gets called by the world update start event.
 void GazeboMotorModel::OnUpdate(const common::UpdateInfo& _info) {
@@ -115,6 +137,12 @@ void GazeboMotorModel::OnUpdate(const common::UpdateInfo& _info) {
   Publish();
 }
 
+void GazeboMotorModel::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
+  if(rot_velocities->motor_speed_size() > motor_number_) {
+    std::cout  << "You tried to access index " << motor_number_
+      << " of the MotorSpeed message array which is of size " << rot_velocities->motor_speed_size() << "." << std::endl;
+  } else ref_motor_rot_vel_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), static_cast<double>(max_rot_velocity_));
+}
 
 void GazeboMotorModel::UpdateForcesAndMoments() {
   motor_rot_vel_ = joint_->GetVelocity(0);

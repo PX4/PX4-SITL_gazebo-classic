@@ -19,13 +19,25 @@
  */
 
 
+#include <boost/bind.hpp>
+#include <Eigen/Eigen>
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+#include "CommandMotorSpeed.pb.h"
+#include "MotorSpeed.pb.h"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/msgs/msgs.hh"
+
 #include <stdio.h>
 
+#include "common.h"
+
 namespace gazebo {
+
+typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
+typedef const boost::shared_ptr<const mav_msgs::msgs::MotorSpeed> MotorSpeedPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -38,19 +50,41 @@ static const std::string kDefaultCommandMotorSpeedSubTopic = "command/motor_spee
 class GazeboControllerInterface : public ModelPlugin {
  public:
   GazeboControllerInterface()
-      : ModelPlugin(){}
+      : ModelPlugin(),
+        received_first_referenc_(false),
+        namespace_(kDefaultNamespace),
+        motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
+        command_motor_speed_sub_topic_(kDefaultCommandMotorSpeedSubTopic),
+        node_handle_(NULL){}
   ~GazeboControllerInterface();
+
+  void InitializeParams();
+  void Publish();
 
  protected:
   void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   void OnUpdate(const common::UpdateInfo& /*_info*/);
 
  private:
-  /// \brief Pointer to the update event connection.
-  event::ConnectionPtr updateConnection_;
 
+  bool received_first_referenc_;
+  Eigen::VectorXd input_reference_;
+
+  std::string namespace_;
+  std::string motor_velocity_reference_pub_topic_;
+  std::string command_motor_speed_sub_topic_;
+
+  transport::NodePtr node_handle_;
+  transport::PublisherPtr motor_velocity_reference_pub_;
+  transport::SubscriberPtr cmd_motor_sub_;
 
   physics::ModelPtr model_;
   physics::WorldPtr world_;
+  /// \brief Pointer to the update event connection.
+  event::ConnectionPtr updateConnection_;
+
+  boost::thread callback_queue_thread_;
+  void QueueThread();
+  void CommandMotorCallback(CommandMotorSpeedPtr &input_reference_msg);
 };
 }

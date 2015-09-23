@@ -29,8 +29,15 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <rotors_model/motor_model.hpp>
+#include "CommandMotorSpeed.pb.h"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/transport/transport.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "MotorSpeed.pb.h"
+#include "Float.pb.h"
 
 #include "common.h"
+
 
 namespace turning_direction {
 const static int CCW = 1;
@@ -42,6 +49,14 @@ namespace gazebo {
 static const std::string kDefaultNamespace = "";
 static const std::string kDefaultCommandSubTopic = "gazebo/command/motor_speed";
 static const std::string kDefaultMotorVelocityPubTopic = "motor_speed";
+
+typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
+
+/*
+// Protobuf test
+typedef const boost::shared_ptr<const mav_msgs::msgs::MotorSpeed> MotorSpeedPtr;  
+static const std::string kDefaultMotorTestSubTopic = "motors";
+*/
 
 // Set the max_force_ to the max double value. The limitations get handled by the FirstOrderFilter.
 static constexpr double kDefaultMaxForce = std::numeric_limits<double>::max();
@@ -59,12 +74,15 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   GazeboMotorModel()
       : ModelPlugin(),
         MotorModel(),
+        command_sub_topic_(kDefaultCommandSubTopic),
+        motor_speed_pub_topic_(kDefaultMotorVelocityPubTopic),
         motor_number_(0),
         turning_direction_(turning_direction::CW),
         max_force_(kDefaultMaxForce),
         max_rot_velocity_(kDefaulMaxRotVelocity),
         moment_constant_(kDefaultMomentConstant),
         motor_constant_(kDefaultMotorConstant),
+        //motor_test_sub_topic_(kDefaultMotorTestSubTopic),
         ref_motor_rot_vel_(0.0),
         rolling_moment_coefficient_(kDefaultRollingMomentCoefficient),
         rotor_drag_coefficient_(kDefaultRotorDragCoefficient),
@@ -77,7 +95,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
 
   virtual void InitializeParams();
   virtual void Publish();
-
+  //void testProto(MotorSpeedPtr &msg);
  protected:
   virtual void UpdateForcesAndMoments();
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
@@ -104,6 +122,10 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   double time_constant_down_;
   double time_constant_up_;
 
+  transport::NodePtr node_handle_;
+  transport::PublisherPtr motor_velocity_pub_;
+  transport::SubscriberPtr command_sub_;
+
   physics::ModelPtr model_;
   physics::JointPtr joint_;
   physics::LinkPtr link_;
@@ -112,6 +134,13 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
 
   boost::thread callback_queue_thread_;
   void QueueThread();
+  std_msgs::msgs::Float turning_velocity_msg_;
+  void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
   std::unique_ptr<FirstOrderFilter<double>>  rotor_velocity_filter_;
+/*
+  // Protobuf test
+  std::string motor_test_sub_topic_;
+  transport::SubscriberPtr motor_sub_;
+*/
 };
 }

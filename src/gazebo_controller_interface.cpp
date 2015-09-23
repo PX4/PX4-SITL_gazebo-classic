@@ -33,16 +33,56 @@ void GazeboControllerInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _
 
   world_ = model_->GetWorld();
 
+  namespace_.clear();
+
+  if (_sdf->HasElement("robotNamespace"))
+    namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
+  else
+    gzerr << "[gazebo_motor_model] Please specify a robotNamespace.\n";
+
+  node_handle_ = transport::NodePtr(new transport::Node());
+  node_handle_->Init(namespace_);
+
+  getSdfParam<std::string>(_sdf, "commandMotorSpeedSubTopic", command_motor_speed_sub_topic_,
+                           command_motor_speed_sub_topic_);
+  getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
+                           motor_velocity_reference_pub_topic_);
+
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GazeboControllerInterface::OnUpdate, this, _1));
-  printf("Hello World!\n");
 
+  cmd_motor_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>(command_motor_speed_sub_topic_,
+                                           &GazeboControllerInterface::CommandMotorCallback,
+                                           this);
+
+  motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>(motor_velocity_reference_pub_topic_);
 }
 
 // This gets called by the world update start event.
 void GazeboControllerInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
+  if(!received_first_referenc_)
+    return;
+
   common::Time now = world_->GetSimTime();
+
+  mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
+
+  for (int i = 0; i < input_reference_.size(); i++)
+  turning_velocities_msg.add_motor_speed(input_reference_[i]);
+  // Add header timestamp etc
+
+  motor_velocity_reference_pub_->Publish(turning_velocities_msg);
+}
+
+void GazeboControllerInterface::CommandMotorCallback(CommandMotorSpeedPtr &input_reference_msg) {
+  input_reference_.resize(input_reference_msg->motor_speed_size());
+  for (int i = 0; i < input_reference_msg->motor_speed_size(); ++i) {
+    input_reference_[i] = input_reference_msg->motor_speed(i);
+  }
+  received_first_referenc_ = true;
 }
 
 
