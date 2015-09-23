@@ -21,6 +21,8 @@
 
 #include "gazebo_mavlink_interface.h"
 
+#define UDP_PORT 14560
+
 namespace gazebo {
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
@@ -69,6 +71,20 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E, D))
   mag_W_ = {0.21523, 0.00771, 0.42741};
+
+  //Create socket
+  // udp socket data
+  const int _port = UDP_PORT;
+
+  // try to setup udp socket for communcation with simulator
+  if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    printf("create socket failed\n");
+    return;
+  }
+
+  _srcaddr.sin_family = AF_INET;
+  _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  _srcaddr.sin_port = htons(UDP_PORT);
 
 }
 
@@ -162,6 +178,39 @@ void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg) {
   received_first_referenc_ = true;
 }
 
+void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID) {
+  component_ID = 0;
+  uint8_t payload_len = mavlink_message_lengths[msgid];
+  unsigned packet_len = payload_len + MAVLINK_NUM_NON_PAYLOAD_BYTES;
+
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+
+  /* header */
+  buf[0] = MAVLINK_STX;
+  buf[1] = payload_len;
+  /* no idea which numbers should be here*/
+  buf[2] = 100;
+  buf[3] = 0;
+  buf[4] = component_ID;
+  buf[5] = msgid;
+
+  /* payload */
+  memcpy(&buf[MAVLINK_NUM_HEADER_BYTES],msg, payload_len);
+
+  /* checksum */
+  uint16_t checksum;
+  crc_init(&checksum);
+  crc_accumulate_buffer(&checksum, (const char *) &buf[1], MAVLINK_CORE_HEADER_LEN + payload_len);
+  crc_accumulate(mavlink_message_crcs[msgid], &checksum);
+
+  buf[MAVLINK_NUM_HEADER_BYTES + payload_len] = (uint8_t)(checksum & 0xFF);
+  buf[MAVLINK_NUM_HEADER_BYTES + payload_len + 1] = (uint8_t)(checksum >> 8);
+
+  ssize_t len = sendto(_fd, buf, packet_len, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
+  if (len <= 0) {
+    printf("Failed sending mavlink message");
+  }
+}
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
@@ -195,6 +244,24 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   
   hil_sensor_pub_->Publish(hil_sensor_msg_);
 
+  mavlink_hil_sensor_t sensor_msg;
+
+  sensor_msg.xacc = imu_message->linear_acceleration().x();
+  sensor_msg.xacc = imu_message->linear_acceleration().y();
+  sensor_msg.xacc = imu_message->linear_acceleration().z();
+  sensor_msg.xgyro = imu_message->angular_velocity().x();
+  sensor_msg.xgyro = imu_message->angular_velocity().y();
+  sensor_msg.xgyro = imu_message->angular_velocity().z();
+  sensor_msg.xmag = mag_I.x;
+  sensor_msg.ymag = mag_I.y;
+  sensor_msg.zmag = mag_I.z;
+  sensor_msg.abs_pressure = 0.0;
+  sensor_msg.diff_pressure = 0.5*1.2754*body_vel.x*body_vel.x;
+  sensor_msg.temperature = 0.0;
+  sensor_msg.fields_updated = 4095;
+
+  send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);
+  
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
