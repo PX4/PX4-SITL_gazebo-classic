@@ -117,6 +117,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void HilControlCallback(HilControlPtr &rmsg);
   void ImuCallback(ImuPtr& imu_msg);
   void send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID);
+  void handle_message(mavlink_message_t *msg);
+  void pollForMAVLinkMessages();
 
   unsigned _rotor_count;
   struct {
@@ -144,6 +146,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   int _fd;
   struct sockaddr_in _srcaddr;
-
+  socklen_t _addrlen;
+  unsigned char _buf[200];
+  struct pollfd fds[1];
   };
 }
