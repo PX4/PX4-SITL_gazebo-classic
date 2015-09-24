@@ -277,7 +277,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
 {
   int len;
-  ::poll(&fds[0], (sizeof(fds[0])/sizeof(fds[0])), 100);
+  ::poll(&fds[0], (sizeof(fds[0])/sizeof(fds[0])), 0);
   if (fds[0].revents & POLLIN) {
     len = recvfrom(_fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_addrlen);
     if (len > 0) {
@@ -292,7 +292,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
-  }else std::cout <<" no data ";
+  }
 }
 
 void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
@@ -310,7 +310,6 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     inputs.control[6] =(double)controls.aux3;
     inputs.control[7] =(double)controls.aux4;
 
-    std::cout <<" got data "<< inputs.control[0];
     // publish message
     double scaling = 150;
     double offset = 600;
