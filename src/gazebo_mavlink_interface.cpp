@@ -257,11 +257,11 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   mavlink_hil_sensor_t sensor_msg;
 
   sensor_msg.xacc = imu_message->linear_acceleration().x();
-  sensor_msg.xacc = imu_message->linear_acceleration().y();
-  sensor_msg.xacc = imu_message->linear_acceleration().z();
+  sensor_msg.yacc = imu_message->linear_acceleration().y();
+  sensor_msg.zacc = imu_message->linear_acceleration().z();
   sensor_msg.xgyro = imu_message->angular_velocity().x();
-  sensor_msg.xgyro = imu_message->angular_velocity().y();
-  sensor_msg.xgyro = imu_message->angular_velocity().z();
+  sensor_msg.ygyro = imu_message->angular_velocity().y();
+  sensor_msg.zgyro = imu_message->angular_velocity().z();
   sensor_msg.xmag = mag_I.x;
   sensor_msg.ymag = mag_I.y;
   sensor_msg.zmag = mag_I.z;
