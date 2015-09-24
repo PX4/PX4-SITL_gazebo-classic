@@ -86,26 +86,33 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   _srcaddr.sin_port = htons(UDP_PORT);
 
+  _addrlen = sizeof(_srcaddr);
+
+  fds[0].fd = _fd;
+  fds[0].events = POLLIN;
 }
 
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
-  gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+
+  pollForMAVLinkMessages();
+
   if(!received_first_referenc_)
     return;
 
   common::Time now = world_->GetSimTime();
 
-  mav_msgs::msgs::CommandMotorSpeed* turning_velocities_msg = new mav_msgs::msgs::CommandMotorSpeed;
+  mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
-  for (int i = 0; i < input_reference_.size(); i++)
-  turning_velocities_msg->add_motor_speed(input_reference_[i]);
 
+  for (int i = 0; i < input_reference_.size(); i++){
+    turning_velocities_msg.add_motor_speed(input_reference_[i]);
+  }
   // TODO Add timestamp and Header
   // turning_velocities_msg->header.stamp.sec = now.sec;
   // turning_velocities_msg->header.stamp.nsec = now.nsec;
 
-  motor_velocity_reference_pub_->Publish(*turning_velocities_msg);
+  motor_velocity_reference_pub_->Publish(turning_velocities_msg);  // Giving strange "You tried to access index 0 of the MotorSpeed message array which is of size 4." error
 
   //send gps
   common::Time current_time  = now;
@@ -263,6 +270,59 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);
   
 }
+
+void GazeboMavlinkInterface::pollForMAVLinkMessages()
+{
+  int len;
+  ::poll(&fds[0], (sizeof(fds[0])/sizeof(fds[0])), 100);
+  if (fds[0].revents & POLLIN) {
+    len = recvfrom(_fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_addrlen);
+    if (len > 0) {
+      mavlink_message_t msg;
+      mavlink_status_t status;
+      for (int i = 0; i < len; ++i)
+      {
+        if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
+        {
+          // have a message, handle it
+          handle_message(&msg);
+        }
+      }
+    }
+  }else std::cout <<" no data ";
+}
+
+void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
+{
+  switch(msg->msgid) {
+  case MAVLINK_MSG_ID_HIL_CONTROLS:
+    mavlink_hil_controls_t controls;
+    mavlink_msg_hil_controls_decode(msg, &controls);
+    inputs.control[0] =(double)controls.roll_ailerons;
+    inputs.control[1] =(double)controls.pitch_elevator;
+    inputs.control[2] =(double)controls.yaw_rudder;
+    inputs.control[3] =(double)controls.throttle;
+    inputs.control[4] =(double)controls.aux1;
+    inputs.control[5] =(double)controls.aux2;
+    inputs.control[6] =(double)controls.aux3;
+    inputs.control[7] =(double)controls.aux4;
+
+    std::cout <<" got data "<< inputs.control[0];
+    // publish message
+    double scaling = 150;
+    double offset = 600;
+
+    input_reference_.resize(_rotor_count);
+
+    for (int i = 0; i < _rotor_count; i++) {
+      input_reference_[i] = inputs.control[i] * scaling + offset;
+    }
+
+    received_first_referenc_ = true;
+    break;
+  }
+}
+
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 }
