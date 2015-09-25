@@ -140,6 +140,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
   if(current_time - last_gps_time_ > gps_update){  // 5Hz
 
+    // Send via protobuf
     hil_gps_msg_.set_time_usec(current_time.nsec*1000);
     hil_gps_msg_.set_fix_type(3);
     hil_gps_msg_.set_lat((lat_zurich + (pos_W_I.x/earth_radius)*180/3.1416) * 10000000);
@@ -155,6 +156,24 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     hil_gps_msg_.set_satellites_visible(10);
            
     hil_gps_pub_->Publish(hil_gps_msg_);
+
+    // Raw UDP mavlink
+    mavlink_hil_gps_t hil_gps_msg;
+    hil_gps_msg.time_usec = current_time.nsec*1000;
+    hil_gps_msg.fix_type = 3;
+    hil_gps_msg.lat = (lat_zurich + (pos_W_I.x/earth_radius)*180/3.1416) * 10000000;
+    hil_gps_msg.lon = (long_zurich + (-pos_W_I.y/earth_radius)*180/3.1416) * 10000000;
+    hil_gps_msg.alt = pos_W_I.z * 1000;
+    hil_gps_msg.eph = 100;
+    hil_gps_msg.epv = 100;
+    hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
+    hil_gps_msg.vn = velocity_current_W.x * 100;
+    hil_gps_msg.ve = -velocity_current_W.y * 100;
+    hil_gps_msg.vd = -velocity_current_W.z * 100;
+    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+    hil_gps_msg.satellites_visible = 10;
+    send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
+
 
     last_gps_time_ = current_time;
   }
