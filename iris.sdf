@@ -419,14 +419,6 @@
       <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='controller_interface' filename='librotors_gazebo_controller_interface.so'>
-      <robotNamespace>iris</robotNamespace>
-      <commandAttitudeThrustSubTopic>command/attitude</commandAttitudeThrustSubTopic>
-      <commandRateThrustSubTopic>command/rate</commandRateThrustSubTopic>
-      <commandMotorSpeedSubTopic>command/motor_speed</commandMotorSpeedSubTopic>
-      <imuSubTopic>imu</imuSubTopic>
-      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
-    </plugin>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
       <robotNamespace>iris</robotNamespace>
       <linkName>iris/imu_link</linkName>
