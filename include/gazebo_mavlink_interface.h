@@ -73,6 +73,8 @@ static const std::string kDefaultImuTopic = "imu";
 static const std::string kDefaultMavlinkHilSensorPubTopic = "HilSensor";
 static const std::string kDefaultMavlinkHilGpsPubTopic = "HilGps";
 
+static bool use_mavlink_udp = true;
+
 class GazeboMavlinkInterface : public ModelPlugin {
  public:
   GazeboMavlinkInterface()
