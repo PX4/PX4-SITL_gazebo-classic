@@ -1,16 +1,53 @@
-# sitl_gazebo
+# Gazebo for PX4 SITL
+## Instructions for Users (Ubuntu 14.04)
+### Install Gazebo Simulator
+Follow instructions on the [official site] (http://gazebosim.org/tutorials?cat=install)
 
-Install gazebo.
+### Install Protobuf Compiler
+ Clone repository from [here](https://github.com/google/protobuf):
+ ```
+ git clone https://github.com/google/protobuf.git
+ ```
+Gazebo requires version 2.5.0 of protobuf, therefore you will have to checkout the correct version.
+In the top level of the protobuf repository type:
+```
+git checkout v2.5.0
+```
+After that follow the protobuf build instructions located in the README of the repository.
 
-Install protobuf compiler https://github.com/google/protobuf  (make sure its the same version that is used by your gazebo version. For mac, i think appropriate protobuf plugin comes packed with gazebo)
+#### Build Gazebo Pluggins
+Clone the gazebo pluggins repository to your computer:
+```
+git clone <url_to_repository>
+```
 
-Clone this repo, take the folders - materials, meshes and files - iris.sdf, model.config out of this repo and put in the .gazebo/models directory of your gazebo installation.
+From the cloned repository copy the folders **materials**, **meshes** and the files **iris.sdf***, **model.config** into the **.gazebo/models** directory of your gazebo installation. (Normally this folder is located in your home directory).
 
-Create a build directory then cmake ../ followed by make. Then, add current build directory to your gazebo plugin path.
+Create a build folder in the top level of your repository:
+```
+mkdir Build
+```
+Next add the location of this build directory to your gazebo plugin path, e.g. add the following line to your .bashrc file:
+```
+export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:~<path_to_your_repository>/Build
+```
 
-Running simulation with pixhawk posix sitl.
-	- Start sitl with make sitl_quad_gazebo
-	- Start gazebo with gazebo
-		- Insert iris model from insert tab. Thats it, if it installed correctly, they should begin communicating over raw UDP in mavlink. GCS is the same as with jmavsim sitl. 
+Navigate into the build directory and invoke CMake from it:
+```
+cd Build
+cmake ../
+```
 
-(Try attitude_estimator_ekf instead of attitude_estimator_q if iris seems to roll too much at takeoff)
+Now build the gazebo pluggins by typing:
+```
+make
+```
+
+If everything has gone well you can launch the PX4 SITL Simulation in a terminal. For instructions see section **Compile and Run the Simulated Autopilot** of the PX4 SITL instructions page [here.](https://pixhawk.org/dev/simulation/native_sitl)
+
+Once you have started the simulation you can launch gazebo in a terminal, type:
+```
+gazebo
+```
+
+Insert the IRIS model from the **insert** tab. This should trigger the communication with the PX4 SITL app.
