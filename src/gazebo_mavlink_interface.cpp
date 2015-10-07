@@ -70,7 +70,10 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E, D))
-  mag_W_ = {0.21523, 0.00771, 0.42741};
+  //mag_W_ = {, 0.00771, 0.42741};
+  mag_W_.x = 0.21523;
+  mag_W_.y = 0.00771;
+  mag_W_.z = 0.42741;
 
   //Create socket
   // udp socket data
