@@ -259,6 +259,10 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Vector3 mag_I = C_W_I.RotateVectorReverse(mag_W_); // TODO: Add noise based on bais and variance like for imu and gyro
   math::Vector3 body_vel = C_W_I.RotateVectorReverse(model_->GetWorldLinearVel());
   
+  standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
+
+  float mag_noise = standard_normal_distribution_(random_generator_);
+
   if(use_mavlink_udp){
     mavlink_hil_sensor_t sensor_msg;
     sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
@@ -268,9 +272,9 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     sensor_msg.xgyro = imu_message->angular_velocity().x();
     sensor_msg.ygyro = imu_message->angular_velocity().y();
     sensor_msg.zgyro = imu_message->angular_velocity().z();
-    sensor_msg.xmag = mag_I.x;
-    sensor_msg.ymag = mag_I.y;
-    sensor_msg.zmag = mag_I.z;
+    sensor_msg.xmag = mag_I.x + mag_noise;
+    sensor_msg.ymag = mag_I.y + mag_noise;
+    sensor_msg.zmag = mag_I.z + mag_noise;
     sensor_msg.abs_pressure = 0.0;
     sensor_msg.diff_pressure = 0.5*1.2754*body_vel.x*body_vel.x;
     sensor_msg.pressure_alt = pos_W_I.z;
