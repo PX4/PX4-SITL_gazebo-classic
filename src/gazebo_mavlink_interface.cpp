@@ -340,8 +340,8 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     inputs.control[7] =(double)controls.aux4;
 
     // publish message
-    double scaling = 150;
-    double offset = 600;
+    double scaling = 340;
+    double offset = 500;
 
     input_reference_.resize(_rotor_count);
 
