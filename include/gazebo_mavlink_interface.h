@@ -41,6 +41,7 @@
 #include <iostream>
 #include <math.h>
 #include <deque>
+#include <random>
 #include <sdf/sdf.hh>
 
 #include "mavlink/v1.0/common/mavlink.h"
