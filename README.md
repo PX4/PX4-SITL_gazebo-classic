@@ -2,44 +2,45 @@
 
 
 
-## Prerequisites for Ubuntu 14.04
+## Install Gazebo 6 Simulator
 
-### Install Gazebo Simulator
-Follow instructions on the [official site] (http://gazebosim.org/tutorials?cat=install)
+Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo version 6.
 
-### Install Protobuf Compiler
- Clone repository from [here](https://github.com/google/protobuf):
-```bash
-git clone https://github.com/google/protobuf.git
-```
 
-Gazebo requires version 2.5.0 of protobuf, therefore you will have to checkout the correct version.
-In the top level of the protobuf repository type:
+## Protobuf
+
+Install the protobuf library, which is used as interface to Gazebo.
+
+### Ubuntu Linux
 
 ```bash
-git checkout v2.5.0
+sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler
 ```
-After that follow the protobuf build instructions located in the README of the repository.
 
-## Prerequisites for Mac OS
+### Mac OS
 
 ```bash
-brew install gazebo
+brew install protobuf
 ```
 
-## Build Gazebo Pluggins
-Clone the gazebo pluggins repository to your computer:
+## Build Gazebo Plugins (all operating systems)
+
+Clone the gazebo plugins repository to your computer. IMPORTANT: If you do not clone to ~/src/sitl_gazebo, all remaining paths in these instructions will need to be adjusted.
+
 ```bash
-git clone <url_to_repository>
+mkdir -p ~/src
+cd src
+git clone https://github.com/PX4/sitl_gazebo.git
 ```
-
-From the cloned repository copy the folders **materials**, **meshes** and the files **iris.sdf***, **model.config** into the **.gazebo/models** directory of your gazebo installation. (Normally this folder is located in your home directory).
 
 Create a build folder in the top level of your repository:
+
 ```bash
 mkdir Build
 ```
-Next add the location of this build directory to your gazebo plugin path, e.g. add the following line to your .bashrc or .bash_profile (Mac) file:
+
+Next add the location of this build directory to your gazebo plugin path, e.g. add the following line to your .bashrc (Linux) or .bash_profile (Mac) file:
+
 
 ```bash
 # Set the plugin path so Gazebo finds our model and sim
@@ -51,21 +52,23 @@ export GAZEBO_MODEL_DATABASE_URI=""
 ```
 
 Navigate into the build directory and invoke CMake from it:
+
 ```bash
+cd ~/src/sitl_gazebo
 cd Build
-cmake ../
+cmake ..
 ```
 
-Now build the gazebo pluggins by typing:
+Now build the gazebo plugins by typing:
+
 ```bash
 make
 ```
 
-If everything has gone well you can launch the PX4 SITL Simulation in a terminal. For instructions see section **Compile and Run the Simulated Autopilot** of the PX4 SITL instructions page [here.](https://pixhawk.org/dev/simulation/native_sitl)
+Gazebo will now launch when typing 'gazebo' on the shell:
 
-Once you have started the simulation you can launch gazebo in a terminal, type:
 ```bash
 gazebo
 ```
 
-Insert the IRIS model from the **insert** tab. This should trigger the communication with the PX4 SITL app.
+Start the PX4 SITL executable as documented [in the PX4 SITL documentation](http://dev.px4.io/simulation-gazebo.html). Then insert the IRIS model from the **insert** tab. This should trigger the communication with the PX4 SITL app.
