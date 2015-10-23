@@ -51,6 +51,12 @@ export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$HOME/src/sitl_gazebo/models
 export GAZEBO_MODEL_DATABASE_URI=""
 ```
 
+You also need to add the the root location of this repository, e.g. add the following line to your .bashrc (Linux) or .bash_profile (Mac) file:
+```bash
+# Set path to sitl_gazebo repository
+export SITL_GAZEBO_PATH=$HOME/src/sitl_gazebo
+```
+
 Navigate into the build directory and invoke CMake from it:
 
 ```bash
