@@ -65,6 +65,11 @@ cd Build
 cmake ..
 ```
 
+Autogenerate the sdf file with the command
+```bash
+make sdf
+```
+
 Now build the gazebo plugins by typing:
 
 ```bash
