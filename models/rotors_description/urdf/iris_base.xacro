@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <robot name="iris" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
+  <xacro:include filename="$(arg rotors_description_dir)/urdf/component_snippets.xacro" />
   <!-- Instantiate iris "mechanics" -->
-  <xacro:include filename="$(find rotors_description)/urdf/iris.xacro" />
+  <xacro:include filename="$(arg rotors_description_dir)/urdf/iris.xacro" />
 
   <xacro:if value="$(arg enable_mavlink_interface)">
   <!-- Instantiate mavlink telemetry interface. -->
