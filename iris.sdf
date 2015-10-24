@@ -35,7 +35,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris/meshes/iris.dae</uri>
+            <uri>model://rotors_description/meshes/iris.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -118,7 +118,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://rotors_description/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -184,7 +184,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://rotors_description/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -250,7 +250,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris/meshes/iris_prop_cw.dae</uri>
+            <uri>model://rotors_description/meshes/iris_prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -316,7 +316,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris/meshes/iris_prop_cw.dae</uri>
+            <uri>model://rotors_description/meshes/iris_prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -419,6 +419,12 @@
       <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
+    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+      <robotNamespace>iris</robotNamespace>
+      <imuSubTopic>imu</imuSubTopic>
+      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+    </plugin>
+    <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
       <robotNamespace>iris</robotNamespace>
       <linkName>iris/imu_link</linkName>
@@ -432,11 +438,5 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
-      <robotNamespace>iris</robotNamespace>
-      <imuSubTopic>imu</imuSubTopic>
-      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
-    </plugin>
-    <static>0</static>
   </model>
 </sdf>

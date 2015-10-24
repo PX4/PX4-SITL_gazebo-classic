@@ -19,6 +19,17 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
   )
 
+set(URDF_DIR "${CMAKE_SOURCE_DIR}/rotors_description/urdf")
+set(enable_mavlink_interface "true")
+set(enable_ground_truth "false")
+set(enable_logging "false")
+add_custom_target(submodule_cleanly
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	COMMAND rm iris.sdf
+	COMMAND python xacro.py -o  ${URDF_DIR}/iris_base.urdf  ${URDF_DIR}/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging}
+	COMMAND gz sdf -p  ${URDF_DIR}/iris_base.urdf >> iris.sdf
+	)
+
 link_directories(${GAZEBO_LIBRARY_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/msgs)
 add_subdirectory(msgs)
 
