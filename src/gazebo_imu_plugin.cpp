@@ -262,9 +262,9 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
 #if GAZEBO_MAJOR_VERSION < 5
   math::Vector3 velocity_current_W = link_->GetWorldLinearVel();
-+  // link_->GetRelativeLinearAccel() does not work sometimes with old gazebo versions.
--  // TODO For an accurate simulation, this might have to be fixed. Consider the
-+  // This issue is solved in gazebo 5.
+  // link_->GetRelativeLinearAccel() does not work sometimes with old gazebo versions.
+  // TODO For an accurate simulation, this might have to be fixed. Consider the
+  // This issue is solved in gazebo 5.
   math::Vector3 acceleration = (velocity_current_W - velocity_prev_W_) / dt;
   math::Vector3 acceleration_I =
       C_W_I.RotateVectorReverse(acceleration - gravity_W_);
