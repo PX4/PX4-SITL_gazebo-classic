@@ -42,8 +42,8 @@ import xml
 
 from xml.dom.minidom import parse
 
-from roslaunch import substitution_args
-from rosgraph.names import load_mappings
+import substitution_args
+from names import load_mappings
 
 try:
     _basestr = basestring
