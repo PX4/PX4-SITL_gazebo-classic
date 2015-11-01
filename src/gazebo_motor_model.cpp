@@ -160,7 +160,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // - \omega * \lambda_1 * V_A^{\perp}
   math::Vector3 joint_axis = joint_->GetGlobalAxis(0);
   math::Vector3 body_velocity = link_->GetWorldLinearVel();
-  math::Vector3 body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
+  math::Vector3 body_velocity_perpendicular = body_velocity - (body_velocity.Dot(joint_axis) * joint_axis);
   math::Vector3 air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
   // Apply air_drag to link.
   link_->AddForce(air_drag);
@@ -177,11 +177,13 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   math::Vector3 rolling_moment;
   // - \omega * \mu_1 * V_A^{\perp}
   rolling_moment = -std::abs(real_motor_velocity) * rolling_moment_coefficient_ * body_velocity_perpendicular;
-  link_->AddRelativeTorque(rolling_moment);
+  parent_links.at(0)->AddTorque(rolling_moment);
   // Apply the filter on the motor's velocity.
-  ref_motor_rot_vel_ = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
-  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel_ / rotor_velocity_slowdown_sim_);
+  double ref_motor_rot_vel;
+  ref_motor_rot_vel = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
+  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);
 }
+
