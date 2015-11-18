@@ -360,7 +360,6 @@
         <pose>0 0.3 -0.3 0.00 0 0.0</pose>
       </inertial>
     </link>
-
     <link name="right_elevon">
       <inertial>
         <mass>0.00000001</mass>
@@ -375,7 +374,6 @@
         <pose>0 -0.3 -0.3 0.00 0 0.0</pose>
       </inertial>
     </link>
-
     <link name="elevator">
       <inertial>
         <mass>0.00000001</mass>
@@ -390,7 +388,6 @@
         <pose>0 0 -0.5 0.00 0 0.0</pose>
       </inertial>
     </link>
-
     <link name="rudder">
       <inertial>
         <mass>0.00000001</mass>
@@ -405,9 +402,6 @@
         <pose>0 0 -0.5 0.00 0 0.0</pose>
       </inertial>
     </link>
-
-
-
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>left_elevon</child>
@@ -429,7 +423,6 @@
         </ode>
       </physics>
     </joint>
-
     <joint name='right_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>right_elevon</child>
@@ -451,7 +444,6 @@
         </ode>
       </physics>
     </joint>
-
     <joint name='elevator_joint' type='revolute'>
       <parent>base_link</parent>
       <child>elevator</child>
@@ -473,7 +465,6 @@
         </ode>
       </physics>
     </joint>
-
     <joint name='rudder_joint' type='revolute'>
       <parent>base_link</parent>
       <child>rudder</child>
@@ -495,8 +486,6 @@
         </ode>
       </physics>
     </joint>
-
-
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>

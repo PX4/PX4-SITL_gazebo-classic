@@ -54,12 +54,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else {
     left_elevon_joint_ = NULL;
   }
-  //else
-  //  gzerr << "[gazebo_motor_model] Please specify a jointName, where the rotor is attached.\n";
-  // Get the pointer to the joint.
-  
-  //if (left_elevon_joint_ == NULL)
-  //  gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << left_elevon_joint_name_ << "\".");
 
   if (_sdf->HasElement("right_elevon_joint")) {
     right_elevon_joint_name_ = _sdf->GetElement("right_elevon_joint")->Get<std::string>();
@@ -67,12 +61,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else {
     right_elevon_joint_ = NULL;
   }
-  //else
-   // gzerr << "[gazebo_motor_model] Please specify a jointName, where the rotor is attached.\n";
-  // Get the pointer to the joint.
-  
-  //if (right_elevon_joint_ == NULL)
-  //  gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << right_elevon_joint_name_ << "\".");
 
   if (_sdf->HasElement("elevator_joint")) {
     elevator_joint_name_ = _sdf->GetElement("elevator_joint")->Get<std::string>();
@@ -80,13 +68,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else {
     elevator_joint_ = NULL;
   }
-
-  //else
-   // gzerr << "[gazebo_motor_model] Please specify a jointName, where the rotor is attached.\n";
-  // Get the pointer to the joint.
-  
-  //if (elevator_joint_ == NULL)
-   // gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << elevator_joint_name_ << "\".");
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
