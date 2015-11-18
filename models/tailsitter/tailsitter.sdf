@@ -346,8 +346,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
-      <link name="left_elevon">
+    <link name="left_elevon">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -358,11 +357,11 @@
           <iyz>0.0</iyz>
           <izz>0.000001</izz>
         </inertia>
-          <pose>0 0.3 -0.3 0.00 0 0.0</pose>
-        </inertial>
-      </link>
+        <pose>0 0.3 -0.3 0.00 0 0.0</pose>
+      </inertial>
+    </link>
 
-      <link name="right_elevon">
+    <link name="right_elevon">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -373,11 +372,11 @@
           <iyz>0.0</iyz>
           <izz>0.000001</izz>
         </inertia>
-          <pose>0 -0.3 -0.3 0.00 0 0.0</pose>
-        </inertial>
-      </link>
+        <pose>0 -0.3 -0.3 0.00 0 0.0</pose>
+      </inertial>
+    </link>
 
-      <link name="elevator">
+    <link name="elevator">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -388,11 +387,11 @@
           <iyz>0.0</iyz>
           <izz>0.000001</izz>
         </inertia>
-          <pose>0 0 -0.5 0.00 0 0.0</pose>
-        </inertial>
-      </link>
+        <pose>0 0 -0.5 0.00 0 0.0</pose>
+      </inertial>
+    </link>
 
-      <link name="rudder">
+    <link name="rudder">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -403,9 +402,9 @@
           <iyz>0.0</iyz>
           <izz>0.000001</izz>
         </inertia>
-          <pose>0 0 -0.5 0.00 0 0.0</pose>
-        </inertial>
-      </link>
+        <pose>0 0 -0.5 0.00 0 0.0</pose>
+      </inertial>
+    </link>
 
 
 
@@ -499,81 +498,80 @@
 
 
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
-        <a0>0.05984281113</a0>
-        <cla>4.752798721</cla>
-        <cda>0.6417112299</cda>
-        <cma>-1.8</cma>
-        <alpha_stall>0.3391428111</alpha_stall>
-        <cla_stall>-3.85</cla_stall>
-        <cda_stall>-0.9233984055</cda_stall>
-        <cma_stall>0</cma_stall>
-        <cp>0 0.3 -0.01</cp>
-        <area>0.15</area>
-        <air_density>1.2041</air_density>
-        <forward>0 0 1</forward>
-        <upward>-1 0 0</upward>
-        <link_name>base_link</link_name>
-        <control_joint_name>
-          left_elevon_joint
-        </control_joint_name>
-        <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <a0>0.05984281113</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 0.3 -0.01</cp>
+      <area>0.15</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        left_elevon_joint
+      </control_joint_name>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
-        <a0>0.05984281113</a0>
-        <cla>4.752798721</cla>
-        <cda>0.6417112299</cda>
-        <cma>-1.8</cma>
-        <alpha_stall>0.3391428111</alpha_stall>
-        <cla_stall>-3.85</cla_stall>
-        <cda_stall>-0.9233984055</cda_stall>
-        <cma_stall>0</cma_stall>
-        <cp>0 -0.3 -0.01</cp>
-        <area>0.15</area>
-        <air_density>1.2041</air_density>
-        <forward>0 0 1</forward>
-        <upward>-1 0 0</upward>
-        <link_name>base_link</link_name>
-        <control_joint_name>
-          right_elevon_joint
-        </control_joint_name>
-        <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <a0>0.05984281113</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 -0.3 -0.01</cp>
+      <area>0.15</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        right_elevon_joint
+      </control_joint_name>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
-        <a0>0.05984281113</a0>
-        <cla>4.752798721</cla>
-        <cda>0.6417112299</cda>
-        <cma>-1.8</cma>
-        <alpha_stall>0.3391428111</alpha_stall>
-        <cla_stall>-3.85</cla_stall>
-        <cda_stall>-0.9233984055</cda_stall>
-        <cma_stall>0</cma_stall>
-        <cp>0 0 -0.5</cp>
-        <area>0.005</area>
-        <air_density>1.2041</air_density>
-        <forward>0 0 1</forward>
-        <upward>-1 0 0</upward>
-        <link_name>base_link</link_name>
-        <control_joint_name>
-          elevator_joint
-        </control_joint_name>
+      <a0>0.05984281113</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 0 -0.5</cp>
+      <area>0.005</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        elevator_joint
+      </control_joint_name>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
-        <a0>0.0</a0>
-        <cla>4.752798721</cla>
-        <cda>0.6417112299</cda>
-        <cma>-1.8</cma>
-        <alpha_stall>0.3391428111</alpha_stall>
-        <cla_stall>-3.85</cla_stall>
-        <cda_stall>-0.9233984055</cda_stall>
-        <cma_stall>0</cma_stall>
-        <cp>-0.1 0 -0.5</cp>
-        <area>0.05</area>
-        <air_density>1.2041</air_density>
-        <forward>0 0 1</forward>
-        <upward>0 1 0</upward>
-        <link_name>base_link</link_name>
+      <a0>0.0</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>-0.1 0 -0.5</cp>
+      <area>0.05</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>0 1 0</upward>
+      <link_name>base_link</link_name>
     </plugin>
-
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
       <robotNamespace>tailsitter</robotNamespace>
       <linkName>base_link</linkName>

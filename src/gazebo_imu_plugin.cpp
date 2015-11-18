@@ -253,14 +253,27 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   orientation->set_z(C_W_I.z);
   orientation->set_w(C_W_I.w);
 
-  math::Vector3 velocity_current_W = link_->GetWorldLinearVel();
 
-  // link_->GetRelativeLinearAccel() does not work sometimes. Returns only 0.
+
+
+
+
+
+
+#if GAZEBO_MAJOR_VERSION < 5
+  math::Vector3 velocity_current_W = link_->GetWorldLinearVel();
+  // link_->GetRelativeLinearAccel() does not work sometimes with old gazebo versions.
   // TODO For an accurate simulation, this might have to be fixed. Consider the
-  //      time delay introduced by this numerical derivative, for example.
+  // This issue is solved in gazebo 5.
   math::Vector3 acceleration = (velocity_current_W - velocity_prev_W_) / dt;
   math::Vector3 acceleration_I =
       C_W_I.RotateVectorReverse(acceleration - gravity_W_);
+
+  velocity_prev_W_ = velocity_current_W;
+#else
+  math::Vector3 acceleration_I = link_->GetRelativeLinearAccel() - C_W_I.RotateVectorReverse(gravity_W_);
+#endif
+
   math::Vector3 angular_vel_I = link_->GetRelativeAngularVel();
 
   Eigen::Vector3d linear_acceleration_I(acceleration_I.x,
@@ -300,8 +313,6 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   imu_message_.set_allocated_angular_velocity(angular_velocity);
 
   imu_pub_->Publish(imu_message_);
-
-  velocity_prev_W_ = velocity_current_W;
 }
 
 

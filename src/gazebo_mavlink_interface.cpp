@@ -172,9 +172,25 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   velocity_current_W_xy.z = 0.0;
 
   // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
-  float lat_zurich = 47.3667;  // deg
-  float long_zurich = 8.5500;  // deg
+  double lat_zurich = 47.3667 * M_PI / 180 ;  // rad
+  double lon_zurich = 8.5500 * M_PI / 180;  // rad
   float earth_radius = 6353000;  // m
+
+  // reproject local position to gps coordinates
+  double x_rad = pos_W_I.x / earth_radius;
+  double y_rad = -pos_W_I.y / earth_radius;
+  double c = sqrt(x_rad * x_rad + y_rad * y_rad);
+  double sin_c = sin(c);
+  double cos_c = cos(c);
+  double lat_rad;
+  double lon_rad;
+  if (c != 0.0) {
+    lat_rad = asin(cos_c * sin(lat_zurich) + (x_rad * sin_c * cos(lat_zurich)) / c);
+    lon_rad = (lon_zurich + atan2(y_rad * sin_c, c * cos(lat_zurich) * cos_c - x_rad * sin(lat_zurich) * sin_c));
+  } else {
+   lat_rad = lat_zurich;
+    lon_rad = lon_zurich;
+  }
   
   common::Time gps_update(gps_update_interval_);
 
@@ -185,8 +201,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       mavlink_hil_gps_t hil_gps_msg;
       hil_gps_msg.time_usec = current_time.nsec*1000;
       hil_gps_msg.fix_type = 3;
-      hil_gps_msg.lat = (lat_zurich + (pos_W_I.x/earth_radius)*180/3.1416) * 10000000;
-      hil_gps_msg.lon = (long_zurich + (-pos_W_I.y/earth_radius)*180/3.1416) * 10000000;
+      hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
+      hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
       hil_gps_msg.alt = pos_W_I.z * 1000;
       hil_gps_msg.eph = 100;
       hil_gps_msg.epv = 100;
@@ -202,8 +218,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       // Send via protobuf
       hil_gps_msg_.set_time_usec(current_time.nsec*1000);
       hil_gps_msg_.set_fix_type(3);
-      hil_gps_msg_.set_lat((lat_zurich + (pos_W_I.x/earth_radius)*180/3.1416) * 10000000);
-      hil_gps_msg_.set_lon((long_zurich + (-pos_W_I.y/earth_radius)*180/3.1416) * 10000000);
+      hil_gps_msg_.set_lat(lat_rad * 180 / M_PI * 1e7);
+      hil_gps_msg_.set_lon(lon_rad * 180 / M_PI * 1e7);
       hil_gps_msg_.set_alt(pos_W_I.z * 1000);
       hil_gps_msg_.set_eph(100);
       hil_gps_msg_.set_epv(100);
