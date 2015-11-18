@@ -111,6 +111,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   physics::ModelPtr model_;
   physics::WorldPtr world_;
+  physics::JointPtr left_elevon_joint_;
+  physics::JointPtr right_elevon_joint_;
+  physics::JointPtr elevator_joint_;
 
   /// \brief Pointer to the update event connection.
   event::ConnectionPtr updateConnection_;
@@ -135,6 +138,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string hil_sensor_mavlink_pub_topic_;
   std::string hil_gps_mavlink_pub_topic_;
   std::string imu_sub_topic_;
+  std::string left_elevon_joint_name_;
+  std::string right_elevon_joint_name_;
+  std::string elevator_joint_name_;
   
   common::Time last_time_;
   common::Time last_gps_time_;

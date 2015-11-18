@@ -48,6 +48,27 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
                            motor_velocity_reference_pub_topic_);
 
+  if (_sdf->HasElement("left_elevon_joint")) {
+    left_elevon_joint_name_ = _sdf->GetElement("left_elevon_joint")->Get<std::string>();
+    left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name_);
+  } else {
+    left_elevon_joint_ = NULL;
+  }
+
+  if (_sdf->HasElement("right_elevon_joint")) {
+    right_elevon_joint_name_ = _sdf->GetElement("right_elevon_joint")->Get<std::string>();
+    right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name_);
+  } else {
+    right_elevon_joint_ = NULL;
+  }
+
+  if (_sdf->HasElement("elevator_joint")) {
+    elevator_joint_name_ = _sdf->GetElement("elevator_joint")->Get<std::string>();
+    elevator_joint_ = model_->GetJoint(elevator_joint_name_);
+  } else {
+    elevator_joint_ = NULL;
+  }
+
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
@@ -363,6 +384,15 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 
     for (int i = 0; i < _rotor_count; i++) {
       input_reference_[i] = inputs.control[i] * scaling + offset;
+    }
+
+    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
+      // set angles of control surface joints (this should go into a message for the correct plugin)
+      double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
+      double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
+      left_elevon_joint_->SetAngle(0, roll);
+      right_elevon_joint_->SetAngle(0, -roll);
+      elevator_joint_->SetAngle(0, -pitch);
     }
 
     received_first_referenc_ = true;

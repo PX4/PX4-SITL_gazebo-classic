@@ -151,16 +151,23 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   }
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
   double force = real_motor_velocity * real_motor_velocity * motor_constant_;
+
+  // scale down force linearly with forward speed
+  // XXX this has to be modelled better
+  math::Vector3 body_velocity = link_->GetWorldLinearVel();
+  double vel = body_velocity.GetLength();
+  double scalar = 1 - vel / 50.0; // at 50 m/s the rotor will not produce any force anymore
+  scalar = math::clamp(scalar, 0.0, 1.0);
   // Apply a force to the link.
-  link_->AddRelativeForce(math::Vector3(0, 0, force));
+  link_->AddRelativeForce(math::Vector3(0, 0, force * scalar));
 
   // Forces from Philppe Martin's and Erwan Salaün's
   // 2010 IEEE Conference on Robotics and Automation paper
   // The True Role of Accelerometer Feedback in Quadrotor Control
   // - \omega * \lambda_1 * V_A^{\perp}
   math::Vector3 joint_axis = joint_->GetGlobalAxis(0);
-  math::Vector3 body_velocity = link_->GetWorldLinearVel();
-  math::Vector3 body_velocity_perpendicular = body_velocity - (body_velocity.Dot(joint_axis) * joint_axis);
+  //math::Vector3 body_velocity = link_->GetWorldLinearVel();
+  math::Vector3 body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
   math::Vector3 air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
   // Apply air_drag to link.
   link_->AddForce(air_drag);

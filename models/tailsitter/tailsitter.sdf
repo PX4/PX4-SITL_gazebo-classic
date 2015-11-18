@@ -11,7 +11,7 @@
           <ixz>0</ixz>
           <iyy>0.0458929</iyy>
           <iyz>0</iyz>
-          <izz>0.0977</izz>
+          <izz>0.1977</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
@@ -346,6 +346,221 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+    <link name="left_elevon">
+      <inertial>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+        <pose>0 0.3 -0.3 0.00 0 0.0</pose>
+      </inertial>
+    </link>
+    <link name="right_elevon">
+      <inertial>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+        <pose>0 -0.3 -0.3 0.00 0 0.0</pose>
+      </inertial>
+    </link>
+    <link name="elevator">
+      <inertial>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+        <pose>0 0 -0.5 0.00 0 0.0</pose>
+      </inertial>
+    </link>
+    <link name="rudder">
+      <inertial>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+        <pose>0 0 -0.5 0.00 0 0.0</pose>
+      </inertial>
+    </link>
+    <joint name='left_elevon_joint' type='revolute'>
+      <parent>base_link</parent>
+      <child>left_elevon</child>
+      <pose>0 0.3 -0.25 0.00 0 0.0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='right_elevon_joint' type='revolute'>
+      <parent>base_link</parent>
+      <child>right_elevon</child>
+      <pose>0 -0.3 -0.25 0.00 0 0.0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='elevator_joint' type='revolute'>
+      <parent>base_link</parent>
+      <child>elevator</child>
+      <pose>0 0 -0.5 0.00 0 0.0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='rudder_joint' type='revolute'>
+      <parent>base_link</parent>
+      <child>rudder</child>
+      <pose>0 0 -0.5 0.00 0 0.0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.01</lower>
+          <upper>0.01</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+      <a0>0.05984281113</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 0.3 -0.01</cp>
+      <area>0.15</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        left_elevon_joint
+      </control_joint_name>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+    </plugin>
+    <plugin name="right_wing" filename="libLiftDragPlugin.so">
+      <a0>0.05984281113</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 -0.3 -0.01</cp>
+      <area>0.15</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        right_elevon_joint
+      </control_joint_name>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+    </plugin>
+    <plugin name="elevator" filename="libLiftDragPlugin.so">
+      <a0>0.05984281113</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 0 -0.5</cp>
+      <area>0.005</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        elevator_joint
+      </control_joint_name>
+    </plugin>
+    <plugin name="rudder" filename="libLiftDragPlugin.so">
+      <a0>0.0</a0>
+      <cla>4.752798721</cla>
+      <cda>0.6417112299</cda>
+      <cma>-1.8</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>-0.1 0 -0.5</cp>
+      <area>0.05</area>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>0 1 0</upward>
+      <link_name>base_link</link_name>
+    </plugin>
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
       <robotNamespace>tailsitter</robotNamespace>
       <linkName>base_link</linkName>
@@ -436,6 +651,15 @@
       <robotNamespace>tailsitter</robotNamespace>
       <imuSubTopic>imu</imuSubTopic>
       <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <left_elevon_joint>
+        left_elevon_joint
+      </left_elevon_joint>
+      <right_elevon_joint>
+        right_elevon_joint
+      </right_elevon_joint>
+      <elevator_joint>
+        elevator_joint
+      </elevator_joint>
     </plugin>
     <static>0</static>
   </model>
