@@ -157,9 +157,10 @@ class GazeboMavlinkInterface : public ModelPlugin {
   mavlink::msgs::HilGps hil_gps_msg_;
 
   int _fd;
+  struct sockaddr_in _myaddr;
   struct sockaddr_in _srcaddr;
   socklen_t _addrlen;
-  unsigned char _buf[200];
+  unsigned char _buf[5000];
   struct pollfd fds[1];
   };
 }
