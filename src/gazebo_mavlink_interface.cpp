@@ -115,7 +115,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   memset((char *)&_myaddr, 0, sizeof(_myaddr));
   _myaddr.sin_family = AF_INET;
   _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  _myaddr.sin_port = htons(UDP_PORT);
+  _myaddr.sin_port = htons(0);
 
   if (bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
     printf("bind failed\n");
