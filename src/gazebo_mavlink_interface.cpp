@@ -112,13 +112,22 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   _addrlen = sizeof(_srcaddr);
 
+  memset((char *)&_myaddr, 0, sizeof(_myaddr));
+  _myaddr.sin_family = AF_INET;
+  _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  _myaddr.sin_port = htons(UDP_PORT);
+
+  if (bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
+    printf("bind failed\n");
+    return;
+  }
+
   fds[0].fd = _fd;
   fds[0].events = POLLIN;
 }
 
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
-
   pollForMAVLinkMessages();
 
   if(!received_first_referenc_)
