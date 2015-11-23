@@ -1,19 +1,24 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
-find_package( PkgConfig )
+find_package( PkgConfig REQUIRED)
 pkg_check_modules( EIGEN3 REQUIRED eigen3 )
 
-find_package(gazebo REQUIRED)
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(GAZEBO gazebo)
-  pkg_check_modules(SDF sdformat)
-endif()
+pkg_check_modules(GAZEBO REQUIRED gazebo>=6.0)
+pkg_check_modules(SDF sdformat)
 add_definitions(-std=c++11)
+
+set(GAZEBO_MSG_INCLUDE_DIRS)
+foreach(ITR ${GAZEBO_INCLUDE_DIRS})
+  if(ITR MATCHES ".*gazebo-[0-9.]+$")
+    set(GAZEBO_MSG_INCLUDE_DIRS "${ITR}/gazebo/msgs")
+  endif()
+endforeach()
 
 include_directories(
   include
   ${GAZEBO_INCLUDE_DIRS}
+  ${GAZEBO_MSG_INCLUDE_DIRS}
   ${SDF_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
