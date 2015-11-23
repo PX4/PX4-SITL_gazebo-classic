@@ -28,11 +28,11 @@
 #include "MotorSpeed.pb.h"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "Imu.pb.h"
 #include <stdio.h>
 
 #include "common.h"
 
+#include "SensorImu.pb.h"
 #include "HilControl.pb.h"
 #include "HilSensor.pb.h"
 #include "HilGps.pb.h"

@@ -21,18 +21,18 @@
 #include <random>
 
 #include <Eigen/Core>
+#include "SensorImu.pb.h"
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "Imu.pb.h" 
 
 #include "common.h"
 
 namespace gazebo {
-typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
+//typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 
 // Default values for use with ADIS16448 IMU
 static constexpr double kDefaultAdisGyroscopeNoiseDensity =
