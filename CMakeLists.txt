@@ -38,26 +38,26 @@ add_subdirectory(msgs)
 
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-add_library(hello_world MODULE src/hello_world.cc)
+add_library(hello_world SHARED src/hello_world.cc)
 target_link_libraries(hello_world ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 
-add_library(rotors_gazebo_controller_interface MODULE src/gazebo_controller_interface.cpp)
+add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} mav_msgs)
 add_dependencies(rotors_gazebo_controller_interface mav_msgs)
 
-add_library(rotors_gazebo_motor_model MODULE src/gazebo_motor_model.cpp)
+add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 target_link_libraries(rotors_gazebo_motor_model mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 add_dependencies(rotors_gazebo_motor_model mav_msgs)
 
-add_library(rotors_gazebo_multirotor_base_plugin MODULE src/gazebo_multirotor_base_plugin.cpp)
+add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 target_link_libraries(rotors_gazebo_multirotor_base_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 add_dependencies(rotors_gazebo_multirotor_base_plugin mav_msgs)
 
-add_library(rotors_gazebo_imu_plugin MODULE src/gazebo_imu_plugin.cpp)
+add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 target_link_libraries(rotors_gazebo_imu_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 add_dependencies(rotors_gazebo_imu_plugin mav_msgs)
 
-add_library(rotors_gazebo_mavlink_interface MODULE src/gazebo_mavlink_interface.cpp)
+add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp)
 target_link_libraries(rotors_gazebo_mavlink_interface mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 add_dependencies(rotors_gazebo_mavlink_interface mav_msgs)
 
