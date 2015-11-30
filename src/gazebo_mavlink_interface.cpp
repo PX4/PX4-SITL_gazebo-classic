@@ -36,7 +36,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   world_ = model_->GetWorld();
 
   namespace_.clear();
-
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
@@ -51,12 +50,18 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   if (_sdf->HasElement("left_elevon_joint")) {
     left_elevon_joint_name_ = _sdf->GetElement("left_elevon_joint")->Get<std::string>();
     left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name_);
+  } else if (_sdf->HasElement("left_aileron_joint")) {
+    left_elevon_joint_name_ = _sdf->GetElement("left_aileron_joint")->Get<std::string>();
+    left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name_);
   } else {
     left_elevon_joint_ = NULL;
   }
 
   if (_sdf->HasElement("right_elevon_joint")) {
     right_elevon_joint_name_ = _sdf->GetElement("right_elevon_joint")->Get<std::string>();
+    right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name_);
+  } else if (_sdf->HasElement("right_aileron_joint")) {
+    right_elevon_joint_name_ = _sdf->GetElement("right_aileron_joint")->Get<std::string>();
     right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name_);
   } else {
     right_elevon_joint_ = NULL;
@@ -68,6 +73,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else {
     elevator_joint_ = NULL;
   }
+
+  if (_sdf->HasElement("propeller_joint")) {
+    propeller_joint_name_ = _sdf->GetElement("propeller_joint")->Get<std::string>();
+    propeller_joint_ = model_->GetJoint(propeller_joint_name_);
+  } else {
+    propeller_joint_ = NULL;
+  }
+
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -389,19 +402,32 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     double scaling = 340;
     double offset = 500;
 
+    // simple check to see if we are simulating fw or mc
+    // we really need to get away from this HIL message
+    bool is_fixed_wing = inputs.control[0] < 10.0f;
+
     input_reference_.resize(_rotor_count);
 
-    for (int i = 0; i < _rotor_count; i++) {
-      input_reference_[i] = inputs.control[i] * scaling + offset;
-    }
+    // at the moment vtol and multirotor are handled togehter
+    // pure fixed wing is handled differently
+    if (!is_fixed_wing) {
+      for (int i = 0; i < _rotor_count; i++) {
+        input_reference_[i] = inputs.control[i] * scaling + offset;
+      }
 
-    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
-      // set angles of control surface joints (this should go into a message for the correct plugin)
-      double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
-      double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
-      left_elevon_joint_->SetAngle(0, roll);
-      right_elevon_joint_->SetAngle(0, -roll);
-      elevator_joint_->SetAngle(0, -pitch);
+      if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
+        // set angles of control surface joints (this should go into a message for the correct plugin)
+        double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
+        double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
+        left_elevon_joint_->SetAngle(0, roll);
+        right_elevon_joint_->SetAngle(0, -roll);
+        elevator_joint_->SetAngle(0, -pitch);
+      }
+    } else {
+      left_elevon_joint_->SetAngle(0, inputs.control[0]);
+      right_elevon_joint_->SetAngle(0, -inputs.control[0]);
+      elevator_joint_->SetAngle(0, inputs.control[1]);
+      propeller_joint_->SetForce(0, 2000.0f * inputs.control[3]);
     }
 
     received_first_referenc_ = true;
