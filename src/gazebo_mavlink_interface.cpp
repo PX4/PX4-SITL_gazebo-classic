@@ -36,7 +36,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   world_ = model_->GetWorld();
 
   namespace_.clear();
-
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
@@ -405,7 +404,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 
     // simple check to see if we are simulating fw or mc
     // we really need to get away from this HIL message
-    bool is_fixed_wing = inputs.control[0] > 10.0f;
+    bool is_fixed_wing = inputs.control[0] < 10.0f;
 
     input_reference_.resize(_rotor_count);
 
@@ -428,7 +427,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       left_elevon_joint_->SetAngle(0, inputs.control[0]);
       right_elevon_joint_->SetAngle(0, -inputs.control[0]);
       elevator_joint_->SetAngle(0, inputs.control[1]);
-      propeller_joint->SetForce(0, 2000.0f * inputs.control[2]);
+      propeller_joint_->SetForce(0, 2000.0f * inputs.control[3]);
     }
 
     received_first_referenc_ = true;

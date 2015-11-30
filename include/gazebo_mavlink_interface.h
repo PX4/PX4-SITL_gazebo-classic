@@ -142,7 +142,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string left_elevon_joint_name_;
   std::string right_elevon_joint_name_;
   std::string elevator_joint_name_;
-  std::strinn propeller_joint_name_;
+  std::string propeller_joint_name_;
   
   common::Time last_time_;
   common::Time last_gps_time_;

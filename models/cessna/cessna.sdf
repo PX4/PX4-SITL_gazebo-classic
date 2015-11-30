@@ -666,6 +666,26 @@
       </physics>
     </joint>
 
+   <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+      <robotNamespace>cessna</robotNamespace>
+      <imuSubTopic>imu</imuSubTopic>
+      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+    </plugin>
+    <static>0</static>
+    <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
+      <robotNamespace>cessna</robotNamespace>
+      <linkName>body</linkName>
+      <imuTopic>imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+
   </model>
 </sdf>
 
