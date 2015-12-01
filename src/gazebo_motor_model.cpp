@@ -111,7 +111,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>(command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
-  motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>(motor_speed_pub_topic_, 1);
+  motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>(motor_speed_pub_topic_);
 
   // Create the first order filter.
   rotor_velocity_filter_.reset(new FirstOrderFilter<double>(time_constant_up_, time_constant_down_, ref_motor_rot_vel_));
