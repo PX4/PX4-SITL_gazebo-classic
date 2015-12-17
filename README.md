@@ -14,13 +14,13 @@ Install the protobuf library, which is used as interface to Gazebo.
 ### Ubuntu Linux
 
 ```bash
-sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler
+sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler eigen3
 ```
 
 ### Mac OS
 
 ```bash
-brew install protobuf
+brew install protobuf eigen
 ```
 
 ## Build Gazebo Plugins (all operating systems)
