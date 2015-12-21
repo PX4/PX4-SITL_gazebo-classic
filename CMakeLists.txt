@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
 find_package( PkgConfig REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(gazebo REQUIRED)
 pkg_check_modules( EIGEN3 REQUIRED eigen3 )
 
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
@@ -21,6 +23,7 @@ include_directories(
   ${GAZEBO_MSG_INCLUDE_DIRS}
   ${SDF_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
   )
 
@@ -61,6 +64,14 @@ add_dependencies(rotors_gazebo_multirotor_base_plugin mav_msgs)
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 target_link_libraries(rotors_gazebo_imu_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 add_dependencies(rotors_gazebo_imu_plugin mav_msgs)
+
+add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
+target_link_libraries(gazebo_opticalFlow_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${OpenCV_LIBS})
+add_dependencies(gazebo_opticalFlow_plugin mav_msgs)
+
+add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
+target_link_libraries(gazebo_lidar_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+add_dependencies(gazebo_lidar_plugin mav_msgs)
 
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp)
 target_link_libraries(rotors_gazebo_mavlink_interface mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${SDF_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
