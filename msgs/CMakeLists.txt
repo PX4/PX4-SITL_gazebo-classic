@@ -19,6 +19,8 @@ set (msgs
   HilControl.proto
   SensorImu.proto
   Float.proto
+  opticalFlow.proto
+  lidar.proto
   CommandAttitudeThrust.proto
   CommandMotorSpeed.proto
   CommandRateThrust.proto
