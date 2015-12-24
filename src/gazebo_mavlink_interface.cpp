@@ -20,6 +20,7 @@
 
 
 #include "gazebo_mavlink_interface.h"
+#include "geo_mag_declination.h"
 
 #define UDP_PORT 14560
 #define UDP_PORT_2 14556
@@ -197,8 +198,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);
-  double lat_rad;
-  double lon_rad;
   if (c != 0.0) {
     lat_rad = asin(cos_c * sin(lat_zurich) + (x_rad * sin_c * cos(lat_zurich)) / c);
     lon_rad = (lon_zurich + atan2(y_rad * sin_c, c * cos(lat_zurich) * cos_c - x_rad * sin(lat_zurich) * sin_c));
@@ -332,6 +331,14 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   C_W_I.x = imu_message->orientation().x();
   C_W_I.y = imu_message->orientation().y();
   C_W_I.z = imu_message->orientation().z();
+
+  float declination = get_mag_declination(lat_rad, lon_rad);
+
+  math::Quaternion C_D_I(0.0, 0.0, declination);
+
+  math::Vector3 mag_decl = C_D_I.RotateVectorReverse(mag_W_);
+
+  // TODO replace mag_W_ in the line below with mag_decl
 
   math::Vector3 mag_I = C_W_I.RotateVectorReverse(mag_W_); // TODO: Add noise based on bais and variance like for imu and gyro
   math::Vector3 body_vel = C_W_I.RotateVectorReverse(model_->GetWorldLinearVel());
