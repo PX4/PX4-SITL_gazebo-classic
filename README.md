@@ -2,9 +2,9 @@
 
 
 
-## Install Gazebo 6 Simulator
+## Install Gazebo Simulator
 
-Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo version 6.
+Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS users should install Gazebo 7, Linux users Gazebo 6. Failing to install the right version can render the simulation inoperational.
 
 
 ## Protobuf
@@ -20,7 +20,8 @@ sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-d
 ### Mac OS
 
 ```bash
-brew install protobuf eigen
+brew install graphviz sdformat3 protobuf eigen
+brew install gazebo7
 ```
 
 ## Build Gazebo Plugins (all operating systems)
