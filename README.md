@@ -20,7 +20,7 @@ sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-d
 ### Mac OS
 
 ```bash
-brew install graphviz sdformat3 protobuf eigen
+brew install graphviz sdformat3 protobuf eigen opencv
 brew install gazebo7
 ```
 
