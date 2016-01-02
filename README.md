@@ -1,6 +1,8 @@
-# Gazebo for PX4 SITL
+# Gazebo for MAVLink SITL
 
 This is a flight simulator for multirotors, VTOL and fixed wing.
+
+NOTE: This repository is in the process of being re-integrated into RotorS: https://github.com/ethz-asl/rotors_simulator
 
 ## Install Gazebo Simulator
 
@@ -83,4 +85,4 @@ Gazebo will now launch when typing 'gazebo' on the shell:
 gazebo
 ```
 
-Start the PX4 SITL executable as documented [in the PX4 SITL documentation](http://dev.px4.io/simulation-gazebo.html). Then insert the IRIS model from the **insert** tab. This should trigger the communication with the PX4 SITL app.
+Please refer to the documentation of the particular flight stack how to run it against this framework.
