@@ -6,7 +6,7 @@ NOTE: This repository is in the process of being re-integrated into RotorS: http
 
 ## Install Gazebo Simulator
 
-Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS users should install Gazebo 7, Linux users Gazebo 6. Failing to install the right version can render the simulation inoperational.
+Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS users should install Gazebo 7, Linux users PGazebo 6. Failing to install the right version can render the simulation inoperational.
 
 
 ## Protobuf
@@ -33,7 +33,7 @@ Clone the gazebo plugins repository to your computer. IMPORTANT: If you do not c
 ```bash
 mkdir -p ~/src
 cd src
-git clone https://github.com/PX4/sitl_gazebo.git
+git clone https://github.com/Dronecode/sitl_gazebo.git
 ```
 
 Create a build folder in the top level of your repository:
