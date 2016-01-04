@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
 find_package( PkgConfig REQUIRED)
 pkg_check_modules( EIGEN3 REQUIRED eigen3 )
+pkg_check_modules( protobuf REQUIRED protobuf )
 
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
 pkg_check_modules(GAZEBO REQUIRED gazebo>=6.0)
@@ -47,7 +48,7 @@ add_library(hello_world SHARED src/hello_world.cc)
 target_link_libraries(hello_world ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
-target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} mav_msgs)
+target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${PROTOBUF_LIBRARY} mav_msgs)
 add_dependencies(rotors_gazebo_controller_interface mav_msgs)
 
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
