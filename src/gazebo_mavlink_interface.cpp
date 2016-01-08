@@ -454,7 +454,9 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 
     // simple check to see if we are simulating fw or mc
     // we really need to get away from this HIL message
-    bool is_fixed_wing = inputs.control[0] < 10.0f;
+    //bool is_fixed_wing = inputs.control[0] < 10.0f;
+    // TODO XXX: this makes SITL work again
+    bool is_fixed_wing = false;
 
     input_reference_.resize(_rotor_count);
 
