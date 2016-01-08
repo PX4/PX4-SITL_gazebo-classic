@@ -341,7 +341,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     sensor_msg.ymag = mag_I.y + mag_noise;
     sensor_msg.zmag = mag_I.z + mag_noise;
     sensor_msg.abs_pressure = 0.0;
-    sensor_msg.diff_pressure = 0.5*1.2754*body_vel.x*body_vel.x;
+    sensor_msg.diff_pressure = 0.5*1.2754*(body_vel.z + body_vel.x)*(body_vel.z + body_vel.x) / 100;
     sensor_msg.pressure_alt = pos_W_I.z;
     sensor_msg.temperature = 0.0;
     sensor_msg.fields_updated = 4095;
