@@ -156,7 +156,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // XXX this has to be modelled better
   math::Vector3 body_velocity = link_->GetWorldLinearVel();
   double vel = body_velocity.GetLength();
-  double scalar = 1 - vel / 50.0; // at 50 m/s the rotor will not produce any force anymore
+  double scalar = 1 - vel / 25.0; // at 50 m/s the rotor will not produce any force anymore
   scalar = math::clamp(scalar, 0.0, 1.0);
   // Apply a force to the link.
   link_->AddRelativeForce(math::Vector3(0, 0, force * scalar));
