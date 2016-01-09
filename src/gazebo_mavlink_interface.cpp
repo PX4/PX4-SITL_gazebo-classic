@@ -143,22 +143,22 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
   pollForMAVLinkMessages();
 
-  if(!received_first_referenc_)
-    return;
-
   common::Time now = world_->GetSimTime();
 
-  mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
+  if(received_first_referenc_) {
+
+    mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
 
-  for (int i = 0; i < input_reference_.size(); i++){
-    turning_velocities_msg.add_motor_speed(input_reference_[i]);
+    for (int i = 0; i < input_reference_.size(); i++){
+      turning_velocities_msg.add_motor_speed(input_reference_[i]);
+    }
+    // TODO Add timestamp and Header
+    // turning_velocities_msg->header.stamp.sec = now.sec;
+    // turning_velocities_msg->header.stamp.nsec = now.nsec;
+
+    motor_velocity_reference_pub_->Publish(turning_velocities_msg);
   }
-  // TODO Add timestamp and Header
-  // turning_velocities_msg->header.stamp.sec = now.sec;
-  // turning_velocities_msg->header.stamp.nsec = now.nsec;
-
-  motor_velocity_reference_pub_->Publish(turning_velocities_msg);
 
   //send gps
   common::Time current_time  = now;
