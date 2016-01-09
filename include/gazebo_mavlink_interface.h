@@ -173,14 +173,14 @@ class GazeboMavlinkInterface : public ModelPlugin {
   mavlink::msgs::HilGps hil_gps_msg_;
 
   int _fd;
-  struct sockaddr_in _srcaddr;
+  struct sockaddr_in _myaddr;  ///< The locally bound address
+  struct sockaddr_in _srcaddr;  ///< SITL instance
   socklen_t _addrlen;
-  unsigned char _buf[200];
+  unsigned char _buf[65535];
   struct pollfd fds[1];
 
 
-  struct sockaddr_in _srcaddr_2;
-  socklen_t _addrlen_2;
+  struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
   double optflow_xgyro;

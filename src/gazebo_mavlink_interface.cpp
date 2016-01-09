@@ -122,6 +122,17 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     return;
   }
 
+  memset((char *)&_myaddr, 0, sizeof(_myaddr));
+  _myaddr.sin_family = AF_INET;
+  _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  // Let the OS pick the port
+  _myaddr.sin_port = htons(0);
+
+  if (bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
+    printf("bind failed\n");
+    return;
+  }
+
   _srcaddr.sin_family = AF_INET;
   _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   _srcaddr.sin_port = htons(UDP_PORT);
@@ -131,8 +142,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   _srcaddr_2.sin_port = htons(UDP_PORT_2);
 
   _addrlen = sizeof(_srcaddr);
-
-  _addrlen_2 = sizeof(_srcaddr_2);
 
   fds[0].fd = _fd;
   fds[0].events = POLLIN;
@@ -421,7 +430,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
     if (len > 0) {
       mavlink_message_t msg;
       mavlink_status_t status;
-      for (int i = 0; i < len; ++i)
+      for (unsigned i = 0; i < len; ++i)
       {
         if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
         {
