@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
 find_package( PkgConfig REQUIRED)
-pkg_check_modules( EIGEN3 REQUIRED eigen3 )
+pkg_check_modules( EIGEN3 REQUIRED eigen3)
 pkg_check_modules( protobuf REQUIRED protobuf )
 
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
 pkg_check_modules(GAZEBO REQUIRED gazebo>=6.0)
-pkg_check_modules(SDF sdformat)
+pkg_check_modules(SDF REQUIRED sdformat)
 add_definitions(-std=c++11)
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
@@ -23,6 +23,9 @@ include_directories(
   ${SDF_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
+  ${Boost_INCLUDE_DIR}
+  # Hack to work around pkg_check_modules not setting the Eigen dir
+  ${Boost_INCLUDE_DIR}/eigen3
   )
 
 set(enable_mavlink_interface "true")
