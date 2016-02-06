@@ -99,7 +99,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   hil_sensor_pub_ = node_handle_->Advertise<mavlink::msgs::HilSensor>(hil_sensor_mavlink_pub_topic_, 1);
   hil_gps_pub_ = node_handle_->Advertise<mavlink::msgs::HilGps>(hil_gps_mavlink_pub_topic_, 1);
 
-  _rotor_count = 4;
+  _rotor_count = 5;
   last_time_ = world_->GetSimTime();
   last_gps_time_ = world_->GetSimTime();
   double gps_update_interval_ = 200*1000000;  // nanoseconds for 5Hz
@@ -476,19 +476,16 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
         input_reference_[i] = inputs.control[i] * scaling + offset;
       }
 
-      if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
-        // set angles of control surface joints (this should go into a message for the correct plugin)
-        double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
-        double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
-        left_elevon_joint_->SetAngle(0, roll);
-        right_elevon_joint_->SetAngle(0, -roll);
-        elevator_joint_->SetAngle(0, -pitch);
-      }
-    } else {
-      left_elevon_joint_->SetAngle(0, inputs.control[0]);
-      right_elevon_joint_->SetAngle(0, -inputs.control[0]);
-      elevator_joint_->SetAngle(0, inputs.control[1]);
-      propeller_joint_->SetForce(0, 2000.0f * inputs.control[3]);
+    // pusher/puller throttle for the standard vtol plane
+    input_reference_[4] = (inputs.control[6] + 1.0f) / 2 * 1800 + (inputs.control[6] > -1 ? 500 : 0);
+
+    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
+      // set angles of control surface joints (this should go into a message for the correct plugin)
+      double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
+      double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
+      left_elevon_joint_->SetAngle(0, roll);
+      right_elevon_joint_->SetAngle(0, -roll);
+      elevator_joint_->SetAngle(0, -pitch);
     }
 
     received_first_referenc_ = true;
