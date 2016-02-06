@@ -26,6 +26,8 @@
 
 namespace gazebo {
 
+GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
+
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
   event::Events::DisconnectWorldUpdateBegin(updateConnection_);
 }
@@ -37,10 +39,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   world_ = model_->GetWorld();
 
   namespace_.clear();
-  if (_sdf->HasElement("robotNamespace"))
+  if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
-  else
+  } else {
     gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+  }
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
@@ -469,14 +472,13 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 
     input_reference_.resize(_rotor_count);
 
-    // at the moment vtol and multirotor are handled togehter
-    // pure fixed wing is handled differently
-    if (!is_fixed_wing) {
-      for (int i = 0; i < _rotor_count; i++) {
-        input_reference_[i] = inputs.control[i] * scaling + offset;
-      }
+    // set rotor speeds for all systems
+    for (int i = 0; i < _rotor_count; i++) {
+      input_reference_[i] = inputs.control[i] * scaling + offset;
+    }
 
-    // pusher/puller throttle for the standard vtol plane
+    // 5th rotor: pusher/puller throttle for the standard vtol plane
+    // XXX this won't work with hexacopters and alike
     input_reference_[4] = (inputs.control[6] + 1.0f) / 2 * 1800 + (inputs.control[6] > -1 ? 500 : 0);
 
     if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
@@ -493,6 +495,4 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
   }
 }
 
-
-GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 }
