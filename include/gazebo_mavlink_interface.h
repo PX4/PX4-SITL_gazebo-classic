@@ -94,7 +94,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
         imu_sub_topic_(kDefaultImuTopic),
         opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
         lidar_sub_topic_(kDefaultLidarTopic),
-        mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic) {}
+        mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic),
         lat_rad(0.0),
         lon_rad(0.0)
         {}
