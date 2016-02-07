@@ -43,7 +43,8 @@
 *
 */
 
-#include <stdint.h>
+#include <cstdint>
+#include <cmath>
 #include "geo_mag_declination.h"
 
 /** set this always to the sampling in degrees for the table below */
@@ -72,8 +73,11 @@ static const int8_t declination_table[13][37] = \
 
 static float get_lookup_table_val(unsigned lat, unsigned lon);
 
-float get_mag_declination(float lat, float lon)
+float get_mag_declination(float lat_rad, float lon_rad)
 {
+	float lat = lat_rad / M_PI * 180.0f;
+	float lon = lon_rad / M_PI * 180.0f;
+
 	/*
 	 * If the values exceed valid ranges, return zero as default
 	 * as we have no way of knowing what the closest real value
@@ -123,7 +127,9 @@ float get_mag_declination(float lat, float lon)
 	float declination_min = ((lon - min_lon) / SAMPLING_RES) * (declination_se - declination_sw) + declination_sw;
 	float declination_max = ((lon - min_lon) / SAMPLING_RES) * (declination_ne - declination_nw) + declination_nw;
 
-	return ((lat - min_lat) / SAMPLING_RES) * (declination_max - declination_min) + declination_min;
+	float declination_ret = ((lat - min_lat) / SAMPLING_RES) * (declination_max - declination_min) + declination_min;
+
+	return declination_ret / 180.0f * M_PI;
 }
 
 float get_lookup_table_val(unsigned lat_index, unsigned lon_index)

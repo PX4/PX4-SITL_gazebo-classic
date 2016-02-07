@@ -188,8 +188,12 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   velocity_current_W_xy.z = 0.0;
 
   // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
-  const double lat_zurich = 47.3667 * M_PI / 180 ;  // rad
-  const double lon_zurich = 8.5500 * M_PI / 180;  // rad
+  // Zurich Irchel Park
+  const double lat_zurich = 47.397742 * M_PI / 180 ;  // rad
+  const double lon_zurich = 8.545594 * M_PI / 180;  // rad
+  // Seattle downtown (15 deg declination): 47.592182, -122.316031
+  // const double lat_zurich = 47.592182 * M_PI / 180 ;  // rad
+  // const double lon_zurich = -122.316031 * M_PI / 180;  // rad
   const float earth_radius = 6353000;  // m
 
   // reproject local position to gps coordinates
@@ -340,7 +344,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   // TODO replace mag_W_ in the line below with mag_decl
 
-  math::Vector3 mag_I = C_W_I.RotateVectorReverse(mag_W_); // TODO: Add noise based on bais and variance like for imu and gyro
+  math::Vector3 mag_I = C_W_I.RotateVectorReverse(mag_decl); // TODO: Add noise based on bais and variance like for imu and gyro
   math::Vector3 body_vel = C_W_I.RotateVectorReverse(model_->GetWorldLinearVel());
   
   standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
