@@ -106,14 +106,18 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   _rotor_count = 5;
   last_time_ = world_->GetSimTime();
   last_gps_time_ = world_->GetSimTime();
-  double gps_update_interval_ = 200*1000000;  // nanoseconds for 5Hz
+  double gps_update_interval_ = 200 * 1000000;  // nanoseconds for 5Hz
 
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E, D))
-  //mag_W_ = {, 0.00771, 0.42741};
+  //mag_W_ = {0.21523, 0.00771, 0.42741};
   mag_W_.x = 0.21523;
-  mag_W_.y = 0.00771;
+  // We set the world Y component to zero because we apply
+  // the declination based on the global position,
+  // and so we need to start without any offsets.
+  // The real value for Zurich would be 0.00771
+  mag_W_.y = 0.0;
   mag_W_.z = 0.42741;
 
   //Create socket
