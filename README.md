@@ -1,6 +1,6 @@
 # Gazebo for PX4 SITL
 
-
+This is a flight simulator for multirotors, VTOL and fixed wing.
 
 ## Install Gazebo Simulator
 
