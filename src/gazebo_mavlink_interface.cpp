@@ -189,15 +189,22 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   math::Vector3 velocity_current_W = model_->GetWorldLinearVel();  // Use the models' world position for GPS velocity.
 
   math::Vector3 velocity_current_W_xy = velocity_current_W;
-  velocity_current_W_xy.z = 0.0;
+  velocity_current_W_xy.z = 0;
+
+  // Set global reference point
+  // Zurich Irchel Park: 47.397742, 8.545594, 488m
+  // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
+  // Moscow downtown: 55.753395, 37.625427, 155m
 
   // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
   // Zurich Irchel Park
-  const double lat_zurich = 47.397742 * M_PI / 180 ;  // rad
+  const double lat_zurich = 47.397742 * M_PI / 180;  // rad
   const double lon_zurich = 8.545594 * M_PI / 180;  // rad
+  const double alt_zurich = 488.0; // meters
   // Seattle downtown (15 deg declination): 47.592182, -122.316031
-  // const double lat_zurich = 47.592182 * M_PI / 180 ;  // rad
+  // const double lat_zurich = 47.592182 * M_PI / 180;  // rad
   // const double lon_zurich = -122.316031 * M_PI / 180;  // rad
+  // const double alt_zurich = 86.0; // meters
   const float earth_radius = 6353000;  // m
 
   // reproject local position to gps coordinates
@@ -225,7 +232,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       hil_gps_msg.fix_type = 3;
       hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
       hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-      hil_gps_msg.alt = pos_W_I.z * 1000;
+      hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
       hil_gps_msg.eph = 100;
       hil_gps_msg.epv = 100;
       hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
@@ -242,7 +249,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       hil_gps_msg_.set_fix_type(3);
       hil_gps_msg_.set_lat(lat_rad * 180 / M_PI * 1e7);
       hil_gps_msg_.set_lon(lon_rad * 180 / M_PI * 1e7);
-      hil_gps_msg_.set_alt(pos_W_I.z * 1000);
+      hil_gps_msg_.set_alt((pos_W_I.z + alt_zurich) * 1000);
       hil_gps_msg_.set_eph(100);
       hil_gps_msg_.set_epv(100);
       hil_gps_msg_.set_vel(velocity_current_W_xy.GetLength() * 100);
