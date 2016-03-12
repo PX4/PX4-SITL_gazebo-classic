@@ -53,35 +53,35 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
                            motor_velocity_reference_pub_topic_);
 
   if (_sdf->HasElement("left_elevon_joint")) {
-    left_elevon_joint_name_ = _sdf->GetElement("left_elevon_joint")->Get<std::string>();
-    left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name_);
+	std::string name = _sdf->GetElement("left_elevon_joint")->Get<std::string>();
+    left_elevon_joint_ = model_->GetJoint(name);
   } else if (_sdf->HasElement("left_aileron_joint")) {
-    left_elevon_joint_name_ = _sdf->GetElement("left_aileron_joint")->Get<std::string>();
-    left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name_);
+    std::string name = _sdf->GetElement("left_aileron_joint")->Get<std::string>();
+    left_elevon_joint_ = model_->GetJoint(name);
   } else {
     left_elevon_joint_ = NULL;
   }
 
   if (_sdf->HasElement("right_elevon_joint")) {
-    right_elevon_joint_name_ = _sdf->GetElement("right_elevon_joint")->Get<std::string>();
-    right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name_);
+    std::string name = _sdf->GetElement("right_elevon_joint")->Get<std::string>();
+    right_elevon_joint_ = model_->GetJoint(name);
   } else if (_sdf->HasElement("right_aileron_joint")) {
-    right_elevon_joint_name_ = _sdf->GetElement("right_aileron_joint")->Get<std::string>();
-    right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name_);
+    std::string name = _sdf->GetElement("right_aileron_joint")->Get<std::string>();
+    right_elevon_joint_ = model_->GetJoint(name);
   } else {
     right_elevon_joint_ = NULL;
   }
 
   if (_sdf->HasElement("elevator_joint")) {
-    elevator_joint_name_ = _sdf->GetElement("elevator_joint")->Get<std::string>();
-    elevator_joint_ = model_->GetJoint(elevator_joint_name_);
+    std::string name = _sdf->GetElement("elevator_joint")->Get<std::string>();
+    elevator_joint_ = model_->GetJoint(name);
   } else {
     elevator_joint_ = NULL;
   }
 
   if (_sdf->HasElement("propeller_joint")) {
-    propeller_joint_name_ = _sdf->GetElement("propeller_joint")->Get<std::string>();
-    propeller_joint_ = model_->GetJoint(propeller_joint_name_);
+    std::string name = _sdf->GetElement("propeller_joint")->Get<std::string>();
+    propeller_joint_ = model_->GetJoint(name);
   } else {
     propeller_joint_ = NULL;
   }
