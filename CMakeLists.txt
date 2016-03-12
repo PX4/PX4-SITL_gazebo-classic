@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 find_package( PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED)
-pkg_check_modules( EIGEN3 REQUIRED eigen3)
+find_package(Eigen3 REQUIRED)
 pkg_check_modules( protobuf REQUIRED protobuf )
 
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
@@ -23,13 +23,11 @@ include_directories(
   ${GAZEBO_INCLUDE_DIRS}
   ${GAZEBO_MSG_INCLUDE_DIRS}
   ${SDF_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
   ${Boost_INCLUDE_DIR}
-  # Hack to work around pkg_check_modules not setting the Eigen dir
-  ${Boost_INCLUDE_DIR}/eigen3
-  # Hack to work around pkg_check_modules not setting the OGRE dirs correctly
+  # Workaround for OGRE include dirs on Mac OS
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
   )
