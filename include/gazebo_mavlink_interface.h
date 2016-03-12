@@ -126,10 +126,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void pollForMAVLinkMessages();
 
   unsigned _rotor_count;
-  struct {
-    float control[8];
-  } inputs; 
-
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;

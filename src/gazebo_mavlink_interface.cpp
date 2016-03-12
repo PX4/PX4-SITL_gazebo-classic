@@ -282,6 +282,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
 void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg)
 {
   if(!use_mavlink_udp){
+    struct {
+      float control[8];
+    } inputs;
 
     inputs.control[0] =(double)rmsg->roll_ailerons();
     inputs.control[1] =(double)rmsg->pitch_elevator();
@@ -488,6 +491,10 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch(msg->msgid) {
   case MAVLINK_MSG_ID_HIL_CONTROLS:
+    struct {
+      float control[8];
+    } inputs;
+
     mavlink_hil_controls_t controls;
     mavlink_msg_hil_controls_decode(msg, &controls);
     inputs.control[0] =(double)controls.roll_ailerons;
