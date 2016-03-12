@@ -49,11 +49,13 @@ GazeboMavlinkInterface::GazeboMavlinkInterface()
 {
 }
 
-GazeboMavlinkInterface::~GazeboMavlinkInterface() {
+GazeboMavlinkInterface::~GazeboMavlinkInterface()
+{
   event::Events::DisconnectWorldUpdateBegin(updateConnection_);
 }
 
-void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+{
   // Store the pointer to the model.
   model_ = _model;
 
@@ -168,7 +170,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 }
 
 // This gets called by the world update start event.
-void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
+void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
+{
 
   pollForMAVLinkMessages();
 
@@ -276,7 +279,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   }
 }
 
-void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg) {
+void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg)
+{
   if(!use_mavlink_udp){
 
     inputs.control[0] =(double)rmsg->roll_ailerons();
@@ -306,7 +310,8 @@ void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg) {
   }
 }
 
-void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID) {
+void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID)
+{
   component_ID = 0;
   uint8_t payload_len = mavlink_message_lengths[msgid];
   unsigned packet_len = payload_len + MAVLINK_NUM_NON_PAYLOAD_BYTES;
@@ -346,7 +351,8 @@ void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const voi
   }
 }
 
-void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
+void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
+{
 
   math::Pose T_W_I = model_->GetWorldPose();
   math::Vector3 pos_W_I = T_W_I.pos;  // Use the models'world position for GPS and pressure alt.
@@ -417,7 +423,8 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   }
 }
 
-void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
+void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message)
+{
   
   mavlink_distance_sensor_t sensor_msg;
   sensor_msg.time_boot_ms = lidar_message->time_msec();
