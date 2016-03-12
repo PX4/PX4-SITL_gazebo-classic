@@ -42,6 +42,10 @@ GazeboMavlinkInterface::GazeboMavlinkInterface()
     , mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic)
     , lat_rad(0.0)
     , lon_rad(0.0)
+    , left_elevon_joint_(nullptr)
+    , right_elevon_joint_(nullptr)
+    , elevator_joint_(nullptr)
+    , propeller_joint_(nullptr)
 {
 }
 
@@ -74,8 +78,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else if (_sdf->HasElement("left_aileron_joint")) {
     std::string name = _sdf->GetElement("left_aileron_joint")->Get<std::string>();
     left_elevon_joint_ = model_->GetJoint(name);
-  } else {
-    left_elevon_joint_ = NULL;
   }
 
   if (_sdf->HasElement("right_elevon_joint")) {
@@ -84,22 +86,16 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else if (_sdf->HasElement("right_aileron_joint")) {
     std::string name = _sdf->GetElement("right_aileron_joint")->Get<std::string>();
     right_elevon_joint_ = model_->GetJoint(name);
-  } else {
-    right_elevon_joint_ = NULL;
   }
 
   if (_sdf->HasElement("elevator_joint")) {
     std::string name = _sdf->GetElement("elevator_joint")->Get<std::string>();
     elevator_joint_ = model_->GetJoint(name);
-  } else {
-    elevator_joint_ = NULL;
   }
 
   if (_sdf->HasElement("propeller_joint")) {
     std::string name = _sdf->GetElement("propeller_joint")->Get<std::string>();
     propeller_joint_ = model_->GetJoint(name);
-  } else {
-    propeller_joint_ = NULL;
   }
 
 
