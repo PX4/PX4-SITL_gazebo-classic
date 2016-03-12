@@ -3,11 +3,14 @@ cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 find_package( PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED)
+if(${GAZEBO_VERSION} VERSION_LESS "6.0")
+  message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
+endif()
+
 find_package(Eigen3 REQUIRED)
 pkg_check_modules( protobuf REQUIRED protobuf )
 
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
-pkg_check_modules(GAZEBO REQUIRED gazebo>=6.0)
 pkg_check_modules(SDF REQUIRED sdformat)
 add_definitions(-std=c++11)
 
