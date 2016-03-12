@@ -84,20 +84,7 @@ static bool use_mavlink_udp = true;
 
 class GazeboMavlinkInterface : public ModelPlugin {
  public:
-  GazeboMavlinkInterface()
-      : ModelPlugin(),
-        received_first_referenc_(false),
-        namespace_(kDefaultNamespace),
-        motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
-        hil_sensor_mavlink_pub_topic_(kDefaultMavlinkHilSensorPubTopic),
-        hil_gps_mavlink_pub_topic_(kDefaultMavlinkHilGpsPubTopic),
-        imu_sub_topic_(kDefaultImuTopic),
-        opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
-        lidar_sub_topic_(kDefaultLidarTopic),
-        mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic),
-        lat_rad(0.0),
-        lon_rad(0.0)
-        {}
+  GazeboMavlinkInterface();
   ~GazeboMavlinkInterface();
 
   void Publish();
