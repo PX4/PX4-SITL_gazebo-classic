@@ -73,7 +73,11 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
       gzmsg << "It is a depth camera sensor\n";
   }
 
+#if GAZEBO_MAJOR_VERSION >= 7
+  this->camera = this->parentSensor->Camera();
+#else
   this->camera = this->parentSensor->GetCamera();
+#endif
 
   if (!this->parentSensor)
   {
@@ -81,10 +85,17 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     return;
   }
 
+#if GAZEBO_MAJOR_VERSION >= 7
+  this->width = this->camera->ImageWidth();
+  this->height = this->camera->ImageHeight();
+  this->depth = this->camera->ImageDepth();
+  this->format = this->camera->ImageFormat();
+#else
   this->width = this->camera->GetImageWidth();
   this->height = this->camera->GetImageHeight();
   this->depth = this->camera->GetImageDepth();
   this->format = this->camera->GetImageFormat();
+#endif
 
 
   if (_sdf->HasElement("robotNamespace"))
@@ -111,14 +122,22 @@ void CameraPlugin::OnNewFrame(const unsigned char * _image,
                               unsigned int _depth,
                               const std::string &_format)
 {
+#if GAZEBO_MAJOR_VERSION >= 7
+  _image = this->camera->ImageData(0);
+#else
   _image = this->camera->GetImageData(0);
+#endif
   //GetHFOV gives fucking gazebo::math::Angle which you can not cast...
   const double Hfov = 0.6;
   const double focal_length = (_width/2)/tan(Hfov/2);
 
   double pixel_flow_x_integral = 0.0;
   double pixel_flow_y_integral = 0.0;
+#if GAZEBO_MAJOR_VERSION >= 7
+  double rate = this->camera->RenderRate();
+#else
   double rate = this->camera->GetRenderRate();
+#endif
   if (!isfinite(rate))
 	   rate =  30.0;
   double dt = 1.0 / rate;
