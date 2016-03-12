@@ -507,9 +507,9 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       // set angles of control surface joints (this should go into a message for the correct plugin)
       double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
       double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
-      left_elevon_joint_->SetAngle(0, roll);
-      right_elevon_joint_->SetAngle(0, -roll);
-      elevator_joint_->SetAngle(0, -pitch);
+      left_elevon_joint_->SetPosition(0, roll);
+      right_elevon_joint_->SetPosition(0, -roll);
+      elevator_joint_->SetPosition(0, -pitch);
     }
 
     received_first_referenc_ = true;
