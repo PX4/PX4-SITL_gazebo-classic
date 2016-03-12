@@ -59,9 +59,9 @@ static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilControl>   HilControlPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilSensor>   HilSensorPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilGps>   HilGpsPtr;
+typedef const boost::shared_ptr<const mavlink::msgs::HilControl> HilControlPtr;
+typedef const boost::shared_ptr<const mavlink::msgs::HilSensor> HilSensorPtr;
+typedef const boost::shared_ptr<const mavlink::msgs::HilGps> HilGpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
@@ -94,7 +94,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void OnUpdate(const common::UpdateInfo& /*_info*/);
 
  private:
-
   bool received_first_referenc_;
   Eigen::VectorXd input_reference_;
 
