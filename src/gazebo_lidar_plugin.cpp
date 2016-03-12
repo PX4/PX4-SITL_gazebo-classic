@@ -61,7 +61,11 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   this->parentSensor =
+#if GAZEBO_MAJOR_VERSION >= 7
+    std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+#else
     boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+#endif
 
   if (!this->parentSensor)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");

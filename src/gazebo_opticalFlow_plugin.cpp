@@ -56,12 +56,20 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     gzerr << "Invalid sensor pointer.\n";
 
   this->parentSensor =
+#if GAZEBO_MAJOR_VERSION >= 7
+    std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
+#else
     boost::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
+#endif
 
   if (!this->parentSensor)
   {
     gzerr << "CameraPlugin requires a CameraSensor.\n";
+#if GAZEBO_MAJOR_VERSION >= 7
+    if (std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
+#else
     if (boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
+#endif
       gzmsg << "It is a depth camera sensor\n";
   }
 
