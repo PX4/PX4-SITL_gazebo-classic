@@ -118,7 +118,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   event::ConnectionPtr updateConnection_;
 
   boost::thread callback_queue_thread_;
-  void QueueThread();
   void HilControlCallback(HilControlPtr &rmsg);
   void ImuCallback(ImuPtr& imu_msg);
   void LidarCallback(LidarPtr& lidar_msg);
