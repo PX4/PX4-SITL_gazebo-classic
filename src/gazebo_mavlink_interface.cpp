@@ -236,9 +236,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
     lon_rad = lon_zurich;
   }
   
-  if(current_time.Double() - last_gps_time_.Double() > gps_update_interval_){  // 5Hz
-
-    if(use_mavlink_udp){
+  if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {
+    last_gps_time_ = current_time;
+    if (use_mavlink_udp) {
       // Raw UDP mavlink
       mavlink_hil_gps_t hil_gps_msg;
       hil_gps_msg.time_usec = current_time.nsec*1000;
@@ -274,14 +274,12 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
              
       hil_gps_pub_->Publish(hil_gps_msg_);
     }
-
-    last_gps_time_ = current_time;
   }
 }
 
 void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg)
 {
-  if(!use_mavlink_udp){
+  if (!use_mavlink_udp) {
     struct {
       float control[8];
     } inputs;
@@ -356,7 +354,6 @@ void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const voi
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 {
-
   math::Pose T_W_I = model_->GetWorldPose();
   math::Vector3 pos_W_I = T_W_I.pos;  // Use the models'world position for GPS and pressure alt.
   
@@ -381,7 +378,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 
   float mag_noise = standard_normal_distribution_(random_generator_);
 
-  if(use_mavlink_udp){
+  if (use_mavlink_udp) {
     mavlink_hil_sensor_t sensor_msg;
     sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
     sensor_msg.xacc = imu_message->linear_acceleration().x();
@@ -428,7 +425,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message)
 {
-  
   mavlink_distance_sensor_t sensor_msg;
   sensor_msg.time_boot_ms = lidar_message->time_msec();
   sensor_msg.min_distance = lidar_message->min_distance() * 100.0;
@@ -443,11 +439,10 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message)
   optflow_distance = lidar_message->current_distance(); //[m]
 
   send_mavlink_message(MAVLINK_MSG_ID_DISTANCE_SENSOR, &sensor_msg, 200);
-
 }
 
-void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
-
+void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message)
+{
   mavlink_optical_flow_rad_t sensor_msg;
   sensor_msg.time_usec = opticalFlow_message->time_usec();
   sensor_msg.sensor_id = opticalFlow_message->sensor_id();
@@ -463,7 +458,6 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   sensor_msg.distance = optflow_distance;
 
   send_mavlink_message(MAVLINK_MSG_ID_OPTICAL_FLOW_RAD, &sensor_msg, 200);
-
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
@@ -527,7 +521,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     // XXX this won't work with hexacopters and alike
     input_reference_[4] = (inputs.control[6] + 1.0f) / 2 * 1800 + (inputs.control[6] > -1 ? 500 : 0);
 
-    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
+    if (right_elevon_joint_ && left_elevon_joint_ && elevator_joint_) {
       // set angles of control surface joints (this should go into a message for the correct plugin)
       double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
       double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
