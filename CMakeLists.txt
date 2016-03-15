@@ -31,6 +31,7 @@ include_directories(
   ${Boost_INCLUDE_DIR}/eigen3
   # Hack to work around pkg_check_modules not setting the OGRE dirs correctly
   /usr/local/include/OGRE
+  /usr/local/include/OGRE/Paging
   )
 
 set(enable_mavlink_interface "true")
