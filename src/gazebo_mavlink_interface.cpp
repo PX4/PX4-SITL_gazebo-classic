@@ -106,7 +106,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   _rotor_count = 5;
   last_time_ = world_->GetSimTime();
   last_gps_time_ = world_->GetSimTime();
-  double gps_update_interval_ = 200 * 1000000;  // nanoseconds for 5Hz
+  gps_update_interval_ = 0.2;  // in seconds for 5Hz
 
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
@@ -221,9 +221,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     lon_rad = lon_zurich;
   }
   
-  common::Time gps_update(gps_update_interval_);
-
-  if(current_time - last_gps_time_ > gps_update){  // 5Hz
+  if(current_time.Double() - last_gps_time_.Double() > gps_update_interval_){  // 5Hz
 
     if(use_mavlink_udp){
       // Raw UDP mavlink
