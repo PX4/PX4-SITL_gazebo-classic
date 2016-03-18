@@ -48,7 +48,7 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
+  this->parentSensor->LaserShape()->DisconnectNewLaserScans(
       this->newLaserScansConnection);
   this->newLaserScansConnection.reset();
 
@@ -61,15 +61,15 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+    std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!this->parentSensor)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor->GetWorldName());
+  this->world = physics::get_world(this->parentSensor->WorldName());
 
   this->newLaserScansConnection =
-    this->parentSensor->GetLaserShape()->ConnectNewLaserScans(
+    this->parentSensor->LaserShape()->ConnectNewLaserScans(
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
@@ -87,9 +87,9 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 void RayPlugin::OnNewLaserScans()
 {
   lidar_message.set_time_msec(0);
-  lidar_message.set_min_distance(parentSensor->GetRangeMin());
-  lidar_message.set_max_distance(parentSensor->GetRangeMax());
-  lidar_message.set_current_distance(parentSensor->GetRange(0));
+  lidar_message.set_min_distance(parentSensor->RangeMin());
+  lidar_message.set_max_distance(parentSensor->RangeMax());
+  lidar_message.set_current_distance(parentSensor->Range(0));
 
   lidar_pub_->Publish(lidar_message);
 }
