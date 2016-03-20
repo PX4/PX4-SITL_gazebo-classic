@@ -157,12 +157,13 @@ class GazeboMavlinkInterface : public ModelPlugin {
   int _fd;
   struct sockaddr_in _myaddr;  ///< The locally bound address
   struct sockaddr_in _srcaddr;  ///< SITL instance
+  struct sockaddr_in _srcaddr_2;  ///< MAVROS
+
   socklen_t _addrlen;
   unsigned char _buf[65535];
   struct pollfd fds[1];
 
 
-  struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
   double optflow_xgyro;
