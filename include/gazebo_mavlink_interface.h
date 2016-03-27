@@ -77,7 +77,6 @@ static const std::string kDefaultMavlinkControlSubTopic = "HilControl";
 static const std::string kDefaultImuTopic = "imu";
 static const std::string kDefaultLidarTopic = "lidar";
 static const std::string kDefaultOpticalFlowTopic = "opticalFlow";
-static const std::string kDefaultMavlinkHilSensorPubTopic = "HilSensor";
 static const std::string kDefaultMavlinkHilGpsPubTopic = "HilGps";
 
 static bool use_mavlink_udp = true;
@@ -129,10 +128,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
-  transport::PublisherPtr hil_sensor_pub_;
   transport::PublisherPtr hil_gps_pub_;
 
-  std::string hil_sensor_mavlink_pub_topic_;
   std::string hil_gps_mavlink_pub_topic_;
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -151,7 +148,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
 
-  mavlink::msgs::HilSensor hil_sensor_msg_;
   mavlink::msgs::HilGps hil_gps_msg_;
 
   int _fd;
