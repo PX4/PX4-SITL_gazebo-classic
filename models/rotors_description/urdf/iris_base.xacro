@@ -2,6 +2,7 @@
 
 <robot name="iris" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(arg rotors_description_dir)/urdf/component_snippets.xacro" />
+  <xacro:include filename="$(arg rotors_description_dir)/urdf/gazebo_gps.xacro" />
   <!-- Instantiate iris "mechanics" -->
   <xacro:include filename="$(arg rotors_description_dir)/urdf/iris.xacro" />
 
@@ -10,9 +11,19 @@
   <xacro:mavlink_interface_macro
     namespace="${namespace}"
     imu_sub_topic="imu"
+    gps_sub_topic="/gazebo/default/iris/gps_link/gps"
     >
   </xacro:mavlink_interface_macro>
   </xacro:if>
+
+  <xacro:gazebo_gps
+    name="gps"
+    parent="base_link"
+    mass="0.015"
+  >
+    <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:gazebo_gps>
 
   <!-- Mount an ADIS16448 IMU. -->
   <xacro:imu_plugin_macro

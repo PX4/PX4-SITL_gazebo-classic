@@ -37,8 +37,6 @@ GazeboMavlinkInterface::GazeboMavlinkInterface()
     , imu_sub_topic_(kDefaultImuTopic)
     , opticalFlow_sub_topic_(kDefaultOpticalFlowTopic)
     , lidar_sub_topic_(kDefaultLidarTopic)
-    , lat_rad(0.0)
-    , lon_rad(0.0)
     , left_elevon_joint_(nullptr)
     , right_elevon_joint_(nullptr)
     , elevator_joint_(nullptr)
@@ -53,6 +51,7 @@ GazeboMavlinkInterface::~GazeboMavlinkInterface()
 
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  std::string gps_sub_topic;
   // Store the pointer to the model.
   model_ = _model;
 
@@ -70,6 +69,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
                            motor_velocity_reference_pub_topic_);
+  getSdfParam<std::string>(_sdf, "gpsPubTopic", gps_sub_topic, gps_sub_topic);
 
   if (_sdf->HasElement("left_elevon_joint")) {
 	std::string name = _sdf->GetElement("left_elevon_joint")->Get<std::string>();
@@ -107,16 +107,13 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe(imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe(lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe(opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
+
+  gps_sub_ = node_handle_->Subscribe(gps_sub_topic, &GazeboMavlinkInterface::GPSCallback, this);
   
   // Publish HilSensor Message and gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>(motor_velocity_reference_pub_topic_, 1);
 
   _rotor_count = 5;
-  last_time_ = world_->GetSimTime();
-  last_gps_time_ = world_->GetSimTime();
-  gps_update_interval_ = 0.2;  // in seconds for 5Hz
-
-  gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E, D))
   //mag_W_ = {0.21523, 0.00771, 0.42741};
@@ -163,92 +160,51 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   fds[0].events = POLLIN;
 }
 
+void GazeboMavlinkInterface::GPSCallback(const boost::shared_ptr<const gazebo::msgs::GPS> &msg)
+{
+  // Raw UDP mavlink
+  mavlink_hil_gps_t hil_gps_msg;
+  math::Vector3 velocity(msg->velocity_east(), msg->velocity_north(), 0);
+
+  this->lat_rad = msg->latitude_deg() * M_PI / 180.0;
+  this->lon_rad = msg->latitude_deg() * M_PI / 180.0;
+
+  hil_gps_msg.time_usec = msg->time().nsec() * 1000;
+  hil_gps_msg.fix_type = 3;
+  hil_gps_msg.lat = msg->latitude_deg() * 1e7;
+  hil_gps_msg.lon = msg->longitude_deg() * 1e7;
+  hil_gps_msg.alt = msg->altitude() * 1000;
+  hil_gps_msg.eph = 100;
+  hil_gps_msg.epv = 100;
+  hil_gps_msg.vel = velocity.GetLength() * 100;
+  hil_gps_msg.vn = -msg->velocity_east() * 100;
+  hil_gps_msg.ve = msg->velocity_north() * 100;
+  hil_gps_msg.vd = -msg->velocity_up() * 100;
+  hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+  hil_gps_msg.satellites_visible = 10;
+
+  send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
+}
+
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
 {
-
   pollForMAVLinkMessages();
 
   common::Time now = world_->GetSimTime();
 
-  if(received_first_referenc_) {
-
+  if (received_first_referenc_) {
     mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
-
-    for (int i = 0; i < input_reference_.size(); i++){
+    for (int i = 0; i < input_reference_.size(); i++) {
       turning_velocities_msg.add_motor_speed(input_reference_[i]);
     }
+
     // TODO Add timestamp and Header
     // turning_velocities_msg->header.stamp.sec = now.sec;
     // turning_velocities_msg->header.stamp.nsec = now.nsec;
 
     motor_velocity_reference_pub_->Publish(turning_velocities_msg);
-  }
-
-  //send gps
-  common::Time current_time  = now;
-  double dt = (current_time - last_time_).Double();
-  last_time_ = current_time;
-  double t = current_time.Double();
-
-  math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
-  math::Vector3 pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
-
-  math::Vector3 velocity_current_W = model_->GetWorldLinearVel();  // Use the models' world position for GPS velocity.
-
-  math::Vector3 velocity_current_W_xy = velocity_current_W;
-  velocity_current_W_xy.z = 0;
-
-  // Set global reference point
-  // Zurich Irchel Park: 47.397742, 8.545594, 488m
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
-  // Moscow downtown: 55.753395, 37.625427, 155m
-
-  // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
-  // Zurich Irchel Park
-  const double lat_zurich = 47.397742 * M_PI / 180;  // rad
-  const double lon_zurich = 8.545594 * M_PI / 180;  // rad
-  const double alt_zurich = 488.0; // meters
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031
-  // const double lat_zurich = 47.592182 * M_PI / 180;  // rad
-  // const double lon_zurich = -122.316031 * M_PI / 180;  // rad
-  // const double alt_zurich = 86.0; // meters
-  const float earth_radius = 6353000;  // m
-
-  // reproject local position to gps coordinates
-  double x_rad = pos_W_I.x / earth_radius;
-  double y_rad = -pos_W_I.y / earth_radius;
-  double c = sqrt(x_rad * x_rad + y_rad * y_rad);
-  double sin_c = sin(c);
-  double cos_c = cos(c);
-  if (c != 0.0) {
-    lat_rad = asin(cos_c * sin(lat_zurich) + (x_rad * sin_c * cos(lat_zurich)) / c);
-    lon_rad = (lon_zurich + atan2(y_rad * sin_c, c * cos(lat_zurich) * cos_c - x_rad * sin(lat_zurich) * sin_c));
-  } else {
-   lat_rad = lat_zurich;
-    lon_rad = lon_zurich;
-  }
-  
-  if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {
-    last_gps_time_ = current_time;
-    // Raw UDP mavlink
-    mavlink_hil_gps_t hil_gps_msg;
-    hil_gps_msg.time_usec = current_time.nsec*1000;
-    hil_gps_msg.fix_type = 3;
-    hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
-    hil_gps_msg.eph = 100;
-    hil_gps_msg.epv = 100;
-    hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
-    hil_gps_msg.vn = velocity_current_W.x * 100;
-    hil_gps_msg.ve = -velocity_current_W.y * 100;
-    hil_gps_msg.vd = -velocity_current_W.z * 100;
-    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
-    hil_gps_msg.satellites_visible = 10;
-
-    send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
   }
 }
 

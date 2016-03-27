@@ -33,9 +33,6 @@
 #include "common.h"
 
 #include "SensorImu.pb.h"
-#include "HilControl.pb.h"
-#include "HilSensor.pb.h"
-#include "HilGps.pb.h"
 #include "opticalFlow.pb.h"
 #include "lidar.pb.h"
 #include <boost/bind.hpp>
@@ -59,9 +56,6 @@ static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilControl> HilControlPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilSensor> HilSensorPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilGps> HilGpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
@@ -119,22 +113,21 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages();
 
+  void GPSCallback(const boost::shared_ptr<const gazebo::msgs::GPS> &msg);
+
   unsigned _rotor_count;
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
+  transport::SubscriberPtr gps_sub_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
   
-  common::Time last_time_;
-  common::Time last_gps_time_;
-  double gps_update_interval_;
   double lat_rad;
   double lon_rad;
 
-  math::Vector3 gravity_W_;
   math::Vector3 velocity_prev_W_;
   math::Vector3 mag_W_;
 

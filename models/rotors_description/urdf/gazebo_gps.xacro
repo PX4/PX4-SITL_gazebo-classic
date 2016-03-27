@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="gazebo_gps"
+    params="name parent mass *inertia *origin">
+    <link name="${name}_link">
+      <inertial>
+        <xacro:insert_block name="inertia" />
+        <mass value="${mass}" />
+      </inertial>
+    </link>
+      <gazebo reference="${name}_link">
+        <sensor name="${name}" type="gps">
+          <pose>0 0 0  0 0 0</pose>
+          <update_rate>10.0</update_rate>
+          <always_on>true</always_on>
+          <gps>
+            <position_sensing>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0</stddev>
+                  <bias_mean>0</bias_mean>
+                  <bias_stddev>0</bias_stddev>
+                  <precision>0.001</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0</stddev>
+                  <bias_mean>0</bias_mean>
+                  <bias_stddev>0</bias_stddev>
+                  <precision>0.001</precision>
+                </noise>
+              </vertical>
+            </position_sensing>
+            <velocity_sensing>
+              <horizontal>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0</stddev>
+                  <bias_mean>0</bias_mean>
+                  <bias_stddev>0</bias_stddev>
+                  <precision>0.001</precision>
+                </noise>
+              </horizontal>
+              <vertical>
+                <noise type="gaussian_quantized">
+                  <mean>0</mean>
+                  <stddev>0</stddev>
+                  <bias_mean>0</bias_mean>
+                  <bias_stddev>0</bias_stddev>
+                  <precision>0.001</precision>
+                </noise>
+              </vertical>
+            </velocity_sensing>
+          </gps>
+        </sensor>
+      </gazebo>
+
+    <joint name="${name}_joint" type="revolute">
+       <parent link="${parent}" />
+       <child link="${name}_link" />
+	<limit upper="0" lower="0" effort="0" velocity="0" />
+       <xacro:insert_block name="origin" />
+    </joint>
+  </xacro:macro>
+</robot>
