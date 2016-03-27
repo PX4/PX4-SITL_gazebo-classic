@@ -15,7 +15,6 @@ endforeach()
 
 set (msgs
   HilGps.proto
-  HilControl.proto
   SensorImu.proto
   Float.proto
   opticalFlow.proto

@@ -38,7 +38,6 @@ GazeboMavlinkInterface::GazeboMavlinkInterface()
     , imu_sub_topic_(kDefaultImuTopic)
     , opticalFlow_sub_topic_(kDefaultOpticalFlowTopic)
     , lidar_sub_topic_(kDefaultLidarTopic)
-    , mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic)
     , lat_rad(0.0)
     , lon_rad(0.0)
     , left_elevon_joint_(nullptr)
@@ -106,7 +105,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       boost::bind(&GazeboMavlinkInterface::OnUpdate, this, _1));
 
   // Subscriber to IMU sensor_msgs::Imu Message and SITL's HilControl message
-  mav_control_sub_ = node_handle_->Subscribe(mavlink_control_sub_topic_, &GazeboMavlinkInterface::HilControlCallback, this);
   imu_sub_ = node_handle_->Subscribe(imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe(lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe(opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
@@ -272,40 +270,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
              
       hil_gps_pub_->Publish(hil_gps_msg_);
     }
-  }
-}
-
-void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg)
-{
-  if (!use_mavlink_udp) {
-    struct {
-      float control[8];
-    } inputs;
-
-    inputs.control[0] =(double)rmsg->roll_ailerons();
-    inputs.control[1] =(double)rmsg->pitch_elevator();
-    inputs.control[2] =(double)rmsg->yaw_rudder();
-    inputs.control[3] =(double)rmsg->throttle();
-    inputs.control[4] =(double)rmsg->aux1();
-    inputs.control[5] =(double)rmsg->aux2();
-    inputs.control[6] =(double)rmsg->aux3();
-    inputs.control[7] =(double)rmsg->aux4();
-
-    // publish message
-    double scaling = 150;
-    double offset = 600;
-
-    mav_msgs::msgs::CommandMotorSpeed* turning_velocities_msg = new mav_msgs::msgs::CommandMotorSpeed;
-
-    for (int i = 0; i < _rotor_count; i++) {
-      turning_velocities_msg->add_motor_speed(inputs.control[i] * scaling + offset);
-    }
-
-    input_reference_.resize(turning_velocities_msg->motor_speed_size());
-    for (int i = 0; i < turning_velocities_msg->motor_speed_size(); ++i) {
-      input_reference_[i] = turning_velocities_msg->motor_speed(i);
-    }
-    received_first_referenc_ = true;
   }
 }
 

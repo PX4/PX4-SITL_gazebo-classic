@@ -72,7 +72,6 @@ static const std::string kDefaultNamespace = "";
 // This just proxies the motor commands from command/motor_speed to the single motors via internal
 // ConsPtr passing, such that the original commands don't have to go n_motors-times over the wire.
 static const std::string kDefaultMotorVelocityReferencePubTopic = "gazebo/command/motor_speed";
-static const std::string kDefaultMavlinkControlSubTopic = "HilControl";
 
 static const std::string kDefaultImuTopic = "imu";
 static const std::string kDefaultLidarTopic = "lidar";
@@ -98,12 +97,10 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   std::string namespace_;
   std::string motor_velocity_reference_pub_topic_;
-  std::string mavlink_control_sub_topic_;
   std::string link_name_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_reference_pub_;
-  transport::SubscriberPtr mav_control_sub_;
 
   physics::ModelPtr model_;
   physics::WorldPtr world_;
@@ -116,7 +113,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   event::ConnectionPtr updateConnection_;
 
   boost::thread callback_queue_thread_;
-  void HilControlCallback(HilControlPtr &rmsg);
   void ImuCallback(ImuPtr& imu_msg);
   void LidarCallback(LidarPtr& lidar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
