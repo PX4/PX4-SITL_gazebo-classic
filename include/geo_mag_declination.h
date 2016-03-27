@@ -40,8 +40,4 @@
 
 #pragma once
 
-__BEGIN_DECLS
-
-float get_mag_declination(float lat, float lon);
-
-__END_DECLS
+double get_mag_declination(double lat, double lon);

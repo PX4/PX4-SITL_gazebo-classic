@@ -48,11 +48,11 @@
 #include "geo_mag_declination.h"
 
 /** set this always to the sampling in degrees for the table below */
-#define SAMPLING_RES		10.0f
-#define SAMPLING_MIN_LAT	-60.0f
-#define SAMPLING_MAX_LAT	60.0f
-#define SAMPLING_MIN_LON	-180.0f
-#define SAMPLING_MAX_LON	180.0f
+#define SAMPLING_RES		10.0
+#define SAMPLING_MIN_LAT	-60.0
+#define SAMPLING_MAX_LAT	60.0
+#define SAMPLING_MIN_LON	-180.0
+#define SAMPLING_MAX_LON	180.0
 
 static const int8_t declination_table[13][37] = \
 {
@@ -71,21 +71,21 @@ static const int8_t declination_table[13][37] = \
 	{ 3, 9, 14, 17, 20, 21, 19, 14, 4, -8, -19, -25, -26, -25, -21, -17, -12, -7, -2, 1, 5, 9, 13, 15, 16, 16, 13, 7, 0, -7, -12, -15, -14, -11, -6, -1, 3 },
 };
 
-static float get_lookup_table_val(unsigned lat, unsigned lon);
+static double get_lookup_table_val(unsigned lat, unsigned lon);
 
-float get_mag_declination(float lat_rad, float lon_rad)
+double get_mag_declination(double lat_rad, double lon_rad)
 {
-	float lat = lat_rad / M_PI * 180.0f;
-	float lon = lon_rad / M_PI * 180.0f;
+	double lat = lat_rad / M_PI * 180.0;
+	double lon = lon_rad / M_PI * 180.0;
 
 	/*
 	 * If the values exceed valid ranges, return zero as default
 	 * as we have no way of knowing what the closest real value
 	 * would be.
 	 */
-	if (lat < -90.0f || lat > 90.0f ||
-	    lon < -180.0f || lon > 180.0f) {
-		return 0.0f;
+	if (lat < -90.0 || lat > 90.0 ||
+	    lon < -180.0 || lon > 180.0) {
+		return 0.0;
 	}
 
 	/* round down to nearest sampling resolution */
@@ -117,22 +117,22 @@ float get_mag_declination(float lat_rad, float lon_rad)
 	unsigned min_lat_index = (-(SAMPLING_MIN_LAT) + min_lat)  / SAMPLING_RES;
 	unsigned min_lon_index = (-(SAMPLING_MIN_LON) + min_lon) / SAMPLING_RES;
 
-	float declination_sw = get_lookup_table_val(min_lat_index, min_lon_index);
-	float declination_se = get_lookup_table_val(min_lat_index, min_lon_index + 1);
-	float declination_ne = get_lookup_table_val(min_lat_index + 1, min_lon_index + 1);
-	float declination_nw = get_lookup_table_val(min_lat_index + 1, min_lon_index);
+	double declination_sw = get_lookup_table_val(min_lat_index, min_lon_index);
+	double declination_se = get_lookup_table_val(min_lat_index, min_lon_index + 1);
+	double declination_ne = get_lookup_table_val(min_lat_index + 1, min_lon_index + 1);
+	double declination_nw = get_lookup_table_val(min_lat_index + 1, min_lon_index);
 
 	/* perform bilinear interpolation on the four grid corners */
 
-	float declination_min = ((lon - min_lon) / SAMPLING_RES) * (declination_se - declination_sw) + declination_sw;
-	float declination_max = ((lon - min_lon) / SAMPLING_RES) * (declination_ne - declination_nw) + declination_nw;
+	double declination_min = ((lon - min_lon) / SAMPLING_RES) * (declination_se - declination_sw) + declination_sw;
+	double declination_max = ((lon - min_lon) / SAMPLING_RES) * (declination_ne - declination_nw) + declination_nw;
 
-	float declination_ret = ((lat - min_lat) / SAMPLING_RES) * (declination_max - declination_min) + declination_min;
+	double declination_ret = ((lat - min_lat) / SAMPLING_RES) * (declination_max - declination_min) + declination_min;
 
-	return declination_ret / 180.0f * M_PI;
+	return declination_ret / 180.0 * M_PI;
 }
 
-float get_lookup_table_val(unsigned lat_index, unsigned lon_index)
+double get_lookup_table_val(unsigned lat_index, unsigned lon_index)
 {
 	return declination_table[lat_index][lon_index];
 }
