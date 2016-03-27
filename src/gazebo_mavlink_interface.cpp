@@ -34,7 +34,6 @@ GazeboMavlinkInterface::GazeboMavlinkInterface()
     , received_first_referenc_(false)
     , namespace_(kDefaultNamespace)
     , motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic)
-    , hil_gps_mavlink_pub_topic_(kDefaultMavlinkHilGpsPubTopic)
     , imu_sub_topic_(kDefaultImuTopic)
     , opticalFlow_sub_topic_(kDefaultOpticalFlowTopic)
     , lidar_sub_topic_(kDefaultLidarTopic)
@@ -111,7 +110,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   
   // Publish HilSensor Message and gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>(motor_velocity_reference_pub_topic_, 1);
-  hil_gps_pub_ = node_handle_->Advertise<mavlink::msgs::HilGps>(hil_gps_mavlink_pub_topic_, 1);
 
   _rotor_count = 5;
   last_time_ = world_->GetSimTime();
@@ -234,42 +232,23 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/)
   
   if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {
     last_gps_time_ = current_time;
-    if (use_mavlink_udp) {
-      // Raw UDP mavlink
-      mavlink_hil_gps_t hil_gps_msg;
-      hil_gps_msg.time_usec = current_time.nsec*1000;
-      hil_gps_msg.fix_type = 3;
-      hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
-      hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-      hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
-      hil_gps_msg.eph = 100;
-      hil_gps_msg.epv = 100;
-      hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
-      hil_gps_msg.vn = velocity_current_W.x * 100;
-      hil_gps_msg.ve = -velocity_current_W.y * 100;
-      hil_gps_msg.vd = -velocity_current_W.z * 100;
-      hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
-      hil_gps_msg.satellites_visible = 10;
+    // Raw UDP mavlink
+    mavlink_hil_gps_t hil_gps_msg;
+    hil_gps_msg.time_usec = current_time.nsec*1000;
+    hil_gps_msg.fix_type = 3;
+    hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
+    hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
+    hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
+    hil_gps_msg.eph = 100;
+    hil_gps_msg.epv = 100;
+    hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
+    hil_gps_msg.vn = velocity_current_W.x * 100;
+    hil_gps_msg.ve = -velocity_current_W.y * 100;
+    hil_gps_msg.vd = -velocity_current_W.z * 100;
+    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+    hil_gps_msg.satellites_visible = 10;
 
-      send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
-    } else{
-      // Send via protobuf
-      hil_gps_msg_.set_time_usec(current_time.nsec*1000);
-      hil_gps_msg_.set_fix_type(3);
-      hil_gps_msg_.set_lat(lat_rad * 180 / M_PI * 1e7);
-      hil_gps_msg_.set_lon(lon_rad * 180 / M_PI * 1e7);
-      hil_gps_msg_.set_alt((pos_W_I.z + alt_zurich) * 1000);
-      hil_gps_msg_.set_eph(100);
-      hil_gps_msg_.set_epv(100);
-      hil_gps_msg_.set_vel(velocity_current_W_xy.GetLength() * 100);
-      hil_gps_msg_.set_vn(velocity_current_W.x * 100);
-      hil_gps_msg_.set_ve(-velocity_current_W.y * 100);
-      hil_gps_msg_.set_vd(-velocity_current_W.z * 100);
-      hil_gps_msg_.set_cog(atan2(-velocity_current_W.y * 100, velocity_current_W.x * 100) * 180.0/3.1416 * 100.0);
-      hil_gps_msg_.set_satellites_visible(10);
-             
-      hil_gps_pub_->Publish(hil_gps_msg_);
-    }
+    send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
   }
 }
 
