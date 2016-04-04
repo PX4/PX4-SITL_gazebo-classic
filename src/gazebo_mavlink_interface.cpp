@@ -22,9 +22,6 @@
 #include "gazebo_mavlink_interface.h"
 #include "geo_mag_declination.h"
 
-#define UDP_PORT 14560
-#define UDP_PORT_2 14556
-
 namespace gazebo {
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
@@ -40,11 +37,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   world_ = model_->GetWorld();
 
   namespace_.clear();
-  if (_sdf->HasElement("robotNamespace")) {
-    namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
-  } else {
-    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
-  }
+  getSdfParam<std::string>(_sdf, "robotNamespace", namespace_, model_->GetName());
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
@@ -86,6 +79,31 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     propeller_joint_ = NULL;
   }
 
+  int udp_port,
+  udp_port2,
+  port_step;
+
+  //ports for first (single) SITL instance
+  getSdfParam<int>(_sdf, "udpPort", udp_port, default_udp_port);
+  getSdfParam<int>(_sdf, "udpPort2", udp_port2, default_udp_port2);
+
+  //ports delta between subsequent SITL instances
+  getSdfParam<int>(_sdf, "portStep", port_step, default_port_step);
+
+  //extract number of SITL instance from end of Model name
+  char digits[]="0123456789";
+  std::string model_name = model_->GetName();
+  std::size_t starti = model_name.find_first_of(digits);
+
+  int model_num = 1;
+  if ( starti != std::string::npos )
+    model_num = std::stoi(model_name.substr(starti),nullptr);
+  int delta = (model_num - 1)*port_step;
+
+  //set SITL ports, according to its number
+  udp_port += delta;
+  udp_port2 += delta;
+  gzmsg << "Working with SITL on "<<udp_port<<" and "<<udp_port2<<" UDP ports\n";
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -120,10 +138,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   mag_W_.y = 0.0;
   mag_W_.z = 0.42741;
 
-  //Create socket
-  // udp socket data
-  const int _port = UDP_PORT;
-
   // try to setup udp socket for communcation with simulator
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     printf("create socket failed\n");
@@ -143,11 +157,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   _srcaddr.sin_family = AF_INET;
   _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  _srcaddr.sin_port = htons(UDP_PORT);
+  _srcaddr.sin_port = htons(udp_port);
 
   _srcaddr_2.sin_family = AF_INET;
   _srcaddr_2.sin_addr.s_addr = htonl(INADDR_ANY);
-  _srcaddr_2.sin_port = htons(UDP_PORT_2);
+  _srcaddr_2.sin_port = htons(udp_port2);
 
   _addrlen = sizeof(_srcaddr);
 

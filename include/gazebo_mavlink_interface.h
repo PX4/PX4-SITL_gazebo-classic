@@ -67,27 +67,29 @@ typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
 
 // Default values
-static const std::string kDefaultNamespace = "";
 
 // This just proxies the motor commands from command/motor_speed to the single motors via internal
 // ConsPtr passing, such that the original commands don't have to go n_motors-times over the wire.
-static const std::string kDefaultMotorVelocityReferencePubTopic = "gazebo/command/motor_speed";
-static const std::string kDefaultMavlinkControlSubTopic = "HilControl";
+static const std::string kDefaultMotorVelocityReferencePubTopic = "~/command/motor_speed";
+static const std::string kDefaultMavlinkControlSubTopic = "~/HilControl";
 
-static const std::string kDefaultImuTopic = "imu";
-static const std::string kDefaultLidarTopic = "lidar";
-static const std::string kDefaultOpticalFlowTopic = "opticalFlow";
-static const std::string kDefaultMavlinkHilSensorPubTopic = "HilSensor";
-static const std::string kDefaultMavlinkHilGpsPubTopic = "HilGps";
+static const std::string kDefaultImuTopic = "~/imu";
+static const std::string kDefaultLidarTopic = "~/lidar";
+static const std::string kDefaultOpticalFlowTopic = "~/opticalFlow";
+static const std::string kDefaultMavlinkHilSensorPubTopic = "~/HilSensor";
+static const std::string kDefaultMavlinkHilGpsPubTopic = "~/HilGps";
 
 static bool use_mavlink_udp = true;
+
+static int default_udp_port = 14560;
+static int default_udp_port2 = 14556;
+static int default_port_step = 10;
 
 class GazeboMavlinkInterface : public ModelPlugin {
  public:
   GazeboMavlinkInterface()
       : ModelPlugin(),
         received_first_referenc_(false),
-        namespace_(kDefaultNamespace),
         motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
         hil_sensor_mavlink_pub_topic_(kDefaultMavlinkHilSensorPubTopic),
         hil_gps_mavlink_pub_topic_(kDefaultMavlinkHilGpsPubTopic),

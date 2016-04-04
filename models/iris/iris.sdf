@@ -347,12 +347,11 @@
       </axis>
     </joint>
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
-      <robotNamespace>iris</robotNamespace>
       <linkName>base_link</linkName>
+      <motorPubTopic>~/motors</motorPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='front_right_motor_model' filename='librotors_gazebo_motor_model.so'>
-      <robotNamespace>iris</robotNamespace>
       <jointName>rotor_0_joint</jointName>
       <linkName>rotor_0</linkName>
       <turningDirection>ccw</turningDirection>
@@ -361,15 +360,14 @@
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>0</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
+      <commandSubTopic>~/command/motor_speed</commandSubTopic>
+      <motorSpeedPubTopic>~/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
-      <robotNamespace>iris</robotNamespace>
       <jointName>rotor_1_joint</jointName>
       <linkName>rotor_1</linkName>
       <turningDirection>ccw</turningDirection>
@@ -378,15 +376,14 @@
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>1</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
+      <commandSubTopic>~/command/motor_speed</commandSubTopic>
+      <motorSpeedPubTopic>~/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
-      <robotNamespace>iris</robotNamespace>
       <jointName>rotor_2_joint</jointName>
       <linkName>rotor_2</linkName>
       <turningDirection>cw</turningDirection>
@@ -395,15 +392,14 @@
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>2</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
+      <commandSubTopic>~/command/motor_speed</commandSubTopic>
+      <motorSpeedPubTopic>~/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
-      <robotNamespace>iris</robotNamespace>
       <jointName>rotor_3_joint</jointName>
       <linkName>rotor_3</linkName>
       <turningDirection>cw</turningDirection>
@@ -412,23 +408,24 @@
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>3</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
+      <commandSubTopic>~/command/motor_speed</commandSubTopic>
+      <motorSpeedPubTopic>~/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
-      <robotNamespace>iris</robotNamespace>
-      <imuSubTopic>imu</imuSubTopic>
-      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <imuSubTopic>~/imu</imuSubTopic>
+      <motorSpeedCommandPubTopic>~/command/motor_speed</motorSpeedCommandPubTopic>
+      <udpPort>14560</udpPort>
+      <udpPort2>14556</udpPort2>
+      <portStep>10</portStep>
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
-      <robotNamespace>iris</robotNamespace>
       <linkName>iris/imu_link</linkName>
-      <imuTopic>imu</imuTopic>
+      <imuTopic>~/imu</imuTopic>
       <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
       <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
       <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
