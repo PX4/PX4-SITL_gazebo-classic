@@ -64,10 +64,6 @@ add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 target_link_libraries(rotors_gazebo_motor_model mav_msgs ${GAZEBO_LIBRARIES})
 add_dependencies(rotors_gazebo_motor_model mav_msgs)
 
-add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
-target_link_libraries(rotors_gazebo_multirotor_base_plugin mav_msgs ${GAZEBO_LIBRARIES} )
-add_dependencies(rotors_gazebo_multirotor_base_plugin mav_msgs)
-
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 target_link_libraries(rotors_gazebo_imu_plugin mav_msgs ${GAZEBO_LIBRARIES})
 add_dependencies(rotors_gazebo_imu_plugin mav_msgs)
