@@ -9,7 +9,7 @@
   <!-- Instantiate mavlink telemetry interface. -->
   <xacro:mavlink_interface_macro
     namespace="${namespace}"
-    imu_sub_topic="imu"
+    imu_sub_topic="~/imu"
     >
   </xacro:mavlink_interface_macro>
   </xacro:if>
@@ -19,7 +19,7 @@
     namespace="${namespace}"
     imu_suffix=""
     parent_link="base_link"
-    imu_topic="imu"
+    imu_topic="~/imu"
     mass_imu_sensor="0.015"
     gyroscope_noise_density="0.0003394"
     gyroscopoe_random_walk="0.000038785"
