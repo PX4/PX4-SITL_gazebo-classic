@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
-find_package( PkgConfig REQUIRED)
+find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED)
 if(${GAZEBO_VERSION} VERSION_LESS "6.0")
@@ -17,7 +17,7 @@ else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
 
-pkg_check_modules( protobuf REQUIRED protobuf )
+pkg_check_modules(protobuf REQUIRED protobuf)
 
 add_definitions(-std=c++11)
 
