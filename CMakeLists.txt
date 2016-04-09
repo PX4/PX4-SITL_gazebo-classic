@@ -17,21 +17,12 @@ else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
 
-pkg_check_modules(protobuf REQUIRED protobuf)
-
 add_definitions(-std=c++11)
-
-set(GAZEBO_MSG_INCLUDE_DIRS)
-foreach(ITR ${GAZEBO_INCLUDE_DIRS})
-  if(ITR MATCHES ".*gazebo-[0-9.]+$")
-    set(GAZEBO_MSG_INCLUDE_DIRS "${ITR}/gazebo/msgs")
-  endif()
-endforeach()
 
 include_directories(
   include
   ${GAZEBO_INCLUDE_DIRS}
-  ${GAZEBO_MSG_INCLUDE_DIRS}
+  ${GAZEBO_PROTO_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
@@ -60,7 +51,7 @@ add_subdirectory(msgs)
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
-target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${PROTOBUF_LIBRARY} mav_msgs)
+target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} mav_msgs)
 add_dependencies(rotors_gazebo_controller_interface mav_msgs)
 
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
