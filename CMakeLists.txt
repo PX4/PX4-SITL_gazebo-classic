@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
+# Add search directory for CMake on OS X
+list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
+
 find_package( PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED)
