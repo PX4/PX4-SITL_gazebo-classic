@@ -67,7 +67,6 @@ static constexpr double kDefaultTimeConstantDown = 1.0 / 40.0;
 static constexpr double kDefaulMaxRotVelocity = 838.0;
 static constexpr double kDefaultRotorDragCoefficient = 1.0e-4;
 static constexpr double kDefaultRollingMomentCoefficient = 1.0e-6;
-static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
 
 class GazeboMotorModel : public MotorModel, public ModelPlugin {
  public:
@@ -86,7 +85,6 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
         ref_motor_rot_vel_(0.0),
         rolling_moment_coefficient_(kDefaultRollingMomentCoefficient),
         rotor_drag_coefficient_(kDefaultRotorDragCoefficient),
-        rotor_velocity_slowdown_sim_(kDefaultRotorVelocitySlowdownSim),
         time_constant_down_(kDefaultTimeConstantDown),
         time_constant_up_(kDefaultTimeConstantUp) {
   }
@@ -118,7 +116,6 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   double ref_motor_rot_vel_;
   double rolling_moment_coefficient_;
   double rotor_drag_coefficient_;
-  double rotor_velocity_slowdown_sim_;
   double time_constant_down_;
   double time_constant_up_;
 

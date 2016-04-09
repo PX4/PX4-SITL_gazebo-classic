@@ -22,7 +22,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Macro to add logging to a bag file. -->
   <xacro:macro name="bag_plugin_macro"
-    params="namespace bag_file rotor_velocity_slowdown_sim">
+    params="namespace bag_file">
     <gazebo>
       <plugin filename="librotors_gazebo_bag_plugin.so" name="rosbag">
         <robotNamespace>${namespace}</robotNamespace>
@@ -31,7 +31,6 @@
         <frameId>base_link</frameId>
         <commandAttitudeThrustSubTopic>command/attitude</commandAttitudeThrustSubTopic>
         <commandAttitudeThrustPubTopic>command/attitude</commandAttitudeThrustPubTopic>
-        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
       </plugin>
     </gazebo>
   </xacro:macro>

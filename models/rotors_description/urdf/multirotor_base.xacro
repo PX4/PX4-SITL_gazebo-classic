@@ -60,7 +60,6 @@
       <plugin filename="librotors_gazebo_multirotor_base_plugin.so" name="rosbag">
         <robotNamespace>${robot_namespace}</robotNamespace>
         <linkName>base_link</linkName>
-        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
       </plugin>
     </gazebo>
 
@@ -120,7 +119,6 @@
         <rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
         <rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
         <motorSpeedPubTopic>motor_speed/${motor_number}</motorSpeedPubTopic>
-        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
       </plugin>
     </gazebo>
     <gazebo reference="rotor_${motor_number}">

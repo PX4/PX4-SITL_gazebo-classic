@@ -3,7 +3,6 @@
 <robot name="iris" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Properties -->
   <xacro:property name="namespace" value="iris" />
-  <xacro:property name="rotor_velocity_slowdown_sim" value="10" />
   <xacro:property name="mesh_file" value="iris.dae" />
   <xacro:property name="mesh_scale" value="1 1 1"/>
   <xacro:property name="mesh_scale_prop" value="1 1 1"/>
@@ -37,9 +36,9 @@
   <!-- inertia of a single rotor, assuming it is a cuboid. Height=3mm, width=15mm -->
   <xacro:property name="rotor_inertia">
     <inertia
-    ixx="${1/12 * mass_rotor * (0.015 * 0.015 + 0.003 * 0.003) * rotor_velocity_slowdown_sim}"
-    iyy="${1/12 * mass_rotor * (4 * radius_rotor * radius_rotor + 0.003 * 0.003) * rotor_velocity_slowdown_sim}"
-    izz="${1/12 * mass_rotor * (4 * radius_rotor * radius_rotor + 0.015 * 0.015) * rotor_velocity_slowdown_sim}"
+    ixx="${1/12 * mass_rotor * (0.015 * 0.015 + 0.003 * 0.003)}"
+    iyy="${1/12 * mass_rotor * (4 * radius_rotor * radius_rotor + 0.003 * 0.003)}"
+    izz="${1/12 * mass_rotor * (4 * radius_rotor * radius_rotor + 0.015 * 0.015)}"
     ixy="0.0" ixz="0.0"  iyz="0.0" /> <!-- [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] -->
   </xacro:property>
 

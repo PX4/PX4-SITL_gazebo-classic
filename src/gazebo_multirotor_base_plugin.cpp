@@ -36,9 +36,6 @@ void GazeboMultirotorBasePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr 
   getSdfParam<std::string>(_sdf, "robotNamespace", namespace_, namespace_, true);
   getSdfParam<std::string>(_sdf, "linkName", link_name_, link_name_, true);
   getSdfParam<std::string>(_sdf, "motorPubTopic", motor_pub_topic_, motor_pub_topic_);
-  getSdfParam<double>(_sdf, "rotorVelocitySlowdownSim", rotor_velocity_slowdown_sim_,
-                      rotor_velocity_slowdown_sim_);
-
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
@@ -80,7 +77,7 @@ void GazeboMultirotorBasePlugin::OnUpdate(const common::UpdateInfo& _info) {
   mav_msgs::msgs::MotorSpeed msg;
   MotorNumberToJointMap::iterator m;
   for (m = motor_joints_.begin(); m != motor_joints_.end(); ++m) {
-    double motor_rot_vel = m->second->GetVelocity(0) * rotor_velocity_slowdown_sim_;
+    double motor_rot_vel = m->second->GetVelocity(0);
     msg.add_motor_speed(motor_rot_vel);
   }
   // motor_pub_->WaitForConnection();
