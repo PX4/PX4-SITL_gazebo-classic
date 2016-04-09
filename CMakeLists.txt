@@ -61,9 +61,6 @@ add_subdirectory(msgs)
 
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-add_library(hello_world SHARED src/hello_world.cc)
-target_link_libraries(hello_world ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${PROTOBUF_LIBRARY} mav_msgs)
 add_dependencies(rotors_gazebo_controller_interface mav_msgs)
