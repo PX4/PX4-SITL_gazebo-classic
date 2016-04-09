@@ -14,9 +14,6 @@ foreach(ITR ${GAZEBO_INCLUDE_DIRS})
 endforeach()
 
 set (msgs
-  HilGps.proto
-  HilSensor.proto
-  HilControl.proto
   SensorImu.proto
   Float.proto
   opticalFlow.proto
