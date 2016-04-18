@@ -13,9 +13,13 @@ endif()
 find_package(Eigen3 QUIET)
 if(NOT EIGEN3_FOUND)
   # Fallback to cmake_modules
-  find_package(Eigen REQUIRED)
-  set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
-  set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
+  find_package(Eigen QUIET)
+  if(NOT EIGEN_FOUND)
+    pkg_check_modules( EIGEN3 REQUIRED eigen3)
+  else()
+    set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
+    set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
+  endif()
 else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
@@ -40,6 +44,8 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}/msgs
   ${Boost_INCLUDE_DIR}
+  # Workaround for Eigen3
+  ${Boost_INCLUDE_DIR}/eigen3
   # Workaround for OGRE include dirs on Mac OS
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
