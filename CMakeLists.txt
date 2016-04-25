@@ -46,6 +46,7 @@ include_directories(
   ${Boost_INCLUDE_DIR}
   # Workaround for Eigen3
   ${Boost_INCLUDE_DIR}/eigen3
+  ${EIGEN3_INCLUDE_DIRS}/eigen3
   # Workaround for OGRE include dirs on Mac OS
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
