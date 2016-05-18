@@ -180,9 +180,12 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
     mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
-
     for (int i = 0; i < input_reference_.size(); i++){
-      turning_velocities_msg.add_motor_speed(input_reference_[i]);
+      if (last_actuator_time_ == 0 || (now - last_actuator_time_).Double() > 0.2) {
+        turning_velocities_msg.add_motor_speed(0);
+      } else {
+        turning_velocities_msg.add_motor_speed(input_reference_[i]);
+      }
     }
     // TODO Add timestamp and Header
     // turning_velocities_msg->header.stamp.sec = now.sec;
@@ -504,6 +507,8 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     // TODO XXX: this makes SITL work again
     bool is_fixed_wing = false;
 
+    last_actuator_time_ = world_->GetSimTime();
+
     input_reference_.resize(_rotor_count);
 
     // set rotor speeds for all systems
@@ -519,9 +524,15 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       // set angles of control surface joints (this should go into a message for the correct plugin)
       double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
       double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
+#if GAZEBO_MAJOR_VERSION >= 6
+      left_elevon_joint_->SetPosition(0, roll);
+      right_elevon_joint_->SetPosition(0, -roll);
+      elevator_joint_->SetPosition(0, -pitch);
+#else
       left_elevon_joint_->SetAngle(0, roll);
       right_elevon_joint_->SetAngle(0, -roll);
       elevator_joint_->SetAngle(0, -pitch);
+#endif
     }
 
     received_first_referenc_ = true;

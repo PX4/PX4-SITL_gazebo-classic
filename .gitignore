@@ -1,3 +1,5 @@
 Build/
 .DS_Store
 *~
+models/iris/*.sdf
+*.pyc
