@@ -44,9 +44,6 @@ static const std::string kDefaultMotorPubTopic = "motors";
 static const std::string kDefaultLinkName = "base_link";
 static const std::string kDefaultFrameId = "base_link";
 
-static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
-
-
 /// \brief This plugin publishes the motor speeds of your multirotor model.
 class GazeboMultirotorBasePlugin : public ModelPlugin {
   typedef std::map<const unsigned int, const physics::JointPtr> MotorNumberToJointMap;
@@ -57,8 +54,9 @@ class GazeboMultirotorBasePlugin : public ModelPlugin {
         namespace_(kDefaultNamespace),
         motor_pub_topic_(kDefaultMotorPubTopic),
         link_name_(kDefaultLinkName),
-        frame_id_(kDefaultFrameId),
-        rotor_velocity_slowdown_sim_(kDefaultRotorVelocitySlowdownSim) {}
+        frame_id_(kDefaultFrameId)
+ {
+ }
 
   virtual ~GazeboMultirotorBasePlugin();
 
@@ -87,7 +85,6 @@ class GazeboMultirotorBasePlugin : public ModelPlugin {
   std::string motor_pub_topic_;
   std::string link_name_;
   std::string frame_id_;
-  double rotor_velocity_slowdown_sim_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_pub_;

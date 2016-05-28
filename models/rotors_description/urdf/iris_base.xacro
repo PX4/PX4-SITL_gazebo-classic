@@ -92,7 +92,6 @@
     <xacro:bag_plugin_macro
       namespace="${namespace}"
       bag_file="$(arg log_file)"
-      rotor_velocity_slowdown_sim="${rotor_velocity_slowdown_sim}"
     >
     </xacro:bag_plugin_macro>
   </xacro:if>

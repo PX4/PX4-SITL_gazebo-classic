@@ -585,7 +585,6 @@
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>plane</robotNamespace>
@@ -602,7 +601,6 @@
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>plane</robotNamespace>
@@ -619,7 +617,6 @@
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>plane</robotNamespace>
@@ -636,7 +633,6 @@
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='puller' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>plane</robotNamespace>
@@ -653,7 +649,6 @@
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>motor_speed/4</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
       <robotNamespace>plane</robotNamespace>
