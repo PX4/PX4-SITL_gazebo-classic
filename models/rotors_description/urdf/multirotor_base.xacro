@@ -64,6 +64,7 @@
       </plugin>
     </gazebo>
     <gazebo reference="base_link">
+      <material>Gazebo/${color}</material>
       <collision name='base_link_inertia_collision'>
         <surface>
           <contact>
@@ -78,10 +79,6 @@
         </surface>
       </collision>
    </gazebo>
-
-    <gazebo reference="base_link">
-      <material>Gazebo/${color}</material>
-    </gazebo>
   </xacro:macro>
 
   <!-- Rotor joint and link -->
