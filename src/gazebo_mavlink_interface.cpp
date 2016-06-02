@@ -177,6 +177,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     // turning_velocities_msg->header.stamp.sec = now.sec;
     // turning_velocities_msg->header.stamp.nsec = now.nsec;
 
+    // gzerr << turning_velocities_msg.motor_speed(0) << "\n";
     motor_velocity_reference_pub_->Publish(turning_velocities_msg);
   }
 
@@ -348,6 +349,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   C_W_I.y = imu_message->orientation().y();
   C_W_I.z = imu_message->orientation().z();
 
+  // gzerr << "got imu: " << C_W_I << "\n";
   float declination = get_mag_declination(lat_rad, lon_rad);
 
   math::Quaternion C_D_I(0.0, 0.0, declination);

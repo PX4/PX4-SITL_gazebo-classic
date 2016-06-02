@@ -115,11 +115,11 @@
     <gazebo>
       <plugin name="controller_interface" filename="librotors_gazebo_controller_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
-        <commandAttitudeThrustSubTopic>command/attitude</commandAttitudeThrustSubTopic>
-        <commandRateThrustSubTopic>command/rate</commandRateThrustSubTopic>
-        <commandMotorSpeedSubTopic>command/motor_speed</commandMotorSpeedSubTopic>
-        <imuSubTopic>${imu_sub_topic}</imuSubTopic>
-        <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+        <commandAttitudeThrustSubTopic>/command/attitude</commandAttitudeThrustSubTopic>
+        <commandRateThrustSubTopic>/command/rate</commandRateThrustSubTopic>
+        <commandMotorSpeedSubTopic>/command/motor_speed</commandMotorSpeedSubTopic>
+        <imuSubTopic>/${imu_sub_topic}</imuSubTopic>
+        <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       </plugin>
     </gazebo>
   </xacro:macro>
@@ -130,7 +130,7 @@
       <plugin name="mavlink_interface" filename="librotors_gazebo_mavlink_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
         <imuSubTopic>${imu_sub_topic}</imuSubTopic>
-        <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+        <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       </plugin>
     </gazebo>
   </xacro:macro>
@@ -436,7 +436,7 @@
       namespace="${namespace}"
       imu_suffix=""
       parent_link="${namespace}/vi_sensor_link"
-      imu_topic="imu"
+      imu_topic="/imu"
       mass_imu_sensor="0.015"
       gyroscope_noise_density="0.0003394"
       gyroscopoe_random_walk="0.000038785"

@@ -312,6 +312,7 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   imu_message_.set_allocated_linear_acceleration(linear_acceleration);
   imu_message_.set_allocated_angular_velocity(angular_velocity);
 
+  // gzerr << "publishing: " << imu_message_.linear_acceleration().z() << "\n";
   imu_pub_->Publish(imu_message_);
 }
 
