@@ -27,7 +27,12 @@ endif()
 pkg_check_modules( protobuf REQUIRED protobuf )
 
 FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
-add_definitions(-std=c++11)
+
+add_definitions(
+	-std=c++11
+	# Shut up warnings about std::binder1st, std::binder2nd.
+	-Wno-deprecated-declarations
+)
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
