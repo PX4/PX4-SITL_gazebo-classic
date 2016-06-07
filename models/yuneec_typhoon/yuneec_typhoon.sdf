@@ -227,13 +227,14 @@
     <joint name='left_leg_joint' type='revolute'>
       <child>left_leg</child>
       <parent>base_link</parent>
+      <pose frame=''>0.00026 -0.040515 -0.048 0 0 0</pose>
       <axis>
         <xyz>-1 0 0</xyz>
         <limit>
           <lower>0</lower>
-          <upper>1.5</upper>
-          <effort>0</effort>
-          <velocity>0</velocity>
+          <upper>1.4</upper>
+          <effort>100</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
           <damping>1</damping>
@@ -333,13 +334,14 @@
     <joint name='right_leg_joint' type='revolute'>
       <child>right_leg</child>
       <parent>base_link</parent>
+      <pose frame=''>0.00026 0.040515 -0.048 0 0 0</pose>
       <axis>
         <xyz>1 0 0</xyz>
         <limit>
           <lower>0</lower>
-          <upper>1.5</upper>
-          <effort>0</effort>
-          <velocity>0</velocity>
+          <upper>1.4</upper>
+          <effort>100</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
           <damping>1</damping>
