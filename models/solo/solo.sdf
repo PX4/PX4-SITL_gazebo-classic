@@ -1,0 +1,276 @@
+<sdf version='1.5'>
+  <model name='solo'>
+    <!-- Solo body -->
+    <link name='base_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>1.47</mass>
+        <inertia>
+          <ixx>0.011</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.015</iyy>
+          <iyz>0</iyz>
+          <izz>0.021</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 -0.051 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.340 0.340 0.190</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://solo/meshes/solo.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <self_collide>0</self_collide>
+    </link>
+
+    <!-- Rotor 0 -->
+    <link name='rotor_0'>
+      <pose>-0.14745 -0.14525 0.051 0 0 0</pose>
+      <!-- Note: inertial values were duplicated from Iris prop inertial values; may not be accurate -->
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_0_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='rotor_0_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/RedTransparent</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_0_joint' type='revolute'>
+      <child>rotor_0</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <!-- Rotor 1 -->
+    <link name='rotor_1'>
+      <pose>0.14745 -0.14525 0.051 0 0 0</pose>
+      <!-- Note: inertial values were duplicated from Iris prop inertial values; may not be accurate -->
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_1_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='rotor_1_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/GreyTransparent</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_1_joint' type='revolute'>
+      <child>rotor_1</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <!-- Rotor 2 -->
+    <link name='rotor_2'>
+      <pose>-0.14745 0.14525 0.051 0 0 0</pose>
+      <!-- Note: inertial values were duplicated from Iris prop inertial values; may not be accurate -->
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_2_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='rotor_2_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/RedTransparent</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_2_joint' type='revolute'>
+      <child>rotor_2</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <!-- Rotor 3 -->
+    <link name='rotor_3'>
+      <pose>0.14745 0.14525 0.051 0 0 0</pose>
+      <!-- Note: inertial values were duplicated from Iris prop inertial values; may not be accurate -->
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_3_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='rotor_3_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.011</length>
+            <radius>0.127</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/GreyTransparent</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_3_joint' type='revolute'>
+      <child>rotor_3</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+  </model>
+</sdf>
