@@ -260,7 +260,7 @@
       <child>rotor_0</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0.0446 -0.0825 1.8977</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -326,7 +326,7 @@
       <child>rotor_1</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0.046 0.0827 1.8977</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -392,7 +392,7 @@
       <child>rotor_2</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>-0.09563 -0.0003 1.8976</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -458,7 +458,7 @@
       <child>rotor_3</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0.0486 0.0811 1.8976</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -525,7 +525,7 @@
       <child>rotor_4</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>-0.033996 -0.0006 0.68216</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -591,7 +591,7 @@
       <child>rotor_5</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0.0404 -0.0876 1.8976</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
