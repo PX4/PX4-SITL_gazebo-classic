@@ -476,24 +476,57 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
   case MAVLINK_MSG_ID_HIL_CONTROLS:
     mavlink_hil_controls_t controls;
     mavlink_msg_hil_controls_decode(msg, &controls);
-    inputs.control[0] =(double)controls.roll_ailerons;
-    inputs.control[1] =(double)controls.pitch_elevator;
-    inputs.control[2] =(double)controls.yaw_rudder;
-    inputs.control[3] =(double)controls.throttle;
-    inputs.control[4] =(double)controls.aux1;
-    inputs.control[5] =(double)controls.aux2;
-    inputs.control[6] =(double)controls.aux3;
-    inputs.control[7] =(double)controls.aux4;
+    bool armed = false;
 
-    // publish message
-    double scaling = 340;
-    double offset = 500;
+    if ((controls.mode & MAV_MODE_FLAG_SAFETY_ARMED) > 0) {
+      armed = true;
+    }
 
-    // simple check to see if we are simulating fw or mc
-    // we really need to get away from this HIL message
-    //bool is_fixed_wing = inputs.control[0] < 10.0f;
-    // TODO XXX: this makes SITL work again
-    bool is_fixed_wing = false;
+    inputs.control[0] = controls.roll_ailerons;
+    inputs.control[1] = controls.pitch_elevator;
+    inputs.control[2] = controls.yaw_rudder;
+    inputs.control[3] = controls.throttle;
+    inputs.control[4] = controls.aux1;
+    inputs.control[5] = controls.aux2;
+    inputs.control[6] = controls.aux3;
+    inputs.control[7] = controls.aux4;
+
+
+    // Set all scalings
+    const unsigned n_out = 8;
+
+    double input_offset[n_out];
+    double input_scaling[n_out];
+    double zero_position_disarmed[n_out];
+    double zero_position_armed[n_out];
+
+    // First four motors
+    for (unsigned i = 0; i < 4; i++) {
+      // scaling values
+      input_offset[i] = 1.0;
+
+      // XXX this needs re-investigation regarding
+      // the correct scaling for the correct motor
+      // model
+      input_scaling[i] = 450.0;
+      zero_position_disarmed[i] = 0.0;
+      zero_position_armed[i] = 100.0;
+    }
+
+    // Fift motor
+    input_offset[5] = 1.0;
+    input_scaling[5] = 900;
+    zero_position_disarmed[5] = 0.0;
+    zero_position_armed[5] = 500.0;
+
+    // Servos
+    for (unsigned i = 4; i < n_out; i++) {
+      // scaling values
+      input_offset[i] = 0.0;
+      input_scaling[i] = 1.0;
+      zero_position_disarmed[i] = 0.0;
+      zero_position_armed[i] = 0.0;
+    }
 
     last_actuator_time_ = world_->GetSimTime();
 
@@ -501,25 +534,33 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 
     // set rotor speeds for all systems
     for (int i = 0; i < _rotor_count; i++) {
-      input_reference_[i] = inputs.control[i] * scaling + offset;
+      if (armed) {
+        input_reference_[i] = (inputs.control[i] + input_offset[i]) * input_scaling[i] + zero_position_armed[i];
+      } else {
+        input_reference_[i] = zero_position_disarmed[i];
+      }
     }
-
-    // 5th rotor: pusher/puller throttle for the standard vtol plane
-    // XXX this won't work with hexacopters and alike
-    input_reference_[4] = (inputs.control[6] + 1.0f) / 2 * 1800 + (inputs.control[6] > -1 ? 500 : 0);
 
     if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
       // set angles of control surface joints (this should go into a message for the correct plugin)
-      double roll = 0.5 * (inputs.control[4] + inputs.control[5]);
-      double pitch = 0.5 * (inputs.control[4] - inputs.control[5]);
+      double elevon_left = (inputs.control[4] + input_offset[4]) * input_scaling[4] + zero_position_armed[4];
+      double elevon_right = (inputs.control[5] + input_offset[5]) * input_scaling[5] + zero_position_armed[5];
+      double elevator = (inputs.control[6] + input_offset[6]) * input_scaling[6] + zero_position_armed[6];
+
+      if (!armed) {
+        elevon_left = zero_position_disarmed[4];
+        elevon_right = zero_position_disarmed[5];
+        elevator = zero_position_disarmed[6];
+      }
+
 #if GAZEBO_MAJOR_VERSION >= 6
-      left_elevon_joint_->SetPosition(0, roll);
-      right_elevon_joint_->SetPosition(0, -roll);
-      elevator_joint_->SetPosition(0, -pitch);
+      left_elevon_joint_->SetPosition(0, elevon_left);
+      right_elevon_joint_->SetPosition(0, elevon_right);
+      elevator_joint_->SetPosition(0, elevator);
 #else
-      left_elevon_joint_->SetAngle(0, roll);
-      right_elevon_joint_->SetAngle(0, -roll);
-      elevator_joint_->SetAngle(0, -pitch);
+      left_elevon_joint_->SetAngle(0, elevon_left);
+      right_elevon_joint_->SetAngle(0, elevon_right);
+      elevator_joint_->SetAngle(0, elevator);
 #endif
     }
 
