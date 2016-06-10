@@ -275,6 +275,7 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
 #endif
 
   math::Vector3 angular_vel_I = link_->GetRelativeAngularVel();
+  // gzerr << acceleration_I << "\n";
 
   Eigen::Vector3d linear_acceleration_I(acceleration_I.x,
                                         acceleration_I.y,

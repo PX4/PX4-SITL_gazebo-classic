@@ -455,6 +455,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
   ::poll(&fds[0], (sizeof(fds[0])/sizeof(fds[0])), 0);
   if (fds[0].revents & POLLIN) {
     len = recvfrom(_fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_addrlen);
+    gzerr << "polling\n";
     if (len > 0) {
       mavlink_message_t msg;
       mavlink_status_t status;
@@ -535,6 +536,9 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     // set rotor speeds for all systems
     for (int i = 0; i < _rotor_count; i++) {
       if (armed) {
+        gzerr << " input control [" << i
+              << "] " << inputs.control[i]
+              << "\n";
         input_reference_[i] = (inputs.control[i] + input_offset[i]) * input_scaling[i] + zero_position_armed[i];
       } else {
         input_reference_[i] = zero_position_disarmed[i];
