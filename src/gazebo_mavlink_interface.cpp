@@ -535,19 +535,6 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       zero_position_armed[i] = 0.0;
     }
 
-    // Config for plane model
-
-    // input_index[0] = 0;
-
-    // input_index[5] = 1;
-    // input_index[6] = 2;
-    // input_index[7] = 3;
-
-    // input_offset[0] = 1.0;
-    // input_scaling[0] = 1200;
-    // zero_position_disarmed[0] = 0.0;
-    // zero_position_armed[0] = 0.0;
-
     last_actuator_time_ = world_->GetSimTime();
 
     input_reference_.resize(n_out);

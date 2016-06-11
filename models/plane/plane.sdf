@@ -16,7 +16,7 @@
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>0 0 -0.2 0 0 0</pose>
+        <pose>0 0 -0.07 0 0 0</pose>
         <geometry>
           <box>
             <size>0.47 0.47 0.11</size>
@@ -101,7 +101,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_puller_collision'>
-        <pose>0.0 0 0.5 0 0 0</pose>
+        <pose>0.0 0 0.0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -380,7 +380,7 @@
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.016</momentConstant>
       <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
-      <motorNumber>0</motorNumber>
+      <motorNumber>4</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
