@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/PX4/ecl.svg?branch=master)](https://travis-ci.org/PX4/ecl) [![DOI](https://zenodo.org/badge/22634/PX4/sitl_gazebo.svg)](https://zenodo.org/badge/latestdoi/22634/PX4/sitl_gazebo)
+
+
 # Gazebo for MAVLink SITL
 
 This is a flight simulator for multirotors, VTOL and fixed wing.
