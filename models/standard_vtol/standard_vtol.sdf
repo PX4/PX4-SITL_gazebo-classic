@@ -16,10 +16,10 @@
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>0 0 -0.2 0 0 0</pose>
+        <pose>-0.01 0 -0.05 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.47 0.47 0.11</size>
+            <size>0.5 2.144 0.05</size>
           </box>
         </geometry>
         <surface>
@@ -35,11 +35,11 @@
         </surface>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0.07 0 -0.08 0 0 0</pose>
+        <pose>0.45 -1.072 -0.1 1.5707963268 0 3.1415926536</pose>
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
-            <uri>model://standard_vtol/meshes/body.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://standard_vtol/meshes/x8_wing.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -101,7 +101,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_0_collision'>
-        <pose>0 0 -0.3 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -167,7 +167,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_1_collision'>
-        <pose>0 0 -0.3 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -233,7 +233,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_2_collision'>
-        <pose>0 0 -0.3 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -299,7 +299,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_3_collision'>
-        <pose>0 0 -0.3 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -352,7 +352,7 @@
     </joint>
 
     <link name='rotor_puller'>
-      <pose>0.3 0 0.0 0 1.57 0</pose>
+      <pose>-0.25 0 0.0 0 1.57 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -366,7 +366,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_puller_collision'>
-        <pose>0.0 0 0.5 0 0 0</pose>
+        <pose>0.0 0 -0.09 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -386,7 +386,7 @@
         <pose>0 0 -0.09 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>1 1 1</scale>
+            <scale>0.8 0.8 0.8</scale>
             <uri>model://standard_vtol/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
@@ -643,7 +643,7 @@
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
+      <momentConstant>0.16</momentConstant>
       <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>0</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
@@ -660,7 +660,7 @@
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
+      <momentConstant>0.16</momentConstant>
       <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>1</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
@@ -677,7 +677,7 @@
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
+      <momentConstant>0.16</momentConstant>
       <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>2</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
@@ -694,7 +694,7 @@
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>838</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
+      <momentConstant>0.16</momentConstant>
       <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>3</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>

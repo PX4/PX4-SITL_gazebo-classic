@@ -455,7 +455,6 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
   ::poll(&fds[0], (sizeof(fds[0])/sizeof(fds[0])), 0);
   if (fds[0].revents & POLLIN) {
     len = recvfrom(_fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_addrlen);
-    gzerr << "polling\n";
     if (len > 0) {
       mavlink_message_t msg;
       mavlink_status_t status;
@@ -483,6 +482,8 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       armed = true;
     }
 
+    armed = true;
+
     inputs.control[0] = controls.roll_ailerons;
     inputs.control[1] = controls.pitch_elevator;
     inputs.control[2] = controls.yaw_rudder;
@@ -500,9 +501,12 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     double input_scaling[n_out];
     double zero_position_disarmed[n_out];
     double zero_position_armed[n_out];
+    int input_index[n_out];
 
     // First four motors
     for (unsigned i = 0; i < 4; i++) {
+      input_index[i] = i;
+
       // scaling values
       input_offset[i] = 1.0;
 
@@ -514,15 +518,19 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       zero_position_armed[i] = 100.0;
     }
 
+    // Config for standard VTOL model
+
     // Fift motor
-    input_offset[5] = 1.0;
-    input_scaling[5] = 900;
-    zero_position_disarmed[5] = 0.0;
-    zero_position_armed[5] = 500.0;
+    input_index[4] = 4;
+    input_offset[4] = 1.0;
+    input_scaling[4] = 1200;
+    zero_position_disarmed[4] = 0.0;
+    zero_position_armed[4] = 0.0;
 
     // Servos
-    for (unsigned i = 4; i < n_out; i++) {
+    for (unsigned i = 5; i < n_out; i++) {
       // scaling values
+      input_index[i] = i;
       input_offset[i] = 0.0;
       input_scaling[i] = 1.0;
       zero_position_disarmed[i] = 0.0;
@@ -531,40 +539,26 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 
     last_actuator_time_ = world_->GetSimTime();
 
-    input_reference_.resize(_rotor_count);
+    input_reference_.resize(n_out);
 
     // set rotor speeds for all systems
-    for (int i = 0; i < _rotor_count; i++) {
+    for (int i = 0; i < n_out; i++) {
       if (armed) {
-        gzerr << " input control [" << i
-              << "] " << inputs.control[i]
-              << "\n";
-        input_reference_[i] = (inputs.control[i] + input_offset[i]) * input_scaling[i] + zero_position_armed[i];
+        input_reference_[i] = (inputs.control[input_index[i]] + input_offset[i]) * input_scaling[i] + zero_position_armed[i];
       } else {
         input_reference_[i] = zero_position_disarmed[i];
       }
     }
 
     if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
-      // set angles of control surface joints (this should go into a message for the correct plugin)
-      double elevon_left = (inputs.control[4] + input_offset[4]) * input_scaling[4] + zero_position_armed[4];
-      double elevon_right = (inputs.control[5] + input_offset[5]) * input_scaling[5] + zero_position_armed[5];
-      double elevator = (inputs.control[6] + input_offset[6]) * input_scaling[6] + zero_position_armed[6];
-
-      if (!armed) {
-        elevon_left = zero_position_disarmed[4];
-        elevon_right = zero_position_disarmed[5];
-        elevator = zero_position_disarmed[6];
-      }
-
 #if GAZEBO_MAJOR_VERSION >= 6
-      left_elevon_joint_->SetPosition(0, elevon_left);
-      right_elevon_joint_->SetPosition(0, elevon_right);
-      elevator_joint_->SetPosition(0, elevator);
+      left_elevon_joint_->SetPosition(0, input_reference_[5]);
+      right_elevon_joint_->SetPosition(0, input_reference_[6]);
+      elevator_joint_->SetPosition(0, input_reference_[7]);
 #else
-      left_elevon_joint_->SetAngle(0, elevon_left);
-      right_elevon_joint_->SetAngle(0, elevon_right);
-      elevator_joint_->SetAngle(0, elevator);
+      left_elevon_joint_->SetAngle(0, input_reference_[5]);
+      right_elevon_joint_->SetAngle(0, input_reference_[6]);
+      elevator_joint_->SetAngle(0, input_reference_[7]);
 #endif
     }
 

@@ -16,7 +16,7 @@
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>0 0 -0.2 0 0 0</pose>
+        <pose>0 0 -0.07 0 0 0</pose>
         <geometry>
           <box>
             <size>0.47 0.47 0.11</size>
@@ -86,211 +86,6 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <link name='rotor_0'>
-      <pose>0.3 -0.3 0.07 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <mass>0.005</mass>
-        <inertia>
-          <ixx>9.75e-07</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.000167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='rotor_0_collision'>
-        <pose>0 0 -0.3 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-    <joint name='rotor_0_joint' type='revolute'>
-      <child>rotor_0</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-    <link name='rotor_1'>
-      <pose>-0.3 0.3 0.07 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <mass>0.005</mass>
-        <inertia>
-          <ixx>9.75e-07</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.000167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='rotor_1_collision'>
-        <pose>0 0 -0.3 0 -0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-    <joint name='rotor_1_joint' type='revolute'>
-      <child>rotor_1</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-    <link name='rotor_2'>
-      <pose>0.3 0.3 0.07 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <mass>0.005</mass>
-        <inertia>
-          <ixx>9.75e-07</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.000167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='rotor_2_collision'>
-        <pose>0 0 -0.3 0 -0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-    <joint name='rotor_2_joint' type='revolute'>
-      <child>rotor_2</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-    <link name='rotor_3'>
-      <pose>-0.3 -0.3 0.07 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <mass>0.005</mass>
-        <inertia>
-          <ixx>9.75e-07</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.000167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='rotor_3_collision'>
-        <pose>0 0 -0.3 0 -0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-    <joint name='rotor_3_joint' type='revolute'>
-      <child>rotor_3</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-
     <link name='rotor_puller'>
       <pose>0.3 0 0.0 0 1.57 0</pose>
       <inertial>
@@ -306,7 +101,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_puller_collision'>
-        <pose>0.0 0 0.5 0 0 0</pose>
+        <pose>0.0 0 0.0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
