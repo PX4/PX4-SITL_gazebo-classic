@@ -481,14 +481,14 @@
         <xyz>-1 0 0</xyz>
         <limit>
           <lower>0</lower>
-          <upper>1.4</upper>
+          <upper>0.1</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
+          <stiffness>100000000</stiffness>
+          <dissipation>1</dissipation>
         </limit>
         <dynamics>
-          <damping>1</damping>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
         <physics>
           <ode>
@@ -588,14 +588,14 @@
         <xyz>1 0 0</xyz>
         <limit>
           <lower>0</lower>
-          <upper>1.4</upper>
+          <upper>0.1</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
+          <stiffness>100000000</stiffness>
+          <dissipation>1</dissipation>
         </limit>
         <dynamics>
-          <damping>1</damping>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
         <physics>
           <ode>
@@ -1148,6 +1148,16 @@
       <robotNamespace>typhoon_h480</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+
+      <channel>
+        <index>0</index>
+        <offset>0</offset>
+        <scaling>0</scaling>
+        <zero_position_disarmed>0</zero_position_disarmed>
+        <aero_position_armed>0</aero_position_armed>
+        <joint>rotor_0_joint</joint>
+      </channel>
+
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
