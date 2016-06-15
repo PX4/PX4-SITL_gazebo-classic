@@ -504,7 +504,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     int input_index[n_out];
 
     // First four motors
-    for (unsigned i = 0; i < 6; i++) {
+    for (unsigned i = 0; i < 4; i++) {
       input_index[i] = i;
 
       // scaling values
@@ -519,21 +519,19 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     }
 
     // Config for standard VTOL model
-/*
     // Fifth motor
     input_index[4] = 4;
     input_offset[4] = 1.0;
-    input_scaling[4] = 1200;
+    input_scaling[4] = 0;
     zero_position_disarmed[4] = 0.0;
     zero_position_armed[4] = 0.0;
 
     // Sixth motor
     input_index[5] = 5;
     input_offset[5] = 1.0;
-    input_scaling[5] = 1200;
+    input_scaling[5] = 0;
     zero_position_disarmed[5] = 0.0;
     zero_position_armed[5] = 0.0;
-*/
 
     // Servos
     for (unsigned i = 6; i < n_out; i++) {
