@@ -1,11 +1,8 @@
-[![DOI](https://zenodo.org/badge/22634/PX4/sitl_gazebo.svg)](https://zenodo.org/badge/latestdoi/22634/PX4/sitl_gazebo)
-
-
 # Gazebo for MAVLink SITL
 
-This is a flight simulator for multirotors, VTOL and fixed wing.
+This is a flight simulator for multirotors, VTOL and fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. This repository is in the process of being re-integrated into RotorS, which then will support ROS and MAVLink as transport options: https://github.com/ethz-asl/rotors_simulator
 
-NOTE: This repository is in the process of being re-integrated into RotorS: https://github.com/ethz-asl/rotors_simulator
+**If you use this simulator in academic work, please cite RotorS as per the README in the above link.**
 
 ## Install Gazebo Simulator
 
@@ -88,4 +85,4 @@ Gazebo will now launch when typing 'gazebo' on the shell:
 gazebo
 ```
 
-Please refer to the documentation of the particular flight stack how to run it against this framework.
+Please refer to the documentation of the particular flight stack how to run it against this framework, e.g. [PX4](http://dev.px4.io/simulation-gazebo.html)
