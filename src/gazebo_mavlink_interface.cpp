@@ -334,7 +334,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const voi
     len = sendto(_fd, buf, packet_len, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
 
   if (len <= 0) {
-    printf("Failed sending mavlink message");
+    printf("Failed sending mavlink message\n");
   }
 }
 
@@ -482,27 +482,30 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       armed = true;
     }
 
-    inputs.control[0] = controls.roll_ailerons;
-    inputs.control[1] = controls.pitch_elevator;
-    inputs.control[2] = controls.yaw_rudder;
-    inputs.control[3] = controls.throttle;
-    inputs.control[4] = controls.aux1;
-    inputs.control[5] = controls.aux2;
-    inputs.control[6] = controls.aux3;
-    inputs.control[7] = controls.aux4;
+    const unsigned n_out = sizeof(inputs.control) / sizeof(inputs.control[0]);
+    const unsigned block_size = 8;
 
+    unsigned off = (controls.nav_mode * block_size);
+
+    // We only support 16 outputs so far, so we
+    // ignore the third and fourth output
+    if (off + block_size > n_out) {
+      break;
+    }
+
+    inputs.control[off + 0] = controls.roll_ailerons;
+    inputs.control[off + 1] = controls.pitch_elevator;
+    inputs.control[off + 2] = controls.yaw_rudder;
+    inputs.control[off + 3] = controls.throttle;
+    inputs.control[off + 4] = controls.aux1;
+    inputs.control[off + 5] = controls.aux2;
+    inputs.control[off + 6] = controls.aux3;
+    inputs.control[off + 7] = controls.aux4;
 
     // Set all scalings
-    const unsigned n_out = 8;
-
-    double input_offset[n_out];
-    double input_scaling[n_out];
-    double zero_position_disarmed[n_out];
-    double zero_position_armed[n_out];
-    int input_index[n_out];
 
     // First four motors
-    for (unsigned i = 0; i < 4; i++) {
+    for (unsigned i = off; i < off + 4; i++) {
       input_index[i] = i;
 
       // scaling values
@@ -519,14 +522,14 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     // Config for standard VTOL model
 
     // Fift motor
-    input_index[4] = 4;
-    input_offset[4] = 1.0;
-    input_scaling[4] = 1200;
-    zero_position_disarmed[4] = 0.0;
-    zero_position_armed[4] = 0.0;
+    input_index[off + 4] = off + 4;
+    input_offset[off + 4] = 1.0;
+    input_scaling[off + 4] = 1200;
+    zero_position_disarmed[off + 4] = 0.0;
+    zero_position_armed[off + 4] = 0.0;
 
     // Servos
-    for (unsigned i = 5; i < n_out; i++) {
+    for (unsigned i = off + 5; i < off + block_size; i++) {
       // scaling values
       input_index[i] = i;
       input_offset[i] = 0.0;
@@ -540,7 +543,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     input_reference_.resize(n_out);
 
     // set rotor speeds for all systems
-    for (int i = 0; i < n_out; i++) {
+    for (int i = 0; i < input_reference_.size(); i++) {
       if (armed) {
         input_reference_[i] = (inputs.control[input_index[i]] + input_offset[i]) * input_scaling[i] + zero_position_armed[i];
       } else {

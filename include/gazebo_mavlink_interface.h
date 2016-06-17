@@ -86,6 +86,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
  public:
   GazeboMavlinkInterface()
       : ModelPlugin(),
+
         received_first_referenc_(false),
         namespace_(kDefaultNamespace),
         motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
@@ -95,6 +96,12 @@ class GazeboMavlinkInterface : public ModelPlugin {
         opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
         lidar_sub_topic_(kDefaultLidarTopic),
         mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic),
+        inputs{},
+        input_offset{},
+        input_scaling{},
+        zero_position_disarmed{},
+        zero_position_armed{},
+        input_index{},
         lat_rad(0.0),
         lon_rad(0.0)
         {}
@@ -140,10 +147,18 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages();
 
+  static const unsigned n_out_max = 16;
+
   unsigned _rotor_count;
   struct {
-    float control[8];
-  } inputs; 
+    float control[n_out_max];
+  } inputs;
+
+  double input_offset[n_out_max];
+  double input_scaling[n_out_max];
+  double zero_position_disarmed[n_out_max];
+  double zero_position_armed[n_out_max];
+  int input_index[n_out_max];
 
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
