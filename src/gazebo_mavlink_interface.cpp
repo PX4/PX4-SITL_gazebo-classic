@@ -599,7 +599,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       // Fift motor
       input_index[off + 4] = off + 4;
       input_offset[off + 4] = 1.0;
-      input_scaling[off + 4] = 1800;
+      input_scaling[off + 4] = 1600;
       zero_position_disarmed[off + 4] = 0.0;
       zero_position_armed[off + 4] = 0.0;
 
