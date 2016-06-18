@@ -588,7 +588,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       // XXX this needs re-investigation regarding
       // the correct scaling for the correct motor
       // model
-      input_scaling[i] = 450.0;
+      input_scaling[i] = 550.0;
       zero_position_disarmed[i] = 0.0;
       zero_position_armed[i] = 100.0;
     }
