@@ -1,4 +1,4 @@
-<sdf version='1.6'>
+<sdf version='1.5'>
   <model name='typhoon_h480'>
     <!-- Typhoon H body -->
     <pose frame=''>0 0 0.220217 0 0 3.1415927</pose>
