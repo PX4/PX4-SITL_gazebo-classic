@@ -519,6 +519,21 @@
         </inertia>
         <pose>0 0.3 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='left_elevon_visual'>
+        <pose>-0.105 0.004 -0.034 1.5707963268 0 3.1415926536</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://standard_vtol/meshes/x8_elevon_left.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="right_elevon">
       <inertial>
@@ -531,8 +546,23 @@
           <iyz>0.0</iyz>
           <izz>0.000001</izz>
         </inertia>
-        <pose>0 -0.3 0 0.00 0 0.0</pose>
+        <pose>0 -0.6 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='right_elevon_visual'>
+        <pose>0.281 -1.032 -0.034 1.5707963268 0 3.1415926536</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://standard_vtol/meshes/x8_elevon_right.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="elevator">
       <inertial>
@@ -565,7 +595,7 @@
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>left_elevon</child>
-      <pose>0 0.3 0 0.00 0 0.0</pose>
+      <pose>-0.18 0.6 -0.005 0 0 0.265</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
@@ -586,7 +616,7 @@
     <joint name='right_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>right_elevon</child>
-      <pose>0 -0.3 0 0.00 0 0.0</pose>
+      <pose>-0.18 -0.6 -0.005 0 0 -0.265</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
