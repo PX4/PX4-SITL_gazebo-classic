@@ -574,6 +574,8 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     inputs.control[off + 6] = controls.aux3;
     inputs.control[off + 7] = controls.aux4;
 
+    bool is_vtol = (right_elevon_joint_ != nullptr);
+
     // Set all scalings
 
     // Initialize all outputs as motors
@@ -590,10 +592,10 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       // model
       input_scaling[i] = 550.0;
       zero_position_disarmed[i] = 0.0;
-      zero_position_armed[i] = 100.0;
+      zero_position_armed[i] = (is_vtol) ? 0.0 : 100.0;
     }
 
-    if (right_elevon_joint_ != NULL) {
+    if (is_vtol) {
       // Config for standard VTOL model
 
       // Fift motor
