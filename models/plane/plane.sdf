@@ -379,7 +379,7 @@
       <maxRotVelocity>1800</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.016</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>4</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
@@ -402,7 +402,7 @@
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace>plane</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <left_elevon_joint>
         left_elevon_joint
       </left_elevon_joint>
