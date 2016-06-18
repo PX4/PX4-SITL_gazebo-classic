@@ -44,8 +44,8 @@ static const std::string kDefaultNamespace = "";
 
 // This just proxies the motor commands from command/motor_speed to the single motors via internal
 // ConsPtr passing, such that the original commands don't have to go n_motors-times over the wire.
-static const std::string kDefaultMotorVelocityReferencePubTopic = "gazebo/command/motor_speed";
-static const std::string kDefaultCommandMotorSpeedSubTopic = "command/motor_speed";
+static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
+static const std::string kDefaultCommandMotorSpeedSubTopic = "/command/motor_speed";
 
 class GazeboControllerInterface : public ModelPlugin {
  public:

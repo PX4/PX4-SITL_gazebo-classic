@@ -96,6 +96,15 @@ class GazeboMavlinkInterface : public ModelPlugin {
         opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
         lidar_sub_topic_(kDefaultLidarTopic),
         mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic),
+        model_{},
+        world_(nullptr),
+        left_elevon_joint_(nullptr),
+        right_elevon_joint_(nullptr),
+        elevator_joint_(nullptr),
+        propeller_joint_(nullptr),
+        gimbal_yaw_joint_(nullptr),
+        gimbal_pitch_joint_(nullptr),
+        gimbal_roll_joint_(nullptr),
         inputs{},
         input_offset{},
         input_scaling{},
@@ -133,6 +142,11 @@ class GazeboMavlinkInterface : public ModelPlugin {
   physics::JointPtr right_elevon_joint_;
   physics::JointPtr elevator_joint_;
   physics::JointPtr propeller_joint_;
+  physics::JointPtr gimbal_yaw_joint_;
+  physics::JointPtr gimbal_pitch_joint_;
+  physics::JointPtr gimbal_roll_joint_;
+
+  std::vector<physics::JointPtr> joints_;
 
   /// \brief Pointer to the update event connection.
   event::ConnectionPtr updateConnection_;
@@ -171,10 +185,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
-  std::string left_elevon_joint_name_;
-  std::string right_elevon_joint_name_;
-  std::string elevator_joint_name_;
-  std::string propeller_joint_name_;
   
   common::Time last_time_;
   common::Time last_gps_time_;
