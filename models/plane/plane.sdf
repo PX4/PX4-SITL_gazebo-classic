@@ -29,9 +29,9 @@
               <min_depth>0.01</min_depth>
             </ode>
           </contact>
-          <friction>
+          <!--<friction>
             <ode/>
-          </friction>
+          </friction>-->
         </surface>
       </collision>
       <visual name='base_link_visual'>
@@ -376,9 +376,9 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1800</maxRotVelocity>
+      <maxRotVelocity>3100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
+      <momentConstant>0.01</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>4</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
