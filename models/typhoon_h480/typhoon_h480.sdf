@@ -1,19 +1,19 @@
 <sdf version='1.6'>
   <model name='typhoon_h480'>
     <!-- Typhoon H body -->
-    <pose frame=''>0 0 0.220217 0 0 3.1415927</pose>
+    <pose>0 0 0.220217 0 0 3.1415927</pose>
     <link name='base_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
         <pose frame=''>0 0 0 0 -0 0</pose>
-        <mass>1.5</mass>
+        <mass>2.02</mass>
         <inertia>
-          <ixx>0.0347563</ixx>
+          <ixx>0.011</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0458929</iyy>
+          <iyy>0.015</iyy>
           <iyz>0</iyz>
-          <izz>0.0977</izz>
+          <izz>0.021</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
@@ -50,6 +50,7 @@
           </script>
         </material>
       </visual>
+      <!--
       <visual name='rotor_0_prop_guard_jybhz'>
         <pose frame=''>0 0 0 0 0 3.14159265359</pose>
         <geometry>
@@ -140,6 +141,7 @@
           </script>
         </material>
       </visual>
+      -->
       <gravity>1</gravity>
       <velocity_decay/>
       <self_collide>0</self_collide>
@@ -235,6 +237,7 @@
       <child>cgo3_vertical_arm_link</child>
       <parent>cgo3_mount_link</parent>
       <pose frame=''>-0.026 0 -0.10 0 0 0</pose>
+      <controlIndex>6</controlIndex>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -291,6 +294,7 @@
       <child>cgo3_horizontal_arm_link</child>
       <parent>cgo3_vertical_arm_link</parent>
       <pose frame=''>0.026 0 -0.162 0 0 0</pose>
+      <controlIndex>7</controlIndex>
       <axis>
         <xyz>-1 0 0</xyz>
         <limit>
@@ -1049,31 +1053,31 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
-      <motorNumber>0</motorNumber>
+      <motorNumber>4</motorNumber>
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
+      <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
       <jointName>rotor_1_joint</jointName>
       <linkName>rotor_1</linkName>
-      <turningDirection>ccw</turningDirection>
+      <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
-      <motorNumber>1</motorNumber>
+      <motorNumber>5</motorNumber>
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
+      <motorSpeedPubTopic>/motor_speed/5</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
@@ -1083,7 +1087,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1097,10 +1101,10 @@
       <robotNamespace>typhoon_h480</robotNamespace>
       <jointName>rotor_3_joint</jointName>
       <linkName>rotor_3</linkName>
-      <turningDirection>cw</turningDirection>
+      <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1117,14 +1121,14 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
-      <motorNumber>4</motorNumber>
+      <motorNumber>0</motorNumber>
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+      <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
@@ -1134,14 +1138,14 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
-      <motorNumber>5</motorNumber>
+      <motorNumber>1</motorNumber>
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>/motor_speed/5</motorSpeedPubTopic>
+      <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
@@ -1149,15 +1153,40 @@
       <imuSubTopic>/imu</imuSubTopic>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
 
-      <channel>
-        <index>0</index>
-        <offset>0</offset>
-        <scaling>0</scaling>
-        <zero_position_disarmed>0</zero_position_disarmed>
-        <aero_position_armed>0</aero_position_armed>
-        <joint>rotor_0_joint</joint>
-      </channel>
-
+      <control_channels>
+        <channel>
+          <input_index>0</input_index>
+          <!-- the MAVLink inputs coming in from -1..1 are shifted to 0..2 -->
+          <input_offset>1.0</input_offset>
+          <!-- The input from 0..2 is multiplied with this number, resulting in max 900 radians per second for the full input of 2.0 (to get from a motor kV to radians per second, calculate this: kV * voltage * 2 * pi /60. This number will be radians per second, because we map 0..2 to it, divide by 2 to obtain the final scaling). -->
+          <input_scaling>450</input_scaling>
+          <!-- this is the minimum speed in disarmed state in radians / second -->
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <!-- this is the minimum speed in armed state in radians / second -->
+          <zero_position_armed>100</zero_position_armed>
+        </channel>
+        <channel>
+          <input_index>1</input_index>
+          <input_offset>1.0</input_offset>
+          <input_scaling>450</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+        </channel>
+        <channel>
+          <input_index>2</input_index>
+          <input_offset>1.0</input_offset>
+          <input_scaling>450</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+        </channel>
+        <channel>
+          <input_index>3</input_index>
+          <input_offset>1.0</input_offset>
+          <input_scaling>450</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+        </channel>
+      </control_channels>
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>

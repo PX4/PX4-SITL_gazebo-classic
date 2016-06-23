@@ -16,10 +16,10 @@
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>-0.01 0 -0.05 0 0 0</pose>
+        <pose>-0.01 0 -0.08 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.5 2.144 0.05</size>
+            <size>0.55 2.144 0.05</size>
           </box>
         </geometry>
         <surface>
@@ -29,18 +29,106 @@
               <min_depth>0.01</min_depth>
             </ode>
           </contact>
-          <friction>
+          <!--<friction>
             <ode/>
-          </friction>
+          </friction>-->
         </surface>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0.45 -1.072 -0.1 1.5707963268 0 3.1415926536</pose>
+        <pose>0.53 -1.072 -0.1 1.5707963268 0 3.1415926536</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
             <uri>model://standard_vtol/meshes/x8_wing.dae</uri>
           </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='left_motor_column'>
+        <pose>0 0.35 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.74 0.03 0.03</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='right_motor_column'>
+        <pose>0 -0.35 0.01 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.74 0.03 0.03</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m0'>
+        <pose>-0.35 0.35 0.045 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.035</length>
+            <radius>0.02</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m1'>
+        <pose>-0.35 -0.35 0.045 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.035</length>
+            <radius>0.02</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m2'>
+        <pose>0.35 -0.35 0.045 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.035</length>
+            <radius>0.02</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m3'>
+        <pose>0.35 0.35 0.045 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.035</length>
+            <radius>0.02</radius>
+          </cylinder>
         </geometry>
         <material>
           <script>
@@ -87,7 +175,7 @@
       </axis>
     </joint>
     <link name='rotor_0'>
-      <pose>0.3 -0.3 0.07 0 0 0</pose>
+      <pose>0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -153,7 +241,7 @@
       </axis>
     </joint>
     <link name='rotor_1'>
-      <pose>-0.3 0.3 0.07 0 0 0</pose>
+      <pose>-0.35 0.35 0.07 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -219,7 +307,7 @@
       </axis>
     </joint>
     <link name='rotor_2'>
-      <pose>0.3 0.3 0.07 0 0 0</pose>
+      <pose>0.35 0.35 0.07 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -285,7 +373,7 @@
       </axis>
     </joint>
     <link name='rotor_3'>
-      <pose>-0.3 -0.3 0.07 0 0 0</pose>
+      <pose>-0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -352,7 +440,7 @@
     </joint>
 
     <link name='rotor_puller'>
-      <pose>-0.25 0 0.0 0 1.57 0</pose>
+      <pose>-0.22 0 0.0 0 1.57 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -366,11 +454,11 @@
         </inertia>
       </inertial>
       <collision name='rotor_puller_collision'>
-        <pose>0.0 0 -0.09 0 0 0</pose>
+        <pose>0.0 0 -0.04 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
-            <radius>0.1</radius>
+            <radius>0.06</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -383,7 +471,7 @@
         </surface>
       </collision>
       <visual name='rotor_puller_visual'>
-        <pose>0 0 -0.09 0 0 0</pose>
+        <pose>0 0 -0.04 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.8 0.8 0.8</scale>
@@ -431,6 +519,21 @@
         </inertia>
         <pose>0 0.3 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='left_elevon_visual'>
+        <pose>-0.105 0.004 -0.034 1.5707963268 0 3.1415926536</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://standard_vtol/meshes/x8_elevon_left.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="right_elevon">
       <inertial>
@@ -443,8 +546,23 @@
           <iyz>0.0</iyz>
           <izz>0.000001</izz>
         </inertia>
-        <pose>0 -0.3 0 0.00 0 0.0</pose>
+        <pose>0 -0.6 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='right_elevon_visual'>
+        <pose>0.281 -1.032 -0.034 1.5707963268 0 3.1415926536</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://standard_vtol/meshes/x8_elevon_right.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="elevator">
       <inertial>
@@ -477,7 +595,7 @@
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>left_elevon</child>
-      <pose>0 0.3 0 0.00 0 0.0</pose>
+      <pose>-0.18 0.6 -0.005 0 0 0.265</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
@@ -498,7 +616,7 @@
     <joint name='right_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>right_elevon</child>
-      <pose>0 -0.3 0 0.00 0 0.0</pose>
+      <pose>-0.18 -0.6 -0.005 0 0 -0.265</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
@@ -641,12 +759,12 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>0</motorNumber>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
@@ -658,12 +776,12 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>1</motorNumber>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
@@ -675,12 +793,12 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>2</motorNumber>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
@@ -692,12 +810,12 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
+      <maxRotVelocity>1100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.16</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>3</motorNumber>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
@@ -709,10 +827,10 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1800</maxRotVelocity>
+      <maxRotVelocity>3100</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
-      <commandSubTopic>gazebo/command/motor_speed</commandSubTopic>
+      <momentConstant>0.01</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>4</motorNumber>
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
@@ -735,7 +853,7 @@
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace>standard_vtol</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <motorSpeedCommandPubTopic>gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <left_elevon_joint>
         left_elevon_joint
       </left_elevon_joint>
