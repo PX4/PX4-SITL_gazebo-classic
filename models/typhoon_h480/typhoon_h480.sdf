@@ -263,7 +263,7 @@
     <link name="cgo3_horizontal_arm_link">
       <inertial>
         <!-- place holder -->
-        <pose frame=''>-0.041 0 -0.162 0 -0 0</pose>
+        <pose frame=''>-0.041 0 -0.081 0 -0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -1271,10 +1271,10 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
-    <plugin name='gimbal_controller' filename='libGimbalController.so'>
-      <joint_yaw>cgo3_vertical_arm_joint</joint_yaw>
-      <joint_roll>cgo3_horizontal_arm_joint</joint_roll>
-      <joint_pitch>cgo3_camera_joint</joint_pitch>
+    <plugin name='gimbal_controller' filename='librotors_gazebo_gimbal_controller_plugin.so'>
+      <joint_yaw>typhoon_h480::cgo3_vertical_arm_joint</joint_yaw>
+      <joint_roll>typhoon_h480::cgo3_horizontal_arm_joint</joint_roll>
+      <joint_pitch>typhoon_h480::cgo3_camera_joint</joint_pitch>
     </plugin>
   </model>
 </sdf>

@@ -26,29 +26,85 @@ GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 
 /////////////////////////////////////////////////
 GimbalControllerPlugin::GimbalControllerPlugin()
-  :status("closed"), command(false)
+  :status("closed")
 {
   this->pitchPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
   this->rollPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
   this->yawPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->command = M_PI/2.0;
+  this->pitchCommand = 0;
+  this->rollCommand = 0;
+  this->yawCommand = 0;
 }
 
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::Load(physics::ModelPtr _model,
-  sdf::ElementPtr /*_sdf*/)
+  sdf::ElementPtr _sdf)
 {
   this->model = _model;
 
+  this->sdf = _sdf;
 
   std::string yawJointName = "cgo3_vertical_arm_joint";
-  std::string rollJointName = "cgo3_horizontal_arm_joint";
-  std::string pitchJointName = "cgo3_camera_joint";
+  this->yawJoint = this->model->GetJoint(yawJointName);
+  if (this->sdf->HasElement("joint_yaw"))
+  {
+    // Add names to map
+    yawJointName = sdf->Get<std::string>("joint_yaw");
+    if (this->model->GetJoint(yawJointName))
+    {
+      this->yawJoint = this->model->GetJoint(yawJointName);
+    }
+    else
+    {
+      gzwarn << "joint_yaw [" << yawJointName << "] does not exist?\n";
+    }
+  }
+  if (!this->yawJoint)
+  {
+    gzerr << "GimbalControllerPlugin::Load ERROR! Can't get yaw joint '"
+          << yawJointName << "' " << endl;
+  }
 
+  std::string rollJointName = "cgo3_horizontal_arm_joint";
+  this->rollJoint = this->model->GetJoint(rollJointName);
+  if (this->sdf->HasElement("joint_roll"))
+  {
+    // Add names to map
+    rollJointName = sdf->Get<std::string>("joint_roll");
+    if (this->model->GetJoint(rollJointName))
+    {
+      this->rollJoint = this->model->GetJoint(rollJointName);
+    }
+    else
+    {
+      gzwarn << "joint_roll [" << rollJointName << "] does not exist?\n";
+    }
+  }
+  if (!this->rollJoint)
+  {
+    gzerr << "GimbalControllerPlugin::Load ERROR! Can't get roll joint '"
+          << rollJointName << "' " << endl;
+  }
+
+
+  std::string pitchJointName = "cgo3_camera_joint";
   this->pitchJoint = this->model->GetJoint(pitchJointName);
+  if (this->sdf->HasElement("joint_pitch"))
+  {
+    // Add names to map
+    pitchJointName = sdf->Get<std::string>("joint_pitch");
+    if (this->model->GetJoint(pitchJointName))
+    {
+      this->pitchJoint = this->model->GetJoint(pitchJointName);
+    }
+    else
+    {
+      gzwarn << "joint_pitch [" << pitchJointName << "] does not exist?\n";
+    }
+  }
   if (!this->pitchJoint)
   {
-    gzerr << "GimbalControllerPlugin::Load ERROR! Can't get pitch(tilt) joint '"
+    gzerr << "GimbalControllerPlugin::Load ERROR! Can't get pitch joint '"
           << pitchJointName << "' " << endl;
   }
 }
@@ -61,16 +117,16 @@ void GimbalControllerPlugin::Init()
 
   this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
 
+  // receive pitch command via gz transport
   std::string topic = std::string("~/") +  this->model->GetName() +
-    "/gimbal_tilt_cmd";
+    "/gimbal_pitch_cmd";
   this->sub = this->node->Subscribe(topic,
-                                       &GimbalControllerPlugin::OnStringMsg,
-                                       this);
+     &GimbalControllerPlugin::OnStringMsg, this);
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&GimbalControllerPlugin::OnUpdate, this)));
 
-  topic = std::string("~/") +  this->model->GetName() + "/gimbal_tilt_status";
+  topic = std::string("~/") +  this->model->GetName() + "/gimbal_pitch_status";
   this->pub = node->Advertise<gazebo::msgs::GzString>(topic);
 
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
@@ -79,8 +135,8 @@ void GimbalControllerPlugin::Init()
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "Command received " << _msg->data() << std::endl;
-  this->command = atof(_msg->data().c_str());
+  gzmsg << "pitch command received " << _msg->data() << std::endl;
+  this->pitchCommand = atof(_msg->data().c_str());
 }
 
 /////////////////////////////////////////////////
@@ -89,7 +145,9 @@ void GimbalControllerPlugin::OnUpdate()
   if (!this->pitchJoint)
     return;
 
-  double angle = this->pitchJoint->GetAngle(0).Radian();
+  double pitchAngle = this->pitchJoint->GetAngle(0).Radian();
+  double rollAngle = this->rollJoint->GetAngle(0).Radian();
+  double yawAngle = this->yawJoint->GetAngle(0).Radian();
 
   common::Time time = this->model->GetWorld()->GetSimTime();
   if (time < this->lastUpdateTime)
@@ -101,9 +159,18 @@ void GimbalControllerPlugin::OnUpdate()
   else if (time > this->lastUpdateTime)
   {
     double dt = (this->lastUpdateTime - time).Double();
-    double error = angle - this->command;
-    double force = this->pitchPid.Update(error, dt);
-    this->pitchJoint->SetForce(0, force);
+    double pitchError = pitchAngle - this->pitchCommand;
+    double pitchForce = this->pitchPid.Update(pitchError, dt);
+    this->pitchJoint->SetForce(0, pitchForce);
+
+    double rollError = rollAngle - this->rollCommand;
+    double rollForce = this->rollPid.Update(rollError, dt);
+    this->rollJoint->SetForce(0, rollForce);
+
+    double yawError = yawAngle - this->yawCommand;
+    double yawForce = this->yawPid.Update(yawError, dt);
+    this->yawJoint->SetForce(0, yawForce);
+
     this->lastUpdateTime = time;
   }
 
@@ -112,7 +179,7 @@ void GimbalControllerPlugin::OnUpdate()
   {
     i = 0;
     std::stringstream ss;
-    ss << angle;
+    ss << pitchAngle;
     gazebo::msgs::GzString m;
     m.set_data(ss.str());
     this->pub->Publish(m);

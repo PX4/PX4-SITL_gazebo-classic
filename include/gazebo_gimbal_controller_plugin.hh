@@ -45,6 +45,8 @@ namespace gazebo
 
     private: void OnStringMsg(ConstGzStringPtr &_msg);
 
+    private: sdf::ElementPtr sdf;
+
     private: std::vector<event::ConnectionPtr> connections;
 
     private: transport::SubscriberPtr sub;
@@ -64,7 +66,9 @@ namespace gazebo
 
     private: std::string status;
 
-    private: double command;
+    private: double pitchCommand;
+    private: double yawCommand;
+    private: double rollCommand;
 
     private: transport::NodePtr node;
 
