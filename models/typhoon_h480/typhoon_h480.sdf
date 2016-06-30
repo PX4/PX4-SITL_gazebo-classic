@@ -386,6 +386,22 @@
         <always_on>1</always_on>
         <update_rate>10</update_rate>
         <visualize>true</visualize>
+        <!-- how to make this work without using urdf?
+        <plugin name="cgo3_camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>cgo3_camera</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>cgo3_camera_optical_frame</frameName>
+          <hackBaseline>0.0</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+        -->
       </sensor>
     </link>
     <joint name='cgo3_camera_joint' type='revolute'>
@@ -1254,6 +1270,11 @@
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <plugin name='gimbal_controller' filename='libGimbalController.so'>
+      <joint_yaw>cgo3_vertical_arm_joint</joint_yaw>
+      <joint_roll>cgo3_horizontal_arm_joint</joint_roll>
+      <joint_pitch>cgo3_camera_joint</joint_pitch>
     </plugin>
   </model>
 </sdf>
