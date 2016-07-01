@@ -1,11 +1,13 @@
 <sdf version='1.5'>
   <model name='typhoon_h480'>
     <!-- Typhoon H body -->
-    <pose>0 0 0.220217 0 0 3.1415927</pose>
+    <pose>0 0 0.26 0 0 3.1415927</pose>
     <link name='base_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <!-- rear reference point X: -100.044mm, CAD offset: 1001.049mm -->
+        <!-- top reference point Z: 33.8663mm, CAD offset: 42.8698mm -->
+        <pose frame=''>0.001005 0 -0.0090035 0 -0 0</pose>
         <mass>2.02</mass>
         <inertia>
           <ixx>0.011</ixx>

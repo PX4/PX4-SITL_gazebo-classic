@@ -28,10 +28,10 @@ GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
-  this->pitchPid.Init(10, 0, 0, 0, 0, 1.0, -1.0);
-  this->rollPid.Init(10, 0, 0, 0, 0, 1.0, -1.0);
-  this->yawPid.Init(10, 0, 0, 0, 0, 1.0, -1.0);
-  this->pitchCommand = 0;
+  this->pitchPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
+  this->rollPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
+  this->yawPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
+  this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
   this->yawCommand = 0;
 }
@@ -143,39 +143,72 @@ void GimbalControllerPlugin::Init()
   this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
 
   // receive pitch command via gz transport
-  std::string topic = std::string("~/") +  this->model->GetName() +
+  std::string pitchTopic = std::string("~/") +  this->model->GetName() +
     "/gimbal_pitch_cmd";
-  this->sub = this->node->Subscribe(topic,
-     &GimbalControllerPlugin::OnStringMsg, this);
+  this->pitchSub = this->node->Subscribe(pitchTopic,
+     &GimbalControllerPlugin::OnPitchStringMsg, this);
+  // receive roll command via gz transport
+  std::string rollTopic = std::string("~/") +  this->model->GetName() +
+    "/gimbal_roll_cmd";
+  this->rollSub = this->node->Subscribe(rollTopic,
+     &GimbalControllerPlugin::OnRollStringMsg, this);
+  // receive yaw command via gz transport
+  std::string yawTopic = std::string("~/") +  this->model->GetName() +
+    "/gimbal_yaw_cmd";
+  this->yawSub = this->node->Subscribe(yawTopic,
+     &GimbalControllerPlugin::OnYawStringMsg, this);
 
+  // plugin update
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&GimbalControllerPlugin::OnUpdate, this)));
 
-  topic = std::string("~/") +  this->model->GetName() + "/gimbal_pitch_status";
-  this->pub = node->Advertise<gazebo::msgs::GzString>(topic);
+  // publish pitch status via gz transport
+  pitchTopic = std::string("~/") +  this->model->GetName()
+    + "/gimbal_pitch_status";
+  this->pitchPub = node->Advertise<gazebo::msgs::GzString>(pitchTopic);
+
+  // publish roll status via gz transport
+  rollTopic = std::string("~/") +  this->model->GetName()
+    + "/gimbal_roll_status";
+  this->rollPub = node->Advertise<gazebo::msgs::GzString>(rollTopic);
+
+  // publish yaw status via gz transport
+  yawTopic = std::string("~/") +  this->model->GetName()
+    + "/gimbal_yaw_status";
+  this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
 
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
   gzmsg << "pitch command received " << _msg->data() << std::endl;
   this->pitchCommand = atof(_msg->data().c_str());
 }
 
 /////////////////////////////////////////////////
+void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
+{
+  gzmsg << "roll command received " << _msg->data() << std::endl;
+  this->rollCommand = atof(_msg->data().c_str());
+}
+
+/////////////////////////////////////////////////
+void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
+{
+  gzmsg << "yaw command received " << _msg->data() << std::endl;
+  this->yawCommand = atof(_msg->data().c_str());
+}
+
+/////////////////////////////////////////////////
 void GimbalControllerPlugin::OnUpdate()
 {
-  if (!this->pitchJoint)
+  if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;
 
 
   ignition::math::Vector3d eulers = this->imuSensor->Orientation().Euler();
-  // gzerr << eulers << "\n";
-  // this->rollCommand = eulers.X();
-  // this->pitchCommand = eulers.Y();
-  // this->yawCommand = -eulers.Z();
   // double pitchAngle = this->pitchJoint->GetAngle(0).Radian();
   // double rollAngle = this->rollJoint->GetAngle(0).Radian();
   // double yawAngle = this->yawJoint->GetAngle(0).Radian();
@@ -197,10 +230,6 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchError = pitchAngle - this->pitchCommand;
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
-    // gzerr << " c[" << this->pitchCommand
-    //       << "] a[" << pitchAngle
-    //       << "] e[" << pitchError
-    //       << "] f[" << pitchForce << "]/\n";
 
     double rollError = rollAngle - this->rollCommand;
     double rollForce = this->rollPid.Update(rollError, dt);
@@ -218,10 +247,19 @@ void GimbalControllerPlugin::OnUpdate()
   {
     i = 0;
     std::stringstream ss;
-    ss << pitchAngle;
     gazebo::msgs::GzString m;
+
+    ss << this->pitchJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
-    this->pub->Publish(m);
+    this->pitchPub->Publish(m);
+
+    ss << this->rollJoint->GetAngle(0).Radian();
+    m.set_data(ss.str());
+    this->rollPub->Publish(m);
+
+    ss << this->yawJoint->GetAngle(0).Radian();
+    m.set_data(ss.str());
+    this->yawPub->Publish(m);
   }
 }
 

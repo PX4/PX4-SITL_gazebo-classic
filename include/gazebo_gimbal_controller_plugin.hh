@@ -44,25 +44,31 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: void OnStringMsg(ConstGzStringPtr &_msg);
+    private: void OnPitchStringMsg(ConstGzStringPtr &_msg);
+    private: void OnRollStringMsg(ConstGzStringPtr &_msg);
+    private: void OnYawStringMsg(ConstGzStringPtr &_msg);
 
     private: sdf::ElementPtr sdf;
 
     private: std::vector<event::ConnectionPtr> connections;
 
-    private: transport::SubscriberPtr sub;
+    private: transport::SubscriberPtr pitchSub;
+    private: transport::SubscriberPtr rollSub;
+    private: transport::SubscriberPtr yawSub;
 
-    private: transport::PublisherPtr pub;
+    private: transport::PublisherPtr pitchPub;
+    private: transport::PublisherPtr rollPub;
+    private: transport::PublisherPtr yawPub;
 
     private: physics::ModelPtr model;
 
     /// \brief yaw camera
     private: physics::JointPtr yawJoint;
 
-    /// \brief roll camera
+    /// \brief camera roll joint
     private: physics::JointPtr rollJoint;
 
-    /// \brief tilt camera
+    /// \brief camera pitch joint
     private: physics::JointPtr pitchJoint;
 
     private: sensors::ImuSensorPtr imuSensor;

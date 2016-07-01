@@ -56,7 +56,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << joint_name_ << "\".");
 
   // setup pid to control joint
-  pid_.Init(3, 0, 0, 0, 0, 3, -3);
+  pid_.Init(0.05, 0, 0, 0, 0, 3, -3);
 
   if (_sdf->HasElement("linkName"))
     link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
