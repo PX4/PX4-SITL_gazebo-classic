@@ -56,7 +56,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << joint_name_ << "\".");
 
   // setup pid to control joint
-  pid_.Init(1, 0, 0, 0, 0, 2, -2);
+  pid_.Init(3, 0, 0, 0, 0, 3, -3);
 
   if (_sdf->HasElement("linkName"))
     link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
@@ -198,8 +198,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // gzerr << turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_ << "\n";
 #else
   double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
-  double f = pid_.Update(err, sampling_time_);
-  joint_->SetForce(0, f);
+  double force = pid_.Update(err, sampling_time_);
+  joint_->SetForce(0, force);
 #endif
 }
 
