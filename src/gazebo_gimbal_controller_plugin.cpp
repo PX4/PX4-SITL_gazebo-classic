@@ -28,9 +28,9 @@ GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
-  this->pitchPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->rollPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->yawPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
+  this->pitchPid.Init(10, 0, 0, 0, 0, 1.0, -1.0);
+  this->rollPid.Init(10, 0, 0, 0, 0, 1.0, -1.0);
+  this->yawPid.Init(10, 0, 0, 0, 0, 1.0, -1.0);
   this->pitchCommand = 0;
   this->rollCommand = 0;
   this->yawCommand = 0;
@@ -170,9 +170,18 @@ void GimbalControllerPlugin::OnUpdate()
   if (!this->pitchJoint)
     return;
 
-  double pitchAngle = this->pitchJoint->GetAngle(0).Radian();
-  double rollAngle = this->rollJoint->GetAngle(0).Radian();
-  double yawAngle = this->yawJoint->GetAngle(0).Radian();
+
+  ignition::math::Vector3d eulers = this->imuSensor->Orientation().Euler();
+  // gzerr << eulers << "\n";
+  // this->rollCommand = eulers.X();
+  // this->pitchCommand = eulers.Y();
+  // this->yawCommand = -eulers.Z();
+  // double pitchAngle = this->pitchJoint->GetAngle(0).Radian();
+  // double rollAngle = this->rollJoint->GetAngle(0).Radian();
+  // double yawAngle = this->yawJoint->GetAngle(0).Radian();
+  double rollAngle = -eulers.X();
+  double pitchAngle = -eulers.Y();
+  double yawAngle = eulers.Z();
 
   common::Time time = this->model->GetWorld()->GetSimTime();
   if (time < this->lastUpdateTime)
@@ -188,6 +197,10 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchError = pitchAngle - this->pitchCommand;
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
+    // gzerr << " c[" << this->pitchCommand
+    //       << "] a[" << pitchAngle
+    //       << "] e[" << pitchError
+    //       << "] f[" << pitchForce << "]/\n";
 
     double rollError = rollAngle - this->rollCommand;
     double rollForce = this->rollPid.Update(rollError, dt);
