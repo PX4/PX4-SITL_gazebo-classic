@@ -364,6 +364,9 @@
           </script>
         </material>
       </visual>
+      <sensor name="camera_imu" type="imu">
+        <always_on>1</always_on>
+      </sensor>
       <sensor name="camera" type="camera">
         <pose frame=''>-0.051 0 -0.162 0 0 3.14159</pose>
         <camera>
@@ -1267,6 +1270,7 @@
       <joint_yaw>typhoon_h480::cgo3_vertical_arm_joint</joint_yaw>
       <joint_roll>typhoon_h480::cgo3_horizontal_arm_joint</joint_roll>
       <joint_pitch>typhoon_h480::cgo3_camera_joint</joint_pitch>
+      <imu>camera_imu</imu>
     </plugin>
   </model>
 </sdf>

@@ -198,8 +198,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // gzerr << turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_ << "\n";
 #else
   double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
-  double force = pid_.Update(err, sampling_time_);
-  joint_->SetForce(0, force);
+  double rotorForce = pid_.Update(err, sampling_time_);
+  joint_->SetForce(0, rotorForce);
 #endif
 }
 

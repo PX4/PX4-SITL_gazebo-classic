@@ -29,6 +29,7 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/util/system.hh>
+#include <gazebo/sensors/sensors.hh>
 
 namespace gazebo
 {
@@ -63,6 +64,8 @@ namespace gazebo
 
     /// \brief tilt camera
     private: physics::JointPtr pitchJoint;
+
+    private: sensors::ImuSensorPtr imuSensor;
 
     private: std::string status;
 
