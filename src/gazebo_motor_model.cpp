@@ -55,6 +55,8 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   if (joint_ == NULL)
     gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << joint_name_ << "\".");
 
+  // setup pid to control joint
+  pid_.Init(1, 0, 0, 0, 0, 2, -2);
 
   if (_sdf->HasElement("linkName"))
     link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
@@ -188,9 +190,17 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // Apply the filter on the motor's velocity.
   double ref_motor_rot_vel;
   ref_motor_rot_vel = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
-  // joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
-  joint_->SetParam("fmax", 0, 4.0);
+#if 0
+  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+#elif 0
+  joint_->SetParam("fmax", 0, 2.0);
   joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+  // gzerr << turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_ << "\n";
+#else
+  double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
+  double f = pid_.Update(err, sampling_time_);
+  joint_->SetForce(0, f);
+#endif
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);
