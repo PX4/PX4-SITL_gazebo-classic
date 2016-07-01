@@ -159,6 +159,7 @@ void GimbalControllerPlugin::OnUpdate()
   else if (time > this->lastUpdateTime)
   {
     double dt = (this->lastUpdateTime - time).Double();
+
     double pitchError = pitchAngle - this->pitchCommand;
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
