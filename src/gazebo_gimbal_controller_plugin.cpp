@@ -31,7 +31,7 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   this->pitchPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
   this->rollPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
   this->yawPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->pitchCommand = 0.5* M_PI;
+  this->pitchCommand = 0;  // 0.5* M_PI is problematic because of singularity
   this->rollCommand = 0;
   this->yawCommand = 0;
 }
@@ -212,9 +212,11 @@ void GimbalControllerPlugin::OnUpdate()
   // double pitchAngle = this->pitchJoint->GetAngle(0).Radian();
   // double rollAngle = this->rollJoint->GetAngle(0).Radian();
   // double yawAngle = this->yawJoint->GetAngle(0).Radian();
-  double rollAngle = -eulers.X();
-  double pitchAngle = -eulers.Y();
-  double yawAngle = eulers.Z();
+  double rollAngle = this->NormalizeAbout(-eulers.X(), 0.0);
+  double pitchAngle = this->NormalizeAbout(-eulers.Y(), 0.0);
+  double yawAngle = this->NormalizeAbout(eulers.Z(), 0.0);
+  // gzerr << "[" << eulers << "] [" << rollAngle
+  //       << ", " << pitchAngle << ", " << yawAngle << "]\n";
 
   common::Time time = this->model->GetWorld()->GetSimTime();
   if (time < this->lastUpdateTime)
@@ -227,15 +229,18 @@ void GimbalControllerPlugin::OnUpdate()
   {
     double dt = (this->lastUpdateTime - time).Double();
 
-    double pitchError = pitchAngle - this->pitchCommand;
+    double pitchError =
+      this->ShortestAngularDistance(this->pitchCommand, pitchAngle );
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
 
-    double rollError = rollAngle - this->rollCommand;
+    double rollError =
+      this->ShortestAngularDistance(this->rollCommand, rollAngle );
     double rollForce = this->rollPid.Update(rollError, dt);
     this->rollJoint->SetForce(0, rollForce);
 
-    double yawError = yawAngle - this->yawCommand;
+    double yawError =
+      this->ShortestAngularDistance(this->yawCommand, yawAngle );
     double yawForce = this->yawPid.Update(yawError, dt);
     this->yawJoint->SetForce(0, yawForce);
 
@@ -263,4 +268,20 @@ void GimbalControllerPlugin::OnUpdate()
   }
 }
 
+/////////////////////////////////////////////////
+double GimbalControllerPlugin::NormalizeAbout(double _angle, double reference)
+{
+  double diff = _angle - reference;
+  // normalize diff about (-pi, pi], then add reference
+  while (diff <= -M_PI)
+  {
+    diff += M_PI;
+  }
+  return fmod(diff, (2.0*M_PI)) + reference;
+}
 
+/////////////////////////////////////////////////
+double GimbalControllerPlugin::ShortestAngularDistance(double _from, double _to)
+{
+  return this->NormalizeAbout(_to, _from) - _from;
+}

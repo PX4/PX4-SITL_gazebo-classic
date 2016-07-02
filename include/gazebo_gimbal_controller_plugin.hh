@@ -48,6 +48,21 @@ namespace gazebo
     private: void OnRollStringMsg(ConstGzStringPtr &_msg);
     private: void OnYawStringMsg(ConstGzStringPtr &_msg);
 
+    /// \TODO something to move into Angle class
+    /// \brief returns _angle1 normalized about
+    /// (_reference - M_PI, _reference + M_PI]
+    /// \param[in] _angle1 input angle
+    /// \param[in] _reference reference input angle for normalization
+    /// \return normalized _angle1 about _reference
+    private: double NormalizeAbout(double _angle, double _reference);
+
+    /// \TODO something to move into Angle class
+    /// \brief returns shortest angular distance from _from to _to
+    /// \param[in] _from starting anglular position
+    /// \param[in] _to end angular position
+    /// \return distance traveled from starting to end angular positions
+    private: double ShortestAngularDistance(double _from, double _to);
+
     private: sdf::ElementPtr sdf;
 
     private: std::vector<event::ConnectionPtr> connections;
