@@ -254,6 +254,11 @@
       <physics>
         <ode>
           <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <!-- testing soft limits -->
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
         </ode>
       </physics>
     </joint>
@@ -309,6 +314,11 @@
       <physics>
         <ode>
           <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <!-- testing soft limits -->
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
         </ode>
       </physics>
     </joint>
@@ -423,6 +433,11 @@
       <physics>
         <ode>
           <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <!-- testing soft limits -->
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
         </ode>
       </physics>
     </joint>

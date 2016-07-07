@@ -28,10 +28,10 @@ GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
-  this->pitchPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->rollPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->yawPid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
-  this->pitchCommand = 0;  // 0.5* M_PI is problematic because of singularity
+  this->pitchPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
+  this->rollPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
+  this->yawPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
+  this->pitchCommand = 0.5* M_PI;  //  is problematic because of singularity
   this->rollCommand = 0;
   this->yawCommand = 0;
 }
@@ -207,17 +207,6 @@ void GimbalControllerPlugin::OnUpdate()
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;
 
-
-  ignition::math::Vector3d eulers = this->imuSensor->Orientation().Euler();
-  // double pitchAngle = this->pitchJoint->GetAngle(0).Radian();
-  // double rollAngle = this->rollJoint->GetAngle(0).Radian();
-  // double yawAngle = this->yawJoint->GetAngle(0).Radian();
-  double rollAngle = this->NormalizeAbout(-eulers.X(), 0.0);
-  double pitchAngle = this->NormalizeAbout(-eulers.Y(), 0.0);
-  double yawAngle = this->NormalizeAbout(eulers.Z(), 0.0);
-  // gzerr << "[" << eulers << "] [" << rollAngle
-  //       << ", " << pitchAngle << ", " << yawAngle << "]\n";
-
   common::Time time = this->model->GetWorld()->GetSimTime();
   if (time < this->lastUpdateTime)
   {
@@ -229,20 +218,40 @@ void GimbalControllerPlugin::OnUpdate()
   {
     double dt = (this->lastUpdateTime - time).Double();
 
-    double pitchError =
-      this->ShortestAngularDistance(this->pitchCommand, pitchAngle );
+    ignition::math::Quaterniond command(
+      -this->rollCommand, -this->pitchCommand, this->yawCommand);
+
+    // error defined from current to command so it's in the current frame
+    // but what we need to give to pid controllers is the negative
+    // values of rpy
+    ignition::math::Quaterniond error =
+      command * this->imuSensor->Orientation().Inverse();
+
+    ignition::math::Vector3d eulers = error.Euler();
+
+    // hardcoded signs to account for model joint axis direction changes
+    double rollError = this->NormalizeAbout(eulers.X(), 0.0);
+    double pitchError = this->NormalizeAbout(eulers.Y(), 0.0);
+    double yawError = -this->NormalizeAbout(eulers.Z(), 0.0);
+
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
 
-    double rollError =
-      this->ShortestAngularDistance(this->rollCommand, rollAngle );
     double rollForce = this->rollPid.Update(rollError, dt);
     this->rollJoint->SetForce(0, rollForce);
 
-    double yawError =
-      this->ShortestAngularDistance(this->yawCommand, yawAngle );
     double yawForce = this->yawPid.Update(yawError, dt);
     this->yawJoint->SetForce(0, yawForce);
+
+    // ignition::math::Vector3d angles = this->imuSensor->Orientation().Euler();
+    // gzerr << "ang[" << angles.X() << ", " << angles.Y() << ", " << angles.Z()
+    //       << "] cmd[ " << this->rollCommand
+    //       << ", " << this->pitchCommand << ", " << this->yawCommand
+    //       << "] err[ " << rollError
+    //       << ", " << pitchError << ", " << yawError
+    //       << "] frc[ " << rollForce
+    //       << ", " << pitchForce << ", " << yawForce << "]\n";
+
 
     this->lastUpdateTime = time;
   }
