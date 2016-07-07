@@ -1,11 +1,13 @@
 <sdf version='1.5'>
   <model name='typhoon_h480'>
     <!-- Typhoon H body -->
-    <pose>0 0 0.220217 0 0 3.1415927</pose>
+    <pose>0 0 0.26 0 0 3.1415927</pose>
     <link name='base_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <!-- rear reference point X: -100.044mm, CAD offset: 1001.049mm -->
+        <!-- top reference point Z: 33.8663mm, CAD offset: 42.8698mm -->
+        <pose frame=''>0.001005 0 -0.0090035 0 -0 0</pose>
         <mass>2.02</mass>
         <inertia>
           <ixx>0.011</ixx>
@@ -191,16 +193,14 @@
         </limit>
         <dynamics>
           <damping>1</damping>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
         </dynamics>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
 
     <link name="cgo3_vertical_arm_link">
@@ -247,23 +247,26 @@
           <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <damping>1</damping>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <!-- testing soft limits -->
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
     </joint>
 
     <link name="cgo3_horizontal_arm_link">
       <inertial>
         <!-- place holder -->
-        <pose frame=''>-0.041 0 -0.162 0 -0 0</pose>
+        <pose frame=''>-0.041 0 -0.081 0 -0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -304,17 +307,20 @@
           <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <damping>1</damping>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <!-- testing soft limits -->
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
     </joint>
 
     <link name="cgo3_camera_link">
@@ -370,6 +376,42 @@
           </script>
         </material>
       </visual>
+      <sensor name="camera_imu" type="imu">
+        <always_on>1</always_on>
+      </sensor>
+      <sensor name="camera" type="camera">
+        <pose frame=''>-0.051 0 -0.162 0 0 3.14159</pose>
+        <camera>
+          <horizontal_fov>2.0</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>15000</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>true</visualize>
+        <!-- how to make this work without using urdf?
+        <plugin name="cgo3_camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>cgo3_camera</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>cgo3_camera_optical_frame</frameName>
+          <hackBaseline>0.0</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+        -->
+      </sensor>
     </link>
     <joint name='cgo3_camera_joint' type='revolute'>
       <child>cgo3_camera_link</child>
@@ -384,17 +426,20 @@
           <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <damping>1</damping>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <!-- testing soft limits -->
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
     </joint>
 
     <link name="left_leg">
@@ -494,13 +539,13 @@
         <dynamics>
           <damping>0.1</damping>
         </dynamics>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
 
     <link name="right_leg">
@@ -601,13 +646,13 @@
         <dynamics>
           <damping>0.1</damping>
         </dynamics>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
 
     <link name='typhoon_h480/imu_link'>
@@ -701,13 +746,19 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
+          <effort>10</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.005</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
     <link name='rotor_0'>
       <pose frame=''>-0.209396 0.122762 0.082219 0 0 2.09439510239</pose>
@@ -767,13 +818,19 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
+          <effort>10</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.005</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
     <link name='rotor_4'>
       <pose frame=''>-0.00187896 0.242705 0.0822169 0 0 0</pose>
@@ -833,13 +890,19 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
+          <effort>10</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.005</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
     <link name='rotor_1'>
       <pose frame=''>0.211396 -0.119762 0.082219 0 0 -2.09439510239</pose>
@@ -899,13 +962,19 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
+          <effort>10</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.005</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
 
     <link name='rotor_5'>
@@ -966,13 +1035,19 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
+          <effort>10</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.005</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
     <link name='rotor_2'>
       <pose frame=''>-0.209396 -0.122762 0.082219 0 0 2.09439510239</pose>
@@ -1032,13 +1107,19 @@
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
+          <effort>10</effort>
+          <velocity>-1</velocity>
         </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.005</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
     </joint>
 
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
@@ -1201,6 +1282,12 @@
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <plugin name='gimbal_controller' filename='librotors_gazebo_gimbal_controller_plugin.so'>
+      <joint_yaw>typhoon_h480::cgo3_vertical_arm_joint</joint_yaw>
+      <joint_roll>typhoon_h480::cgo3_horizontal_arm_joint</joint_roll>
+      <joint_pitch>typhoon_h480::cgo3_camera_joint</joint_pitch>
+      <imu>camera_imu</imu>
     </plugin>
   </model>
 </sdf>

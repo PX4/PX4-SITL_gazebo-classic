@@ -83,6 +83,10 @@ add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_inte
 target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${PROTOBUF_LIBRARY} mav_msgs)
 add_dependencies(rotors_gazebo_controller_interface mav_msgs)
 
+add_library(rotors_gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
+target_link_libraries(rotors_gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+# add_dependencies(rotors_gazebo_gimbal_controller_plugin)
+
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 target_link_libraries(rotors_gazebo_motor_model mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 add_dependencies(rotors_gazebo_motor_model mav_msgs)
