@@ -20,8 +20,8 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>10</iters>
-          <sor>1.3</sor>
+          <iters>50</iters>
+          <sor>1.0</sor>
           <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
         </solver>
         <constraints>
