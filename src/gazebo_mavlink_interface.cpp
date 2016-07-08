@@ -558,13 +558,6 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     // We only support 8 outputs so far, so we
     // ignore the second, third and fourth output
 
-    // XXX setting this to anything higher than 8 results
-    // in memory smashing, likely due to a hardcoded
-    // motor count somewhere
-    if (off + block_size > 8) {
-      break;
-    }
-
     inputs.control[off + 0] = controls.roll_ailerons;
     inputs.control[off + 1] = controls.pitch_elevator;
     inputs.control[off + 2] = controls.yaw_rudder;
@@ -573,6 +566,13 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     inputs.control[off + 5] = controls.aux2;
     inputs.control[off + 6] = controls.aux3;
     inputs.control[off + 7] = controls.aux4;
+
+    // XXX setting this to anything higher than 8 results
+    // in memory smashing, likely due to a hardcoded
+    // motor count somewhere
+    if (off + block_size > 8) {
+      break;
+    }
 
     bool is_vtol = (right_elevon_joint_ != nullptr);
 
