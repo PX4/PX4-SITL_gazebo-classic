@@ -22,8 +22,6 @@
 #include "gazebo_mavlink_interface.h"
 #include "geo_mag_declination.h"
 
-#define UDP_PORT 14560
-
 namespace gazebo {
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
@@ -186,7 +184,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   //Create socket
   // udp socket data
-  const int _port = UDP_PORT;
+  if (_sdf->HasElement("mavlink_udp_port")) {
+    mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
+  }
 
   // try to setup udp socket for communcation with simulator
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -207,8 +207,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   _srcaddr.sin_family = AF_INET;
   _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  _srcaddr.sin_port = htons(UDP_PORT);
-
+  _srcaddr.sin_port = htons(mavlink_udp_port_);
   _addrlen = sizeof(_srcaddr);
 
   fds[0].fd = _fd;
