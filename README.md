@@ -42,24 +42,6 @@ Create a build folder in the top level of your repository:
 mkdir Build
 ```
 
-Next add the location of this build directory to your gazebo plugin path, e.g. add the following line to your .bashrc (Linux) or .bash_profile (Mac) file:
-
-
-```bash
-# Set the plugin path so Gazebo finds our model and sim
-export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:$HOME/src/sitl_gazebo/Build
-# Set the model path so Gazebo finds the airframes
-export GAZEBO_MODEL_PATH=${GAZEBO_MODEL_PATH}:$HOME/src/sitl_gazebo/models
-# Disable online model lookup since this is quite experimental and unstable
-export GAZEBO_MODEL_DATABASE_URI=""
-```
-
-You also need to add the the root location of this repository, e.g. add the following line to your .bashrc (Linux) or .bash_profile (Mac) file:
-```bash
-# Set path to sitl_gazebo repository
-export SITL_GAZEBO_PATH=$HOME/src/sitl_gazebo
-```
-
 Navigate into the build directory and invoke CMake from it:
 
 ```bash
@@ -68,16 +50,23 @@ cd Build
 cmake ..
 ```
 
-Autogenerate the sdf file with the command
-```bash
-make sdf
-```
-
 Now build the gazebo plugins by typing:
 
 ```bash
 make
 ```
+
+## Install
+
+Finally install the plugin to your system:
+
+**Note: If you are using ubuntu, it is best to see the packaging section.**
+
+```bash
+sudo make install
+```
+
+## Testing
 
 Gazebo will now launch when typing 'gazebo' on the shell:
 
@@ -86,3 +75,18 @@ gazebo
 ```
 
 Please refer to the documentation of the particular flight stack how to run it against this framework, e.g. [PX4](http://dev.px4.io/simulation-gazebo.html)
+
+## Packaging
+
+### Deb
+
+To create a debian package for ubuntu and install it to your system.
+
+```bash
+cd Build
+cmake ..
+make
+rm *.deb
+cpack -G DEB
+sudo dpkg -i *.deb
+```

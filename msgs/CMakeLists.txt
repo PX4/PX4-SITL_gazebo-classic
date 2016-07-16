@@ -32,3 +32,5 @@ set (msgs
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
 target_link_libraries(mav_msgs ${PROTOBUF_LIBRARY} ${GAZEBO_LIBRARIES})
+
+install(TARGETS mav_msgs DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
