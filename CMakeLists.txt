@@ -37,7 +37,8 @@ list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED)
-if(${GAZEBO_VERSION} VERSION_LESS "6.0")
+
+if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
 endif()
 
@@ -151,7 +152,7 @@ target_link_libraries(rotors_gazebo_mavlink_interface mav_msgs ${Boost_LIBRARIES
 add_dependencies(rotors_gazebo_mavlink_interface mav_msgs)
 list(APPEND installed_libraries rotors_gazebo_mavlink_interface)
 
-if(${GAZEBO_VERSION} VERSION_LESS "7.0")
+if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
 	add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
 	target_link_libraries(LiftDragPlugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 	add_dependencies(LiftDragPlugin mav_msgs)
