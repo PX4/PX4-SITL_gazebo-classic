@@ -34,7 +34,6 @@ message (STATUS "${PROJECT_NAME} version ${PROJECT_VERSION}")
 # Add search directory for CMake on OS X
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 
-find_package(PkgConfig REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(gazebo REQUIRED)
 
@@ -47,7 +46,7 @@ if(NOT EIGEN3_FOUND)
   # Fallback to cmake_modules
   find_package(Eigen QUIET)
   if(NOT EIGEN_FOUND)
-    pkg_check_modules( EIGEN3 REQUIRED eigen3)
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
   else()
     set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
     set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
@@ -55,7 +54,7 @@ if(NOT EIGEN3_FOUND)
 else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
-pkg_check_modules(protobuf REQUIRED protobuf )
+pkg_check_modules(PROTOBUF REQUIRED protobuf=2.6.1)
 find_package(Boost 1.40 COMPONENTS system thread REQUIRED )
 
 #----------------------------------------------------------------------------
