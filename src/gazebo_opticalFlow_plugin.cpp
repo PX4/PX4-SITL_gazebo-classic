@@ -34,25 +34,26 @@ using namespace cv;
 using namespace std;
 
 using namespace gazebo;
-GZ_REGISTER_SENSOR_PLUGIN(CameraPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(OpticalFlowPlugin)
 
 /////////////////////////////////////////////////
-CameraPlugin::CameraPlugin()
+OpticalFlowPlugin::OpticalFlowPlugin()
 : SensorPlugin(), width(0), height(0), depth(0)
 {
 }
 
 /////////////////////////////////////////////////
-CameraPlugin::~CameraPlugin()
+OpticalFlowPlugin::~OpticalFlowPlugin()
 {
   this->parentSensor.reset();
   this->camera.reset();
 }
 
 /////////////////////////////////////////////////
-void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
+void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 {
   if (!_sensor)
+
     gzerr << "Invalid sensor pointer.\n";
 
   this->parentSensor =
@@ -64,7 +65,7 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   if (!this->parentSensor)
   {
-    gzerr << "CameraPlugin requires a CameraSensor.\n";
+    gzerr << "OpticalFlowPlugin requires a CameraSensor.\n";
 #if GAZEBO_MAJOR_VERSION >= 7
     if (std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
 #else
@@ -81,7 +82,7 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   if (!this->parentSensor)
   {
-    gzerr << "CameraPlugin not attached to a camera sensor\n";
+    gzerr << "OpticalFlowPlugin not attached to a camera sensor\n";
     return;
   }
 
@@ -110,13 +111,13 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
-      boost::bind(&CameraPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
+      boost::bind(&OpticalFlowPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
 
   this->parentSensor->SetActive(true);
 }
 
 /////////////////////////////////////////////////
-void CameraPlugin::OnNewFrame(const unsigned char * _image,
+void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
                               unsigned int _width,
                               unsigned int _height,
                               unsigned int _depth,

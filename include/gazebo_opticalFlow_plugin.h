@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CAMERA_PLUGIN_HH_
-#define _GAZEBO_CAMERA_PLUGIN_HH_
+#ifndef _GAZEBO_OPTICAL_FLOW_PLUGIN_HH_
+#define _GAZEBO_OPTICAL_FLOW_PLUGIN_HH_
 
 #include <string>
 
@@ -38,12 +38,12 @@ using namespace std;
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE CameraPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE OpticalFlowPlugin : public SensorPlugin
   {
-    public: CameraPlugin();
+    public: OpticalFlowPlugin();
 
     /// \brief Destructor
-    public: virtual ~CameraPlugin();
+    public: virtual ~OpticalFlowPlugin();
 
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 

@@ -39,8 +39,8 @@
           </noise>
         </camera>
         <plugin name="opticalflow_plugin" filename="libgazebo_opticalFlow_plugin.so">
-            <always_on>1</always_on>
-            <update_rate>30</update_rate>
+            <always_on>true</always_on>
+            <update_rate>0.0</update_rate>
             <visualize>false</visualize>
         </plugin>
         <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
