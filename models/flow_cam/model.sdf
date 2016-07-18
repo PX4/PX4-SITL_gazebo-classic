@@ -38,7 +38,7 @@
             <stddev>0.001</stddev>
           </noise>
         </camera>
-        <plugin name="CameraPlugin" filename="libgazebo_opticalFlow_plugin.so">
+        <plugin name="opticalflow_plugin" filename="libgazebo_opticalFlow_plugin.so">
             <always_on>1</always_on>
             <update_rate>30</update_rate>
             <visualize>false</visualize>
