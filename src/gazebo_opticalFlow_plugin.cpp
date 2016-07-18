@@ -183,7 +183,7 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
 
   old_gray = frame_gray.clone();
 
-  std::cout << "pixel flow x = " << pixel_flow_x_integral << "   pixel flow y = " << pixel_flow_y_integral << endl;
+  //std::cout << "pixel flow x = " << pixel_flow_x_integral << "   pixel flow y = " << pixel_flow_y_integral << endl;
 
   opticalFlow_message.set_time_usec(100000000000000);//big number to prevent timeout in inav
   opticalFlow_message.set_sensor_id(2.0);
