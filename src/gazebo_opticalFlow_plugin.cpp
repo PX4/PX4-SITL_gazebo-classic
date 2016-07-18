@@ -127,7 +127,7 @@ void CameraPlugin::OnNewFrame(const unsigned char * _image,
 #else
   _image = this->camera->GetImageData(0);
 #endif
-  //GetHFOV gives fucking gazebo::math::Angle which you can not cast...
+  //GetHFOV gives gazebo::math::Angle which you can not cast...
   const double Hfov = 0.6;
   const double focal_length = (_width/2)/tan(Hfov/2);
 
