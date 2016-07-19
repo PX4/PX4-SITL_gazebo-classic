@@ -54,16 +54,21 @@ if(NOT EIGEN3_FOUND)
 else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
-pkg_check_modules(PROTOBUF REQUIRED protobuf=2.6.1)
+pkg_check_modules(PROTOBUF REQUIRED protobuf)
+if (NOT "${PROTOBUF_VERSION}" VERSION_LESS "3.0.0" OR
+  "${PROTOBUF_VERSION}" VERSION_LESS "2.5.0")
+  message(FATAL_ERROR "protobuf version ${PROTOBUF_VERSOIN} not compatible, must be >= 2.5.0 and < 3.0.0")
+endif()
+
 find_package(Boost 1.40 COMPONENTS system thread REQUIRED )
 
 #----------------------------------------------------------------------------
 # Build:
 
 add_definitions(
-	-std=c++11
-	# Shut up warnings about std::binder1st, std::binder2nd.
-	-Wno-deprecated-declarations
+  -std=c++11
+  # Shut up warnings about std::binder1st, std::binder2nd.
+  -Wno-deprecated-declarations
 )
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
@@ -96,12 +101,12 @@ set(enable_camera "false")
 set(rotors_description_dir "${CMAKE_SOURCE_DIR}/models/rotors_description")
 set(scripts_dir "${CMAKE_SOURCE_DIR}/scripts")
 add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	COMMAND rm -f ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
-	COMMAND python ${scripts_dir}/xacro.py -o  ${rotors_description_dir}/urdf/iris_base.urdf  ${rotors_description_dir}/urdf/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging} rotors_description_dir:=${rotors_description_dir} 
-	COMMAND gz sdf -p  ${rotors_description_dir}/urdf/iris_base.urdf >> ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
-	COMMAND rm -f ${rotors_description_dir}/urdf/iris_base.urdf
-	)
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMAND rm -f ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
+  COMMAND python ${scripts_dir}/xacro.py -o  ${rotors_description_dir}/urdf/iris_base.urdf  ${rotors_description_dir}/urdf/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging} rotors_description_dir:=${rotors_description_dir} 
+  COMMAND gz sdf -p  ${rotors_description_dir}/urdf/iris_base.urdf >> ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
+  COMMAND rm -f ${rotors_description_dir}/urdf/iris_base.urdf
+  )
 add_custom_target(sdf ALL DEPENDS ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf)
 
 
@@ -152,10 +157,10 @@ add_dependencies(rotors_gazebo_mavlink_interface mav_msgs)
 list(APPEND installed_libraries rotors_gazebo_mavlink_interface)
 
 if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
-	add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
-	target_link_libraries(LiftDragPlugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-	add_dependencies(LiftDragPlugin mav_msgs)
-	list(APPEND installed_libraries LiftDragPlugin)
+  add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
+  target_link_libraries(LiftDragPlugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+  add_dependencies(LiftDragPlugin mav_msgs)
+  list(APPEND installed_libraries LiftDragPlugin)
 endif()
 
 #----------------------------------------------------------------------------
@@ -195,3 +200,5 @@ set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_MAJOR_VERSION}-${PRO
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_MAJOR_VERSION}-${PROJECT_VERSION}")
 
 include(CPack)
+# vim: set et fenc= ff=unix sts=0 sw=2 ts=2 :
+
