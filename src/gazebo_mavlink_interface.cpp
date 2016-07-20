@@ -165,7 +165,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe(imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe(lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe(opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
-  
+
   // Publish HilSensor Message and gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>(motor_velocity_reference_pub_topic_, 1);
   hil_sensor_pub_ = node_handle_->Advertise<mavlink::msgs::HilSensor>(hil_sensor_mavlink_pub_topic_, 1);
@@ -263,36 +263,45 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   math::Vector3 velocity_current_W_xy = velocity_current_W;
   velocity_current_W_xy.z = 0;
 
-  // Set global reference point
+  // Set default global reference point
   // Zurich Irchel Park: 47.397742, 8.545594, 488m
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
-  // Moscow downtown: 55.753395, 37.625427, 155m
+  const double lat_default = 47.397742 * M_PI / 180;  // rad
+  const double lon_default = 8.545594 * M_PI / 180;  // rad
+  const double alt_default = 488.0; // meters
+  const float radius_default = 6353000;  // m
 
-  // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
-  // Zurich Irchel Park
-  const double lat_zurich = 47.397742 * M_PI / 180;  // rad
-  const double lon_zurich = 8.545594 * M_PI / 180;  // rad
-  const double alt_zurich = 488.0; // meters
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031
-  // const double lat_zurich = 47.592182 * M_PI / 180;  // rad
-  // const double lon_zurich = -122.316031 * M_PI / 180;  // rad
-  // const double alt_zurich = 86.0; // meters
-  const float earth_radius = 6353000;  // m
+  double lat_world = lat_default;
+  double lon_world = lon_default;
+  double alt_world = alt_default;
+  double radius_world = radius_default;
+
+  common::SphericalCoordinatesPtr spherical_coordinates = world_->GetSphericalCoordinates();
+  if (spherical_coordinates) {
+    lat_world = spherical_coordinates->LatitudeReference().Radian();  // rad
+    lon_world = spherical_coordinates->LongitudeReference().Radian();  // rad
+    alt_world = spherical_coordinates->GetElevationReference();  // m
+    switch (spherical_coordinates->GetSurfaceType()) {
+      case (common::SphericalCoordinates::EARTH_WGS84): {
+          radius_world = 6353000;  // m
+          break;
+      }
+    }
+  }
 
   // reproject local position to gps coordinates
-  double x_rad = pos_W_I.x / earth_radius;
-  double y_rad = -pos_W_I.y / earth_radius;
+  double x_rad = pos_W_I.x / radius_world;
+  double y_rad = -pos_W_I.y / radius_world;
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);
   if (c != 0.0) {
-    lat_rad = asin(cos_c * sin(lat_zurich) + (x_rad * sin_c * cos(lat_zurich)) / c);
-    lon_rad = (lon_zurich + atan2(y_rad * sin_c, c * cos(lat_zurich) * cos_c - x_rad * sin(lat_zurich) * sin_c));
+    lat_rad = asin(cos_c * sin(lat_world) + (x_rad * sin_c * cos(lat_world)) / c);
+    lon_rad = (lon_world + atan2(y_rad * sin_c, c * cos(lat_world) * cos_c - x_rad * sin(lat_world) * sin_c));
   } else {
-   lat_rad = lat_zurich;
-    lon_rad = lon_zurich;
+   lat_rad = lat_world;
+    lon_rad = lon_world;
   }
-  
+
   if(current_time.Double() - last_gps_time_.Double() > gps_update_interval_){  // 5Hz
 
     if(use_mavlink_udp){
@@ -302,7 +311,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       hil_gps_msg.fix_type = 3;
       hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
       hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-      hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
+      hil_gps_msg.alt = (pos_W_I.z + alt_world) * 1000;
       hil_gps_msg.eph = 100;
       hil_gps_msg.epv = 100;
       hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
@@ -319,7 +328,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       hil_gps_msg_.set_fix_type(3);
       hil_gps_msg_.set_lat(lat_rad * 180 / M_PI * 1e7);
       hil_gps_msg_.set_lon(lon_rad * 180 / M_PI * 1e7);
-      hil_gps_msg_.set_alt((pos_W_I.z + alt_zurich) * 1000);
+      hil_gps_msg_.set_alt((pos_W_I.z + alt_world) * 1000);
       hil_gps_msg_.set_eph(100);
       hil_gps_msg_.set_epv(100);
       hil_gps_msg_.set_vel(velocity_current_W_xy.GetLength() * 100);
@@ -328,7 +337,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
       hil_gps_msg_.set_vd(-velocity_current_W.z * 100);
       hil_gps_msg_.set_cog(atan2(-velocity_current_W.y * 100, velocity_current_W.x * 100) * 180.0/3.1416 * 100.0);
       hil_gps_msg_.set_satellites_visible(10);
-             
+
       hil_gps_pub_->Publish(hil_gps_msg_);
     }
 
@@ -410,7 +419,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   math::Pose T_W_I = model_->GetWorldPose();
   math::Vector3 pos_W_I = T_W_I.pos;  // Use the models'world position for GPS and pressure alt.
-  
+
   math::Quaternion C_W_I;
   C_W_I.w = imu_message->orientation().w();
   C_W_I.x = imu_message->orientation().x();
@@ -428,7 +437,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   math::Vector3 mag_I = C_W_I.RotateVectorReverse(mag_decl); // TODO: Add noise based on bais and variance like for imu and gyro
   math::Vector3 body_vel = C_W_I.RotateVectorReverse(model_->GetWorldLinearVel());
-  
+
   standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
 
   float mag_noise = standard_normal_distribution_(random_generator_);
@@ -456,7 +465,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     optflow_ygyro = imu_message->angular_velocity().y();
     optflow_zgyro = imu_message->angular_velocity().z();
 
-    send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);    
+    send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);
   } else{
     hil_sensor_msg_.set_time_usec(world_->GetSimTime().nsec*1000);
     hil_sensor_msg_.set_xacc(imu_message->linear_acceleration().x());
@@ -473,13 +482,13 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     hil_sensor_msg_.set_pressure_alt(pos_W_I.z);
     hil_sensor_msg_.set_temperature(0.0);
     hil_sensor_msg_.set_fields_updated(4095);  // 0b1111111111111 (All updated since new data with new noise added always)
-    
+
     hil_sensor_pub_->Publish(hil_sensor_msg_);
   }
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
-  
+
   mavlink_distance_sensor_t sensor_msg;
   sensor_msg.time_boot_ms = lidar_message->time_msec();
   sensor_msg.min_distance = lidar_message->min_distance() * 100.0;
