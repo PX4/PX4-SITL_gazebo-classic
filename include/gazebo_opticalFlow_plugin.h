@@ -73,7 +73,7 @@ namespace gazebo
 	 transport::NodePtr node_handle_;
 	 opticalFlow_msgs::msgs::opticalFlow opticalFlow_message;
 	 std::string namespace_;
-	 const string topicName = "opticalFlow";
+	 const string topicName = "/opticalFlow";
 
      const int maxfeatures = 20;
      const double qualityLevel = 0.01;

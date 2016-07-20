@@ -479,8 +479,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
-  printf("lidar message sent!!!!!!!!!\n");
-  
   mavlink_distance_sensor_t sensor_msg;
   sensor_msg.time_boot_ms = lidar_message->time_msec();
   sensor_msg.min_distance = lidar_message->min_distance() * 100.0;
@@ -499,8 +497,6 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 }
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
-  printf("optical flow message sent!!!!!!!!!\n");
-
   mavlink_optical_flow_rad_t sensor_msg;
   sensor_msg.time_usec = opticalFlow_message->time_usec();
   sensor_msg.sensor_id = opticalFlow_message->sensor_id();
