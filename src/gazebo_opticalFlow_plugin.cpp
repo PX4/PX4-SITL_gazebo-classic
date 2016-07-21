@@ -129,19 +129,19 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   _image = this->camera->GetImageData(0);
 #endif
   //GetHFOV gives gazebo::math::Angle which you can not cast...
-  const double Hfov = 0.6;
-  const double focal_length = (_width/2)/tan(Hfov/2);
+  const float Hfov = 0.6;
+  const float focal_length = (_width/2)/tan(Hfov/2);
 
-  double pixel_flow_x_integral = 0.0;
-  double pixel_flow_y_integral = 0.0;
+  float pixel_flow_x_integral = 0.0;
+  float pixel_flow_y_integral = 0.0;
 #if GAZEBO_MAJOR_VERSION >= 7
-  double rate = this->camera->RenderRate();
+  float rate = this->camera->RenderRate();
 #else
-  double rate = this->camera->GetRenderRate();
+  float rate = this->camera->GetRenderRate();
 #endif
   if (!isfinite(rate))
 	   rate =  30.0;
-  double dt = 1.0 / rate;
+  float dt = 1.0 / rate;
 
 
   Mat frame = Mat(_height, _width, CV_8UC3);
@@ -168,18 +168,21 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   cornerSubPix(old_gray, featuresPrevious, winSize, zeroZone, criteria);*/
 
   //calc diff
-  int meancount = 0;
+  int n_features = 0;
   for (int i = 0; i < featuresNextPos.size(); i++) {
-
     if (featuresFound[i] == true) {
-     	pixel_flow_x_integral += featuresNextPos[i].x - featuresPrevious[i].x;
-      pixel_flow_y_integral += featuresNextPos[i].y - featuresPrevious[i].y;
-      meancount++;
-	  }	 	
+		flowX_[i] =  featuresNextPos[i].x - featuresPrevious[i].x;
+		flowY_[i] =  featuresNextPos[i].y - featuresPrevious[i].y;
+		n_features += 1;
+	}	 	
   }
 
-  double flow_x_ang = atan2(pixel_flow_x_integral/meancount, focal_length);
-  double flow_y_ang = atan2(pixel_flow_y_integral/meancount, focal_length);
+  float median_flow_x = computeMedian(flowX_, n_features);
+  float median_flow_y = computeMedian(flowY_, n_features);
+
+  float flow_x_ang = atan2(median_flow_x, focal_length);
+  float flow_y_ang = atan2(median_flow_y, focal_length);
+  uint8_t quality = 255*(float(n_features)/ maxfeatures);
 
   old_gray = frame_gray.clone();
 
@@ -194,10 +197,33 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   opticalFlow_message.set_integrated_ygyro(0.0); //get real values in gazebo_mavlink_interface.cpp
   opticalFlow_message.set_integrated_zgyro(0.0); //get real values in gazebo_mavlink_interface.cpp
   opticalFlow_message.set_temperature(20.0);
-  opticalFlow_message.set_quality(meancount * 255 / maxfeatures); //features?
+  opticalFlow_message.set_quality(quality); //features?
   opticalFlow_message.set_time_delta_distance_us(0.0);
   opticalFlow_message.set_distance(0.0); //get real values in gazebo_mavlink_interface.cpp
 
   opticalFlow_pub_->Publish(opticalFlow_message);
 
 }
+
+float OpticalFlowPlugin::computeMedian(float * array, int iSize) {
+    for (int i = iSize - 1; i > 0; --i) {
+        for (int j = 0; j < i; ++j) {
+            if (array[j] > array[j+1]) {
+                float dTemp = array[j];
+                array[j] = array[j+1];
+                array[j+1] = dTemp;
+            }
+        }
+    }
+
+    // Middle or average of middle values in the sorted array.
+    float dMedian = 0.0;
+    if ((iSize % 2) == 0) {
+        dMedian = (array[iSize/2] + array[(iSize/2) - 1])/2.0;
+    } else {
+        dMedian = array[iSize/2];
+    }
+    return dMedian;
+}
+
+

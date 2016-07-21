@@ -51,6 +51,8 @@ namespace gazebo
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
+	float computeMedian(float * array, int iSize);
+
     protected: unsigned int width, height, depth;
     protected: std::string format;
 
@@ -60,6 +62,14 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
 
     private: 
+	 const std::string topicName = "/opticalFlow";
+     static const int maxfeatures = 50;
+     const float qualityLevel = 0.1;
+     const float minDistance = 7;
+     const int blockSize = 7;
+     const bool useHarrisDetector = false;
+     const float k = 0.04;
+
 	 vector<Point2f> featuresPrevious;
      vector<Point2f> featuresCurrent;
      vector<Point2f> featuresNextPos;
@@ -73,15 +83,8 @@ namespace gazebo
 	 transport::NodePtr node_handle_;
 	 opticalFlow_msgs::msgs::opticalFlow opticalFlow_message;
 	 std::string namespace_;
-	 const string topicName = "/opticalFlow";
-
-     const int maxfeatures = 20;
-     const double qualityLevel = 0.01;
-     const double minDistance = 10;
-     const int blockSize = 5;
-     const bool useHarrisDetector = false;
-     const double k = 0.04;
-
+	 float flowX_[maxfeatures];
+	 float flowY_[maxfeatures];
   };
 }
 #endif
