@@ -128,9 +128,8 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
 #else
   _image = this->camera->GetImageData(0);
 #endif
-  //GetHFOV gives gazebo::math::Angle which you can not cast...
-  const float Hfov = 0.6;
-  const float focal_length = (_width/2)/tan(Hfov/2);
+  const float hfov = float(this->camera->HFOV().Radian());
+  const float focal_length = (_width/2)/tan(hfov/2);
 
   float pixel_flow_x_integral = 0.0;
   float pixel_flow_y_integral = 0.0;
