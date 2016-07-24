@@ -13,7 +13,6 @@ list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 
 ## System dependencies are found with CMake's conventions
 find_package(PkgConfig REQUIRED)
-find_package(catkin REQUIRED)
 find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
