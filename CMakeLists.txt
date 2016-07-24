@@ -198,9 +198,9 @@ set(WORLD_DIR ${CMAKE_INSTALL_FULL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/world
 file(GLOB models ${PROJECT_SOURCE_DIR}/models/*)
 file(GLOB worlds ${PROJECT_SOURCE_DIR}/worlds/*)
 
-install(TARGETS ${installed_libraries} DESTINATION ${PLUGIN_DIR})
-install(DIRECTORY ${models} DESTINATION ${MODEL_DIR})
-install(FILES ${worlds} DESTINATION ${WORLD_DIR})
+#install(TARGETS ${installed_libraries} DESTINATION ${PLUGIN_DIR})
+#install(DIRECTORY ${models} DESTINATION ${MODEL_DIR})
+#install(FILES ${worlds} DESTINATION ${WORLD_DIR})
 
 
 #############
