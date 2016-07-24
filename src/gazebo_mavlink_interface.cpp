@@ -23,7 +23,6 @@
 #include "geo_mag_declination.h"
 
 #define UDP_PORT 14560
-#define UDP_PORT_2 14556
 
 namespace gazebo {
 
@@ -213,10 +212,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   _srcaddr.sin_port = htons(UDP_PORT);
 
-  _srcaddr_2.sin_family = AF_INET;
-  _srcaddr_2.sin_addr.s_addr = htonl(INADDR_ANY);
-  _srcaddr_2.sin_port = htons(UDP_PORT_2);
-
   _addrlen = sizeof(_srcaddr);
 
   fds[0].fd = _fd;
@@ -396,10 +391,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const voi
 
   ssize_t len;
 
-  if (msgid == MAVLINK_MSG_ID_DISTANCE_SENSOR || msgid == MAVLINK_MSG_ID_OPTICAL_FLOW_RAD)
-    len = sendto(_fd, buf, packet_len, 0, (struct sockaddr *)&_srcaddr_2, sizeof(_srcaddr_2));
-  else
-    len = sendto(_fd, buf, packet_len, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
+  len = sendto(_fd, buf, packet_len, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
 
   if (len <= 0) {
     printf("Failed sending mavlink message\n");
@@ -479,7 +471,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
-  
   mavlink_distance_sensor_t sensor_msg;
   sensor_msg.time_boot_ms = lidar_message->time_msec();
   sensor_msg.min_distance = lidar_message->min_distance() * 100.0;
@@ -498,8 +489,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 }
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
-
-  mavlink_optical_flow_rad_t sensor_msg;
+  mavlink_hil_optical_flow_t sensor_msg;
   sensor_msg.time_usec = opticalFlow_message->time_usec();
   sensor_msg.sensor_id = opticalFlow_message->sensor_id();
   sensor_msg.integration_time_us = opticalFlow_message->integration_time_us();
@@ -513,8 +503,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   sensor_msg.time_delta_distance_us = opticalFlow_message->time_delta_distance_us();
   sensor_msg.distance = optflow_distance;
 
-  send_mavlink_message(MAVLINK_MSG_ID_OPTICAL_FLOW_RAD, &sensor_msg, 200);
-
+  send_mavlink_message(MAVLINK_MSG_ID_HIL_OPTICAL_FLOW, &sensor_msg, 200);
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
