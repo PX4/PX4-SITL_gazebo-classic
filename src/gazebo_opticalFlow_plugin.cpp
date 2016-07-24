@@ -128,7 +128,12 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
 #else
   _image = this->camera->GetImageData(0);
 #endif
+
+#if GAZEBO_MAJOR_VERSION >= 7
   const float hfov = float(this->camera->HFOV().Radian());
+#else
+  const float hfov = float(this->camera->GetHFOV().Radian());
+#endif
   const float focal_length = (_width/2)/tan(hfov/2);
 
 #if GAZEBO_MAJOR_VERSION >= 7
