@@ -195,12 +195,15 @@ set(PLUGIN_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugi
 set(MODEL_DIR ${CMAKE_INSTALL_FULL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
 set(WORLD_DIR ${CMAKE_INSTALL_FULL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/worlds)
 
-file(GLOB models ${PROJECT_SOURCE_DIR}/models/*)
-file(GLOB worlds ${PROJECT_SOURCE_DIR}/worlds/*)
+file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/models/.DS_Store)
+file(GLOB models_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/models/*)
 
-#install(TARGETS ${installed_libraries} DESTINATION ${PLUGIN_DIR})
-#install(DIRECTORY ${models} DESTINATION ${MODEL_DIR})
-#install(FILES ${worlds} DESTINATION ${WORLD_DIR})
+file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/worlds/.DS_Store)
+file(GLOB worlds_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/worlds/*)
+
+install(TARGETS ${installed_libraries} DESTINATION ${PLUGIN_DIR})
+install(DIRECTORY ${models_list} DESTINATION ${MODEL_DIR})
+install(FILES ${worlds_list} DESTINATION ${WORLD_DIR})
 
 
 #############
