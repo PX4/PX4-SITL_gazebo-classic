@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CAMERA_PLUGIN_HH_
-#define _GAZEBO_CAMERA_PLUGIN_HH_
+#ifndef _GAZEBO_OPTICAL_FLOW_PLUGIN_HH_
+#define _GAZEBO_OPTICAL_FLOW_PLUGIN_HH_
 
 #include <string>
 
@@ -32,24 +32,27 @@
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <boost/timer/timer.hpp>
 
 using namespace cv;
 using namespace std;
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE CameraPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE OpticalFlowPlugin : public SensorPlugin
   {
-    public: CameraPlugin();
+    public: OpticalFlowPlugin();
 
     /// \brief Destructor
-    public: virtual ~CameraPlugin();
+    public: virtual ~OpticalFlowPlugin();
 
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     public: virtual void OnNewFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
+
+	float computeMedian(float * array, int iSize);
 
     protected: unsigned int width, height, depth;
     protected: std::string format;
@@ -60,6 +63,14 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
 
     private: 
+	 const std::string topicName = "/opticalFlow";
+     static const int maxfeatures = 50;
+     const float qualityLevel = 0.1;
+     const float minDistance = 7;
+     const int blockSize = 7;
+     const bool useHarrisDetector = false;
+     const float k = 0.04;
+
 	 vector<Point2f> featuresPrevious;
      vector<Point2f> featuresCurrent;
      vector<Point2f> featuresNextPos;
@@ -73,15 +84,9 @@ namespace gazebo
 	 transport::NodePtr node_handle_;
 	 opticalFlow_msgs::msgs::opticalFlow opticalFlow_message;
 	 std::string namespace_;
-	 const string topicName = "opticalFlow";
-
-     const int maxfeatures = 20;
-     const double qualityLevel = 0.01;
-     const double minDistance = 10;
-     const int blockSize = 5;
-     const bool useHarrisDetector = false;
-     const double k = 0.04;
-
+	 float flowX_[maxfeatures];
+	 float flowY_[maxfeatures];
+	 boost::timer::cpu_timer timer_;
   };
 }
 #endif

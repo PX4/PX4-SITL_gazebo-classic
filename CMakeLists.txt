@@ -1,12 +1,26 @@
-cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
+cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0054 NEW)
+project(mavlink_sitl_gazebo VERSION 1.0.0)
+include(GNUInstallDirs)
+
+#######################
+## Find Dependencies ##
+#######################
 
 # Add search directory for CMake on OS X
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 
-find_package( PkgConfig REQUIRED)
-find_package(OpenCV REQUIRED)
+## System dependencies are found with CMake's conventions
+find_package(PkgConfig REQUIRED)
+find_package(catkin REQUIRED)
 find_package(gazebo REQUIRED)
-if(${GAZEBO_VERSION} VERSION_LESS "6.0")
+find_program(px4 REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(Protobuf REQUIRED)
+pkg_check_modules(PROTOBUF protobuf)
+
+if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
 endif()
 
@@ -15,7 +29,7 @@ if(NOT EIGEN3_FOUND)
   # Fallback to cmake_modules
   find_package(Eigen QUIET)
   if(NOT EIGEN_FOUND)
-    pkg_check_modules( EIGEN3 REQUIRED eigen3)
+    pkg_check_modules(EIGEN3 REQUIRED eigen3)
   else()
     set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
     set(EIGEN3_LIBRARIES ${EIGEN_LIBRARIES})
@@ -23,15 +37,22 @@ if(NOT EIGEN3_FOUND)
 else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
+if (NOT "${PROTOBUF_VERSION}" VERSION_LESS "3.0.0" OR
+  "${PROTOBUF_VERSION}" VERSION_LESS "2.5.0")
+  message(FATAL_ERROR "protobuf version: ${PROTOBUF_VERSION} not compatible, must be >= 2.5.0 and < 3.0.0")
+endif()
+find_package(Boost 1.40 COMPONENTS system thread timer REQUIRED )
 
-pkg_check_modules( protobuf REQUIRED protobuf )
+###########
+## Build ##
+###########
 
-FIND_PACKAGE( Boost 1.40 COMPONENTS system thread REQUIRED )
+list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 add_definitions(
-	-std=c++11
-	# Shut up warnings about std::binder1st, std::binder2nd.
-	-Wno-deprecated-declarations
+  -std=c++11
+  # Shut up warnings about std::binder1st, std::binder2nd.
+  -Wno-deprecated-declarations
 )
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
@@ -47,7 +68,7 @@ include_directories(
   ${GAZEBO_MSG_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}/msgs
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
   # Workaround for Eigen3
   ${Boost_INCLUDE_DIR}/eigen3
@@ -57,56 +78,159 @@ include_directories(
   /usr/local/include/OGRE/Paging
   )
 
+link_libraries(
+	${PROTOBUF_LIBRARY}
+	${GAZEBO_LIBRARIES}
+	${OpenCV_LIBRARIES}
+	${Boost_SYSTEM_LIBRARY_RELEASE}
+	${Boost_THREAD_LIBRARY_RELEASE}
+	${Boost_TIMER_LIBRARY_RELEASE}
+	)
+
+link_directories(
+	${GAZEBO_LIBRARY_DIRS}
+	${CMAKE_CURRENT_BINARY_DIR}
+	)
+
+#--------------------------#
+# Generation of SDF models #
+#--------------------------#
+
 set(enable_mavlink_interface "true")
 set(enable_ground_truth "false")
 set(enable_logging "false")
 set(enable_camera "false")
-set(rotors_description_dir "${CMAKE_SOURCE_DIR}/models/rotors_description")
-set(scripts_dir "${CMAKE_SOURCE_DIR}/scripts")
-add_custom_target(sdf
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	COMMAND rm -f ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
-	COMMAND python ${scripts_dir}/xacro.py -o  ${rotors_description_dir}/urdf/iris_base.urdf  ${rotors_description_dir}/urdf/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging} rotors_description_dir:=${rotors_description_dir} 
-	COMMAND gz sdf -p  ${rotors_description_dir}/urdf/iris_base.urdf >> ${CMAKE_SOURCE_DIR}/models/iris/iris.sdf
-	COMMAND rm -f ${rotors_description_dir}/urdf/iris_base.urdf
-	)
+set(rotors_description_dir "${CMAKE_CURRENT_SOURCE_DIR}/models/rotors_description")
+set(scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/tools")
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
+ 	COMMAND python ${scripts_dir}/xacro.py -o  ${rotors_description_dir}/urdf/iris_base.urdf  ${rotors_description_dir}/urdf/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging} rotors_description_dir:=${rotors_description_dir} 
+	COMMAND gz sdf -p  ${rotors_description_dir}/urdf/iris_base.urdf >> ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
+ 	COMMAND rm -f ${rotors_description_dir}/urdf/iris_base.urdf
+  )
+add_custom_target(sdf ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf)
 
-link_directories(${GAZEBO_LIBRARY_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/msgs)
-add_subdirectory(msgs)
+#--------------------#
+# Message Generation #
+#--------------------#
 
-list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
+# XXX this approach is extremely error prone
+# it would be preferable to either depend on the
+# compiled headers from Gazebo directly
+# or to have something entirely independent.
+#
 
-add_library(hello_world SHARED src/hello_world.cc)
-target_link_libraries(hello_world ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+set(PROTOBUF_IMPORT_DIRS)
+foreach(ITR ${GAZEBO_INCLUDE_DIRS})
+  if(ITR MATCHES ".*gazebo-[0-9.]+$")
+    set(PROTOBUF_IMPORT_DIRS "${ITR}/gazebo/msgs/proto")
+  endif()
+endforeach()
+
+set (msgs
+  msgs/HilGps.proto
+  msgs/HilSensor.proto
+  msgs/HilControl.proto
+  msgs/SensorImu.proto
+  msgs/Float.proto
+  msgs/opticalFlow.proto
+  msgs/lidar.proto
+  msgs/CommandAttitudeThrust.proto
+  msgs/CommandMotorSpeed.proto
+  msgs/CommandRateThrust.proto
+  msgs/CommandRollPitchYawrateThrust.proto
+  msgs/CommandTrajectory.proto
+  msgs/CommandVelocityTrajectory.proto
+  msgs/MotorSpeed.proto
+)
+PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
+add_library(mav_msgs SHARED ${PROTO_SRCS})
+
+#---------#
+# Plugins #
+#---------#
+
+link_libraries(mav_msgs)
+
+# add_library(hello_world SHARED src/hello_world.cc)
 
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
-target_link_libraries(rotors_gazebo_controller_interface ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${PROTOBUF_LIBRARY} mav_msgs)
-add_dependencies(rotors_gazebo_controller_interface mav_msgs)
-
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
-target_link_libraries(rotors_gazebo_motor_model mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-add_dependencies(rotors_gazebo_motor_model mav_msgs)
-
 add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
-target_link_libraries(rotors_gazebo_multirotor_base_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-add_dependencies(rotors_gazebo_multirotor_base_plugin mav_msgs)
-
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-target_link_libraries(rotors_gazebo_imu_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-add_dependencies(rotors_gazebo_imu_plugin mav_msgs)
-
 add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
-target_link_libraries(gazebo_opticalFlow_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${OpenCV_LIBS})
-add_dependencies(gazebo_opticalFlow_plugin mav_msgs)
-
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
-target_link_libraries(gazebo_lidar_plugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-add_dependencies(gazebo_lidar_plugin mav_msgs)
-
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
-target_link_libraries(rotors_gazebo_mavlink_interface mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-add_dependencies(rotors_gazebo_mavlink_interface mav_msgs)
 
-add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
-target_link_libraries(LiftDragPlugin mav_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-add_dependencies(LiftDragPlugin mav_msgs)
+set(plugins
+	rotors_gazebo_controller_interface
+	rotors_gazebo_motor_model
+	rotors_gazebo_multirotor_base_plugin
+	rotors_gazebo_imu_plugin
+	gazebo_opticalFlow_plugin
+	gazebo_lidar_plugin
+	rotors_gazebo_mavlink_interface
+	)
+
+if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
+  add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
+  list(APPEND plugins LiftDragPlugin)
+endif()
+
+foreach(plugin ${plugins})
+	add_dependencies(${plugin} mav_msgs)
+endforeach()
+
+#############
+## Install ##
+#############
+
+install(TARGETS mav_msgs ${plugins}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+set(PLUGIN_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+set(MODEL_DIR ${CMAKE_INSTALL_FULL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
+set(WORLD_DIR ${CMAKE_INSTALL_FULL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/worlds)
+
+file(GLOB models ${PROJECT_SOURCE_DIR}/models/*)
+file(GLOB worlds ${PROJECT_SOURCE_DIR}/worlds/*)
+
+install(TARGETS ${installed_libraries} DESTINATION ${PLUGIN_DIR})
+install(DIRECTORY ${models} DESTINATION ${MODEL_DIR})
+install(FILES ${worlds} DESTINATION ${WORLD_DIR})
+
+
+#############
+## Testing ##
+#############
+
+###############
+## Packaging ##
+###############
+
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME}-${GAZEBO_MAJOR_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_CONTACT pxusers@googlegroups.com)
+set(DEBIAN_PACKAGE_DEPENDS "")
+set(RPM_PACKAGE_DEPENDS "")
+
+set(CPACK_DEBIAN_PACKAGE_DEPENDS ${DEBIAN_PACKAGE_DEPENDS})
+set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "gazebo plugins for px4 sitl.")
+
+set(CPACK_RPM_PACKAGE_REQUIRES "${DEBIAN_PACKAGE_DEPENDS}")
+set(CPACK_RPM_PACKAGE_DESCRIPTION "Gazebo plugins for px4 sitl.")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_MAJOR_VERSION}-${PROJECT_VERSION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_MAJOR_VERSION}-${PROJECT_VERSION}")
+
+include(CPack)
+# vim: set et fenc= ff=unix sts=0 sw=2 ts=2 :
+
