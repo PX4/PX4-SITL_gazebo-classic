@@ -159,16 +159,13 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GazeboMavlinkInterface::OnUpdate, this, _1));
 
-  // Subscriber to IMU sensor_msgs::Imu Message and SITL's HilControl message
-  mav_control_sub_ = node_handle_->Subscribe(mavlink_control_sub_topic_, &GazeboMavlinkInterface::HilControlCallback, this);
+  // Subscriber to IMU sensor_msgs::Imu Message and SITL message
   imu_sub_ = node_handle_->Subscribe(imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe(lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe(opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   
-  // Publish HilSensor Message and gazebo's motor_speed message
+  // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>(motor_velocity_reference_pub_topic_, 1);
-  hil_sensor_pub_ = node_handle_->Advertise<mavlink::msgs::HilSensor>(hil_sensor_mavlink_pub_topic_, 1);
-  hil_gps_pub_ = node_handle_->Advertise<mavlink::msgs::HilGps>(hil_gps_mavlink_pub_topic_, 1);
 
   _rotor_count = 5;
   last_time_ = world_->GetSimTime();
@@ -288,76 +285,26 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     lon_rad = lon_zurich;
   }
   
-  if(current_time.Double() - last_gps_time_.Double() > gps_update_interval_){  // 5Hz
+  if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
+    // Raw UDP mavlink
+    mavlink_hil_gps_t hil_gps_msg;
+    hil_gps_msg.time_usec = current_time.nsec*1000;
+    hil_gps_msg.fix_type = 3;
+    hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
+    hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
+    hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
+    hil_gps_msg.eph = 100;
+    hil_gps_msg.epv = 100;
+    hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
+    hil_gps_msg.vn = velocity_current_W.x * 100;
+    hil_gps_msg.ve = -velocity_current_W.y * 100;
+    hil_gps_msg.vd = -velocity_current_W.z * 100;
+    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+    hil_gps_msg.satellites_visible = 10;
 
-    if(use_mavlink_udp){
-      // Raw UDP mavlink
-      mavlink_hil_gps_t hil_gps_msg;
-      hil_gps_msg.time_usec = current_time.nsec*1000;
-      hil_gps_msg.fix_type = 3;
-      hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
-      hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-      hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
-      hil_gps_msg.eph = 100;
-      hil_gps_msg.epv = 100;
-      hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
-      hil_gps_msg.vn = velocity_current_W.x * 100;
-      hil_gps_msg.ve = -velocity_current_W.y * 100;
-      hil_gps_msg.vd = -velocity_current_W.z * 100;
-      hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
-      hil_gps_msg.satellites_visible = 10;
-
-      send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
-    } else{
-      // Send via protobuf
-      hil_gps_msg_.set_time_usec(current_time.nsec*1000);
-      hil_gps_msg_.set_fix_type(3);
-      hil_gps_msg_.set_lat(lat_rad * 180 / M_PI * 1e7);
-      hil_gps_msg_.set_lon(lon_rad * 180 / M_PI * 1e7);
-      hil_gps_msg_.set_alt((pos_W_I.z + alt_zurich) * 1000);
-      hil_gps_msg_.set_eph(100);
-      hil_gps_msg_.set_epv(100);
-      hil_gps_msg_.set_vel(velocity_current_W_xy.GetLength() * 100);
-      hil_gps_msg_.set_vn(velocity_current_W.x * 100);
-      hil_gps_msg_.set_ve(-velocity_current_W.y * 100);
-      hil_gps_msg_.set_vd(-velocity_current_W.z * 100);
-      hil_gps_msg_.set_cog(atan2(-velocity_current_W.y * 100, velocity_current_W.x * 100) * 180.0/3.1416 * 100.0);
-      hil_gps_msg_.set_satellites_visible(10);
-             
-      hil_gps_pub_->Publish(hil_gps_msg_);
-    }
+    send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
 
     last_gps_time_ = current_time;
-  }
-}
-
-void GazeboMavlinkInterface::HilControlCallback(HilControlPtr &rmsg) {
-  if(!use_mavlink_udp){
-
-    inputs.control[0] =(double)rmsg->roll_ailerons();
-    inputs.control[1] =(double)rmsg->pitch_elevator();
-    inputs.control[2] =(double)rmsg->yaw_rudder();
-    inputs.control[3] =(double)rmsg->throttle();
-    inputs.control[4] =(double)rmsg->aux1();
-    inputs.control[5] =(double)rmsg->aux2();
-    inputs.control[6] =(double)rmsg->aux3();
-    inputs.control[7] =(double)rmsg->aux4();
-
-    // publish message
-    double scaling = 150;
-    double offset = 600;
-
-    mav_msgs::msgs::CommandMotorSpeed* turning_velocities_msg = new mav_msgs::msgs::CommandMotorSpeed;
-
-    for (int i = 0; i < _rotor_count; i++) {
-      turning_velocities_msg->add_motor_speed(inputs.control[i] * scaling + offset);
-    }
-
-    input_reference_.resize(turning_velocities_msg->motor_speed_size());
-    for (int i = 0; i < turning_velocities_msg->motor_speed_size(); ++i) {
-      input_reference_[i] = turning_velocities_msg->motor_speed(i);
-    }
-    received_first_referenc_ = true;
   }
 }
 
@@ -425,49 +372,29 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   float mag_noise = standard_normal_distribution_(random_generator_);
 
-  if(use_mavlink_udp){
-    mavlink_hil_sensor_t sensor_msg;
-    sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
-    sensor_msg.xacc = imu_message->linear_acceleration().x();
-    sensor_msg.yacc = imu_message->linear_acceleration().y();
-    sensor_msg.zacc = imu_message->linear_acceleration().z();
-    sensor_msg.xgyro = imu_message->angular_velocity().x();
-    sensor_msg.ygyro = imu_message->angular_velocity().y();
-    sensor_msg.zgyro = imu_message->angular_velocity().z();
-    sensor_msg.xmag = mag_I.x + mag_noise;
-    sensor_msg.ymag = mag_I.y + mag_noise;
-    sensor_msg.zmag = mag_I.z + mag_noise;
-    sensor_msg.abs_pressure = 0.0;
-    sensor_msg.diff_pressure = 0.5*1.2754*(body_vel.z + body_vel.x)*(body_vel.z + body_vel.x) / 100;
-    sensor_msg.pressure_alt = pos_W_I.z;
-    sensor_msg.temperature = 0.0;
-    sensor_msg.fields_updated = 4095;
+  mavlink_hil_sensor_t sensor_msg;
+  sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
+  sensor_msg.xacc = imu_message->linear_acceleration().x();
+  sensor_msg.yacc = imu_message->linear_acceleration().y();
+  sensor_msg.zacc = imu_message->linear_acceleration().z();
+  sensor_msg.xgyro = imu_message->angular_velocity().x();
+  sensor_msg.ygyro = imu_message->angular_velocity().y();
+  sensor_msg.zgyro = imu_message->angular_velocity().z();
+  sensor_msg.xmag = mag_I.x + mag_noise;
+  sensor_msg.ymag = mag_I.y + mag_noise;
+  sensor_msg.zmag = mag_I.z + mag_noise;
+  sensor_msg.abs_pressure = 0.0;
+  sensor_msg.diff_pressure = 0.5*1.2754*(body_vel.z + body_vel.x)*(body_vel.z + body_vel.x) / 100;
+  sensor_msg.pressure_alt = pos_W_I.z;
+  sensor_msg.temperature = 0.0;
+  sensor_msg.fields_updated = 4095;
 
-    //gyro needed for optical flow message
-    optflow_xgyro = imu_message->angular_velocity().x();
-    optflow_ygyro = imu_message->angular_velocity().y();
-    optflow_zgyro = imu_message->angular_velocity().z();
+  //gyro needed for optical flow message
+  optflow_xgyro = imu_message->angular_velocity().x();
+  optflow_ygyro = imu_message->angular_velocity().y();
+  optflow_zgyro = imu_message->angular_velocity().z();
 
-    send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);    
-  } else{
-    hil_sensor_msg_.set_time_usec(world_->GetSimTime().nsec*1000);
-    hil_sensor_msg_.set_xacc(imu_message->linear_acceleration().x());
-    hil_sensor_msg_.set_yacc(imu_message->linear_acceleration().y());
-    hil_sensor_msg_.set_zacc(imu_message->linear_acceleration().z());
-    hil_sensor_msg_.set_xgyro(imu_message->angular_velocity().x());
-    hil_sensor_msg_.set_ygyro(imu_message->angular_velocity().y());
-    hil_sensor_msg_.set_zgyro(imu_message->angular_velocity().z());
-    hil_sensor_msg_.set_xmag(mag_I.x);
-    hil_sensor_msg_.set_ymag(mag_I.y);
-    hil_sensor_msg_.set_zmag(mag_I.z);
-    hil_sensor_msg_.set_abs_pressure(0.0);
-    hil_sensor_msg_.set_diff_pressure(0.5*1.2754*body_vel.x*body_vel.x);
-    hil_sensor_msg_.set_pressure_alt(pos_W_I.z);
-    hil_sensor_msg_.set_temperature(0.0);
-    hil_sensor_msg_.set_fields_updated(4095);  // 0b1111111111111 (All updated since new data with new noise added always)
-    
-    hil_sensor_pub_->Publish(hil_sensor_msg_);
-  }
+  send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);    
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {

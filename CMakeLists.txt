@@ -16,11 +16,29 @@ find_package(PkgConfig REQUIRED)
 find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
+
+# XXX this approach is extremely error prone
+# it would be preferable to either depend on the
+# compiled headers from Gazebo directly
+# or to have something entirely independent.
+#
+
+set(PROTOBUF_IMPORT_DIRS "")
+foreach(ITR ${GAZEBO_INCLUDE_DIRS})
+  if(ITR MATCHES ".*gazebo-[0-9.]+$")
+    set(PROTOBUF_IMPORT_DIRS "${ITR}/gazebo/msgs/proto")
+  endif()
+endforeach()
+
+# PROTOBUF_IMPORT_DIRS has to be set before
+# find_package is called
 find_package(Protobuf REQUIRED)
 pkg_check_modules(PROTOBUF protobuf)
 
 if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
+else()
+  message("Gazebo version: ${GAZEBO_VERSION}")
 endif()
 
 find_package(Eigen3 QUIET)
@@ -114,33 +132,12 @@ add_custom_target(sdf ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.s
 # Message Generation #
 #--------------------#
 
-# XXX this approach is extremely error prone
-# it would be preferable to either depend on the
-# compiled headers from Gazebo directly
-# or to have something entirely independent.
-#
-
-set(PROTOBUF_IMPORT_DIRS)
-foreach(ITR ${GAZEBO_INCLUDE_DIRS})
-  if(ITR MATCHES ".*gazebo-[0-9.]+$")
-    set(PROTOBUF_IMPORT_DIRS "${ITR}/gazebo/msgs/proto")
-  endif()
-endforeach()
-
 set (msgs
-  msgs/HilGps.proto
-  msgs/HilSensor.proto
-  msgs/HilControl.proto
-  msgs/SensorImu.proto
   msgs/Float.proto
+  msgs/SensorImu.proto
   msgs/opticalFlow.proto
   msgs/lidar.proto
-  msgs/CommandAttitudeThrust.proto
   msgs/CommandMotorSpeed.proto
-  msgs/CommandRateThrust.proto
-  msgs/CommandRollPitchYawrateThrust.proto
-  msgs/CommandTrajectory.proto
-  msgs/CommandVelocityTrajectory.proto
   msgs/MotorSpeed.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
