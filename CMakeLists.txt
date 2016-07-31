@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0054 NEW)
+
+if (NOT CMAKE_INSTALL_PREFIX)
+  set(CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "install prefix" FORCE)
+endif()
+
+message(STATUS "install-prefix: ${CMAKE_INSTALL_PREFIX}")
+
 project(mavlink_sitl_gazebo VERSION 1.0.0)
 include(GNUInstallDirs)
 
@@ -182,15 +189,9 @@ endforeach()
 ## Install ##
 #############
 
-install(TARGETS mav_msgs ${plugins}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-set(PLUGIN_DIR ${CMAKE_INSTALL_LIBDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
-set(MODEL_DIR ${CMAKE_INSTALL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
-set(WORLD_DIR ${CMAKE_INSTALL_DATADIR}/gazebo-${GAZEBO_MAJOR_VERSION}/worlds)
+set(PLUGIN_PATH ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/plugins)
+set(MODEL_PATH ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/models)
+set(RESOURCE_PATH ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
 
 file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/models/.DS_Store)
 file(GLOB models_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/models/*)
@@ -198,9 +199,12 @@ file(GLOB models_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/models/*)
 file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/worlds/.DS_Store)
 file(GLOB worlds_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/worlds/*)
 
-install(TARGETS ${installed_libraries} DESTINATION ${PLUGIN_DIR})
-install(DIRECTORY ${models_list} DESTINATION ${MODEL_DIR})
-install(FILES ${worlds_list} DESTINATION ${WORLD_DIR})
+install(TARGETS ${plugins} mav_msgs DESTINATION ${PLUGIN_PATH})
+install(DIRECTORY ${models_list} DESTINATION ${MODEL_PATH})
+install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
+
+configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})
 
 
 #############

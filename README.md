@@ -90,7 +90,9 @@ sudo make install
 Gazebo will now launch when typing 'gazebo' on the shell:
 
 ```bash
-gazebo
+. /usr/share/gazebo/setup.sh
+. /usr/share/mavlink_sitl_gazebo/setup.sh
+gazebo worlds/iris.world
 ```
 
 Please refer to the documentation of the particular flight stack how to run it against this framework, e.g. [PX4](http://dev.px4.io/simulation-gazebo.html)
