@@ -52,6 +52,7 @@
 static const uint8_t mavlink_message_lengths[256] = MAVLINK_MESSAGE_LENGTHS;
 static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
 
+static const uint32_t kDefaultMavlinkUdpPort = 14560;
 
 namespace gazebo {
 
@@ -98,7 +99,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
         zero_position_armed{},
         input_index{},
         lat_rad(0.0),
-        lon_rad(0.0)
+        lon_rad(0.0),
+        mavlink_udp_port_(kDefaultMavlinkUdpPort)
         {}
   ~GazeboMavlinkInterface();
 
@@ -195,6 +197,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
   double optflow_ygyro;
   double optflow_zgyro;
   double optflow_distance;
+
+  //mavlink udp port
+  int mavlink_udp_port_;
 
   };
 }
