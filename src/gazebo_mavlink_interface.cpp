@@ -184,6 +184,17 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   //Create socket
   // udp socket data
+  mavlink_addr_ = htonl(INADDR_ANY);
+  if (_sdf->HasElement("mavlink_addr")) {
+    std::string mavlink_addr = _sdf->GetElement("mavlink_addr")->Get<std::string>();
+    if (mavlink_addr != "INADDR_ANY") {
+      mavlink_addr_ = inet_addr(mavlink_addr.c_str());
+      if (mavlink_addr_ == INADDR_NONE) {
+        fprintf(stderr, "invalid mavlink_addr \"%s\"\n", mavlink_addr.c_str());
+        return;
+      }
+    }
+  }
   if (_sdf->HasElement("mavlink_udp_port")) {
     mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
   }
@@ -206,7 +217,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
 
   _srcaddr.sin_family = AF_INET;
-  _srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  _srcaddr.sin_addr.s_addr = mavlink_addr_;
   _srcaddr.sin_port = htons(mavlink_udp_port_);
   _addrlen = sizeof(_srcaddr);
 
