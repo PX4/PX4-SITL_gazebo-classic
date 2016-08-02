@@ -198,7 +198,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   double optflow_zgyro;
   double optflow_distance;
 
-  //mavlink udp port
+  in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
 
   };
