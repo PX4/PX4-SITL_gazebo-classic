@@ -26,10 +26,10 @@ find_package(OpenCV REQUIRED)
 
 find_package(catkin QUIET)
 if (catkin_FOUND)
-	message(STATUS "building as catkin package")
+  message(STATUS "building as catkin package")
   catkin_package()
 else()
-	message(STATUS "not building as catkin package")
+  message(STATUS "not building as catkin package")
 endif()
 
 # XXX this approach is extremely error prone
@@ -111,18 +111,18 @@ include_directories(
   )
 
 link_libraries(
-	${PROTOBUF_LIBRARY}
-	${GAZEBO_LIBRARIES}
-	${OpenCV_LIBRARIES}
-	${Boost_SYSTEM_LIBRARY_RELEASE}
-	${Boost_THREAD_LIBRARY_RELEASE}
-	${Boost_TIMER_LIBRARY_RELEASE}
-	)
+  ${PROTOBUF_LIBRARY}
+  ${GAZEBO_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${Boost_SYSTEM_LIBRARY_RELEASE}
+  ${Boost_THREAD_LIBRARY_RELEASE}
+  ${Boost_TIMER_LIBRARY_RELEASE}
+  )
 
 link_directories(
-	${GAZEBO_LIBRARY_DIRS}
-	${CMAKE_CURRENT_BINARY_DIR}
-	)
+  ${GAZEBO_LIBRARY_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 #--------------------------#
 # Generation of SDF models #
@@ -135,11 +135,11 @@ set(enable_camera "false")
 set(rotors_description_dir "${CMAKE_CURRENT_SOURCE_DIR}/models/rotors_description")
 set(scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
- 	COMMAND python ${scripts_dir}/xacro.py -o  ${rotors_description_dir}/urdf/iris_base.urdf  ${rotors_description_dir}/urdf/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging} rotors_description_dir:=${rotors_description_dir} 
-	COMMAND gz sdf -p  ${rotors_description_dir}/urdf/iris_base.urdf >> ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
- 	COMMAND rm -f ${rotors_description_dir}/urdf/iris_base.urdf
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
+  COMMAND python ${scripts_dir}/xacro.py -o  ${rotors_description_dir}/urdf/iris_base.urdf  ${rotors_description_dir}/urdf/iris_base.xacro enable_mavlink_interface:=${enable_mavlink_interface} enable_ground_truth:=${enable_ground_truth} enable_logging:=${enable_logging} rotors_description_dir:=${rotors_description_dir} 
+  COMMAND gz sdf -p  ${rotors_description_dir}/urdf/iris_base.urdf >> ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
+  COMMAND rm -f ${rotors_description_dir}/urdf/iris_base.urdf
   )
 add_custom_target(sdf ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf)
 
@@ -175,14 +175,14 @@ add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 
 set(plugins
-	rotors_gazebo_controller_interface
-	rotors_gazebo_motor_model
-	rotors_gazebo_multirotor_base_plugin
-	rotors_gazebo_imu_plugin
-	gazebo_opticalFlow_plugin
-	gazebo_lidar_plugin
-	rotors_gazebo_mavlink_interface
-	)
+  rotors_gazebo_controller_interface
+  rotors_gazebo_motor_model
+  rotors_gazebo_multirotor_base_plugin
+  rotors_gazebo_imu_plugin
+  gazebo_opticalFlow_plugin
+  gazebo_lidar_plugin
+  rotors_gazebo_mavlink_interface
+  )
 
 if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
   add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
@@ -190,7 +190,7 @@ if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
 endif()
 
 foreach(plugin ${plugins})
-	add_dependencies(${plugin} mav_msgs)
+  add_dependencies(${plugin} mav_msgs)
 endforeach()
 
 #############
