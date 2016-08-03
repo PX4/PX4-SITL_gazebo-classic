@@ -24,6 +24,14 @@ find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
 
+find_package(catkin QUIET)
+if (catkin_FOUND)
+	message(STATUS "building as catkin package")
+  catkin_package()
+else()
+	message(STATUS "not building as catkin package")
+endif()
+
 # XXX this approach is extremely error prone
 # it would be preferable to either depend on the
 # compiled headers from Gazebo directly
