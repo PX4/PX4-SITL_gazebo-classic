@@ -101,7 +101,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
   /*
   std::cout << "Subscribing to: " << motor_test_sub_topic_ << std::endl;
-  motor_sub_ = node_handle_->Subscribe<mav_msgs::msgs::MotorSpeed>(motor_test_sub_topic_, &GazeboMotorModel::testProto, this);
+  motor_sub_ = node_handle_->Subscribe<mav_msgs::msgs::MotorSpeed>("~/" + model_->GetName() + motor_test_sub_topic_, &GazeboMotorModel::testProto, this);
   */
 
   // Set the maximumForce on the joint. This is deprecated from V5 on, and the joint won't move.
@@ -112,8 +112,8 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 
-  command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>(command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
-  motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>(motor_speed_pub_topic_, 1);
+  command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
+  motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>("~/" + model_->GetName() + motor_speed_pub_topic_, 1);
 
   // Create the first order filter.
   rotor_velocity_filter_.reset(new FirstOrderFilter<double>(time_constant_up_, time_constant_down_, ref_motor_rot_vel_));
@@ -205,4 +205,3 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);
 }
-
