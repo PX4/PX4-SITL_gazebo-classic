@@ -1268,6 +1268,9 @@
           <zero_position_armed>100</zero_position_armed>
         </channel>
       </control_channels>
+      <cgo3_vertical_arm_joint>typhoon_h480::cgo3_vertical_arm_joint</cgo3_vertical_arm_joint>
+      <cgo3_horizontal_arm_joint>typhoon_h480::cgo3_horizontal_arm_joint</cgo3_horizontal_arm_joint>
+      <cgo3_mount_joint>typhoon_h480::cgo3_camera_joint</cgo3_mount_joint>
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
