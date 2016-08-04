@@ -33,9 +33,6 @@
 #include "common.h"
 
 #include "SensorImu.pb.h"
-#include "HilControl.pb.h"
-#include "HilSensor.pb.h"
-#include "HilGps.pb.h"
 #include "opticalFlow.pb.h"
 #include "lidar.pb.h"
 #include <boost/bind.hpp>
@@ -55,13 +52,11 @@
 static const uint8_t mavlink_message_lengths[256] = MAVLINK_MESSAGE_LENGTHS;
 static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
 
+static const uint32_t kDefaultMavlinkUdpPort = 14560;
 
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilControl>   HilControlPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilSensor>   HilSensorPtr;
-typedef const boost::shared_ptr<const mavlink::msgs::HilGps>   HilGpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
@@ -72,15 +67,10 @@ static const std::string kDefaultNamespace = "";
 // This just proxies the motor commands from command/motor_speed to the single motors via internal
 // ConsPtr passing, such that the original commands don't have to go n_motors-times over the wire.
 static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
-static const std::string kDefaultMavlinkControlSubTopic = "/HilControl";
 
 static const std::string kDefaultImuTopic = "/imu";
 static const std::string kDefaultLidarTopic = "/lidar";
 static const std::string kDefaultOpticalFlowTopic = "/opticalFlow";
-static const std::string kDefaultMavlinkHilSensorPubTopic = "/HilSensor";
-static const std::string kDefaultMavlinkHilGpsPubTopic = "/HilGps";
-
-static bool use_mavlink_udp = true;
 
 class GazeboMavlinkInterface : public ModelPlugin {
  public:
@@ -90,12 +80,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
         received_first_referenc_(false),
         namespace_(kDefaultNamespace),
         motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
-        hil_sensor_mavlink_pub_topic_(kDefaultMavlinkHilSensorPubTopic),
-        hil_gps_mavlink_pub_topic_(kDefaultMavlinkHilGpsPubTopic),
         imu_sub_topic_(kDefaultImuTopic),
         opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
         lidar_sub_topic_(kDefaultLidarTopic),
-        mavlink_control_sub_topic_(kDefaultMavlinkControlSubTopic),
         model_{},
         world_(nullptr),
         left_elevon_joint_(nullptr),
@@ -112,7 +99,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
         zero_position_armed{},
         input_index{},
         lat_rad(0.0),
-        lon_rad(0.0)
+        lon_rad(0.0),
+        mavlink_udp_port_(kDefaultMavlinkUdpPort)
         {}
   ~GazeboMavlinkInterface();
 
@@ -153,7 +141,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   boost::thread callback_queue_thread_;
   void QueueThread();
-  void HilControlCallback(HilControlPtr &rmsg);
   void ImuCallback(ImuPtr& imu_msg);
   void LidarCallback(LidarPtr& lidar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
@@ -177,11 +164,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
-  transport::PublisherPtr hil_sensor_pub_;
-  transport::PublisherPtr hil_gps_pub_;
-
-  std::string hil_sensor_mavlink_pub_topic_;
-  std::string hil_gps_mavlink_pub_topic_;
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
@@ -200,9 +182,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
 
-  mavlink::msgs::HilSensor hil_sensor_msg_;
-  mavlink::msgs::HilGps hil_gps_msg_;
-
   int _fd;
   struct sockaddr_in _myaddr;  ///< The locally bound address
   struct sockaddr_in _srcaddr;  ///< SITL instance
@@ -218,6 +197,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
   double optflow_ygyro;
   double optflow_zgyro;
   double optflow_distance;
+
+  in_addr_t mavlink_addr_;
+  int mavlink_udp_port_;
 
   };
 }

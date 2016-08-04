@@ -42,7 +42,7 @@ void GazeboMultirotorBasePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr 
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
-  motor_pub_ = node_handle_->Advertise<mav_msgs::msgs::MotorSpeed>(motor_pub_topic_, 1);
+  motor_pub_ = node_handle_->Advertise<mav_msgs::msgs::MotorSpeed>("~/" + model_->GetName() + motor_pub_topic_, 1);
 
 
   frame_id_ = link_name_;

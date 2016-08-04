@@ -1,7 +1,0 @@
-syntax = "proto2";
-package mav_msgs.msgs;
-
-message CommandAttitudeThrust
-{
-  required float   thrust  = 1;
-}
