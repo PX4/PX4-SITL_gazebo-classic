@@ -133,6 +133,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
   physics::JointPtr gimbal_yaw_joint_;
   physics::JointPtr gimbal_pitch_joint_;
   physics::JointPtr gimbal_roll_joint_;
+  common::PID elevator_pid_;
+  common::PID left_elevon_pid_;
+  common::PID right_elevon_pid_;
 
   std::vector<physics::JointPtr> joints_;
 
@@ -145,8 +148,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void LidarCallback(LidarPtr& lidar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID);
-  void handle_message(mavlink_message_t *msg);
-  void pollForMAVLinkMessages();
+  void handle_message(mavlink_message_t *msg, double _dt);
+  void pollForMAVLinkMessages(double _dt);
 
   static const unsigned n_out_max = 16;
 

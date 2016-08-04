@@ -49,6 +49,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
                            motor_velocity_reference_pub_topic_);
 
+  // setup pid to control joint
+  elevator_pid_.Init(0.1, 0, 0, 0, 0, 0, -0);
+  right_elevon_pid_.Init(0.1, 0, 0, 0, 0, 3, -3);
+  left_elevon_pid_.Init(0.1, 0, 0, 0, 0, 3, -3);
+
   joints_.resize(n_out_max);
 
   if (_sdf->HasElement("control_channels")) {
@@ -228,35 +233,33 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
-  pollForMAVLinkMessages();
+  common::Time current_time = world_->GetSimTime();
+  double dt = (current_time - last_time_).Double();
 
-  common::Time now = world_->GetSimTime();
+  pollForMAVLinkMessages(dt);
 
   if(received_first_referenc_) {
 
     mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
     for (int i = 0; i < input_reference_.size(); i++){
-      if (last_actuator_time_ == 0 || (now - last_actuator_time_).Double() > 0.2) {
+      if (last_actuator_time_ == 0 || (current_time - last_actuator_time_).Double() > 0.2) {
         turning_velocities_msg.add_motor_speed(0);
       } else {
         turning_velocities_msg.add_motor_speed(input_reference_[i]);
       }
     }
     // TODO Add timestamp and Header
-    // turning_velocities_msg->header.stamp.sec = now.sec;
-    // turning_velocities_msg->header.stamp.nsec = now.nsec;
+    // turning_velocities_msg->header.stamp.sec = current_time.sec;
+    // turning_velocities_msg->header.stamp.nsec = current_time.nsec;
 
     // gzerr << turning_velocities_msg.motor_speed(0) << "\n";
     motor_velocity_reference_pub_->Publish(turning_velocities_msg);
   }
 
-  //send gps
-  common::Time current_time  = now;
-  double dt = (current_time - last_time_).Double();
   last_time_ = current_time;
-  double t = current_time.Double();
 
+  //send gps
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
   math::Vector3 pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
 
@@ -443,7 +446,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   send_mavlink_message(MAVLINK_MSG_ID_HIL_OPTICAL_FLOW, &sensor_msg, 200);
 }
 
-void GazeboMavlinkInterface::pollForMAVLinkMessages()
+void GazeboMavlinkInterface::pollForMAVLinkMessages(double _dt)
 {
   int len;
   ::poll(&fds[0], (sizeof(fds[0])/sizeof(fds[0])), 0);
@@ -457,14 +460,14 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
         {
           // have a message, handle it
-          handle_message(&msg);
+          handle_message(&msg, _dt);
         }
       }
     }
   }
 }
 
-void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
+void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
 {
   switch(msg->msgid) {
   case MAVLINK_MSG_ID_HIL_CONTROLS:
@@ -558,6 +561,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     // set joint positions
     for (int i = 0; i < input_reference_.size(); i++) {
       if (joints_[i]) {
+      gzerr << "new joint_?\n";
 #if GAZEBO_MAJOR_VERSION >= 6
         joints_[i]->SetPosition(0, input_reference_[i]);
 #else
@@ -567,17 +571,43 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     }
 
     // legacy method, can eventually be replaced
+#if 1
+    if (right_elevon_joint_ != NULL)
+    {
+      double right_elevon_err =
+       right_elevon_joint_->GetAngle(0).Radian() - input_reference_[5];
+      double right_elevon_force = right_elevon_pid_.Update(right_elevon_err, _dt);
+      right_elevon_joint_->SetForce(0, right_elevon_force);
+    }
+
+    if (left_elevon_joint_!= NULL)
+    {
+      double left_elevon_err =
+       left_elevon_joint_->GetAngle(0).Radian() - input_reference_[6];
+      double left_elevon_force = left_elevon_pid_.Update(left_elevon_err, _dt);
+      left_elevon_joint_->SetForce(0, left_elevon_force);
+    }
+
+    if (elevator_joint_ != NULL)
+    {
+      double elevator_err =
+       elevator_joint_->GetAngle(0).Radian() - input_reference_[7];
+      double elevator_force = elevator_pid_.Update(elevator_err, _dt);
+      elevator_joint_->SetForce(0, elevator_force);
+    }
+#elif GAZEBO_MAJOR_VERSION >= 6
     if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
-#if GAZEBO_MAJOR_VERSION >= 6
       left_elevon_joint_->SetPosition(0, input_reference_[5]);
       right_elevon_joint_->SetPosition(0, input_reference_[6]);
       elevator_joint_->SetPosition(0, input_reference_[7]);
+    }
 #else
+    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
       left_elevon_joint_->SetAngle(0, input_reference_[5]);
       right_elevon_joint_->SetAngle(0, input_reference_[6]);
       elevator_joint_->SetAngle(0, input_reference_[7]);
-#endif
     }
+#endif
 
     received_first_referenc_ = true;
     break;
