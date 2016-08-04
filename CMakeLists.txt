@@ -168,6 +168,10 @@ link_libraries(mav_msgs)
 
 # add_library(hello_world SHARED src/hello_world.cc)
 
+add_library(rotors_gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
+target_link_libraries(rotors_gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+# add_dependencies(rotors_gazebo_gimbal_controller_plugin)
+
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
