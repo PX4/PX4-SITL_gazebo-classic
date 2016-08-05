@@ -32,7 +32,6 @@ void GazeboMotorModel::InitializeParams() {}
 void GazeboMotorModel::Publish() {
   turning_velocity_msg_.set_data(joint_->GetVelocity(0));
   motor_velocity_pub_->Publish(turning_velocity_msg_);
-  use_pid_ = false;
 }
 
 void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -83,6 +82,10 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
       cmdMin = pid->Get<double>("cmdMin");
     pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
     use_pid_ = true;
+  }
+  else
+  {
+    use_pid_ = false;
   }
 
   if (_sdf->HasElement("linkName"))

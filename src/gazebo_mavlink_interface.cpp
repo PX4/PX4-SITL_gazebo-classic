@@ -49,11 +49,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
                            motor_velocity_reference_pub_topic_);
 
-  // setup pid to control joint
-  elevator_pid_.Init(1.0, 0, 0, 0, 0, 0, -0);
-  right_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
-  left_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
-
   joints_.resize(n_out_max);
 
   if (_sdf->HasElement("control_channels")) {
@@ -61,29 +56,34 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     sdf::ElementPtr channel = control_channels->GetElement("channel");
     while (channel)
     {
+      gzerr << "reading channel but doing nothing.\n";
+      // sdf::ElementPtr_V children = control_channels->elements;
 
-    // sdf::ElementPtr_V children = control_channels->elements;
+      // for (unsigned i = 0; i < children.size(); i++) {
+      //   std::string name = children.at(i).Get<std::string>();
 
-    // for (unsigned i = 0; i < children.size(); i++) {
-    //   std::string name = children.at(i).Get<std::string>();
-
-    //   if (name == std::string("channel")) {
-    //     //int input_index = _sdf->GetElement("input_index")->Get<int>();
-    //     input_offset[i] = _sdf->GetElement("input_offset")->Get<double>();
-    //     input_scaling[i] = _sdf->GetElement("input_scaling")->Get<double>();
-    //   }
-    // }
-    channel = channel->GetNextElement("channel");
+      //   if (name == std::string("channel")) {
+      //     //int input_index = _sdf->GetElement("input_index")->Get<int>();
+      //     input_offset[i] = _sdf->GetElement("input_offset")->Get<double>();
+      //     input_scaling[i] = _sdf->GetElement("input_scaling")->Get<double>();
+      //   }
+      // }
+      channel = channel->GetNextElement("channel");
     }
   }
 
   if (_sdf->HasElement("left_elevon_joint")) {
-    std::string left_elevon_joint_name = _sdf->GetElement("left_elevon_joint")->Get<std::string>();
+    sdf::ElementPtr left_elevon =  _sdf->GetElement("left_elevon_joint");
+    std::string left_elevon_joint_name = left_elevon->Get<std::string>();
     left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name);
     int control_index;
     getSdfParam<int>(_sdf->GetElement("left_elevon_joint"), "controlIndex", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = left_elevon_joint_;
+    }
+    // setup pid to control joint
+    left_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
+    if (left_elevon->HasElement("joint_control_pid")) {
     }
   }
 
@@ -98,12 +98,17 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
 
   if (_sdf->HasElement("right_elevon_joint")) {
-    std::string right_elevon_joint_name = _sdf->GetElement("right_elevon_joint")->Get<std::string>();
+    sdf::ElementPtr right_elevon =  _sdf->GetElement("right_elevon_joint");
+    std::string right_elevon_joint_name = right_elevon->Get<std::string>();
     right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name);
     int control_index;
     getSdfParam<int>(_sdf->GetElement("right_elevon_joint"), "controlIndex", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = right_elevon_joint_;
+    }
+    // setup pid to control joint
+    right_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
+    if (right_elevon->HasElement("joint_control_pid")) {
     }
   }
 
@@ -118,12 +123,17 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
 
   if (_sdf->HasElement("elevator_joint")) {
-    std::string elevator_joint_name = _sdf->GetElement("elevator_joint")->Get<std::string>();
+    sdf::ElementPtr elevator =  _sdf->GetElement("elevator_joint");
+    std::string elevator_joint_name = elevator->Get<std::string>();
     elevator_joint_ = model_->GetJoint(elevator_joint_name);
     int control_index;
     getSdfParam<int>(_sdf->GetElement("elevator_joint"), "controlIndex", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = elevator_joint_;
+    }
+    // setup pid to control joint
+    elevator_pid_.Init(1.0, 0, 0, 0, 0, 0, -0);
+    if (elevator->HasElement("joint_control_pid")) {
     }
   }
 
