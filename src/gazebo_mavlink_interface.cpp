@@ -51,8 +51,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // setup pid to control joint
   elevator_pid_.Init(1.0, 0, 0, 0, 0, 0, -0);
-  right_elevon_pid_.Init(1.0, 0, 0, 0, 0, 3, -3);
-  left_elevon_pid_.Init(1.0, 0, 0, 0, 0, 3, -3);
+  right_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
+  left_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
 
   joints_.resize(n_out_max);
 
@@ -574,32 +574,30 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
 #if 1
     if (left_elevon_joint_!= NULL)
     {
-      gzerr << "left curr[" << left_elevon_joint_->GetAngle(0).Radian()
-            << "] target[" << input_reference_[5]
-            << "] mix[" << 0.524*0.5*(input_reference_[5] - input_reference_[7])
-            << "] ele[" << input_reference_[7]
-            << "] dt[" << _dt
-            << "]\n";
-      double left_elevon_err =
-       left_elevon_joint_->GetAngle(0).Radian() -
-         0.524*0.5*(input_reference_[5] - input_reference_[7]);
+      double target = 0.524*(0.5*input_reference_[5] - 0.5*input_reference_[7]);
+      double left_elevon_err = left_elevon_joint_->GetAngle(0).Radian() - target;
       double left_elevon_force = left_elevon_pid_.Update(left_elevon_err, _dt);
       left_elevon_joint_->SetForce(0, left_elevon_force);
+      // gzerr << "left curr[" << left_elevon_joint_->GetAngle(0).Radian()
+      //       << "] ail[" << input_reference_[5]
+      //       << "] ele[" << input_reference_[7]
+      //       << "] target[" << target
+      //       // << "] dt[" << _dt
+      //       << "]\n";
     }
 
     if (right_elevon_joint_ != NULL)
     {
-      gzerr << "right curr[" << right_elevon_joint_->GetAngle(0).Radian()
-            << "] target[" << input_reference_[6]
-            << "] mix[" << 0.524*0.5*(input_reference_[6] - input_reference_[7])
-            << "] ele[" << input_reference_[7]
-            << "] dt[" << _dt
-            << "]\n";
-      double right_elevon_err =
-       right_elevon_joint_->GetAngle(0).Radian() - 
-         0.524*0.5*(input_reference_[6] - input_reference_[7]);
+      double target = 0.524*(0.5*input_reference_[6] - 0.5*input_reference_[7]);
+      double right_elevon_err = right_elevon_joint_->GetAngle(0).Radian() - target;
       double right_elevon_force = right_elevon_pid_.Update(right_elevon_err, _dt);
       right_elevon_joint_->SetForce(0, right_elevon_force);
+      // gzerr << "right curr[" << right_elevon_joint_->GetAngle(0).Radian()
+      //       << "] ail[" << input_reference_[6]
+      //       << "] ele[" << input_reference_[7]
+      //       << "] target[" << target
+      //       // << "] dt[" << _dt
+      //       << "]\n";
     }
 
     if (elevator_joint_ != NULL)
