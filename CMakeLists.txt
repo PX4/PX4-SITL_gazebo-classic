@@ -24,14 +24,17 @@ find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
 
-option(CATKIN_SUPPORT "OFF")
-
-find_package(catkin QUIET)
-if (CATKIN_SUPPORT AND catkin_FOUND)
-  message(STATUS "building as catkin package")
-  catkin_package()
+# see if catkin was invoked to build this
+if (CATKIN_DEVEL_PREFIX)
+  message(STATUS "catkin ENABLED")
+  find_package(catkin REQUIRED)
+  if (catkin_FOUND)
+    catkin_package()
+  else()
+    message(FATAL_ERROR "catkin not found")
+  endif()
 else()
-  message(STATUS "not building as catkin package")
+  message(STATUS "catkin DISABLED")
 endif()
 
 # XXX this approach is extremely error prone
