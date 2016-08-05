@@ -1147,6 +1147,15 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <gazebo_joint_control_pid>
+        <p>0.1</p>
+        <i>0</i>
+        <d>0</d>
+        <iMax>0</iMax>
+        <iMin>0</iMin>
+        <cmdMax>3</cmdMax>
+        <cmdMin>-3</cmdMin>
+      </gazebo_joint_control_pid>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1164,6 +1173,15 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/5</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <gazebo_joint_control_pid>
+        <p>0.1</p>
+        <i>0</i>
+        <d>0</d>
+        <iMax>0</iMax>
+        <iMin>0</iMin>
+        <cmdMax>3</cmdMax>
+        <cmdMin>-3</cmdMin>
+      </gazebo_joint_control_pid>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1181,6 +1199,15 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <gazebo_joint_control_pid>
+        <p>0.1</p>
+        <i>0</i>
+        <d>0</d>
+        <iMax>0</iMax>
+        <iMin>0</iMin>
+        <cmdMax>3</cmdMax>
+        <cmdMin>-3</cmdMin>
+      </gazebo_joint_control_pid>
     </plugin>
     <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1198,6 +1225,15 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <gazebo_joint_control_pid>
+        <p>0.1</p>
+        <i>0</i>
+        <d>0</d>
+        <iMax>0</iMax>
+        <iMin>0</iMin>
+        <cmdMax>3</cmdMax>
+        <cmdMin>-3</cmdMin>
+      </gazebo_joint_control_pid>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1215,6 +1251,15 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <gazebo_joint_control_pid>
+        <p>0.1</p>
+        <i>0</i>
+        <d>0</d>
+        <iMax>0</iMax>
+        <iMin>0</iMin>
+        <cmdMax>3</cmdMax>
+        <cmdMin>-3</cmdMin>
+      </gazebo_joint_control_pid>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1232,6 +1277,15 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <gazebo_joint_control_pid>
+        <p>0.1</p>
+        <i>0</i>
+        <d>0</d>
+        <iMax>0</iMax>
+        <iMin>0</iMin>
+        <cmdMax>3</cmdMax>
+        <cmdMin>-3</cmdMin>
+      </gazebo_joint_control_pid>
     </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1243,7 +1297,14 @@
           <input_index>0</input_index>
           <!-- the MAVLink inputs coming in from -1..1 are shifted to 0..2 -->
           <input_offset>1.0</input_offset>
-          <!-- The input from 0..2 is multiplied with this number, resulting in max 900 radians per second for the full input of 2.0 (to get from a motor kV to radians per second, calculate this: kV * voltage * 2 * pi /60. This number will be radians per second, because we map 0..2 to it, divide by 2 to obtain the final scaling). -->
+          <!-- The input from 0..2 is multiplied with this number,
+               resulting in max 900 radians per second for the full
+               input of 2.0 (to get from a motor kV to radians per
+               second, calculate this:
+                 kV * voltage * 2 * pi /60.
+               This number will be radians per second, because we
+               map 0..2 to it, divide by 2 to obtain the final scaling).
+          -->
           <input_scaling>450</input_scaling>
           <!-- this is the minimum speed in disarmed state in radians / second -->
           <zero_position_disarmed>0</zero_position_disarmed>

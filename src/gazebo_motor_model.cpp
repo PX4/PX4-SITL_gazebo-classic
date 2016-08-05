@@ -32,6 +32,7 @@ void GazeboMotorModel::InitializeParams() {}
 void GazeboMotorModel::Publish() {
   turning_velocity_msg_.set_data(joint_->GetVelocity(0));
   motor_velocity_pub_->Publish(turning_velocity_msg_);
+  use_pid_ = false;
 }
 
 void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -55,8 +56,34 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   if (joint_ == NULL)
     gzthrow("[gazebo_motor_model] Couldn't find specified joint \"" << joint_name_ << "\".");
 
-  // setup pid to control joint
-  pid_.Init(0.1, 0, 0, 0, 0, 3, -3);
+  // setup joint control pid to control joint
+  if (_sdf->HasElement("gazebo_joint_control_pid"))
+  {
+    sdf::ElementPtr pid = _sdf->GetElement("gazebo_joint_control_pid");
+    double p = 0.1;
+    if (pid->HasElement("p"))
+      p = pid->Get<double>("p");
+    double i = 0;
+    if (pid->HasElement("i"))
+      i = pid->Get<double>("i");
+    double d = 0;
+    if (pid->HasElement("d"))
+      d = pid->Get<double>("d");
+    double iMax = 0;
+    if (pid->HasElement("iMax"))
+      iMax = pid->Get<double>("iMax");
+    double iMin = 0;
+    if (pid->HasElement("iMin"))
+      iMin = pid->Get<double>("iMin");
+    double cmdMax = 3;
+    if (pid->HasElement("cmdMax"))
+      cmdMax = pid->Get<double>("cmdMax");
+    double cmdMin = -3;
+    if (pid->HasElement("cmdMin"))
+      cmdMin = pid->Get<double>("cmdMin");
+    pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+    use_pid_ = true;
+  }
 
   if (_sdf->HasElement("linkName"))
     link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
@@ -190,17 +217,23 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // Apply the filter on the motor's velocity.
   double ref_motor_rot_vel;
   ref_motor_rot_vel = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
-#if 0
-  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
-#elif 0
-  joint_->SetParam("fmax", 0, 2.0);
-  joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
-  // gzerr << turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_ << "\n";
-#else
-  double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
-  double rotorForce = pid_.Update(err, sampling_time_);
-  joint_->SetForce(0, rotorForce);
-#endif
+  if (use_pid_)
+  {
+    double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
+    double rotorForce = pid_.Update(err, sampling_time_);
+    joint_->SetForce(0, rotorForce);
+  }
+  else
+  {
+    // Not desirable to use SetVelocity for parts of a moving model
+    // joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+
+    // Not idea as the approach could result in unrealistic impulses, and
+    // is only available in ODE
+    joint_->SetParam("fmax", 0, 2.0);
+    joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+    // gzerr << turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_ << "\n";
+  }
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);

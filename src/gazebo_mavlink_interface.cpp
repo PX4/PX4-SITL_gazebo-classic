@@ -57,9 +57,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   joints_.resize(n_out_max);
 
   if (_sdf->HasElement("control_channels")) {
-    sdf::ElementPtr cmapping = _sdf->GetElement("control_channels");
+    sdf::ElementPtr control_channels = _sdf->GetElement("control_channels");
+    sdf::ElementPtr channel = control_channels->GetElement("channel");
+    while (channel)
+    {
 
-    // sdf::ElementPtr_V children = cmapping->elements;
+    // sdf::ElementPtr_V children = control_channels->elements;
 
     // for (unsigned i = 0; i < children.size(); i++) {
     //   std::string name = children.at(i).Get<std::string>();
@@ -70,6 +73,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     //     input_scaling[i] = _sdf->GetElement("input_scaling")->Get<double>();
     //   }
     // }
+    channel = channel->GetNextElement("channel");
+    }
   }
 
   if (_sdf->HasElement("left_elevon_joint")) {
@@ -552,7 +557,8 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
     // set rotor speeds
     for (int i = 0; i < input_reference_.size(); i++) {
       if (armed) {
-        input_reference_[i] = (inputs.control[input_index[i]] + input_offset[i]) * input_scaling[i] + zero_position_armed[i];
+        input_reference_[i] = (inputs.control[input_index[i]] + input_offset[i])
+          * input_scaling[i] + zero_position_armed[i];
       } else {
         input_reference_[i] = zero_position_disarmed[i];
       }

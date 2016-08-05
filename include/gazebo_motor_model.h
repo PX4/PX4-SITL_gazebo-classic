@@ -129,6 +129,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   physics::ModelPtr model_;
   physics::JointPtr joint_;
   common::PID pid_;
+  bool use_pid_;
   physics::LinkPtr link_;
   /// \brief Pointer to the update event connection.
   event::ConnectionPtr updateConnection_;
