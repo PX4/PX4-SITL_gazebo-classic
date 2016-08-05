@@ -50,9 +50,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
                            motor_velocity_reference_pub_topic_);
 
   // setup pid to control joint
-  elevator_pid_.Init(0.1, 0, 0, 0, 0, 0, -0);
-  right_elevon_pid_.Init(0.1, 0, 0, 0, 0, 3, -3);
-  left_elevon_pid_.Init(0.1, 0, 0, 0, 0, 3, -3);
+  elevator_pid_.Init(1.0, 0, 0, 0, 0, 0, -0);
+  right_elevon_pid_.Init(1.0, 0, 0, 0, 0, 3, -3);
+  left_elevon_pid_.Init(1.0, 0, 0, 0, 0, 3, -3);
 
   joints_.resize(n_out_max);
 
@@ -572,20 +572,34 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
 
     // legacy method, can eventually be replaced
 #if 1
-    if (right_elevon_joint_ != NULL)
-    {
-      double right_elevon_err =
-       right_elevon_joint_->GetAngle(0).Radian() - input_reference_[5];
-      double right_elevon_force = right_elevon_pid_.Update(right_elevon_err, _dt);
-      right_elevon_joint_->SetForce(0, right_elevon_force);
-    }
-
     if (left_elevon_joint_!= NULL)
     {
+      gzerr << "left curr[" << left_elevon_joint_->GetAngle(0).Radian()
+            << "] target[" << input_reference_[5]
+            << "] mix[" << 0.524*0.5*(input_reference_[5] - input_reference_[7])
+            << "] ele[" << input_reference_[7]
+            << "] dt[" << _dt
+            << "]\n";
       double left_elevon_err =
-       left_elevon_joint_->GetAngle(0).Radian() - input_reference_[6];
+       left_elevon_joint_->GetAngle(0).Radian() -
+         0.524*0.5*(input_reference_[5] - input_reference_[7]);
       double left_elevon_force = left_elevon_pid_.Update(left_elevon_err, _dt);
       left_elevon_joint_->SetForce(0, left_elevon_force);
+    }
+
+    if (right_elevon_joint_ != NULL)
+    {
+      gzerr << "right curr[" << right_elevon_joint_->GetAngle(0).Radian()
+            << "] target[" << input_reference_[6]
+            << "] mix[" << 0.524*0.5*(input_reference_[6] - input_reference_[7])
+            << "] ele[" << input_reference_[7]
+            << "] dt[" << _dt
+            << "]\n";
+      double right_elevon_err =
+       right_elevon_joint_->GetAngle(0).Radian() - 
+         0.524*0.5*(input_reference_[6] - input_reference_[7]);
+      double right_elevon_force = right_elevon_pid_.Update(right_elevon_err, _dt);
+      right_elevon_joint_->SetForce(0, right_elevon_force);
     }
 
     if (elevator_joint_ != NULL)
