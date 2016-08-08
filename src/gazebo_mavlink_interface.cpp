@@ -57,6 +57,21 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     while (channel)
     {
       gzerr << "reading channel but doing nothing.\n";
+
+      if (channel->HasElement("input_index"))
+      {
+        int index = channel->Get<int>("input_index");
+        double input_offset = channel->Get<double>("input_offset");
+        double input_scaling = channel->Get<double>("input_scaling");
+        double zero_position_disarmed = channel->Get<double>("zero_position_disarmed");
+        double zero_position_armed = channel->Get<double>("zero_position_armed");
+        std::string joint_name = channel->Get<std::string>("joint_name");
+      }
+      else
+      {
+        gzerr << "no input_index, not parsing.\n";
+        break;
+      }
       // sdf::ElementPtr_V children = control_channels->elements;
 
       // for (unsigned i = 0; i < children.size(); i++) {
