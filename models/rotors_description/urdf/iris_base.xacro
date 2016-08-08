@@ -1,7 +1,15 @@
 <?xml version="1.0"?>
 
 <robot name="iris" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Properties that can be assigned at build time as arguments.
+  Is there a reason not to make all properties arguments?
+  -->
+  <xacro:arg name='mavlink_addr' default='INADDR_ANY' />
+  <xacro:arg name='mavlink_udp_port' default='14560' />
+
+  <!-- macros for gazebo plugins, sensors -->
   <xacro:include filename="$(arg rotors_description_dir)/urdf/component_snippets.xacro" />
+
   <!-- Instantiate iris "mechanics" -->
   <xacro:include filename="$(arg rotors_description_dir)/urdf/iris.xacro" />
 
