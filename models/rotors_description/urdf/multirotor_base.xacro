@@ -133,6 +133,15 @@
         <rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
         <motorSpeedPubTopic>/motor_speed/${motor_number}</motorSpeedPubTopic>
         <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
+        <gazebo_joint_control_pid>
+          <p>0.1</p>
+          <i>0</i>
+          <d>0</d>
+          <iMax>0</iMax>
+          <iMin>0</iMin>
+          <cmdMax>3</cmdMax>
+          <cmdMin>-3</cmdMin>
+        </gazebo_joint_control_pid>
       </plugin>
     </gazebo>
     <gazebo reference="rotor_${motor_number}">
