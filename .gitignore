@@ -4,3 +4,4 @@ build/
 *~
 models/iris/*.sdf
 *.pyc
+.*.sw?
