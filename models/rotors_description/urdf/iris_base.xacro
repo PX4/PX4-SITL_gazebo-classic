@@ -10,6 +10,8 @@
   <xacro:mavlink_interface_macro
     namespace="${namespace}"
     imu_sub_topic="/imu"
+    mavlink_addr="INADDR_ANY"
+    mavlink_udp_port="14560"
     >
   </xacro:mavlink_interface_macro>
   </xacro:if>
