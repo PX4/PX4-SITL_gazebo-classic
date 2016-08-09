@@ -61,7 +61,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     sdf::ElementPtr channel = control_channels->GetElement("channel");
     while (channel)
     {
-      gzerr << "reading channel but doing nothing.\n";
       if (channel->HasElement("input_index"))
       {
         int index = channel->Get<int>("input_index");
@@ -77,15 +76,15 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
           }
           else
           {
-            gzdbg << "joint_control_type[" << index << "] not specified, using velocity.\n";
+            gzwarn << "joint_control_type[" << index << "] not specified, using velocity.\n";
             joint_control_type[index] = "velocity";
           }
           std::string joint_name = channel->Get<std::string>("joint_name");
           joints_[index] = model_->GetJoint(joint_name);
           if (joints_[index] == nullptr)
           {
-            gzerr << "joint [" << joint_name << "] not found for channel["
-                  << index << "] no joint control for this channel.\n";
+            gzwarn << "joint [" << joint_name << "] not found for channel["
+                   << index << "] no joint control for this channel.\n";
           }
           else
           {
@@ -697,12 +696,12 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
 
-        gzerr << "chan[" << i
-              << "] curr[" << current
-              << "] cmd[" << target
-              << "] f[" << force
-              << "] scale[" << input_scaling[i]
-              << "]\n";
+        // gzerr << "chan[" << i
+        //       << "] curr[" << current
+        //       << "] cmd[" << target
+        //       << "] f[" << force
+        //       << "] scale[" << input_scaling[i]
+        //       << "]\n";
 
 #elif GAZEBO_MAJOR_VERSION >= 6
         joints_[i]->SetPosition(0, input_reference_[i]);
