@@ -50,6 +50,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
                            motor_velocity_reference_pub_topic_);
 
   joints_.resize(n_out_max);
+  pids_.resize(n_out_max);
+  for(int i = 0; i < n_out_max; ++i)
+  {
+    pids_[i].Init(0, 0, 0, 0, 0, 0, 0);
+  }
 
   if (_sdf->HasElement("control_channels")) {
     sdf::ElementPtr control_channels = _sdf->GetElement("control_channels");
@@ -57,32 +62,74 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     while (channel)
     {
       gzerr << "reading channel but doing nothing.\n";
-
       if (channel->HasElement("input_index"))
       {
         int index = channel->Get<int>("input_index");
-        double input_offset = channel->Get<double>("input_offset");
-        double input_scaling = channel->Get<double>("input_scaling");
-        double zero_position_disarmed = channel->Get<double>("zero_position_disarmed");
-        double zero_position_armed = channel->Get<double>("zero_position_armed");
-        std::string joint_name = channel->Get<std::string>("joint_name");
+        if (index < n_out_max)
+        {
+          input_offset[index] = channel->Get<double>("input_offset");
+          input_scaling[index] = channel->Get<double>("input_scaling");
+          zero_position_disarmed[index] = channel->Get<double>("zero_position_disarmed");
+          zero_position_armed[index] = channel->Get<double>("zero_position_armed");
+          if (channel->HasElement("joint_control_type"))
+          {
+            joint_control_type[index] = channel->Get<std::string>("joint_control_type");
+          }
+          else
+          {
+            gzdbg << "joint_control_type[" << index << "] not specified, using velocity.\n";
+            joint_control_type[index] = "velocity";
+          }
+          std::string joint_name = channel->Get<std::string>("joint_name");
+          joints_[index] = model_->GetJoint(joint_name);
+          if (joints_[index] == nullptr)
+          {
+            gzerr << "joint [" << joint_name << "] not found for channel["
+                  << index << "] no joint control for this channel.\n";
+          }
+          else
+          {
+            gzdbg << "joint [" << joint_name << "] found for channel["
+                  << index << "] joint control active for this channel.\n";
+          }
+          // setup joint control pid to control joint
+          if (channel->HasElement("joint_control_pid"))
+          {
+            sdf::ElementPtr pid = channel->GetElement("joint_control_pid");
+            double p = 0;
+            if (pid->HasElement("p"))
+              p = pid->Get<double>("p");
+            double i = 0;
+            if (pid->HasElement("i"))
+              i = pid->Get<double>("i");
+            double d = 0;
+            if (pid->HasElement("d"))
+              d = pid->Get<double>("d");
+            double iMax = 0;
+            if (pid->HasElement("iMax"))
+              iMax = pid->Get<double>("iMax");
+            double iMin = 0;
+            if (pid->HasElement("iMin"))
+              iMin = pid->Get<double>("iMin");
+            double cmdMax = 0;
+            if (pid->HasElement("cmdMax"))
+              cmdMax = pid->Get<double>("cmdMax");
+            double cmdMin = 0;
+            if (pid->HasElement("cmdMin"))
+              cmdMin = pid->Get<double>("cmdMin");
+            pids_[index].Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+          }
+        }
+        else
+        {
+          gzerr << "input_index[" << index << "] out of range, not parsing.\n";
+        }
       }
       else
       {
         gzerr << "no input_index, not parsing.\n";
         break;
       }
-      // sdf::ElementPtr_V children = control_channels->elements;
-
-      // for (unsigned i = 0; i < children.size(); i++) {
-      //   std::string name = children.at(i).Get<std::string>();
-
-      //   if (name == std::string("channel")) {
-      //     //int input_index = _sdf->GetElement("input_index")->Get<int>();
-      //     input_offset[i] = _sdf->GetElement("input_offset")->Get<double>();
-      //     input_scaling[i] = _sdf->GetElement("input_scaling")->Get<double>();
-      //   }
-      // }
       channel = channel->GetNextElement("channel");
     }
   }
@@ -92,12 +139,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     std::string left_elevon_joint_name = left_elevon->Get<std::string>();
     left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("left_elevon_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(left_elevon, "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = left_elevon_joint_;
     }
     // setup pid to control joint
-    left_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
+    left_elevon_pid_.Init(20.0, 0, 0, 0, 0, 20, -20);
     if (left_elevon->HasElement("joint_control_pid")) {
     }
   }
@@ -106,7 +153,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     std::string left_elevon_joint_name = _sdf->GetElement("left_aileron_joint")->Get<std::string>();
     left_elevon_joint_ = model_->GetJoint(left_elevon_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("left_aileron_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(_sdf->GetElement("left_aileron_joint"), "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = left_elevon_joint_;
     }
@@ -117,21 +164,19 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     std::string right_elevon_joint_name = right_elevon->Get<std::string>();
     right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("right_elevon_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(right_elevon, "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = right_elevon_joint_;
     }
     // setup pid to control joint
-    right_elevon_pid_.Init(40.0, 0, 0, 0, 0, 20, -20);
-    if (right_elevon->HasElement("joint_control_pid")) {
-    }
+    right_elevon_pid_.Init(20.0, 0, 0, 0, 0, 20, -20);
   }
 
   if (_sdf->HasElement("right_aileron_joint")) {
     std::string right_elevon_joint_name = _sdf->GetElement("right_aileron_joint")->Get<std::string>();
     right_elevon_joint_ = model_->GetJoint(right_elevon_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("right_aileron_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(_sdf->GetElement("right_aileron_joint"), "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = right_elevon_joint_;
     }
@@ -142,7 +187,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     std::string elevator_joint_name = elevator->Get<std::string>();
     elevator_joint_ = model_->GetJoint(elevator_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("elevator_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(elevator, "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = elevator_joint_;
     }
@@ -153,15 +198,49 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
 
   if (_sdf->HasElement("propeller_joint")) {
-    std::string propeller_joint_name = _sdf->GetElement("propeller_joint")->Get<std::string>();
+    sdf::ElementPtr propeller =  _sdf->GetElement("propeller_joint");
+    std::string propeller_joint_name = propeller->Get<std::string>();
     propeller_joint_ = model_->GetJoint(propeller_joint_name);
+    int control_index;
+    getSdfParam<int>(propeller, "input_index", control_index, -1);
+    if (control_index >= 0) {
+      joints_.at(control_index) = propeller_joint_;
+    }
+    propeller_pid_.Init(0.1, 0, 0, 0, 0, 4, -4);
+    // setup joint control pid to control joint
+    if (propeller->HasElement("joint_control_pid"))
+    {
+      sdf::ElementPtr pid = _sdf->GetElement("joint_control_pid");
+      double p = 0.1;
+      if (pid->HasElement("p"))
+        p = pid->Get<double>("p");
+      double i = 0;
+      if (pid->HasElement("i"))
+        i = pid->Get<double>("i");
+      double d = 0;
+      if (pid->HasElement("d"))
+        d = pid->Get<double>("d");
+      double iMax = 0;
+      if (pid->HasElement("iMax"))
+        iMax = pid->Get<double>("iMax");
+      double iMin = 0;
+      if (pid->HasElement("iMin"))
+        iMin = pid->Get<double>("iMin");
+      double cmdMax = 3;
+      if (pid->HasElement("cmdMax"))
+        cmdMax = pid->Get<double>("cmdMax");
+      double cmdMin = -3;
+      if (pid->HasElement("cmdMin"))
+        cmdMin = pid->Get<double>("cmdMin");
+      propeller_pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+    }
   }
 
   if (_sdf->HasElement("cgo3_mount_joint")) {
     std::string gimbal_yaw_joint_name = _sdf->GetElement("cgo3_mount_joint")->Get<std::string>();
     gimbal_yaw_joint_ = model_->GetJoint(gimbal_yaw_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("cgo3_mount_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(_sdf->GetElement("cgo3_mount_joint"), "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = gimbal_yaw_joint_;
     }
@@ -171,7 +250,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     std::string gimbal_roll_joint_name = _sdf->GetElement("cgo3_vertical_arm_joint")->Get<std::string>();
     gimbal_roll_joint_ = model_->GetJoint(gimbal_roll_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("cgo3_vertical_arm_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(_sdf->GetElement("cgo3_vertical_arm_joint"), "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = gimbal_roll_joint_;
     }
@@ -181,7 +260,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     std::string gimbal_pitch_joint_name = _sdf->GetElement("cgo3_horizontal_arm_joint")->Get<std::string>();
     gimbal_pitch_joint_ = model_->GetJoint(gimbal_pitch_joint_name);
     int control_index;
-    getSdfParam<int>(_sdf->GetElement("cgo3_horizontal_arm_joint"), "controlIndex", control_index, -1);
+    getSdfParam<int>(_sdf->GetElement("cgo3_horizontal_arm_joint"), "input_index", control_index, -1);
     if (control_index >= 0) {
       joints_.at(control_index) = gimbal_pitch_joint_;
     }
@@ -535,8 +614,10 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
 
     bool is_vtol = (right_elevon_joint_ != nullptr);
 
+    /* this whole block below seems strange, not sure
+       what's happening, commenting out for now
+    */
     // Set all scalings
-
     // Initialize all outputs as motors
     // if joints are present these will be
     // reconfigured in the next step
@@ -544,14 +625,14 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
       input_index[i] = i;
 
       // scaling values
-      input_offset[i] = 1.0;
+      // input_offset[i] = 1.0;
 
       // XXX this needs re-investigation regarding
       // the correct scaling for the correct motor
       // model
-      input_scaling[i] = 550.0;
-      zero_position_disarmed[i] = 0.0;
-      zero_position_armed[i] = (is_vtol) ? 0.0 : 100.0;
+      // input_scaling[i] = 550.0;
+      // zero_position_disarmed[i] = 0.0;
+      // zero_position_armed[i] = (is_vtol) ? 0.0 : 100.0;
     }
 
     if (is_vtol) {
@@ -559,24 +640,25 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
 
       // Fift motor
       input_index[off + 4] = off + 4;
-      input_offset[off + 4] = 1.0;
-      input_scaling[off + 4] = 1600;
-      zero_position_disarmed[off + 4] = 0.0;
-      zero_position_armed[off + 4] = 0.0;
+      // input_offset[off + 4] = 1.0;
+      // input_scaling[off + 4] = 1600;
+      // zero_position_disarmed[off + 4] = 0.0;
+      // zero_position_armed[off + 4] = 0.0;
 
       // Servos
       for (unsigned i = off + 5; i < off + block_size; i++) {
         // scaling values
         input_index[i] = i;
-        input_offset[i] = 0.0;
-        input_scaling[i] = 1.0;
-        zero_position_disarmed[i] = 0.0;
-        zero_position_armed[i] = 0.0;
+        // input_offset[i] = 0.0;
+        // input_scaling[i] = 1.0;
+        // zero_position_disarmed[i] = 0.0;
+        // zero_position_armed[i] = 0.0;
       }
     }
 
     last_actuator_time_ = world_->GetSimTime();
 
+    // set input_reference_ from inputs.control
     input_reference_.resize(n_out);
 
     // set rotor speeds
@@ -584,6 +666,8 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
       if (armed) {
         input_reference_[i] = (inputs.control[input_index[i]] + input_offset[i])
           * input_scaling[i] + zero_position_armed[i];
+        // if (joints_[i])
+        //   gzerr << inputs.control[input_index[i]] << "\n";
       } else {
         input_reference_[i] = zero_position_disarmed[i];
       }
@@ -592,8 +676,35 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
     // set joint positions
     for (int i = 0; i < input_reference_.size(); i++) {
       if (joints_[i]) {
-      gzerr << "new joint_?\n";
-#if GAZEBO_MAJOR_VERSION >= 6
+#if 1
+        double target = input_reference_[i];
+        double err = 0;
+        double current = 0;
+        if (joint_control_type[i] == "velocity")
+        {
+          current = joints_[i]->GetVelocity(0);
+          err = current - target;
+        }
+        else if (joint_control_type[i] == "position")
+        {
+          current = joints_[i]->GetAngle(0).Radian();
+          err = current - target;
+        }
+        else
+        {
+          gzerr << "joiint_control_type[" << joint_control_type << "] undefined.\n";
+        }
+        double force = pids_[i].Update(err, _dt);
+        joints_[i]->SetForce(0, force);
+
+        gzerr << "chan[" << i
+              << "] curr[" << current
+              << "] cmd[" << target
+              << "] f[" << force
+              << "] scale[" << input_scaling[i]
+              << "]\n";
+
+#elif GAZEBO_MAJOR_VERSION >= 6
         joints_[i]->SetPosition(0, input_reference_[i]);
 #else
         joints_[i]->SetAngle(0, input_reference_[i]);
@@ -603,6 +714,23 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
 
     // legacy method, can eventually be replaced
 #if 1
+    if (propeller_joint_ != NULL)
+    {
+      double rpm = input_reference_[4];
+      double rad_per_sec = 2.0 * M_PI * rpm / 60.0;
+      double target = input_scaling[4] * rad_per_sec;
+      double propeller_err = propeller_joint_->GetVelocity(0) - target;
+      double propeller_force = propeller_pid_.Update(propeller_err, _dt);
+      propeller_joint_->SetForce(0, propeller_force);
+      gzerr << "prop curr[" << propeller_joint_->GetVelocity(0)
+            << "] target[" << target
+            << "] rpm[" << rpm
+            << "] rad_per_sec[" << rad_per_sec
+            << "] f[" << propeller_force
+            << "] scale[" << input_scaling[4]
+            << "]\n";
+    }
+
     if (left_elevon_joint_!= NULL)
     {
       double target = 0.524*(0.5*input_reference_[5] - 0.5*input_reference_[7]);
