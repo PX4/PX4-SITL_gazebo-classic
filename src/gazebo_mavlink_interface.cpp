@@ -79,6 +79,16 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
             gzwarn << "joint_control_type[" << index << "] not specified, using velocity.\n";
             joint_control_type[index] = "velocity";
           }
+
+          // start gz transport node handle
+          if (joint_control_type[i] == "position_gztopic")
+          {
+            // setup publisher handle to topic
+            gztopic[index] = channel->Get<std::string>("gztopic");
+            joint_control_pub[index] = node_handle_->Advertise<gazebo::msgs::GzString>(
+              gztopic[index]);
+          }
+
           std::string joint_name = channel->Get<std::string>("joint_name");
           joints_[index] = model_->GetJoint(joint_name);
           if (joints_[index] == nullptr)
@@ -679,22 +689,32 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
         double target = input_reference_[i];
         double err = 0;
         double current = 0;
+        double force = 0;
         if (joint_control_type[i] == "velocity")
         {
           current = joints_[i]->GetVelocity(0);
           err = current - target;
+          force = pids_[i].Update(err, _dt);
+          joints_[i]->SetForce(0, force);
         }
         else if (joint_control_type[i] == "position")
         {
           current = joints_[i]->GetAngle(0).Radian();
           err = current - target;
+          force = pids_[i].Update(err, _dt);
+          joints_[i]->SetForce(0, force);
+        }
+        else if (joint_control_type[i] == "position_gztopic")
+        {
+          current = joints_[i]->GetAngle(0).Radian();
+          err = current - target;
+          force = pids_[i].Update(err, _dt);
+          joints_[i]->SetForce(0, force);
         }
         else
         {
           gzerr << "joiint_control_type[" << joint_control_type << "] undefined.\n";
         }
-        double force = pids_[i].Update(err, _dt);
-        joints_[i]->SetForce(0, force);
 
         // gzerr << "chan[" << i
         //       << "] curr[" << current

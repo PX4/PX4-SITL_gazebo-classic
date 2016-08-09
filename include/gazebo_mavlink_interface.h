@@ -163,9 +163,11 @@ class GazeboMavlinkInterface : public ModelPlugin {
   double input_offset[n_out_max];
   double input_scaling[n_out_max];
   std::string joint_control_type[n_out_max];
+  std::string gztopic[n_out_max];
   double zero_position_disarmed[n_out_max];
   double zero_position_armed[n_out_max];
   int input_index[n_out_max];
+  transport::PublisherPtr joint_control_pub[n_out_max];
 
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
