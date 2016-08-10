@@ -1293,49 +1293,144 @@
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
 
       <control_channels>
-        <channel>
+        <channel name="rotor0">
           <input_index>0</input_index>
-          <!-- the MAVLink inputs coming in from -1..1 are shifted to 0..2 -->
-          <input_offset>1.0</input_offset>
-          <!-- The input from 0..2 is multiplied with this number,
-               resulting in max 900 radians per second for the full
-               input of 2.0 (to get from a motor kV to radians per
-               second, calculate this:
-                 kV * voltage * 2 * pi /60.
-               This number will be radians per second, because we
-               map 0..2 to it, divide by 2 to obtain the final scaling).
-          -->
+          <input_offset>1</input_offset>
           <input_scaling>450</input_scaling>
-          <!-- this is the minimum speed in disarmed state in radians / second -->
           <zero_position_disarmed>0</zero_position_disarmed>
-          <!-- this is the minimum speed in armed state in radians / second -->
           <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>3</cmdMax>
+            <cmdMin>-3</cmdMin>
+          </joint_control_pid>
+          <joint_name>rotor_4_joint</joint_name>
         </channel>
-        <channel>
+        <channel name="rotor1">
           <input_index>1</input_index>
-          <input_offset>1.0</input_offset>
+          <input_offset>1</input_offset>
           <input_scaling>450</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>3</cmdMax>
+            <cmdMin>-3</cmdMin>
+          </joint_control_pid>
+          <joint_name>rotor_5_joint</joint_name>
         </channel>
-        <channel>
+        <channel name="rotor2">
           <input_index>2</input_index>
-          <input_offset>1.0</input_offset>
+          <input_offset>1</input_offset>
           <input_scaling>450</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>3</cmdMax>
+            <cmdMin>-3</cmdMin>
+          </joint_control_pid>
+          <joint_name>rotor_2_joint</joint_name>
         </channel>
-        <channel>
+        <channel name="rotor3">
           <input_index>3</input_index>
-          <input_offset>1.0</input_offset>
+          <input_offset>1</input_offset>
           <input_scaling>450</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>3</cmdMax>
+            <cmdMin>-3</cmdMin>
+          </joint_control_pid>
+          <joint_name>rotor_3_joint</joint_name>
         </channel>
+        <channel name="rotor4">
+          <input_index>4</input_index>
+          <input_offset>1</input_offset>
+          <input_scaling>450</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>3</cmdMax>
+            <cmdMin>-3</cmdMin>
+          </joint_control_pid>
+          <joint_name>rotor_0_joint</joint_name>
+        </channel>
+        <channel name="rotor5">
+          <input_index>5</input_index>
+          <input_offset>1</input_offset>
+          <input_scaling>450</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>3</cmdMax>
+            <cmdMin>-3</cmdMin>
+          </joint_control_pid>
+          <joint_name>rotor_1_joint</joint_name>
+        </channel>
+        <channel name="gimbal_yaw">
+          <input_index>6</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1.57</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_gztopic</joint_control_type>
+          <gztopic>/gimbal_yaw_cmd</gztopic>
+          <joint_name>typhoon_h480::cgo3_vertical_arm_joint</joint_name>
+          <joint_control_pid>
+            <p>10.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>20</cmdMax>
+            <cmdMin>-20</cmdMin>
+          </joint_control_pid>
+        </channel>
+        <channel name="gimbal_pitch">
+          <input_index>7</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1.57</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>1.5707</zero_position_armed>
+          <joint_control_type>position_gztopic</joint_control_type>
+          <gztopic>/gimbal_pitch_cmd</gztopic>
+        </channel>
+        <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
       </control_channels>
-      <cgo3_vertical_arm_joint>typhoon_h480::cgo3_vertical_arm_joint</cgo3_vertical_arm_joint>
-      <cgo3_horizontal_arm_joint>typhoon_h480::cgo3_horizontal_arm_joint</cgo3_horizontal_arm_joint>
-      <cgo3_mount_joint>typhoon_h480::cgo3_camera_joint</cgo3_mount_joint>
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>

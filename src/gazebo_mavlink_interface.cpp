@@ -81,11 +81,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
           }
 
           // start gz transport node handle
-          if (joint_control_type[i] == "position_gztopic")
+          if (joint_control_type[index] == "position_gztopic")
           {
             // setup publisher handle to topic
-            gztopic[index] = channel->Get<std::string>("gztopic");
-            joint_control_pub[index] = node_handle_->Advertise<gazebo::msgs::GzString>(
+            if (channel->HasElement("gztopic"))
+              gztopic[index] = channel->Get<std::string>("gztopic");
+            else
+              gztopic[index] = "control_position_gztopic_" + std::to_string(index);
+            joint_control_pub[index] = node_handle_->Advertise<gazebo::msgs::Any>(
               gztopic[index]);
           }
 
@@ -687,41 +690,37 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, double _dt)
       if (joints_[i]) {
 #if 1
         double target = input_reference_[i];
-        double err = 0;
-        double current = 0;
-        double force = 0;
         if (joint_control_type[i] == "velocity")
         {
-          current = joints_[i]->GetVelocity(0);
-          err = current - target;
-          force = pids_[i].Update(err, _dt);
+          double current = joints_[i]->GetVelocity(0);
+          double err = current - target;
+          double force = pids_[i].Update(err, _dt);
           joints_[i]->SetForce(0, force);
         }
         else if (joint_control_type[i] == "position")
         {
-          current = joints_[i]->GetAngle(0).Radian();
-          err = current - target;
-          force = pids_[i].Update(err, _dt);
+          double current = joints_[i]->GetAngle(0).Radian();
+          double err = current - target;
+          double force = pids_[i].Update(err, _dt);
           joints_[i]->SetForce(0, force);
+          // gzerr << "chan[" << i
+          //       << "] curr[" << current
+          //       << "] cmd[" << target
+          //       << "] f[" << force
+          //       << "] scale[" << input_scaling[i]
+          //       << "]\n";
         }
         else if (joint_control_type[i] == "position_gztopic")
         {
-          current = joints_[i]->GetAngle(0).Radian();
-          err = current - target;
-          force = pids_[i].Update(err, _dt);
-          joints_[i]->SetForce(0, force);
+          gazebo::msgs::Any m;
+          m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
+          m.set_double_value(target);
+          joint_control_pub[i]->Publish(m);
         }
         else
         {
           gzerr << "joiint_control_type[" << joint_control_type << "] undefined.\n";
         }
-
-        // gzerr << "chan[" << i
-        //       << "] curr[" << current
-        //       << "] cmd[" << target
-        //       << "] f[" << force
-        //       << "] scale[" << input_scaling[i]
-        //       << "]\n";
 
 #elif GAZEBO_MAJOR_VERSION >= 6
         joints_[i]->SetPosition(0, input_reference_[i]);

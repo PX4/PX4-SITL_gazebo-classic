@@ -181,24 +181,24 @@ void GimbalControllerPlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
 {
-  gzmsg << "pitch command received " << _msg->data() << std::endl;
-  this->pitchCommand = atof(_msg->data().c_str());
+  gzmsg << "pitch command received " << _msg->double_value() << std::endl;
+  this->pitchCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
 {
-  gzmsg << "roll command received " << _msg->data() << std::endl;
-  this->rollCommand = atof(_msg->data().c_str());
+  gzmsg << "roll command received " << _msg->double_value() << std::endl;
+  this->rollCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
 {
-  gzmsg << "yaw command received " << _msg->data() << std::endl;
-  this->yawCommand = atof(_msg->data().c_str());
+  gzmsg << "yaw command received " << _msg->double_value() << std::endl;
+  this->yawCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
