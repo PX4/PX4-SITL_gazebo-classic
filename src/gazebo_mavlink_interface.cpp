@@ -371,12 +371,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     for (int i = 0; i < input_reference_.size(); i++){
       if (last_actuator_time_ == 0 || (current_time - last_actuator_time_).Double() > 0.2) {
         turning_velocities_msg.add_motor_speed(0);
-        gzerr << "zero motor\n";
       } else {
         turning_velocities_msg.add_motor_speed(input_reference_[i]);
-        // gzerr << i << " : " << (current_time - last_actuator_time_).Double()
-        //       << " : " << input_reference_[i]
-        //       << "\n";
       }
     }
     // TODO Add timestamp and Header
