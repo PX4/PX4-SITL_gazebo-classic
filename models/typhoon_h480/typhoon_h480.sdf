@@ -1410,15 +1410,6 @@
           <joint_control_type>position_gztopic</joint_control_type>
           <gztopic>/gimbal_yaw_cmd</gztopic>
           <joint_name>typhoon_h480::cgo3_vertical_arm_joint</joint_name>
-          <joint_control_pid>
-            <p>10.0</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0</iMax>
-            <iMin>0</iMin>
-            <cmdMax>20</cmdMax>
-            <cmdMin>-20</cmdMin>
-          </joint_control_pid>
         </channel>
         <channel name="gimbal_pitch">
           <input_index>7</input_index>
@@ -1428,8 +1419,44 @@
           <zero_position_armed>1.5707</zero_position_armed>
           <joint_control_type>position_gztopic</joint_control_type>
           <gztopic>/gimbal_pitch_cmd</gztopic>
+          <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
         </channel>
-        <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
+        <channel name="left_leg">
+          <input_index>8</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position</joint_control_type>
+          <joint_control_pid>
+            <p>50.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>10</cmdMax>
+            <cmdMin>-10</cmdMin>
+          </joint_control_pid>
+          <joint_name>left_leg_joint</joint_name>
+        </channel>
+        <channel name="right_leg">
+          <input_index>9</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position</joint_control_type>
+          <joint_control_pid>
+            <p>50.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>10</cmdMax>
+            <cmdMin>-10</cmdMin>
+          </joint_control_pid>
+          <joint_name>right_leg_joint</joint_name>
+        </channel>
       </control_channels>
     </plugin>
     <static>0</static>
