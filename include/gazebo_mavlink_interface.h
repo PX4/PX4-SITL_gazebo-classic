@@ -93,11 +93,11 @@ class GazeboMavlinkInterface : public ModelPlugin {
         gimbal_pitch_joint_(nullptr),
         gimbal_roll_joint_(nullptr),
         inputs{},
-        input_offset{},
-        input_scaling{},
-        zero_position_disarmed{},
-        zero_position_armed{},
-        input_index{},
+        input_offset_{},
+        input_scaling_{},
+        zero_position_disarmed_{},
+        zero_position_armed_{},
+        input_index_{},
         lat_rad(0.0),
         lon_rad(0.0),
         mavlink_udp_port_(kDefaultMavlinkUdpPort)
@@ -150,8 +150,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void LidarCallback(LidarPtr& lidar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID);
-  void handle_message(mavlink_message_t *msg, double _dt);
-  void pollForMAVLinkMessages(double _dt);
+  void handle_message(mavlink_message_t *msg);
+  void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
   static const unsigned n_out_max = 16;
 
@@ -160,14 +160,14 @@ class GazeboMavlinkInterface : public ModelPlugin {
     float control[n_out_max];
   } inputs;
 
-  double input_offset[n_out_max];
-  double input_scaling[n_out_max];
-  std::string joint_control_type[n_out_max];
-  std::string gztopic[n_out_max];
-  double zero_position_disarmed[n_out_max];
-  double zero_position_armed[n_out_max];
-  int input_index[n_out_max];
-  transport::PublisherPtr joint_control_pub[n_out_max];
+  double input_offset_[n_out_max];
+  double input_scaling_[n_out_max];
+  std::string joint_control_type_[n_out_max];
+  std::string gztopic_[n_out_max];
+  double zero_position_disarmed_[n_out_max];
+  double zero_position_armed_[n_out_max];
+  int input_index_[n_out_max];
+  transport::PublisherPtr joint_control_pub_[n_out_max];
 
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
@@ -182,6 +182,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   double gps_update_interval_;
   double lat_rad;
   double lon_rad;
+  void handle_control(double _dt);
 
   math::Vector3 gravity_W_;
   math::Vector3 velocity_prev_W_;
@@ -196,7 +197,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   socklen_t _addrlen;
   unsigned char _buf[65535];
   struct pollfd fds[1];
-
 
   struct sockaddr_in _srcaddr_2;  ///< MAVROS
 

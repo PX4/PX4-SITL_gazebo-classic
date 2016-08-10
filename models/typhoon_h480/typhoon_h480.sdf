@@ -1147,7 +1147,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-      <gazebo_joint_control_pid>
+      <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
         <d>0</d>
@@ -1155,7 +1155,7 @@
         <iMin>0</iMin>
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
-      </gazebo_joint_control_pid>
+      </joint_control_pid>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1173,7 +1173,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/5</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-      <gazebo_joint_control_pid>
+      <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
         <d>0</d>
@@ -1181,7 +1181,7 @@
         <iMin>0</iMin>
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
-      </gazebo_joint_control_pid>
+      </joint_control_pid>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1199,7 +1199,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-      <gazebo_joint_control_pid>
+      <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
         <d>0</d>
@@ -1207,7 +1207,7 @@
         <iMin>0</iMin>
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
-      </gazebo_joint_control_pid>
+      </joint_control_pid>
     </plugin>
     <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1225,7 +1225,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-      <gazebo_joint_control_pid>
+      <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
         <d>0</d>
@@ -1233,7 +1233,7 @@
         <iMin>0</iMin>
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
-      </gazebo_joint_control_pid>
+      </joint_control_pid>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1251,7 +1251,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-      <gazebo_joint_control_pid>
+      <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
         <d>0</d>
@@ -1259,7 +1259,7 @@
         <iMin>0</iMin>
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
-      </gazebo_joint_control_pid>
+      </joint_control_pid>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1277,7 +1277,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-      <gazebo_joint_control_pid>
+      <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
         <d>0</d>
@@ -1285,7 +1285,7 @@
         <iMin>0</iMin>
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
-      </gazebo_joint_control_pid>
+      </joint_control_pid>
     </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace>typhoon_h480</robotNamespace>
@@ -1300,6 +1300,7 @@
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
+          <!-- gazebo_motor_model has the joint_control_pid active in this model
           <joint_control_pid>
             <p>0.1</p>
             <i>0</i>
@@ -1309,6 +1310,7 @@
             <cmdMax>3</cmdMax>
             <cmdMin>-3</cmdMin>
           </joint_control_pid>
+          -->
           <joint_name>rotor_4_joint</joint_name>
         </channel>
         <channel name="rotor1">
@@ -1318,6 +1320,7 @@
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
+          <!-- gazebo_motor_model has the joint_control_pid active in this model
           <joint_control_pid>
             <p>0.1</p>
             <i>0</i>
@@ -1327,6 +1330,7 @@
             <cmdMax>3</cmdMax>
             <cmdMin>-3</cmdMin>
           </joint_control_pid>
+          -->
           <joint_name>rotor_5_joint</joint_name>
         </channel>
         <channel name="rotor2">
@@ -1336,6 +1340,7 @@
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
+          <!-- gazebo_motor_model has the joint_control_pid active in this model
           <joint_control_pid>
             <p>0.1</p>
             <i>0</i>
@@ -1345,6 +1350,7 @@
             <cmdMax>3</cmdMax>
             <cmdMin>-3</cmdMin>
           </joint_control_pid>
+          -->
           <joint_name>rotor_2_joint</joint_name>
         </channel>
         <channel name="rotor3">
@@ -1354,6 +1360,7 @@
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
+          <!-- gazebo_motor_model has the joint_control_pid active in this model
           <joint_control_pid>
             <p>0.1</p>
             <i>0</i>
@@ -1363,6 +1370,7 @@
             <cmdMax>3</cmdMax>
             <cmdMin>-3</cmdMin>
           </joint_control_pid>
+          -->
           <joint_name>rotor_3_joint</joint_name>
         </channel>
         <channel name="rotor4">
@@ -1372,6 +1380,7 @@
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
+          <!-- gazebo_motor_model has the joint_control_pid active in this model
           <joint_control_pid>
             <p>0.1</p>
             <i>0</i>
@@ -1381,6 +1390,7 @@
             <cmdMax>3</cmdMax>
             <cmdMin>-3</cmdMin>
           </joint_control_pid>
+          -->
           <joint_name>rotor_0_joint</joint_name>
         </channel>
         <channel name="rotor5">
@@ -1390,6 +1400,7 @@
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
+          <!-- gazebo_motor_model has the joint_control_pid active in this model
           <joint_control_pid>
             <p>0.1</p>
             <i>0</i>
@@ -1399,11 +1410,12 @@
             <cmdMax>3</cmdMax>
             <cmdMin>-3</cmdMin>
           </joint_control_pid>
+          -->
           <joint_name>rotor_1_joint</joint_name>
         </channel>
         <channel name="left_leg">
           <input_index>6</input_index>
-          <input_offset>0</input_offset>
+          <input_offset>1</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
@@ -1421,7 +1433,7 @@
         </channel>
         <channel name="right_leg">
           <input_index>7</input_index>
-          <input_offset>0</input_offset>
+          <input_offset>1</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
@@ -1437,6 +1449,7 @@
           </joint_control_pid>
           <joint_name>right_leg_joint</joint_name>
         </channel>
+        <!-- gazebo_mavlink_interface.cpp hardcoded to 8
         <channel name="gimbal_yaw">
           <input_index>8</input_index>
           <input_offset>0</input_offset>
@@ -1457,6 +1470,7 @@
           <gztopic>/gimbal_pitch_cmd</gztopic>
           <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
         </channel>
+        -->
       </control_channels>
     </plugin>
     <static>0</static>
