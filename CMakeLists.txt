@@ -189,10 +189,8 @@ set(plugins
   rotors_gazebo_mavlink_interface
   )
 
-if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
-  add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
-  list(APPEND plugins LiftDragPlugin)
-endif()
+add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
+list(APPEND plugins LiftDragPlugin)
 
 foreach(plugin ${plugins})
   add_dependencies(${plugin} mav_msgs)
