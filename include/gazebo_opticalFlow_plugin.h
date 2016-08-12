@@ -63,7 +63,6 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
 
     private: 
-	 const std::string topicName = "/opticalFlow";
      static const int maxfeatures = 50;
      const float qualityLevel = 0.1;
      const float minDistance = 7;

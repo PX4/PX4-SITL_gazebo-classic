@@ -23,6 +23,7 @@ find_package(PkgConfig REQUIRED)
 find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system thread timer)
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)

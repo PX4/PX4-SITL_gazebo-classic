@@ -34,8 +34,10 @@
 #include <iostream>
 #include <memory>
 #include <stdio.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace gazebo;
+using namespace std;
 
 // Register this plugin with the simulator
 GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
@@ -96,8 +98,16 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
+#if GAZEBO_MAJOR_VERSION >= 7
+  const string scopedName = _parent->ParentName();
+#else
+  const string scopedName = _parent->GetParentName();
+#endif
+  string topicName = "~/" + scopedName + "/lidar";
+  boost::replace_all(topicName, "::", "/");
+
   // TODO(tfoote) Find a way to namespace this within the model to allow multiple models
-  lidar_pub_ = node_handle_->Advertise<lidar_msgs::msgs::lidar>("/lidar", 10);
+  lidar_pub_ = node_handle_->Advertise<lidar_msgs::msgs::lidar>(topicName, 10);
 }
 
 /////////////////////////////////////////////////
