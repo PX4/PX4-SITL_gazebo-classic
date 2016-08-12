@@ -106,7 +106,6 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   string topicName = "~/" + scopedName + "/lidar";
   boost::replace_all(topicName, "::", "/");
 
-  // TODO(tfoote) Find a way to namespace this within the model to allow multiple models
   lidar_pub_ = node_handle_->Advertise<lidar_msgs::msgs::lidar>(topicName, 10);
 }
 

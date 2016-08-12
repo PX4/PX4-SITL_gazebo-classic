@@ -107,7 +107,6 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
-  // TODO(tfoote) Find a way to namespace this within the model to allow multiple models
 
 #if GAZEBO_MAJOR_VERSION >= 7
   const string scopedName = _sensor->ParentName();
