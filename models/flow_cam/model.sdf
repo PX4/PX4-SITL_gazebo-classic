@@ -40,11 +40,13 @@
           </noise>
         </camera>
         <plugin name="opticalflow_plugin" filename="libgazebo_opticalFlow_plugin.so">
+            <robotNamespace></robotNamespace>
             <always_on>true</always_on>
             <updateRate>0.0</updateRate>
             <visualize>false</visualize>
         </plugin>
         <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <robotNamespace></robotNamespace>
             <alwaysOn>true</alwaysOn>
             <updateRate>0.0</updateRate>
             <cameraName>flow_camera</cameraName>
