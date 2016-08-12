@@ -48,6 +48,10 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
                            motor_velocity_reference_pub_topic_);
+  getSdfParam<std::string>(_sdf, "imuSubTopic", imu_sub_topic_, imu_sub_topic_);
+  getSdfParam<std::string>(_sdf, "lidarSubTopic", lidar_sub_topic_, lidar_sub_topic_);
+  getSdfParam<std::string>(_sdf, "opticalFlowSubTopic",
+      opticalFlow_sub_topic_, opticalFlow_sub_topic_);
 
   joints_.resize(n_out_max);
 
