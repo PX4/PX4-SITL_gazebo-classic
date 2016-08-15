@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     public: ~LiftDragPlugin();
 
     // Documentation Inherited.
-    protected: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Callback for World Update events.
     protected: virtual void OnUpdate();
@@ -133,8 +134,6 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
-
-    private: std::string controlJointName;
   };
 }
 #endif
