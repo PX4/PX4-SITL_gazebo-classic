@@ -28,6 +28,7 @@
 #include <math.h>
 #include <string>
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 
 
 using namespace cv;
@@ -106,7 +107,15 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
-  // TODO(tfoote) Find a way to namespace this within the model to allow multiple models
+
+#if GAZEBO_MAJOR_VERSION >= 7
+  const string scopedName = _sensor->ParentName();
+#else
+  const string scopedName = _sensor->GetParentName();
+#endif
+  string topicName = "~/" + scopedName + "/opticalFlow";
+  boost::replace_all(topicName, "::", "/");
+
   opticalFlow_pub_ = node_handle_->Advertise<opticalFlow_msgs::msgs::opticalFlow>(topicName, 10);
 
 
@@ -159,7 +168,7 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   goodFeaturesToTrack(frame_gray, featuresCurrent, maxfeatures, qualityLevel, minDistance, Mat(), blockSize, useHarrisDetector, k); //calculate the features
 
   if (!old_gray.empty() && featuresPrevious.size() > 0){
-    calcOpticalFlowPyrLK(old_gray, frame_gray, featuresPrevious, featuresNextPos, featuresFound, err);
+    calcOpticalFlowPyrLK(old_gray, frame_gray, featuresPrevious, featuresNextPos, featuresFound, err, cv::Size(8,8), 0);
   }
 
   /*/// Set the needed parameters to find the refined corners

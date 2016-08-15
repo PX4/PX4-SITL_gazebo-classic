@@ -23,6 +23,7 @@ find_package(PkgConfig REQUIRED)
 find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system thread timer)
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)
@@ -193,10 +194,11 @@ set(plugins
   rotors_gazebo_mavlink_interface
   )
 
-if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
+# Linux is not consistent with plugin availability, even on Gazebo 7
+#if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
   add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
   list(APPEND plugins LiftDragPlugin)
-endif()
+#endif()
 
 foreach(plugin ${plugins})
   add_dependencies(${plugin} mav_msgs)
