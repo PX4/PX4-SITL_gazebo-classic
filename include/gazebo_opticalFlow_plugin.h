@@ -63,7 +63,7 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
 
     private: 
-     static const int maxfeatures = 50;
+     static const int maxfeatures = 20;
      const float qualityLevel = 0.1;
      const float minDistance = 7;
      const int blockSize = 7;
