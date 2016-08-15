@@ -168,7 +168,7 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   goodFeaturesToTrack(frame_gray, featuresCurrent, maxfeatures, qualityLevel, minDistance, Mat(), blockSize, useHarrisDetector, k); //calculate the features
 
   if (!old_gray.empty() && featuresPrevious.size() > 0){
-    calcOpticalFlowPyrLK(old_gray, frame_gray, featuresPrevious, featuresNextPos, featuresFound, err);
+    calcOpticalFlowPyrLK(old_gray, frame_gray, featuresPrevious, featuresNextPos, featuresFound, err, cv::Size(8,8), 0);
   }
 
   /*/// Set the needed parameters to find the refined corners
