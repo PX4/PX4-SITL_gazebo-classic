@@ -114,6 +114,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
                     << index << "] joint control active for this channel.\n";
             }
           }
+          else
+          {
+            gzdbg << "<joint_name> not found for channel[" << index
+                  << "] no joint control will be performed for this channel.\n";
+          }
 
           // setup joint control pid to control joint
           if (channel->HasElement("joint_control_pid"))
