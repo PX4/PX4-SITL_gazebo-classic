@@ -165,41 +165,80 @@ void GimbalControllerPlugin::Init()
   // publish pitch status via gz transport
   pitchTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_pitch_status";
+#if 0
+  /// only gazebo 7.4 and above support Any
+  this->pitchPub = node->Advertise<gazebo::msgs::Any>(pitchTopic);
+#else
   this->pitchPub = node->Advertise<gazebo::msgs::GzString>(pitchTopic);
+#endif
 
   // publish roll status via gz transport
   rollTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_roll_status";
+#if 0
+  /// only gazebo 7.4 and above support Any
+  this->rollPub = node->Advertise<gazebo::msgs::Any>(rollTopic);
+#else
   this->rollPub = node->Advertise<gazebo::msgs::GzString>(rollTopic);
+#endif
 
   // publish yaw status via gz transport
   yawTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_yaw_status";
+#if 0
+  /// only gazebo 7.4 and above support Any
+  this->yawPub = node->Advertise<gazebo::msgs::Any>(yawTopic);
+#else
   this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
+#endif
 
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
 }
 
+#if 0
+/// only gazebo 7.4 and above support Any
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
+void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
   gzmsg << "pitch command received " << _msg->double_value() << std::endl;
   this->pitchCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
+void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
   gzmsg << "roll command received " << _msg->double_value() << std::endl;
   this->rollCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
+void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 {
   gzmsg << "yaw command received " << _msg->double_value() << std::endl;
   this->yawCommand = _msg->double_value();
 }
+#else
+/////////////////////////////////////////////////
+void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
+{
+  gzmsg << "pitch command received " << _msg->data() << std::endl;
+  this->pitchCommand = atof(_msg->data().c_str());
+}
+
+/////////////////////////////////////////////////
+void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
+{
+  gzmsg << "roll command received " << _msg->data() << std::endl;
+  this->rollCommand = atof(_msg->data().c_str());
+}
+
+/////////////////////////////////////////////////
+void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
+{
+  gzmsg << "yaw command received " << _msg->data() << std::endl;
+  this->yawCommand = atof(_msg->data().c_str());
+}
+#endif
 
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnUpdate()

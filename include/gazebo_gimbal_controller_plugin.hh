@@ -44,9 +44,16 @@ namespace gazebo
 
     private: void OnUpdate();
 
+#if 0
+    /// only gazebo 7.4 and above support Any
     private: void OnPitchStringMsg(ConstAnyPtr &_msg);
     private: void OnRollStringMsg(ConstAnyPtr &_msg);
     private: void OnYawStringMsg(ConstAnyPtr &_msg);
+#else
+    private: void OnPitchStringMsg(ConstGzStringPtr &_msg);
+    private: void OnRollStringMsg(ConstGzStringPtr &_msg);
+    private: void OnYawStringMsg(ConstGzStringPtr &_msg);
+#endif
 
     /// \TODO something to move into Angle class
     /// \brief returns _angle1 normalized about

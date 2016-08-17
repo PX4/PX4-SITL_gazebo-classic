@@ -762,9 +762,17 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         }
         else if (joint_control_type_[i] == "position_gztopic")
         {
+#if 0
+          /// only gazebo 7.4 and above support Any
           gazebo::msgs::Any m;
           m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
           m.set_double_value(target);
+#else
+          std::stringstream ss;
+          gazebo::msgs::GzString m;
+          ss << target;
+          m.set_data(ss.str());
+#endif
           joint_control_pub_[i]->Publish(m);
         }
         else
