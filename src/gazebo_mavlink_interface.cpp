@@ -95,8 +95,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
               gztopic_[index] = channel->Get<std::string>("gztopic");
             else
               gztopic_[index] = "control_position_gztopic_" + std::to_string(index);
+#if 0
+            /// only gazebo 7.4 and above support Any
             joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::Any>(
               gztopic_[index]);
+#else
+            joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::GzString>(
+              gztopic_[index]);
+#endif
           }
 
           if (channel->HasElement("joint_name"))
