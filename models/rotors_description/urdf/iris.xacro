@@ -27,7 +27,7 @@
   <xacro:property name="sqrt2" value="1.4142135623730951" />
   <xacro:property name="rotor_drag_coefficient" value="8.06428e-04" />
   <xacro:property name="rolling_moment_coefficient" value="0.000001" />
-  <xacro:property name="color" value="DarkGrey" />
+  <xacro:property name="color" value="$(arg visual_material)" />
 
   <!-- Property Blocks -->
   <xacro:property name="body_inertia">
