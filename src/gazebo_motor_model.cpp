@@ -230,7 +230,6 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   else
   {
 #if GAZEBO_MAJOR_VERSION >= 7
-
     // Not desirable to use SetVelocity for parts of a moving model
     // impact on rest of the dynamic system is non-physical.
     joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);

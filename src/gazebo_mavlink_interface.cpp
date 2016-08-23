@@ -95,14 +95,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
               gztopic_[index] = channel->Get<std::string>("gztopic");
             else
               gztopic_[index] = "control_position_gztopic_" + std::to_string(index);
-#if 0
-            /// only gazebo 7.4 and above support Any
-            joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::Any>(
-              gztopic_[index]);
-#else
-            joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::GzString>(
-              gztopic_[index]);
-#endif
+            #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+              /// only gazebo 7.4 and above support Any
+              joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::Any>(
+                gztopic_[index]);
+            #else
+              joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::GzString>(
+                gztopic_[index]);
+            #endif
           }
 
           if (channel->HasElement("joint_name"))
@@ -178,8 +178,33 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       joints_.at(control_index) = left_elevon_joint_;
     }
     // setup pid to control joint
-    left_elevon_pid_.Init(20.0, 0, 0, 0, 0, 20, -20);
+    use_left_elevon_pid_ = false;
     if (left_elevon->HasElement("joint_control_pid")) {
+      // setup joint control pid to control joint
+      sdf::ElementPtr pid = _sdf->GetElement("joint_control_pid");
+      double p = 0.1;
+      if (pid->HasElement("p"))
+        p = pid->Get<double>("p");
+      double i = 0;
+      if (pid->HasElement("i"))
+        i = pid->Get<double>("i");
+      double d = 0;
+      if (pid->HasElement("d"))
+        d = pid->Get<double>("d");
+      double iMax = 0;
+      if (pid->HasElement("iMax"))
+        iMax = pid->Get<double>("iMax");
+      double iMin = 0;
+      if (pid->HasElement("iMin"))
+        iMin = pid->Get<double>("iMin");
+      double cmdMax = 3;
+      if (pid->HasElement("cmdMax"))
+        cmdMax = pid->Get<double>("cmdMax");
+      double cmdMin = -3;
+      if (pid->HasElement("cmdMin"))
+        cmdMin = pid->Get<double>("cmdMin");
+      left_elevon_pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+      use_left_elevon_pid_ = true;
     }
   }
 
@@ -203,7 +228,34 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       joints_.at(control_index) = right_elevon_joint_;
     }
     // setup pid to control joint
-    right_elevon_pid_.Init(20.0, 0, 0, 0, 0, 20, -20);
+    use_right_elevon_pid_ = false;
+    if (right_elevon->HasElement("joint_control_pid")) {
+      // setup joint control pid to control joint
+      sdf::ElementPtr pid = _sdf->GetElement("joint_control_pid");
+      double p = 0.1;
+      if (pid->HasElement("p"))
+        p = pid->Get<double>("p");
+      double i = 0;
+      if (pid->HasElement("i"))
+        i = pid->Get<double>("i");
+      double d = 0;
+      if (pid->HasElement("d"))
+        d = pid->Get<double>("d");
+      double iMax = 0;
+      if (pid->HasElement("iMax"))
+        iMax = pid->Get<double>("iMax");
+      double iMin = 0;
+      if (pid->HasElement("iMin"))
+        iMin = pid->Get<double>("iMin");
+      double cmdMax = 3;
+      if (pid->HasElement("cmdMax"))
+        cmdMax = pid->Get<double>("cmdMax");
+      double cmdMin = -3;
+      if (pid->HasElement("cmdMin"))
+        cmdMin = pid->Get<double>("cmdMin");
+      right_elevon_pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+      use_right_elevon_pid_ = true;
+    }
   }
 
   if (_sdf->HasElement("right_aileron_joint")) {
@@ -226,8 +278,33 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       joints_.at(control_index) = elevator_joint_;
     }
     // setup pid to control joint
-    elevator_pid_.Init(1.0, 0, 0, 0, 0, 0, -0);
+    use_elevator_pid_ = false;
     if (elevator->HasElement("joint_control_pid")) {
+      // setup joint control pid to control joint
+      sdf::ElementPtr pid = _sdf->GetElement("joint_control_pid");
+      double p = 0.1;
+      if (pid->HasElement("p"))
+        p = pid->Get<double>("p");
+      double i = 0;
+      if (pid->HasElement("i"))
+        i = pid->Get<double>("i");
+      double d = 0;
+      if (pid->HasElement("d"))
+        d = pid->Get<double>("d");
+      double iMax = 0;
+      if (pid->HasElement("iMax"))
+        iMax = pid->Get<double>("iMax");
+      double iMin = 0;
+      if (pid->HasElement("iMin"))
+        iMin = pid->Get<double>("iMin");
+      double cmdMax = 3;
+      if (pid->HasElement("cmdMax"))
+        cmdMax = pid->Get<double>("cmdMax");
+      double cmdMin = -3;
+      if (pid->HasElement("cmdMin"))
+        cmdMin = pid->Get<double>("cmdMin");
+      elevator_pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+      use_elevator_pid_ = true;
     }
   }
 
@@ -240,7 +317,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     if (control_index >= 0) {
       joints_.at(control_index) = propeller_joint_;
     }
-    propeller_pid_.Init(0.1, 0, 0, 0, 0, 4, -4);
+    use_propeller_pid_ = false;
     // setup joint control pid to control joint
     if (propeller->HasElement("joint_control_pid"))
     {
@@ -267,6 +344,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       if (pid->HasElement("cmdMin"))
         cmdMin = pid->Get<double>("cmdMin");
       propeller_pid_.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+      use_propeller_pid_ = true;
     }
   }
 
@@ -744,7 +822,6 @@ void GazeboMavlinkInterface::handle_control(double _dt)
     // set joint positions
     for (int i = 0; i < input_reference_.size(); i++) {
       if (joints_[i]) {
-#if 1
         double target = input_reference_[i];
         if (joint_control_type_[i] == "velocity")
         {
@@ -768,99 +845,146 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         }
         else if (joint_control_type_[i] == "position_gztopic")
         {
-#if 0
-          /// only gazebo 7.4 and above support Any
-          gazebo::msgs::Any m;
-          m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
-          m.set_double_value(target);
-#else
-          std::stringstream ss;
-          gazebo::msgs::GzString m;
-          ss << target;
-          m.set_data(ss.str());
-#endif
+          #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+            /// only gazebo 7.4 and above support Any
+            gazebo::msgs::Any m;
+            m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
+            m.set_double_value(target);
+          #else
+            std::stringstream ss;
+            gazebo::msgs::GzString m;
+            ss << target;
+            m.set_data(ss.str());
+          #endif
           joint_control_pub_[i]->Publish(m);
+        }
+        else if (joint_control_type_[i] == "position_kinematic")
+        {
+          /// really not ideal if your drone is moving at all,
+          /// mixing kinematic updates with dynamics calculation is
+          /// non-physical.
+          #if GAZEBO_MAJOR_VERSION >= 6
+            joints_[i]->SetPosition(0, input_reference_[i]);
+          #else
+            joints_[i]->SetAngle(0, input_reference_[i]);
+          #endif
         }
         else
         {
           gzerr << "joiint_control_type[" << joint_control_type_[i] << "] undefined.\n";
         }
-
-#elif GAZEBO_MAJOR_VERSION >= 6
-        joints_[i]->SetPosition(0, input_reference_[i]);
-#else
-        joints_[i]->SetAngle(0, input_reference_[i]);
-#endif
       }
     }
 
     // legacy method, can eventually be replaced
-#if 1
     if (propeller_joint_ != NULL)
     {
       double rpm = input_reference_[4];
       double rad_per_sec = 2.0 * M_PI * rpm / 60.0;
       double target = input_scaling_[4] * rad_per_sec;
-      double propeller_err = propeller_joint_->GetVelocity(0) - target;
-      double propeller_force = propeller_pid_.Update(propeller_err, _dt);
-      propeller_joint_->SetForce(0, propeller_force);
-      gzerr << "prop curr[" << propeller_joint_->GetVelocity(0)
-            << "] target[" << target
-            << "] rpm[" << rpm
-            << "] rad_per_sec[" << rad_per_sec
-            << "] f[" << propeller_force
-            << "] scale[" << input_scaling_[4]
-            << "]\n";
+      if (use_propeller_pid_)
+      {
+        double propeller_err = propeller_joint_->GetVelocity(0) - target;
+        double propeller_force = propeller_pid_.Update(propeller_err, _dt);
+        propeller_joint_->SetForce(0, propeller_force);
+        gzerr << "prop curr[" << propeller_joint_->GetVelocity(0)
+              << "] target[" << target
+              << "] rpm[" << rpm
+              << "] rad_per_sec[" << rad_per_sec
+              << "] f[" << propeller_force
+              << "] scale[" << input_scaling_[4]
+              << "]\n";
+      }
+      else
+      {
+        #if GAZEBO_MAJOR_VERSION >= 7
+          // Not desirable to use SetVelocity for parts of a moving model
+          // impact on rest of the dynamic system is non-physical.
+          propeller_joint_->SetVelocity(0, target);
+        #elif GAZEBO_MAJOR_VERSION >= 6
+          // Not ideal as the approach could result in unrealistic impulses, and
+          // is only available in ODE
+          const double kTorque = 2.0;
+          propeller_joint_->SetParam("fmax", 0, kTorque);
+          propeller_joint_->SetParam("vel", 0, target);
+        #endif
+      }
     }
 
     if (left_elevon_joint_!= NULL)
     {
       double target = 0.524*(0.5*input_reference_[5] - 0.5*input_reference_[7]);
-      double left_elevon_err = left_elevon_joint_->GetAngle(0).Radian() - target;
-      double left_elevon_force = left_elevon_pid_.Update(left_elevon_err, _dt);
-      left_elevon_joint_->SetForce(0, left_elevon_force);
-      // gzerr << "left curr[" << left_elevon_joint_->GetAngle(0).Radian()
-      //       << "] ail[" << input_reference_[5]
-      //       << "] ele[" << input_reference_[7]
-      //       << "] target[" << target
-      //       // << "] dt[" << _dt
-      //       << "]\n";
+      if (use_left_elevon_pid_)
+      {
+        double left_elevon_err = left_elevon_joint_->GetAngle(0).Radian() - target;
+        double left_elevon_force = left_elevon_pid_.Update(left_elevon_err, _dt);
+        left_elevon_joint_->SetForce(0, left_elevon_force);
+        // gzerr << "left curr[" << left_elevon_joint_->GetAngle(0).Radian()
+        //       << "] ail[" << input_reference_[5]
+        //       << "] ele[" << input_reference_[7]
+        //       << "] target[" << target
+        //       // << "] dt[" << _dt
+        //       << "]\n";
+      }
+      else
+      {
+        // Not desirable to use SetVelocity for parts of a moving model
+        // impact on rest of the dynamic system is non-physical.
+        #if GAZEBO_MAJOR_VERSION >= 6
+          left_elevon_joint_->SetPosition(0, target);
+        #else
+          left_elevon_joint_->SetAngle(0, target);
+        #endif
+      }
     }
 
     if (right_elevon_joint_ != NULL)
     {
       double target = 0.524*(0.5*input_reference_[6] - 0.5*input_reference_[7]);
-      double right_elevon_err = right_elevon_joint_->GetAngle(0).Radian() - target;
-      double right_elevon_force = right_elevon_pid_.Update(right_elevon_err, _dt);
-      right_elevon_joint_->SetForce(0, right_elevon_force);
-      // gzerr << "right curr[" << right_elevon_joint_->GetAngle(0).Radian()
-      //       << "] ail[" << input_reference_[6]
-      //       << "] ele[" << input_reference_[7]
-      //       << "] target[" << target
-      //       // << "] dt[" << _dt
-      //       << "]\n";
+      if (use_right_elevon_pid_)
+      {
+        double right_elevon_err = right_elevon_joint_->GetAngle(0).Radian() - target;
+        double right_elevon_force = right_elevon_pid_.Update(right_elevon_err, _dt);
+        right_elevon_joint_->SetForce(0, right_elevon_force);
+        // gzerr << "right curr[" << right_elevon_joint_->GetAngle(0).Radian()
+        //       << "] ail[" << input_reference_[6]
+        //       << "] ele[" << input_reference_[7]
+        //       << "] target[" << target
+        //       // << "] dt[" << _dt
+        //       << "]\n";
+      }
+      else
+      {
+        // Not desirable to use SetVelocity for parts of a moving model
+        // impact on rest of the dynamic system is non-physical.
+        #if GAZEBO_MAJOR_VERSION >= 6
+          right_elevon_joint_->SetPosition(0, target);
+        #else
+          right_elevon_joint_->SetAngle(0, target);
+        #endif
+      }
     }
 
     if (elevator_joint_ != NULL)
     {
-      double elevator_err =
-       elevator_joint_->GetAngle(0).Radian() - input_reference_[7];
-      double elevator_force = elevator_pid_.Update(elevator_err, _dt);
-      elevator_joint_->SetForce(0, elevator_force);
+      if (use_elevator_pid_)
+      {
+        double elevator_err =
+         elevator_joint_->GetAngle(0).Radian() - input_reference_[7];
+        double elevator_force = elevator_pid_.Update(elevator_err, _dt);
+        elevator_joint_->SetForce(0, elevator_force);
+      }
+      else
+      {
+        // Not desirable to use SetVelocity for parts of a moving model
+        // impact on rest of the dynamic system is non-physical.
+        #if GAZEBO_MAJOR_VERSION >= 6
+          elevator_joint_->SetPosition(0, input_reference_[7]);
+        #else
+          elevator_joint_->SetAngle(0, input_reference_[7]);
+        #endif
+      }
     }
-#elif GAZEBO_MAJOR_VERSION >= 6
-    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
-      left_elevon_joint_->SetPosition(0, input_reference_[5]);
-      right_elevon_joint_->SetPosition(0, input_reference_[6]);
-      elevator_joint_->SetPosition(0, input_reference_[7]);
-    }
-#else
-    if (right_elevon_joint_ != NULL && left_elevon_joint_!= 0 && elevator_joint_ != 0) {
-      left_elevon_joint_->SetAngle(0, input_reference_[5]);
-      right_elevon_joint_->SetAngle(0, input_reference_[6]);
-      elevator_joint_->SetAngle(0, input_reference_[7]);
-    }
-#endif
 }
 
 }

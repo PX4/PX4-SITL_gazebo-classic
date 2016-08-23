@@ -44,7 +44,7 @@ namespace gazebo
 
     private: void OnUpdate();
 
-#if 0
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
     /// only gazebo 7.4 and above support Any
     private: void OnPitchStringMsg(ConstAnyPtr &_msg);
     private: void OnRollStringMsg(ConstAnyPtr &_msg);

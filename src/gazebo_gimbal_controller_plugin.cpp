@@ -161,7 +161,7 @@ void GimbalControllerPlugin::Init()
   // publish pitch status via gz transport
   pitchTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_pitch_status";
-#if 0
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
   /// only gazebo 7.4 and above support Any
   this->pitchPub = node->Advertise<gazebo::msgs::Any>(pitchTopic);
 #else
@@ -171,7 +171,7 @@ void GimbalControllerPlugin::Init()
   // publish roll status via gz transport
   rollTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_roll_status";
-#if 0
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
   /// only gazebo 7.4 and above support Any
   this->rollPub = node->Advertise<gazebo::msgs::Any>(rollTopic);
 #else
@@ -181,7 +181,7 @@ void GimbalControllerPlugin::Init()
   // publish yaw status via gz transport
   yawTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_yaw_status";
-#if 0
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
   /// only gazebo 7.4 and above support Any
   this->yawPub = node->Advertise<gazebo::msgs::Any>(yawTopic);
 #else
@@ -191,7 +191,7 @@ void GimbalControllerPlugin::Init()
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
 }
 
-#if 0
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
 /// only gazebo 7.4 and above support Any
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
