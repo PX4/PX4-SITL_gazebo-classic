@@ -229,14 +229,17 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   }
   else
   {
-    // Not desirable to use SetVelocity for parts of a moving model
-    // joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+#if GAZEBO_MAJOR_VERSION >= 7
 
-    // Not idea as the approach could result in unrealistic impulses, and
+    // Not desirable to use SetVelocity for parts of a moving model
+    // impact on rest of the dynamic system is non-physical.
+    joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+#elif GAZEBO_MAJOR_VERSION >= 6
+    // Not ideal as the approach could result in unrealistic impulses, and
     // is only available in ODE
     joint_->SetParam("fmax", 0, 2.0);
     joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
-    // gzerr << turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_ << "\n";
+#endif
   }
 }
 

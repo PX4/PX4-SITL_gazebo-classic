@@ -111,22 +111,18 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
 
   // get imu sensor
   std::string imuSensorName = "camera_imu";
-  this->imuSensor = std::static_pointer_cast<sensors::ImuSensor>(
-    sensors::SensorManager::Instance()->GetSensor(imuSensorName));
   if (this->sdf->HasElement("imu"))
   {
     // Add names to map
     imuSensorName = sdf->Get<std::string>("imu");
-    if (this->model->GetJoint(imuSensorName))
-    {
-      this->imuSensor = std::static_pointer_cast<sensors::ImuSensor>(
-        sensors::SensorManager::Instance()->GetSensor(imuSensorName));
-    }
-    else
-    {
-      gzwarn << "imu [" << imuSensorName << "] does not exist?\n";
-    }
   }
+#if GAZEBO_MAJOR_VERSION >= 7
+  this->imuSensor = std::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(imuSensorName));
+#elif GAZEBO_MAJOR_VERSION >= 6
+  this->imuSensor = boost::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(imuSensorName));
+#endif
   if (!this->imuSensor)
   {
     gzerr << "GimbalControllerPlugin::Load ERROR! Can't get imu sensor '"
