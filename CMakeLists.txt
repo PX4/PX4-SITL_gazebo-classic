@@ -199,6 +199,36 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf
   )
 add_custom_target(sdf ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.sdf)
 
+
+#-----------#
+# Functions #
+#-----------#
+function(glob_generate target file_glob)
+  file(GLOB_RECURSE glob_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${file_glob})
+	set(gen_files)
+	foreach(glob_file ${glob_files})
+		string(REGEX REPLACE "\\.[^.]*$" "" file_name ${glob_file})
+		string(REGEX MATCH "[^.]*$" file_ext ${glob_file})
+		get_filename_component(file_dir ${glob_file} DIRECTORY)
+		set(in_file ${CMAKE_CURRENT_SOURCE_DIR}/${glob_file})
+		file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${file_dir})
+		set(out_file ${CMAKE_CURRENT_SOURCE_DIR}/${file_name})
+		string(REGEX REPLACE ".sdf" "-gen.sdf" out_file ${out_file})
+		if (${file_ext} STREQUAL "jinja")
+			add_custom_command(OUTPUT ${out_file}
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py
+        ${in_file} ${CMAKE_CURRENT_SOURCE_DIR}
+				DEPENDS ${in_file}
+				VERBATIM
+				)
+			list(APPEND gen_files_${target} ${out_file})
+		endif()
+	endforeach()
+	add_custom_target(${target} ALL DEPENDS ${gen_files_${target}})
+endfunction()
+
+glob_generate(models_gen ${CMAKE_CURRENT_SOURCE_DIR}/models/*.jinja)
+
 #--------------------#
 # Message Generation #
 #--------------------#

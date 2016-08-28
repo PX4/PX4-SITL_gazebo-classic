@@ -99,8 +99,8 @@ static const std::string kDefaultNamespace = "";
 static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
 
 static const std::string kDefaultImuTopic = "/imu";
-static const std::string kDefaultLidarTopic = "/lidar/link/lidar";
-static const std::string kDefaultOpticalFlowTopic = "/camera/link/opticalFlow";
+static const std::string kDefaultLidarTopic = "/sf10a/link/lidar";
+static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
 static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";

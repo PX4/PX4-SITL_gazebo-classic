@@ -7,7 +7,11 @@
     </include>
     <!-- A ground plane -->
     <include>
+<<<<<<< 5e3375facdfae687c4eb3d20aa9da65aea0ec5d1
       <uri>model://iris_opt_flow</uri>
+=======
+      <uri>model://asphalt_plane</uri>
+>>>>>>> Added new jinja based models.
     </include>
     <include>
       <uri>model://uneven_ground</uri>
