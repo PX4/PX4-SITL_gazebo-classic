@@ -6,3 +6,4 @@ scripts/schemas
 models/iris/*.sdf
 *.pyc
 .*.sw?
+*-gen.sdf
