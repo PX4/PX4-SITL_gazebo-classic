@@ -1413,8 +1413,38 @@
           -->
           <joint_name>rotor_1_joint</joint_name>
         </channel>
-        <channel name="left_leg">
+        <channel name="gimbal_roll">
           <input_index>6</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>3.1415</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_gztopic</joint_control_type>
+          <gztopic>/gimbal_roll_cmd</gztopic>
+          <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
+        </channel>
+        <channel name="gimbal_pitch">
+          <input_index>7</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>3.1415</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_gztopic</joint_control_type>
+          <gztopic>/gimbal_pitch_cmd</gztopic>
+          <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
+        </channel>
+        <channel name="gimbal_yaw">
+          <input_index>8</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>3.1415</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_gztopic</joint_control_type>
+          <gztopic>/gimbal_yaw_cmd</gztopic>
+          <joint_name>typhoon_h480::cgo3_vertical_arm_joint</joint_name>
+        </channel>
+        <channel name="left_leg">
+          <input_index>9</input_index>
           <input_offset>1</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -1432,7 +1462,7 @@
           <joint_name>left_leg_joint</joint_name>
         </channel>
         <channel name="right_leg">
-          <input_index>7</input_index>
+          <input_index>10</input_index>
           <input_offset>1</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -1449,28 +1479,6 @@
           </joint_control_pid>
           <joint_name>right_leg_joint</joint_name>
         </channel>
-        <!-- gazebo_mavlink_interface.cpp hardcoded to 8
-        <channel name="gimbal_yaw">
-          <input_index>8</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>1.57</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position_gztopic</joint_control_type>
-          <gztopic>/gimbal_yaw_cmd</gztopic>
-          <joint_name>typhoon_h480::cgo3_vertical_arm_joint</joint_name>
-        </channel>
-        <channel name="gimbal_pitch">
-          <input_index>9</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>1.57</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>1.5707</zero_position_armed>
-          <joint_control_type>position_gztopic</joint_control_type>
-          <gztopic>/gimbal_pitch_cmd</gztopic>
-          <joint_name>typhoon_h480::cgo3_camera_joint</joint_name>
-        </channel>
-        -->
       </control_channels>
     </plugin>
     <static>0</static>
