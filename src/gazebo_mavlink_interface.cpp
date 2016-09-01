@@ -92,7 +92,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
           {
             // setup publisher handle to topic
             if (channel->HasElement("gztopic"))
-              gztopic_[index] = channel->Get<std::string>("gztopic");
+              gztopic_[index] = "~/"+ model_->GetName() + channel->Get<std::string>("gztopic");
             else
               gztopic_[index] = "control_position_gztopic_" + std::to_string(index);
             #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4

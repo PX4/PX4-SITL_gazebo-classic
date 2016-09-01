@@ -196,42 +196,42 @@ void GimbalControllerPlugin::Init()
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "pitch command received " << _msg->double_value() << std::endl;
+//  gzdbg << "pitch command received " << _msg->double_value() << std::endl;
   this->pitchCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "roll command received " << _msg->double_value() << std::endl;
+//  gzdbg << "roll command received " << _msg->double_value() << std::endl;
   this->rollCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "yaw command received " << _msg->double_value() << std::endl;
+//  gzdbg << "yaw command received " << _msg->double_value() << std::endl;
   this->yawCommand = _msg->double_value();
 }
 #else
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "pitch command received " << _msg->data() << std::endl;
+//  gzdbg << "pitch command received " << _msg->data() << std::endl;
   this->pitchCommand = atof(_msg->data().c_str());
 }
 
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "roll command received " << _msg->data() << std::endl;
+//  gzdbg << "roll command received " << _msg->data() << std::endl;
   this->rollCommand = atof(_msg->data().c_str());
 }
 
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 {
-  gzmsg << "yaw command received " << _msg->data() << std::endl;
+//  gzdbg << "yaw command received " << _msg->data() << std::endl;
   this->yawCommand = atof(_msg->data().c_str());
 }
 #endif
@@ -319,9 +319,13 @@ double GimbalControllerPlugin::NormalizeAbout(double _angle, double reference)
   // normalize diff about (-pi, pi], then add reference
   while (diff <= -M_PI)
   {
-    diff += M_PI;
+    diff += 2.0*M_PI;
   }
-  return fmod(diff, (2.0*M_PI)) + reference;
+  while (diff > M_PI)
+  {
+    diff -= 2.0*M_PI;
+  }
+  return diff + reference;
 }
 
 /////////////////////////////////////////////////
