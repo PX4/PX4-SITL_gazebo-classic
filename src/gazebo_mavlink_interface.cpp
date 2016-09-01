@@ -718,51 +718,27 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages(double _dt, uint32_t _timeou
 void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch(msg->msgid) {
-  case MAVLINK_MSG_ID_HIL_CONTROLS:
-    mavlink_hil_controls_t controls;
-    mavlink_msg_hil_controls_decode(msg, &controls);
+  case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
+    mavlink_hil_actuator_controls_t controls;
+    mavlink_msg_hil_actuator_controls_decode(msg, &controls);
     bool armed = false;
 
     if ((controls.mode & MAV_MODE_FLAG_SAFETY_ARMED) > 0) {
       armed = true;
     }
 
-    const unsigned n_out = sizeof(inputs.control) / sizeof(inputs.control[0]);
-    const unsigned block_size = 8;
-
-    unsigned off = (controls.nav_mode * block_size);
-
-    // We only support 8 outputs so far, so we
-    // ignore the second, third and fourth output
-
-    inputs.control[off + 0] = controls.roll_ailerons;
-    inputs.control[off + 1] = controls.pitch_elevator;
-    inputs.control[off + 2] = controls.yaw_rudder;
-    inputs.control[off + 3] = controls.throttle;
-    inputs.control[off + 4] = controls.aux1;
-    inputs.control[off + 5] = controls.aux2;
-    inputs.control[off + 6] = controls.aux3;
-    inputs.control[off + 7] = controls.aux4;
-    // inputs.control[off + 8] = controls.aux5?
-    // inputs.control[off + 9] = controls.aux6?
-
-    // XXX setting this to anything higher than 8 results
-    // in memory smashing, likely due to a hardcoded
-    // motor count somewhere
-    if (off + block_size > 8) {
-      break;
+    Inputs inputs;
+    for (int i = 0; i < n_out_max; ++i) {
+        inputs.control[i] = controls.controls[i];
     }
 
     bool is_vtol = (right_elevon_joint_ != nullptr);
 
-    /* this whole block below seems strange, not sure
-       what's happening, commenting out for now
-    */
     // Set all scalings
     // Initialize all outputs as motors
     // if joints are present these will be
     // reconfigured in the next step
-    for (unsigned i = off; i < off + block_size; i++) {
+    for (unsigned i = 0; i < n_out_max; i++) {
       input_index_[i] = i;
 
       // scaling values
@@ -780,14 +756,14 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       // Config for standard VTOL model
 
       // Fift motor
-      input_index_[off + 4] = off + 4;
+      input_index_[4] = 4;
       // input_offset_[off + 4] = 1.0;
       // input_scaling_[off + 4] = 1600;
       // zero_position_disarmed_[off + 4] = 0.0;
       // zero_position_armed_[off + 4] = 0.0;
 
       // Servos
-      for (unsigned i = off + 5; i < off + block_size; i++) {
+      for (unsigned i = 5; i < n_out_max; i++) {
         // scaling values
         input_index_[i] = i;
         // input_offset_[i] = 0.0;
@@ -800,7 +776,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
     last_actuator_time_ = world_->GetSimTime();
 
     // set rotor speeds, controller targets
-    input_reference_.resize(n_out);
+    input_reference_.resize(n_out_max);
     for (int i = 0; i < input_reference_.size(); i++) {
       if (armed) {
         input_reference_[i] = (inputs.control[input_index_[i]] + input_offset_[i])

@@ -92,7 +92,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
         gimbal_yaw_joint_(nullptr),
         gimbal_pitch_joint_(nullptr),
         gimbal_roll_joint_(nullptr),
-        inputs{},
         input_offset_{},
         input_scaling_{},
         zero_position_disarmed_{},
@@ -160,9 +159,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
   static const unsigned n_out_max = 16;
 
   unsigned _rotor_count;
-  struct {
+  struct Inputs {
     float control[n_out_max];
-  } inputs;
+  };
 
   double input_offset_[n_out_max];
   double input_scaling_[n_out_max];
