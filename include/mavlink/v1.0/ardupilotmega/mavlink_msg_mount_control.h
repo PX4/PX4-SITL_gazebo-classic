@@ -2,24 +2,40 @@
 
 #define MAVLINK_MSG_ID_MOUNT_CONTROL 157
 
-typedef struct __mavlink_mount_control_t
-{
+MAVPACKED(
+typedef struct __mavlink_mount_control_t {
  int32_t input_a; /*< pitch(deg*100) or lat, depending on mount mode*/
  int32_t input_b; /*< roll(deg*100) or lon depending on mount mode*/
  int32_t input_c; /*< yaw(deg*100) or alt (in cm) depending on mount mode*/
  uint8_t target_system; /*< System ID*/
  uint8_t target_component; /*< Component ID*/
  uint8_t save_position; /*< if "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING)*/
-} mavlink_mount_control_t;
+}) mavlink_mount_control_t;
 
 #define MAVLINK_MSG_ID_MOUNT_CONTROL_LEN 15
+#define MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN 15
 #define MAVLINK_MSG_ID_157_LEN 15
+#define MAVLINK_MSG_ID_157_MIN_LEN 15
 
 #define MAVLINK_MSG_ID_MOUNT_CONTROL_CRC 21
 #define MAVLINK_MSG_ID_157_CRC 21
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MOUNT_CONTROL { \
+	157, \
+	"MOUNT_CONTROL", \
+	6, \
+	{  { "input_a", NULL, MAVLINK_TYPE_INT32_T, 0, 0, offsetof(mavlink_mount_control_t, input_a) }, \
+         { "input_b", NULL, MAVLINK_TYPE_INT32_T, 0, 4, offsetof(mavlink_mount_control_t, input_b) }, \
+         { "input_c", NULL, MAVLINK_TYPE_INT32_T, 0, 8, offsetof(mavlink_mount_control_t, input_c) }, \
+         { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 12, offsetof(mavlink_mount_control_t, target_system) }, \
+         { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 13, offsetof(mavlink_mount_control_t, target_component) }, \
+         { "save_position", NULL, MAVLINK_TYPE_UINT8_T, 0, 14, offsetof(mavlink_mount_control_t, save_position) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MOUNT_CONTROL { \
 	"MOUNT_CONTROL", \
 	6, \
@@ -31,7 +47,7 @@ typedef struct __mavlink_mount_control_t
          { "save_position", NULL, MAVLINK_TYPE_UINT8_T, 0, 14, offsetof(mavlink_mount_control_t, save_position) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a mount_control message
@@ -73,11 +89,7 @@ static inline uint16_t mavlink_msg_mount_control_pack(uint8_t system_id, uint8_t
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MOUNT_CONTROL;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 }
 
 /**
@@ -121,11 +133,7 @@ static inline uint16_t mavlink_msg_mount_control_pack_chan(uint8_t system_id, ui
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MOUNT_CONTROL;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 }
 
 /**
@@ -179,11 +187,7 @@ static inline void mavlink_msg_mount_control_send(mavlink_channel_t chan, uint8_
 	_mav_put_uint8_t(buf, 13, target_component);
 	_mav_put_uint8_t(buf, 14, save_position);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, buf, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 #else
 	mavlink_mount_control_t packet;
 	packet.input_a = input_a;
@@ -193,11 +197,21 @@ static inline void mavlink_msg_mount_control_send(mavlink_channel_t chan, uint8_
 	packet.target_component = target_component;
 	packet.save_position = save_position;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)&packet, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)&packet, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)&packet, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 #endif
+}
+
+/**
+ * @brief Send a mount_control message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_mount_control_send_struct(mavlink_channel_t chan, const mavlink_mount_control_t* mount_control)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_mount_control_send(chan, mount_control->target_system, mount_control->target_component, mount_control->input_a, mount_control->input_b, mount_control->input_c, mount_control->save_position);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)mount_control, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 #endif
 }
 
@@ -220,11 +234,7 @@ static inline void mavlink_msg_mount_control_send_buf(mavlink_message_t *msgbuf,
 	_mav_put_uint8_t(buf, 13, target_component);
 	_mav_put_uint8_t(buf, 14, save_position);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, buf, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, buf, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 #else
 	mavlink_mount_control_t *packet = (mavlink_mount_control_t *)msgbuf;
 	packet->input_a = input_a;
@@ -234,11 +244,7 @@ static inline void mavlink_msg_mount_control_send_buf(mavlink_message_t *msgbuf,
 	packet->target_component = target_component;
 	packet->save_position = save_position;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)packet, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)packet, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONTROL, (const char *)packet, MAVLINK_MSG_ID_MOUNT_CONTROL_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN, MAVLINK_MSG_ID_MOUNT_CONTROL_CRC);
 #endif
 }
 #endif
@@ -316,7 +322,7 @@ static inline uint8_t mavlink_msg_mount_control_get_save_position(const mavlink_
  */
 static inline void mavlink_msg_mount_control_decode(const mavlink_message_t* msg, mavlink_mount_control_t* mount_control)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mount_control->input_a = mavlink_msg_mount_control_get_input_a(msg);
 	mount_control->input_b = mavlink_msg_mount_control_get_input_b(msg);
 	mount_control->input_c = mavlink_msg_mount_control_get_input_c(msg);
@@ -324,6 +330,8 @@ static inline void mavlink_msg_mount_control_decode(const mavlink_message_t* msg
 	mount_control->target_component = mavlink_msg_mount_control_get_target_component(msg);
 	mount_control->save_position = mavlink_msg_mount_control_get_save_position(msg);
 #else
-	memcpy(mount_control, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MOUNT_CONTROL_LEN? msg->len : MAVLINK_MSG_ID_MOUNT_CONTROL_LEN;
+        memset(mount_control, 0, MAVLINK_MSG_ID_MOUNT_CONTROL_LEN);
+	memcpy(mount_control, _MAV_PAYLOAD(msg), len);
 #endif
 }

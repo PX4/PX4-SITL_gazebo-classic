@@ -26,6 +26,12 @@ static void mavlink_test_all(uint8_t system_id, uint8_t component_id, mavlink_me
 
 static void mavlink_test_test_types(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
+#ifdef MAVLINK_STATUS_FLAG_OUT_MAVLINK1
+	mavlink_status_t *status = mavlink_get_channel_status(MAVLINK_COMM_0);
+        if ((status->flags & MAVLINK_STATUS_FLAG_OUT_MAVLINK1) && MAVLINK_MSG_ID_TEST_TYPES >= 256) {
+        	return;
+        }
+#endif
 	mavlink_message_t msg;
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
@@ -34,31 +40,36 @@ static void mavlink_test_test_types(uint8_t system_id, uint8_t component_id, mav
     };
 	mavlink_test_types_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
-        	packet1.u64 = packet_in.u64;
-        	packet1.s64 = packet_in.s64;
-        	packet1.d = packet_in.d;
-        	packet1.u32 = packet_in.u32;
-        	packet1.s32 = packet_in.s32;
-        	packet1.f = packet_in.f;
-        	packet1.u16 = packet_in.u16;
-        	packet1.s16 = packet_in.s16;
-        	packet1.c = packet_in.c;
-        	packet1.u8 = packet_in.u8;
-        	packet1.s8 = packet_in.s8;
+        packet1.u64 = packet_in.u64;
+        packet1.s64 = packet_in.s64;
+        packet1.d = packet_in.d;
+        packet1.u32 = packet_in.u32;
+        packet1.s32 = packet_in.s32;
+        packet1.f = packet_in.f;
+        packet1.u16 = packet_in.u16;
+        packet1.s16 = packet_in.s16;
+        packet1.c = packet_in.c;
+        packet1.u8 = packet_in.u8;
+        packet1.s8 = packet_in.s8;
         
-        	mav_array_memcpy(packet1.u64_array, packet_in.u64_array, sizeof(uint64_t)*3);
-        	mav_array_memcpy(packet1.s64_array, packet_in.s64_array, sizeof(int64_t)*3);
-        	mav_array_memcpy(packet1.d_array, packet_in.d_array, sizeof(double)*3);
-        	mav_array_memcpy(packet1.u32_array, packet_in.u32_array, sizeof(uint32_t)*3);
-        	mav_array_memcpy(packet1.s32_array, packet_in.s32_array, sizeof(int32_t)*3);
-        	mav_array_memcpy(packet1.f_array, packet_in.f_array, sizeof(float)*3);
-        	mav_array_memcpy(packet1.u16_array, packet_in.u16_array, sizeof(uint16_t)*3);
-        	mav_array_memcpy(packet1.s16_array, packet_in.s16_array, sizeof(int16_t)*3);
-        	mav_array_memcpy(packet1.s, packet_in.s, sizeof(char)*10);
-        	mav_array_memcpy(packet1.u8_array, packet_in.u8_array, sizeof(uint8_t)*3);
-        	mav_array_memcpy(packet1.s8_array, packet_in.s8_array, sizeof(int8_t)*3);
+        mav_array_memcpy(packet1.u64_array, packet_in.u64_array, sizeof(uint64_t)*3);
+        mav_array_memcpy(packet1.s64_array, packet_in.s64_array, sizeof(int64_t)*3);
+        mav_array_memcpy(packet1.d_array, packet_in.d_array, sizeof(double)*3);
+        mav_array_memcpy(packet1.u32_array, packet_in.u32_array, sizeof(uint32_t)*3);
+        mav_array_memcpy(packet1.s32_array, packet_in.s32_array, sizeof(int32_t)*3);
+        mav_array_memcpy(packet1.f_array, packet_in.f_array, sizeof(float)*3);
+        mav_array_memcpy(packet1.u16_array, packet_in.u16_array, sizeof(uint16_t)*3);
+        mav_array_memcpy(packet1.s16_array, packet_in.s16_array, sizeof(int16_t)*3);
+        mav_array_memcpy(packet1.s, packet_in.s, sizeof(char)*10);
+        mav_array_memcpy(packet1.u8_array, packet_in.u8_array, sizeof(uint8_t)*3);
+        mav_array_memcpy(packet1.s8_array, packet_in.s8_array, sizeof(int8_t)*3);
         
-
+#ifdef MAVLINK_STATUS_FLAG_OUT_MAVLINK1
+        if (status->flags & MAVLINK_STATUS_FLAG_OUT_MAVLINK1) {
+           // cope with extensions
+           memset(MAVLINK_MSG_ID_TEST_TYPES_MIN_LEN + (char *)&packet1, 0, sizeof(packet1)-MAVLINK_MSG_ID_TEST_TYPES_MIN_LEN);
+        }
+#endif
         memset(&packet2, 0, sizeof(packet2));
 	mavlink_msg_test_types_encode(system_id, component_id, &msg, &packet1);
 	mavlink_msg_test_types_decode(&msg, &packet2);

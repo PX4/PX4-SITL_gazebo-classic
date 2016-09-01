@@ -2,20 +2,32 @@
 
 #define MAVLINK_MSG_ID_SYSTEM_TIME 2
 
-typedef struct __mavlink_system_time_t
-{
+MAVPACKED(
+typedef struct __mavlink_system_time_t {
  uint64_t time_unix_usec; /*< Timestamp of the master clock in microseconds since UNIX epoch.*/
  uint32_t time_boot_ms; /*< Timestamp of the component clock since boot time in milliseconds.*/
-} mavlink_system_time_t;
+}) mavlink_system_time_t;
 
 #define MAVLINK_MSG_ID_SYSTEM_TIME_LEN 12
+#define MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN 12
 #define MAVLINK_MSG_ID_2_LEN 12
+#define MAVLINK_MSG_ID_2_MIN_LEN 12
 
 #define MAVLINK_MSG_ID_SYSTEM_TIME_CRC 137
 #define MAVLINK_MSG_ID_2_CRC 137
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SYSTEM_TIME { \
+	2, \
+	"SYSTEM_TIME", \
+	2, \
+	{  { "time_unix_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_system_time_t, time_unix_usec) }, \
+         { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 8, offsetof(mavlink_system_time_t, time_boot_ms) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SYSTEM_TIME { \
 	"SYSTEM_TIME", \
 	2, \
@@ -23,7 +35,7 @@ typedef struct __mavlink_system_time_t
          { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 8, offsetof(mavlink_system_time_t, time_boot_ms) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a system_time message
@@ -53,11 +65,7 @@ static inline uint16_t mavlink_msg_system_time_pack(uint8_t system_id, uint8_t c
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SYSTEM_TIME;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 }
 
 /**
@@ -89,11 +97,7 @@ static inline uint16_t mavlink_msg_system_time_pack_chan(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SYSTEM_TIME;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 }
 
 /**
@@ -139,21 +143,27 @@ static inline void mavlink_msg_system_time_send(mavlink_channel_t chan, uint64_t
 	_mav_put_uint64_t(buf, 0, time_unix_usec);
 	_mav_put_uint32_t(buf, 8, time_boot_ms);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, buf, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, buf, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, buf, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 #else
 	mavlink_system_time_t packet;
 	packet.time_unix_usec = time_unix_usec;
 	packet.time_boot_ms = time_boot_ms;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)&packet, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)&packet, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)&packet, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 #endif
+}
+
+/**
+ * @brief Send a system_time message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_system_time_send_struct(mavlink_channel_t chan, const mavlink_system_time_t* system_time)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_system_time_send(chan, system_time->time_unix_usec, system_time->time_boot_ms);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)system_time, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 #endif
 }
 
@@ -172,21 +182,13 @@ static inline void mavlink_msg_system_time_send_buf(mavlink_message_t *msgbuf, m
 	_mav_put_uint64_t(buf, 0, time_unix_usec);
 	_mav_put_uint32_t(buf, 8, time_boot_ms);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, buf, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, buf, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, buf, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 #else
 	mavlink_system_time_t *packet = (mavlink_system_time_t *)msgbuf;
 	packet->time_unix_usec = time_unix_usec;
 	packet->time_boot_ms = time_boot_ms;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)packet, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)packet, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SYSTEM_TIME, (const char *)packet, MAVLINK_MSG_ID_SYSTEM_TIME_MIN_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_LEN, MAVLINK_MSG_ID_SYSTEM_TIME_CRC);
 #endif
 }
 #endif
@@ -224,10 +226,12 @@ static inline uint32_t mavlink_msg_system_time_get_time_boot_ms(const mavlink_me
  */
 static inline void mavlink_msg_system_time_decode(const mavlink_message_t* msg, mavlink_system_time_t* system_time)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	system_time->time_unix_usec = mavlink_msg_system_time_get_time_unix_usec(msg);
 	system_time->time_boot_ms = mavlink_msg_system_time_get_time_boot_ms(msg);
 #else
-	memcpy(system_time, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SYSTEM_TIME_LEN? msg->len : MAVLINK_MSG_ID_SYSTEM_TIME_LEN;
+        memset(system_time, 0, MAVLINK_MSG_ID_SYSTEM_TIME_LEN);
+	memcpy(system_time, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED 85
 
-typedef struct __mavlink_position_target_local_ned_t
-{
+MAVPACKED(
+typedef struct __mavlink_position_target_local_ned_t {
  uint32_t time_boot_ms; /*< Timestamp in milliseconds since system boot*/
  float x; /*< X Position in NED frame in meters*/
  float y; /*< Y Position in NED frame in meters*/
@@ -18,16 +18,40 @@ typedef struct __mavlink_position_target_local_ned_t
  float yaw_rate; /*< yaw rate setpoint in rad/s*/
  uint16_t type_mask; /*< Bitmask to indicate which dimensions should be ignored by the vehicle: a value of 0b0000000000000000 or 0b0000001000000000 indicates that none of the setpoint dimensions should be ignored. If bit 10 is set the floats afx afy afz should be interpreted as force instead of acceleration. Mapping: bit 1: x, bit 2: y, bit 3: z, bit 4: vx, bit 5: vy, bit 6: vz, bit 7: ax, bit 8: ay, bit 9: az, bit 10: is force setpoint, bit 11: yaw, bit 12: yaw rate*/
  uint8_t coordinate_frame; /*< Valid options are: MAV_FRAME_LOCAL_NED = 1, MAV_FRAME_LOCAL_OFFSET_NED = 7, MAV_FRAME_BODY_NED = 8, MAV_FRAME_BODY_OFFSET_NED = 9*/
-} mavlink_position_target_local_ned_t;
+}) mavlink_position_target_local_ned_t;
 
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN 51
+#define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN 51
 #define MAVLINK_MSG_ID_85_LEN 51
+#define MAVLINK_MSG_ID_85_MIN_LEN 51
 
 #define MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC 140
 #define MAVLINK_MSG_ID_85_CRC 140
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_POSITION_TARGET_LOCAL_NED { \
+	85, \
+	"POSITION_TARGET_LOCAL_NED", \
+	14, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_position_target_local_ned_t, time_boot_ms) }, \
+         { "x", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_position_target_local_ned_t, x) }, \
+         { "y", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_position_target_local_ned_t, y) }, \
+         { "z", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_position_target_local_ned_t, z) }, \
+         { "vx", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_position_target_local_ned_t, vx) }, \
+         { "vy", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_position_target_local_ned_t, vy) }, \
+         { "vz", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_position_target_local_ned_t, vz) }, \
+         { "afx", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_position_target_local_ned_t, afx) }, \
+         { "afy", NULL, MAVLINK_TYPE_FLOAT, 0, 32, offsetof(mavlink_position_target_local_ned_t, afy) }, \
+         { "afz", NULL, MAVLINK_TYPE_FLOAT, 0, 36, offsetof(mavlink_position_target_local_ned_t, afz) }, \
+         { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 40, offsetof(mavlink_position_target_local_ned_t, yaw) }, \
+         { "yaw_rate", NULL, MAVLINK_TYPE_FLOAT, 0, 44, offsetof(mavlink_position_target_local_ned_t, yaw_rate) }, \
+         { "type_mask", NULL, MAVLINK_TYPE_UINT16_T, 0, 48, offsetof(mavlink_position_target_local_ned_t, type_mask) }, \
+         { "coordinate_frame", NULL, MAVLINK_TYPE_UINT8_T, 0, 50, offsetof(mavlink_position_target_local_ned_t, coordinate_frame) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_POSITION_TARGET_LOCAL_NED { \
 	"POSITION_TARGET_LOCAL_NED", \
 	14, \
@@ -47,7 +71,7 @@ typedef struct __mavlink_position_target_local_ned_t
          { "coordinate_frame", NULL, MAVLINK_TYPE_UINT8_T, 0, 50, offsetof(mavlink_position_target_local_ned_t, coordinate_frame) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a position_target_local_ned message
@@ -113,11 +137,7 @@ static inline uint16_t mavlink_msg_position_target_local_ned_pack(uint8_t system
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 }
 
 /**
@@ -185,11 +205,7 @@ static inline uint16_t mavlink_msg_position_target_local_ned_pack_chan(uint8_t s
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 }
 
 /**
@@ -259,11 +275,7 @@ static inline void mavlink_msg_position_target_local_ned_send(mavlink_channel_t 
 	_mav_put_uint16_t(buf, 48, type_mask);
 	_mav_put_uint8_t(buf, 50, coordinate_frame);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, buf, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, buf, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, buf, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 #else
 	mavlink_position_target_local_ned_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -281,11 +293,21 @@ static inline void mavlink_msg_position_target_local_ned_send(mavlink_channel_t 
 	packet.type_mask = type_mask;
 	packet.coordinate_frame = coordinate_frame;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)&packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)&packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)&packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 #endif
+}
+
+/**
+ * @brief Send a position_target_local_ned message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_position_target_local_ned_send_struct(mavlink_channel_t chan, const mavlink_position_target_local_ned_t* position_target_local_ned)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_position_target_local_ned_send(chan, position_target_local_ned->time_boot_ms, position_target_local_ned->coordinate_frame, position_target_local_ned->type_mask, position_target_local_ned->x, position_target_local_ned->y, position_target_local_ned->z, position_target_local_ned->vx, position_target_local_ned->vy, position_target_local_ned->vz, position_target_local_ned->afx, position_target_local_ned->afy, position_target_local_ned->afz, position_target_local_ned->yaw, position_target_local_ned->yaw_rate);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)position_target_local_ned, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 #endif
 }
 
@@ -316,11 +338,7 @@ static inline void mavlink_msg_position_target_local_ned_send_buf(mavlink_messag
 	_mav_put_uint16_t(buf, 48, type_mask);
 	_mav_put_uint8_t(buf, 50, coordinate_frame);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, buf, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, buf, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, buf, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 #else
 	mavlink_position_target_local_ned_t *packet = (mavlink_position_target_local_ned_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -338,11 +356,7 @@ static inline void mavlink_msg_position_target_local_ned_send_buf(mavlink_messag
 	packet->type_mask = type_mask;
 	packet->coordinate_frame = coordinate_frame;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, (const char *)packet, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_MIN_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_CRC);
 #endif
 }
 #endif
@@ -500,7 +514,7 @@ static inline float mavlink_msg_position_target_local_ned_get_yaw_rate(const mav
  */
 static inline void mavlink_msg_position_target_local_ned_decode(const mavlink_message_t* msg, mavlink_position_target_local_ned_t* position_target_local_ned)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	position_target_local_ned->time_boot_ms = mavlink_msg_position_target_local_ned_get_time_boot_ms(msg);
 	position_target_local_ned->x = mavlink_msg_position_target_local_ned_get_x(msg);
 	position_target_local_ned->y = mavlink_msg_position_target_local_ned_get_y(msg);
@@ -516,6 +530,8 @@ static inline void mavlink_msg_position_target_local_ned_decode(const mavlink_me
 	position_target_local_ned->type_mask = mavlink_msg_position_target_local_ned_get_type_mask(msg);
 	position_target_local_ned->coordinate_frame = mavlink_msg_position_target_local_ned_get_coordinate_frame(msg);
 #else
-	memcpy(position_target_local_ned, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN? msg->len : MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN;
+        memset(position_target_local_ned, 0, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED_LEN);
+	memcpy(position_target_local_ned, _MAV_PAYLOAD(msg), len);
 #endif
 }

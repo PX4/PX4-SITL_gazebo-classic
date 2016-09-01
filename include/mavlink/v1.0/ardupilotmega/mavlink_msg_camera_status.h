@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_CAMERA_STATUS 179
 
-typedef struct __mavlink_camera_status_t
-{
+MAVPACKED(
+typedef struct __mavlink_camera_status_t {
  uint64_t time_usec; /*< Image timestamp (microseconds since UNIX epoch, according to camera clock)*/
  float p1; /*< Parameter 1 (meaning depends on event, see CAMERA_STATUS_TYPES enum)*/
  float p2; /*< Parameter 2 (meaning depends on event, see CAMERA_STATUS_TYPES enum)*/
@@ -13,16 +13,35 @@ typedef struct __mavlink_camera_status_t
  uint8_t target_system; /*< System ID*/
  uint8_t cam_idx; /*< Camera ID*/
  uint8_t event_id; /*< See CAMERA_STATUS_TYPES enum for definition of the bitmask*/
-} mavlink_camera_status_t;
+}) mavlink_camera_status_t;
 
 #define MAVLINK_MSG_ID_CAMERA_STATUS_LEN 29
+#define MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN 29
 #define MAVLINK_MSG_ID_179_LEN 29
+#define MAVLINK_MSG_ID_179_MIN_LEN 29
 
 #define MAVLINK_MSG_ID_CAMERA_STATUS_CRC 189
 #define MAVLINK_MSG_ID_179_CRC 189
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_CAMERA_STATUS { \
+	179, \
+	"CAMERA_STATUS", \
+	9, \
+	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_camera_status_t, time_usec) }, \
+         { "p1", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_camera_status_t, p1) }, \
+         { "p2", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_camera_status_t, p2) }, \
+         { "p3", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_camera_status_t, p3) }, \
+         { "p4", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_camera_status_t, p4) }, \
+         { "img_idx", NULL, MAVLINK_TYPE_UINT16_T, 0, 24, offsetof(mavlink_camera_status_t, img_idx) }, \
+         { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 26, offsetof(mavlink_camera_status_t, target_system) }, \
+         { "cam_idx", NULL, MAVLINK_TYPE_UINT8_T, 0, 27, offsetof(mavlink_camera_status_t, cam_idx) }, \
+         { "event_id", NULL, MAVLINK_TYPE_UINT8_T, 0, 28, offsetof(mavlink_camera_status_t, event_id) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_CAMERA_STATUS { \
 	"CAMERA_STATUS", \
 	9, \
@@ -37,7 +56,7 @@ typedef struct __mavlink_camera_status_t
          { "event_id", NULL, MAVLINK_TYPE_UINT8_T, 0, 28, offsetof(mavlink_camera_status_t, event_id) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a camera_status message
@@ -88,11 +107,7 @@ static inline uint16_t mavlink_msg_camera_status_pack(uint8_t system_id, uint8_t
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CAMERA_STATUS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 }
 
 /**
@@ -145,11 +160,7 @@ static inline uint16_t mavlink_msg_camera_status_pack_chan(uint8_t system_id, ui
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CAMERA_STATUS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 }
 
 /**
@@ -209,11 +220,7 @@ static inline void mavlink_msg_camera_status_send(mavlink_channel_t chan, uint64
 	_mav_put_uint8_t(buf, 27, cam_idx);
 	_mav_put_uint8_t(buf, 28, event_id);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, buf, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, buf, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, buf, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 #else
 	mavlink_camera_status_t packet;
 	packet.time_usec = time_usec;
@@ -226,11 +233,21 @@ static inline void mavlink_msg_camera_status_send(mavlink_channel_t chan, uint64
 	packet.cam_idx = cam_idx;
 	packet.event_id = event_id;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 #endif
+}
+
+/**
+ * @brief Send a camera_status message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_camera_status_send_struct(mavlink_channel_t chan, const mavlink_camera_status_t* camera_status)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_camera_status_send(chan, camera_status->time_usec, camera_status->target_system, camera_status->cam_idx, camera_status->img_idx, camera_status->event_id, camera_status->p1, camera_status->p2, camera_status->p3, camera_status->p4);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)camera_status, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 #endif
 }
 
@@ -256,11 +273,7 @@ static inline void mavlink_msg_camera_status_send_buf(mavlink_message_t *msgbuf,
 	_mav_put_uint8_t(buf, 27, cam_idx);
 	_mav_put_uint8_t(buf, 28, event_id);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, buf, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, buf, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, buf, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 #else
 	mavlink_camera_status_t *packet = (mavlink_camera_status_t *)msgbuf;
 	packet->time_usec = time_usec;
@@ -273,11 +286,7 @@ static inline void mavlink_msg_camera_status_send_buf(mavlink_message_t *msgbuf,
 	packet->cam_idx = cam_idx;
 	packet->event_id = event_id;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)packet, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)packet, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_STATUS, (const char *)packet, MAVLINK_MSG_ID_CAMERA_STATUS_MIN_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_LEN, MAVLINK_MSG_ID_CAMERA_STATUS_CRC);
 #endif
 }
 #endif
@@ -385,7 +394,7 @@ static inline float mavlink_msg_camera_status_get_p4(const mavlink_message_t* ms
  */
 static inline void mavlink_msg_camera_status_decode(const mavlink_message_t* msg, mavlink_camera_status_t* camera_status)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	camera_status->time_usec = mavlink_msg_camera_status_get_time_usec(msg);
 	camera_status->p1 = mavlink_msg_camera_status_get_p1(msg);
 	camera_status->p2 = mavlink_msg_camera_status_get_p2(msg);
@@ -396,6 +405,8 @@ static inline void mavlink_msg_camera_status_decode(const mavlink_message_t* msg
 	camera_status->cam_idx = mavlink_msg_camera_status_get_cam_idx(msg);
 	camera_status->event_id = mavlink_msg_camera_status_get_event_id(msg);
 #else
-	memcpy(camera_status, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_CAMERA_STATUS_LEN? msg->len : MAVLINK_MSG_ID_CAMERA_STATUS_LEN;
+        memset(camera_status, 0, MAVLINK_MSG_ID_CAMERA_STATUS_LEN);
+	memcpy(camera_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

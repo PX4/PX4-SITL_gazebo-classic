@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_CAMERA_FEEDBACK 180
 
-typedef struct __mavlink_camera_feedback_t
-{
+MAVPACKED(
+typedef struct __mavlink_camera_feedback_t {
  uint64_t time_usec; /*< Image timestamp (microseconds since UNIX epoch), as passed in by CAMERA_STATUS message (or autopilot if no CCB)*/
  int32_t lat; /*< Latitude in (deg * 1E7)*/
  int32_t lng; /*< Longitude in (deg * 1E7)*/
@@ -17,16 +17,39 @@ typedef struct __mavlink_camera_feedback_t
  uint8_t target_system; /*< System ID*/
  uint8_t cam_idx; /*< Camera ID*/
  uint8_t flags; /*< See CAMERA_FEEDBACK_FLAGS enum for definition of the bitmask*/
-} mavlink_camera_feedback_t;
+}) mavlink_camera_feedback_t;
 
 #define MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN 45
+#define MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN 45
 #define MAVLINK_MSG_ID_180_LEN 45
+#define MAVLINK_MSG_ID_180_MIN_LEN 45
 
 #define MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC 52
 #define MAVLINK_MSG_ID_180_CRC 52
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_CAMERA_FEEDBACK { \
+	180, \
+	"CAMERA_FEEDBACK", \
+	13, \
+	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_camera_feedback_t, time_usec) }, \
+         { "lat", NULL, MAVLINK_TYPE_INT32_T, 0, 8, offsetof(mavlink_camera_feedback_t, lat) }, \
+         { "lng", NULL, MAVLINK_TYPE_INT32_T, 0, 12, offsetof(mavlink_camera_feedback_t, lng) }, \
+         { "alt_msl", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_camera_feedback_t, alt_msl) }, \
+         { "alt_rel", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_camera_feedback_t, alt_rel) }, \
+         { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_camera_feedback_t, roll) }, \
+         { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_camera_feedback_t, pitch) }, \
+         { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 32, offsetof(mavlink_camera_feedback_t, yaw) }, \
+         { "foc_len", NULL, MAVLINK_TYPE_FLOAT, 0, 36, offsetof(mavlink_camera_feedback_t, foc_len) }, \
+         { "img_idx", NULL, MAVLINK_TYPE_UINT16_T, 0, 40, offsetof(mavlink_camera_feedback_t, img_idx) }, \
+         { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 42, offsetof(mavlink_camera_feedback_t, target_system) }, \
+         { "cam_idx", NULL, MAVLINK_TYPE_UINT8_T, 0, 43, offsetof(mavlink_camera_feedback_t, cam_idx) }, \
+         { "flags", NULL, MAVLINK_TYPE_UINT8_T, 0, 44, offsetof(mavlink_camera_feedback_t, flags) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_CAMERA_FEEDBACK { \
 	"CAMERA_FEEDBACK", \
 	13, \
@@ -45,7 +68,7 @@ typedef struct __mavlink_camera_feedback_t
          { "flags", NULL, MAVLINK_TYPE_UINT8_T, 0, 44, offsetof(mavlink_camera_feedback_t, flags) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a camera_feedback message
@@ -108,11 +131,7 @@ static inline uint16_t mavlink_msg_camera_feedback_pack(uint8_t system_id, uint8
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CAMERA_FEEDBACK;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 }
 
 /**
@@ -177,11 +196,7 @@ static inline uint16_t mavlink_msg_camera_feedback_pack_chan(uint8_t system_id, 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CAMERA_FEEDBACK;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 }
 
 /**
@@ -249,11 +264,7 @@ static inline void mavlink_msg_camera_feedback_send(mavlink_channel_t chan, uint
 	_mav_put_uint8_t(buf, 43, cam_idx);
 	_mav_put_uint8_t(buf, 44, flags);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, buf, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, buf, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, buf, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 #else
 	mavlink_camera_feedback_t packet;
 	packet.time_usec = time_usec;
@@ -270,11 +281,21 @@ static inline void mavlink_msg_camera_feedback_send(mavlink_channel_t chan, uint
 	packet.cam_idx = cam_idx;
 	packet.flags = flags;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 #endif
+}
+
+/**
+ * @brief Send a camera_feedback message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_camera_feedback_send_struct(mavlink_channel_t chan, const mavlink_camera_feedback_t* camera_feedback)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_camera_feedback_send(chan, camera_feedback->time_usec, camera_feedback->target_system, camera_feedback->cam_idx, camera_feedback->img_idx, camera_feedback->lat, camera_feedback->lng, camera_feedback->alt_msl, camera_feedback->alt_rel, camera_feedback->roll, camera_feedback->pitch, camera_feedback->yaw, camera_feedback->foc_len, camera_feedback->flags);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)camera_feedback, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 #endif
 }
 
@@ -304,11 +325,7 @@ static inline void mavlink_msg_camera_feedback_send_buf(mavlink_message_t *msgbu
 	_mav_put_uint8_t(buf, 43, cam_idx);
 	_mav_put_uint8_t(buf, 44, flags);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, buf, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, buf, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, buf, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 #else
 	mavlink_camera_feedback_t *packet = (mavlink_camera_feedback_t *)msgbuf;
 	packet->time_usec = time_usec;
@@ -325,11 +342,7 @@ static inline void mavlink_msg_camera_feedback_send_buf(mavlink_message_t *msgbu
 	packet->cam_idx = cam_idx;
 	packet->flags = flags;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)packet, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)packet, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_FEEDBACK, (const char *)packet, MAVLINK_MSG_ID_CAMERA_FEEDBACK_MIN_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN, MAVLINK_MSG_ID_CAMERA_FEEDBACK_CRC);
 #endif
 }
 #endif
@@ -477,7 +490,7 @@ static inline uint8_t mavlink_msg_camera_feedback_get_flags(const mavlink_messag
  */
 static inline void mavlink_msg_camera_feedback_decode(const mavlink_message_t* msg, mavlink_camera_feedback_t* camera_feedback)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	camera_feedback->time_usec = mavlink_msg_camera_feedback_get_time_usec(msg);
 	camera_feedback->lat = mavlink_msg_camera_feedback_get_lat(msg);
 	camera_feedback->lng = mavlink_msg_camera_feedback_get_lng(msg);
@@ -492,6 +505,8 @@ static inline void mavlink_msg_camera_feedback_decode(const mavlink_message_t* m
 	camera_feedback->cam_idx = mavlink_msg_camera_feedback_get_cam_idx(msg);
 	camera_feedback->flags = mavlink_msg_camera_feedback_get_flags(msg);
 #else
-	memcpy(camera_feedback, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN? msg->len : MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN;
+        memset(camera_feedback, 0, MAVLINK_MSG_ID_CAMERA_FEEDBACK_LEN);
+	memcpy(camera_feedback, _MAV_PAYLOAD(msg), len);
 #endif
 }

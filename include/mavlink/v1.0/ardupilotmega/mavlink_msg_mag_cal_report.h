@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT 192
 
-typedef struct __mavlink_mag_cal_report_t
-{
+MAVPACKED(
+typedef struct __mavlink_mag_cal_report_t {
  float fitness; /*< RMS milligauss residuals*/
  float ofs_x; /*< X offset*/
  float ofs_y; /*< Y offset*/
@@ -18,16 +18,40 @@ typedef struct __mavlink_mag_cal_report_t
  uint8_t cal_mask; /*< Bitmask of compasses being calibrated*/
  uint8_t cal_status; /*< Status (see MAG_CAL_STATUS enum)*/
  uint8_t autosaved; /*< 0=requires a MAV_CMD_DO_ACCEPT_MAG_CAL, 1=saved to parameters*/
-} mavlink_mag_cal_report_t;
+}) mavlink_mag_cal_report_t;
 
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN 44
+#define MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN 44
 #define MAVLINK_MSG_ID_192_LEN 44
+#define MAVLINK_MSG_ID_192_MIN_LEN 44
 
 #define MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC 36
 #define MAVLINK_MSG_ID_192_CRC 36
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MAG_CAL_REPORT { \
+	192, \
+	"MAG_CAL_REPORT", \
+	14, \
+	{  { "fitness", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_mag_cal_report_t, fitness) }, \
+         { "ofs_x", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_mag_cal_report_t, ofs_x) }, \
+         { "ofs_y", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_mag_cal_report_t, ofs_y) }, \
+         { "ofs_z", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_mag_cal_report_t, ofs_z) }, \
+         { "diag_x", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_mag_cal_report_t, diag_x) }, \
+         { "diag_y", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_mag_cal_report_t, diag_y) }, \
+         { "diag_z", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_mag_cal_report_t, diag_z) }, \
+         { "offdiag_x", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_mag_cal_report_t, offdiag_x) }, \
+         { "offdiag_y", NULL, MAVLINK_TYPE_FLOAT, 0, 32, offsetof(mavlink_mag_cal_report_t, offdiag_y) }, \
+         { "offdiag_z", NULL, MAVLINK_TYPE_FLOAT, 0, 36, offsetof(mavlink_mag_cal_report_t, offdiag_z) }, \
+         { "compass_id", NULL, MAVLINK_TYPE_UINT8_T, 0, 40, offsetof(mavlink_mag_cal_report_t, compass_id) }, \
+         { "cal_mask", NULL, MAVLINK_TYPE_UINT8_T, 0, 41, offsetof(mavlink_mag_cal_report_t, cal_mask) }, \
+         { "cal_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 42, offsetof(mavlink_mag_cal_report_t, cal_status) }, \
+         { "autosaved", NULL, MAVLINK_TYPE_UINT8_T, 0, 43, offsetof(mavlink_mag_cal_report_t, autosaved) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MAG_CAL_REPORT { \
 	"MAG_CAL_REPORT", \
 	14, \
@@ -47,7 +71,7 @@ typedef struct __mavlink_mag_cal_report_t
          { "autosaved", NULL, MAVLINK_TYPE_UINT8_T, 0, 43, offsetof(mavlink_mag_cal_report_t, autosaved) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a mag_cal_report message
@@ -113,11 +137,7 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MAG_CAL_REPORT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 }
 
 /**
@@ -185,11 +205,7 @@ static inline uint16_t mavlink_msg_mag_cal_report_pack_chan(uint8_t system_id, u
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MAG_CAL_REPORT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 }
 
 /**
@@ -259,11 +275,7 @@ static inline void mavlink_msg_mag_cal_report_send(mavlink_channel_t chan, uint8
 	_mav_put_uint8_t(buf, 42, cal_status);
 	_mav_put_uint8_t(buf, 43, autosaved);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 #else
 	mavlink_mag_cal_report_t packet;
 	packet.fitness = fitness;
@@ -281,11 +293,21 @@ static inline void mavlink_msg_mag_cal_report_send(mavlink_channel_t chan, uint8
 	packet.cal_status = cal_status;
 	packet.autosaved = autosaved;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)&packet, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)&packet, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)&packet, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a mag_cal_report message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_mag_cal_report_send_struct(mavlink_channel_t chan, const mavlink_mag_cal_report_t* mag_cal_report)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_mag_cal_report_send(chan, mag_cal_report->compass_id, mag_cal_report->cal_mask, mag_cal_report->cal_status, mag_cal_report->autosaved, mag_cal_report->fitness, mag_cal_report->ofs_x, mag_cal_report->ofs_y, mag_cal_report->ofs_z, mag_cal_report->diag_x, mag_cal_report->diag_y, mag_cal_report->diag_z, mag_cal_report->offdiag_x, mag_cal_report->offdiag_y, mag_cal_report->offdiag_z);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)mag_cal_report, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 #endif
 }
 
@@ -316,11 +338,7 @@ static inline void mavlink_msg_mag_cal_report_send_buf(mavlink_message_t *msgbuf
 	_mav_put_uint8_t(buf, 42, cal_status);
 	_mav_put_uint8_t(buf, 43, autosaved);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, buf, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 #else
 	mavlink_mag_cal_report_t *packet = (mavlink_mag_cal_report_t *)msgbuf;
 	packet->fitness = fitness;
@@ -338,11 +356,7 @@ static inline void mavlink_msg_mag_cal_report_send_buf(mavlink_message_t *msgbuf
 	packet->cal_status = cal_status;
 	packet->autosaved = autosaved;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)packet, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)packet, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_REPORT, (const char *)packet, MAVLINK_MSG_ID_MAG_CAL_REPORT_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN, MAVLINK_MSG_ID_MAG_CAL_REPORT_CRC);
 #endif
 }
 #endif
@@ -500,7 +514,7 @@ static inline float mavlink_msg_mag_cal_report_get_offdiag_z(const mavlink_messa
  */
 static inline void mavlink_msg_mag_cal_report_decode(const mavlink_message_t* msg, mavlink_mag_cal_report_t* mag_cal_report)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mag_cal_report->fitness = mavlink_msg_mag_cal_report_get_fitness(msg);
 	mag_cal_report->ofs_x = mavlink_msg_mag_cal_report_get_ofs_x(msg);
 	mag_cal_report->ofs_y = mavlink_msg_mag_cal_report_get_ofs_y(msg);
@@ -516,6 +530,8 @@ static inline void mavlink_msg_mag_cal_report_decode(const mavlink_message_t* ms
 	mag_cal_report->cal_status = mavlink_msg_mag_cal_report_get_cal_status(msg);
 	mag_cal_report->autosaved = mavlink_msg_mag_cal_report_get_autosaved(msg);
 #else
-	memcpy(mag_cal_report, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN? msg->len : MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN;
+        memset(mag_cal_report, 0, MAVLINK_MSG_ID_MAG_CAL_REPORT_LEN);
+	memcpy(mag_cal_report, _MAV_PAYLOAD(msg), len);
 #endif
 }

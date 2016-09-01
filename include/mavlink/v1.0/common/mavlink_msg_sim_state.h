@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_SIM_STATE 108
 
-typedef struct __mavlink_sim_state_t
-{
+MAVPACKED(
+typedef struct __mavlink_sim_state_t {
  float q1; /*< True attitude quaternion component 1, w (1 in null-rotation)*/
  float q2; /*< True attitude quaternion component 2, x (0 in null-rotation)*/
  float q3; /*< True attitude quaternion component 3, y (0 in null-rotation)*/
@@ -25,16 +25,47 @@ typedef struct __mavlink_sim_state_t
  float vn; /*< True velocity in m/s in NORTH direction in earth-fixed NED frame*/
  float ve; /*< True velocity in m/s in EAST direction in earth-fixed NED frame*/
  float vd; /*< True velocity in m/s in DOWN direction in earth-fixed NED frame*/
-} mavlink_sim_state_t;
+}) mavlink_sim_state_t;
 
 #define MAVLINK_MSG_ID_SIM_STATE_LEN 84
+#define MAVLINK_MSG_ID_SIM_STATE_MIN_LEN 84
 #define MAVLINK_MSG_ID_108_LEN 84
+#define MAVLINK_MSG_ID_108_MIN_LEN 84
 
 #define MAVLINK_MSG_ID_SIM_STATE_CRC 32
 #define MAVLINK_MSG_ID_108_CRC 32
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SIM_STATE { \
+	108, \
+	"SIM_STATE", \
+	21, \
+	{  { "q1", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_sim_state_t, q1) }, \
+         { "q2", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_sim_state_t, q2) }, \
+         { "q3", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_sim_state_t, q3) }, \
+         { "q4", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_sim_state_t, q4) }, \
+         { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_sim_state_t, roll) }, \
+         { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_sim_state_t, pitch) }, \
+         { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_sim_state_t, yaw) }, \
+         { "xacc", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_sim_state_t, xacc) }, \
+         { "yacc", NULL, MAVLINK_TYPE_FLOAT, 0, 32, offsetof(mavlink_sim_state_t, yacc) }, \
+         { "zacc", NULL, MAVLINK_TYPE_FLOAT, 0, 36, offsetof(mavlink_sim_state_t, zacc) }, \
+         { "xgyro", NULL, MAVLINK_TYPE_FLOAT, 0, 40, offsetof(mavlink_sim_state_t, xgyro) }, \
+         { "ygyro", NULL, MAVLINK_TYPE_FLOAT, 0, 44, offsetof(mavlink_sim_state_t, ygyro) }, \
+         { "zgyro", NULL, MAVLINK_TYPE_FLOAT, 0, 48, offsetof(mavlink_sim_state_t, zgyro) }, \
+         { "lat", NULL, MAVLINK_TYPE_FLOAT, 0, 52, offsetof(mavlink_sim_state_t, lat) }, \
+         { "lon", NULL, MAVLINK_TYPE_FLOAT, 0, 56, offsetof(mavlink_sim_state_t, lon) }, \
+         { "alt", NULL, MAVLINK_TYPE_FLOAT, 0, 60, offsetof(mavlink_sim_state_t, alt) }, \
+         { "std_dev_horz", NULL, MAVLINK_TYPE_FLOAT, 0, 64, offsetof(mavlink_sim_state_t, std_dev_horz) }, \
+         { "std_dev_vert", NULL, MAVLINK_TYPE_FLOAT, 0, 68, offsetof(mavlink_sim_state_t, std_dev_vert) }, \
+         { "vn", NULL, MAVLINK_TYPE_FLOAT, 0, 72, offsetof(mavlink_sim_state_t, vn) }, \
+         { "ve", NULL, MAVLINK_TYPE_FLOAT, 0, 76, offsetof(mavlink_sim_state_t, ve) }, \
+         { "vd", NULL, MAVLINK_TYPE_FLOAT, 0, 80, offsetof(mavlink_sim_state_t, vd) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SIM_STATE { \
 	"SIM_STATE", \
 	21, \
@@ -61,7 +92,7 @@ typedef struct __mavlink_sim_state_t
          { "vd", NULL, MAVLINK_TYPE_FLOAT, 0, 80, offsetof(mavlink_sim_state_t, vd) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a sim_state message
@@ -148,11 +179,7 @@ static inline uint16_t mavlink_msg_sim_state_pack(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SIM_STATE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SIM_STATE_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 }
 
 /**
@@ -241,11 +268,7 @@ static inline uint16_t mavlink_msg_sim_state_pack_chan(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SIM_STATE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SIM_STATE_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 }
 
 /**
@@ -329,11 +352,7 @@ static inline void mavlink_msg_sim_state_send(mavlink_channel_t chan, float q1, 
 	_mav_put_float(buf, 76, ve);
 	_mav_put_float(buf, 80, vd);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, buf, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, buf, MAVLINK_MSG_ID_SIM_STATE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, buf, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 #else
 	mavlink_sim_state_t packet;
 	packet.q1 = q1;
@@ -358,11 +377,21 @@ static inline void mavlink_msg_sim_state_send(mavlink_channel_t chan, float q1, 
 	packet.ve = ve;
 	packet.vd = vd;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)&packet, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)&packet, MAVLINK_MSG_ID_SIM_STATE_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)&packet, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 #endif
+}
+
+/**
+ * @brief Send a sim_state message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_sim_state_send_struct(mavlink_channel_t chan, const mavlink_sim_state_t* sim_state)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_sim_state_send(chan, sim_state->q1, sim_state->q2, sim_state->q3, sim_state->q4, sim_state->roll, sim_state->pitch, sim_state->yaw, sim_state->xacc, sim_state->yacc, sim_state->zacc, sim_state->xgyro, sim_state->ygyro, sim_state->zgyro, sim_state->lat, sim_state->lon, sim_state->alt, sim_state->std_dev_horz, sim_state->std_dev_vert, sim_state->vn, sim_state->ve, sim_state->vd);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)sim_state, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 #endif
 }
 
@@ -400,11 +429,7 @@ static inline void mavlink_msg_sim_state_send_buf(mavlink_message_t *msgbuf, mav
 	_mav_put_float(buf, 76, ve);
 	_mav_put_float(buf, 80, vd);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, buf, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, buf, MAVLINK_MSG_ID_SIM_STATE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, buf, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 #else
 	mavlink_sim_state_t *packet = (mavlink_sim_state_t *)msgbuf;
 	packet->q1 = q1;
@@ -429,11 +454,7 @@ static inline void mavlink_msg_sim_state_send_buf(mavlink_message_t *msgbuf, mav
 	packet->ve = ve;
 	packet->vd = vd;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)packet, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)packet, MAVLINK_MSG_ID_SIM_STATE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SIM_STATE, (const char *)packet, MAVLINK_MSG_ID_SIM_STATE_MIN_LEN, MAVLINK_MSG_ID_SIM_STATE_LEN, MAVLINK_MSG_ID_SIM_STATE_CRC);
 #endif
 }
 #endif
@@ -661,7 +682,7 @@ static inline float mavlink_msg_sim_state_get_vd(const mavlink_message_t* msg)
  */
 static inline void mavlink_msg_sim_state_decode(const mavlink_message_t* msg, mavlink_sim_state_t* sim_state)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	sim_state->q1 = mavlink_msg_sim_state_get_q1(msg);
 	sim_state->q2 = mavlink_msg_sim_state_get_q2(msg);
 	sim_state->q3 = mavlink_msg_sim_state_get_q3(msg);
@@ -684,6 +705,8 @@ static inline void mavlink_msg_sim_state_decode(const mavlink_message_t* msg, ma
 	sim_state->ve = mavlink_msg_sim_state_get_ve(msg);
 	sim_state->vd = mavlink_msg_sim_state_get_vd(msg);
 #else
-	memcpy(sim_state, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SIM_STATE_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SIM_STATE_LEN? msg->len : MAVLINK_MSG_ID_SIM_STATE_LEN;
+        memset(sim_state, 0, MAVLINK_MSG_ID_SIM_STATE_LEN);
+	memcpy(sim_state, _MAV_PAYLOAD(msg), len);
 #endif
 }

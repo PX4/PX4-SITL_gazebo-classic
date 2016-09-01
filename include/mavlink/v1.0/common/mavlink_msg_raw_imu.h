@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_RAW_IMU 27
 
-typedef struct __mavlink_raw_imu_t
-{
+MAVPACKED(
+typedef struct __mavlink_raw_imu_t {
  uint64_t time_usec; /*< Timestamp (microseconds since UNIX epoch or microseconds since system boot)*/
  int16_t xacc; /*< X acceleration (raw)*/
  int16_t yacc; /*< Y acceleration (raw)*/
@@ -14,16 +14,36 @@ typedef struct __mavlink_raw_imu_t
  int16_t xmag; /*< X Magnetic field (raw)*/
  int16_t ymag; /*< Y Magnetic field (raw)*/
  int16_t zmag; /*< Z Magnetic field (raw)*/
-} mavlink_raw_imu_t;
+}) mavlink_raw_imu_t;
 
 #define MAVLINK_MSG_ID_RAW_IMU_LEN 26
+#define MAVLINK_MSG_ID_RAW_IMU_MIN_LEN 26
 #define MAVLINK_MSG_ID_27_LEN 26
+#define MAVLINK_MSG_ID_27_MIN_LEN 26
 
 #define MAVLINK_MSG_ID_RAW_IMU_CRC 144
 #define MAVLINK_MSG_ID_27_CRC 144
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_RAW_IMU { \
+	27, \
+	"RAW_IMU", \
+	10, \
+	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_raw_imu_t, time_usec) }, \
+         { "xacc", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_raw_imu_t, xacc) }, \
+         { "yacc", NULL, MAVLINK_TYPE_INT16_T, 0, 10, offsetof(mavlink_raw_imu_t, yacc) }, \
+         { "zacc", NULL, MAVLINK_TYPE_INT16_T, 0, 12, offsetof(mavlink_raw_imu_t, zacc) }, \
+         { "xgyro", NULL, MAVLINK_TYPE_INT16_T, 0, 14, offsetof(mavlink_raw_imu_t, xgyro) }, \
+         { "ygyro", NULL, MAVLINK_TYPE_INT16_T, 0, 16, offsetof(mavlink_raw_imu_t, ygyro) }, \
+         { "zgyro", NULL, MAVLINK_TYPE_INT16_T, 0, 18, offsetof(mavlink_raw_imu_t, zgyro) }, \
+         { "xmag", NULL, MAVLINK_TYPE_INT16_T, 0, 20, offsetof(mavlink_raw_imu_t, xmag) }, \
+         { "ymag", NULL, MAVLINK_TYPE_INT16_T, 0, 22, offsetof(mavlink_raw_imu_t, ymag) }, \
+         { "zmag", NULL, MAVLINK_TYPE_INT16_T, 0, 24, offsetof(mavlink_raw_imu_t, zmag) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_RAW_IMU { \
 	"RAW_IMU", \
 	10, \
@@ -39,7 +59,7 @@ typedef struct __mavlink_raw_imu_t
          { "zmag", NULL, MAVLINK_TYPE_INT16_T, 0, 24, offsetof(mavlink_raw_imu_t, zmag) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a raw_imu message
@@ -93,11 +113,7 @@ static inline uint16_t mavlink_msg_raw_imu_pack(uint8_t system_id, uint8_t compo
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RAW_IMU;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RAW_IMU_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 }
 
 /**
@@ -153,11 +169,7 @@ static inline uint16_t mavlink_msg_raw_imu_pack_chan(uint8_t system_id, uint8_t 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RAW_IMU;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RAW_IMU_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 }
 
 /**
@@ -219,11 +231,7 @@ static inline void mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t tim
 	_mav_put_int16_t(buf, 22, ymag);
 	_mav_put_int16_t(buf, 24, zmag);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, buf, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, buf, MAVLINK_MSG_ID_RAW_IMU_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, buf, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 #else
 	mavlink_raw_imu_t packet;
 	packet.time_usec = time_usec;
@@ -237,11 +245,21 @@ static inline void mavlink_msg_raw_imu_send(mavlink_channel_t chan, uint64_t tim
 	packet.ymag = ymag;
 	packet.zmag = zmag;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)&packet, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)&packet, MAVLINK_MSG_ID_RAW_IMU_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)&packet, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 #endif
+}
+
+/**
+ * @brief Send a raw_imu message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_raw_imu_send_struct(mavlink_channel_t chan, const mavlink_raw_imu_t* raw_imu)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_raw_imu_send(chan, raw_imu->time_usec, raw_imu->xacc, raw_imu->yacc, raw_imu->zacc, raw_imu->xgyro, raw_imu->ygyro, raw_imu->zgyro, raw_imu->xmag, raw_imu->ymag, raw_imu->zmag);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)raw_imu, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 #endif
 }
 
@@ -268,11 +286,7 @@ static inline void mavlink_msg_raw_imu_send_buf(mavlink_message_t *msgbuf, mavli
 	_mav_put_int16_t(buf, 22, ymag);
 	_mav_put_int16_t(buf, 24, zmag);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, buf, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, buf, MAVLINK_MSG_ID_RAW_IMU_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, buf, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 #else
 	mavlink_raw_imu_t *packet = (mavlink_raw_imu_t *)msgbuf;
 	packet->time_usec = time_usec;
@@ -286,11 +300,7 @@ static inline void mavlink_msg_raw_imu_send_buf(mavlink_message_t *msgbuf, mavli
 	packet->ymag = ymag;
 	packet->zmag = zmag;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)packet, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)packet, MAVLINK_MSG_ID_RAW_IMU_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RAW_IMU, (const char *)packet, MAVLINK_MSG_ID_RAW_IMU_MIN_LEN, MAVLINK_MSG_ID_RAW_IMU_LEN, MAVLINK_MSG_ID_RAW_IMU_CRC);
 #endif
 }
 #endif
@@ -408,7 +418,7 @@ static inline int16_t mavlink_msg_raw_imu_get_zmag(const mavlink_message_t* msg)
  */
 static inline void mavlink_msg_raw_imu_decode(const mavlink_message_t* msg, mavlink_raw_imu_t* raw_imu)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	raw_imu->time_usec = mavlink_msg_raw_imu_get_time_usec(msg);
 	raw_imu->xacc = mavlink_msg_raw_imu_get_xacc(msg);
 	raw_imu->yacc = mavlink_msg_raw_imu_get_yacc(msg);
@@ -420,6 +430,8 @@ static inline void mavlink_msg_raw_imu_decode(const mavlink_message_t* msg, mavl
 	raw_imu->ymag = mavlink_msg_raw_imu_get_ymag(msg);
 	raw_imu->zmag = mavlink_msg_raw_imu_get_zmag(msg);
 #else
-	memcpy(raw_imu, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_RAW_IMU_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_RAW_IMU_LEN? msg->len : MAVLINK_MSG_ID_RAW_IMU_LEN;
+        memset(raw_imu, 0, MAVLINK_MSG_ID_RAW_IMU_LEN);
+	memcpy(raw_imu, _MAV_PAYLOAD(msg), len);
 #endif
 }

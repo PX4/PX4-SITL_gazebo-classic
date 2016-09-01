@@ -2,20 +2,32 @@
 
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER 112
 
-typedef struct __mavlink_camera_trigger_t
-{
+MAVPACKED(
+typedef struct __mavlink_camera_trigger_t {
  uint64_t time_usec; /*< Timestamp for the image frame in microseconds*/
  uint32_t seq; /*< Image frame sequence*/
-} mavlink_camera_trigger_t;
+}) mavlink_camera_trigger_t;
 
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN 12
+#define MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN 12
 #define MAVLINK_MSG_ID_112_LEN 12
+#define MAVLINK_MSG_ID_112_MIN_LEN 12
 
 #define MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC 174
 #define MAVLINK_MSG_ID_112_CRC 174
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_CAMERA_TRIGGER { \
+	112, \
+	"CAMERA_TRIGGER", \
+	2, \
+	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_camera_trigger_t, time_usec) }, \
+         { "seq", NULL, MAVLINK_TYPE_UINT32_T, 0, 8, offsetof(mavlink_camera_trigger_t, seq) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_CAMERA_TRIGGER { \
 	"CAMERA_TRIGGER", \
 	2, \
@@ -23,7 +35,7 @@ typedef struct __mavlink_camera_trigger_t
          { "seq", NULL, MAVLINK_TYPE_UINT32_T, 0, 8, offsetof(mavlink_camera_trigger_t, seq) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a camera_trigger message
@@ -53,11 +65,7 @@ static inline uint16_t mavlink_msg_camera_trigger_pack(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CAMERA_TRIGGER;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 }
 
 /**
@@ -89,11 +97,7 @@ static inline uint16_t mavlink_msg_camera_trigger_pack_chan(uint8_t system_id, u
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CAMERA_TRIGGER;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 }
 
 /**
@@ -139,21 +143,27 @@ static inline void mavlink_msg_camera_trigger_send(mavlink_channel_t chan, uint6
 	_mav_put_uint64_t(buf, 0, time_usec);
 	_mav_put_uint32_t(buf, 8, seq);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, buf, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, buf, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, buf, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 #else
 	mavlink_camera_trigger_t packet;
 	packet.time_usec = time_usec;
 	packet.seq = seq;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)&packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 #endif
+}
+
+/**
+ * @brief Send a camera_trigger message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_camera_trigger_send_struct(mavlink_channel_t chan, const mavlink_camera_trigger_t* camera_trigger)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_camera_trigger_send(chan, camera_trigger->time_usec, camera_trigger->seq);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)camera_trigger, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 #endif
 }
 
@@ -172,21 +182,13 @@ static inline void mavlink_msg_camera_trigger_send_buf(mavlink_message_t *msgbuf
 	_mav_put_uint64_t(buf, 0, time_usec);
 	_mav_put_uint32_t(buf, 8, seq);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, buf, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, buf, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, buf, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 #else
 	mavlink_camera_trigger_t *packet = (mavlink_camera_trigger_t *)msgbuf;
 	packet->time_usec = time_usec;
 	packet->seq = seq;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CAMERA_TRIGGER, (const char *)packet, MAVLINK_MSG_ID_CAMERA_TRIGGER_MIN_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN, MAVLINK_MSG_ID_CAMERA_TRIGGER_CRC);
 #endif
 }
 #endif
@@ -224,10 +226,12 @@ static inline uint32_t mavlink_msg_camera_trigger_get_seq(const mavlink_message_
  */
 static inline void mavlink_msg_camera_trigger_decode(const mavlink_message_t* msg, mavlink_camera_trigger_t* camera_trigger)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	camera_trigger->time_usec = mavlink_msg_camera_trigger_get_time_usec(msg);
 	camera_trigger->seq = mavlink_msg_camera_trigger_get_seq(msg);
 #else
-	memcpy(camera_trigger, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN? msg->len : MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN;
+        memset(camera_trigger, 0, MAVLINK_MSG_ID_CAMERA_TRIGGER_LEN);
+	memcpy(camera_trigger, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_ATTITUDE 30
 
-typedef struct __mavlink_attitude_t
-{
+MAVPACKED(
+typedef struct __mavlink_attitude_t {
  uint32_t time_boot_ms; /*< Timestamp (milliseconds since system boot)*/
  float roll; /*< Roll angle (rad, -pi..+pi)*/
  float pitch; /*< Pitch angle (rad, -pi..+pi)*/
@@ -11,16 +11,33 @@ typedef struct __mavlink_attitude_t
  float rollspeed; /*< Roll angular speed (rad/s)*/
  float pitchspeed; /*< Pitch angular speed (rad/s)*/
  float yawspeed; /*< Yaw angular speed (rad/s)*/
-} mavlink_attitude_t;
+}) mavlink_attitude_t;
 
 #define MAVLINK_MSG_ID_ATTITUDE_LEN 28
+#define MAVLINK_MSG_ID_ATTITUDE_MIN_LEN 28
 #define MAVLINK_MSG_ID_30_LEN 28
+#define MAVLINK_MSG_ID_30_MIN_LEN 28
 
 #define MAVLINK_MSG_ID_ATTITUDE_CRC 39
 #define MAVLINK_MSG_ID_30_CRC 39
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_ATTITUDE { \
+	30, \
+	"ATTITUDE", \
+	7, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_attitude_t, time_boot_ms) }, \
+         { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_attitude_t, roll) }, \
+         { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_attitude_t, pitch) }, \
+         { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_attitude_t, yaw) }, \
+         { "rollspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_attitude_t, rollspeed) }, \
+         { "pitchspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_attitude_t, pitchspeed) }, \
+         { "yawspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_attitude_t, yawspeed) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_ATTITUDE { \
 	"ATTITUDE", \
 	7, \
@@ -33,7 +50,7 @@ typedef struct __mavlink_attitude_t
          { "yawspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_attitude_t, yawspeed) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a attitude message
@@ -78,11 +95,7 @@ static inline uint16_t mavlink_msg_attitude_pack(uint8_t system_id, uint8_t comp
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ATTITUDE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ATTITUDE_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 }
 
 /**
@@ -129,11 +142,7 @@ static inline uint16_t mavlink_msg_attitude_pack_chan(uint8_t system_id, uint8_t
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ATTITUDE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ATTITUDE_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 }
 
 /**
@@ -189,11 +198,7 @@ static inline void mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t ti
 	_mav_put_float(buf, 20, pitchspeed);
 	_mav_put_float(buf, 24, yawspeed);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, buf, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, buf, MAVLINK_MSG_ID_ATTITUDE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, buf, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 #else
 	mavlink_attitude_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -204,11 +209,21 @@ static inline void mavlink_msg_attitude_send(mavlink_channel_t chan, uint32_t ti
 	packet.pitchspeed = pitchspeed;
 	packet.yawspeed = yawspeed;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)&packet, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)&packet, MAVLINK_MSG_ID_ATTITUDE_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)&packet, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 #endif
+}
+
+/**
+ * @brief Send a attitude message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_attitude_send_struct(mavlink_channel_t chan, const mavlink_attitude_t* attitude)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_attitude_send(chan, attitude->time_boot_ms, attitude->roll, attitude->pitch, attitude->yaw, attitude->rollspeed, attitude->pitchspeed, attitude->yawspeed);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)attitude, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 #endif
 }
 
@@ -232,11 +247,7 @@ static inline void mavlink_msg_attitude_send_buf(mavlink_message_t *msgbuf, mavl
 	_mav_put_float(buf, 20, pitchspeed);
 	_mav_put_float(buf, 24, yawspeed);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, buf, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, buf, MAVLINK_MSG_ID_ATTITUDE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, buf, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 #else
 	mavlink_attitude_t *packet = (mavlink_attitude_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -247,11 +258,7 @@ static inline void mavlink_msg_attitude_send_buf(mavlink_message_t *msgbuf, mavl
 	packet->pitchspeed = pitchspeed;
 	packet->yawspeed = yawspeed;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)packet, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)packet, MAVLINK_MSG_ID_ATTITUDE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ATTITUDE, (const char *)packet, MAVLINK_MSG_ID_ATTITUDE_MIN_LEN, MAVLINK_MSG_ID_ATTITUDE_LEN, MAVLINK_MSG_ID_ATTITUDE_CRC);
 #endif
 }
 #endif
@@ -339,7 +346,7 @@ static inline float mavlink_msg_attitude_get_yawspeed(const mavlink_message_t* m
  */
 static inline void mavlink_msg_attitude_decode(const mavlink_message_t* msg, mavlink_attitude_t* attitude)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	attitude->time_boot_ms = mavlink_msg_attitude_get_time_boot_ms(msg);
 	attitude->roll = mavlink_msg_attitude_get_roll(msg);
 	attitude->pitch = mavlink_msg_attitude_get_pitch(msg);
@@ -348,6 +355,8 @@ static inline void mavlink_msg_attitude_decode(const mavlink_message_t* msg, mav
 	attitude->pitchspeed = mavlink_msg_attitude_get_pitchspeed(msg);
 	attitude->yawspeed = mavlink_msg_attitude_get_yawspeed(msg);
 #else
-	memcpy(attitude, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_ATTITUDE_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_ATTITUDE_LEN? msg->len : MAVLINK_MSG_ID_ATTITUDE_LEN;
+        memset(attitude, 0, MAVLINK_MSG_ID_ATTITUDE_LEN);
+	memcpy(attitude, _MAV_PAYLOAD(msg), len);
 #endif
 }

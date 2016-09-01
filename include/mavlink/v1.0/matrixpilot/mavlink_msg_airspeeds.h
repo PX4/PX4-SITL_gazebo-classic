@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_AIRSPEEDS 182
 
-typedef struct __mavlink_airspeeds_t
-{
+MAVPACKED(
+typedef struct __mavlink_airspeeds_t {
  uint32_t time_boot_ms; /*< Timestamp (milliseconds since system boot)*/
  int16_t airspeed_imu; /*< Airspeed estimate from IMU, cm/s*/
  int16_t airspeed_pitot; /*< Pitot measured forward airpseed, cm/s*/
@@ -11,16 +11,33 @@ typedef struct __mavlink_airspeeds_t
  int16_t airspeed_ultrasonic; /*< Ultrasonic measured airspeed, cm/s*/
  int16_t aoa; /*< Angle of attack sensor, degrees * 10*/
  int16_t aoy; /*< Yaw angle sensor, degrees * 10*/
-} mavlink_airspeeds_t;
+}) mavlink_airspeeds_t;
 
 #define MAVLINK_MSG_ID_AIRSPEEDS_LEN 16
+#define MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN 16
 #define MAVLINK_MSG_ID_182_LEN 16
+#define MAVLINK_MSG_ID_182_MIN_LEN 16
 
 #define MAVLINK_MSG_ID_AIRSPEEDS_CRC 154
 #define MAVLINK_MSG_ID_182_CRC 154
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_AIRSPEEDS { \
+	182, \
+	"AIRSPEEDS", \
+	7, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_airspeeds_t, time_boot_ms) }, \
+         { "airspeed_imu", NULL, MAVLINK_TYPE_INT16_T, 0, 4, offsetof(mavlink_airspeeds_t, airspeed_imu) }, \
+         { "airspeed_pitot", NULL, MAVLINK_TYPE_INT16_T, 0, 6, offsetof(mavlink_airspeeds_t, airspeed_pitot) }, \
+         { "airspeed_hot_wire", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_airspeeds_t, airspeed_hot_wire) }, \
+         { "airspeed_ultrasonic", NULL, MAVLINK_TYPE_INT16_T, 0, 10, offsetof(mavlink_airspeeds_t, airspeed_ultrasonic) }, \
+         { "aoa", NULL, MAVLINK_TYPE_INT16_T, 0, 12, offsetof(mavlink_airspeeds_t, aoa) }, \
+         { "aoy", NULL, MAVLINK_TYPE_INT16_T, 0, 14, offsetof(mavlink_airspeeds_t, aoy) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_AIRSPEEDS { \
 	"AIRSPEEDS", \
 	7, \
@@ -33,7 +50,7 @@ typedef struct __mavlink_airspeeds_t
          { "aoy", NULL, MAVLINK_TYPE_INT16_T, 0, 14, offsetof(mavlink_airspeeds_t, aoy) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a airspeeds message
@@ -78,11 +95,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AIRSPEEDS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 }
 
 /**
@@ -129,11 +142,7 @@ static inline uint16_t mavlink_msg_airspeeds_pack_chan(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AIRSPEEDS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 }
 
 /**
@@ -189,11 +198,7 @@ static inline void mavlink_msg_airspeeds_send(mavlink_channel_t chan, uint32_t t
 	_mav_put_int16_t(buf, 12, aoa);
 	_mav_put_int16_t(buf, 14, aoy);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, buf, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 #else
 	mavlink_airspeeds_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -204,11 +209,21 @@ static inline void mavlink_msg_airspeeds_send(mavlink_channel_t chan, uint32_t t
 	packet.aoa = aoa;
 	packet.aoy = aoy;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)&packet, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)&packet, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)&packet, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 #endif
+}
+
+/**
+ * @brief Send a airspeeds message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_airspeeds_send_struct(mavlink_channel_t chan, const mavlink_airspeeds_t* airspeeds)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_airspeeds_send(chan, airspeeds->time_boot_ms, airspeeds->airspeed_imu, airspeeds->airspeed_pitot, airspeeds->airspeed_hot_wire, airspeeds->airspeed_ultrasonic, airspeeds->aoa, airspeeds->aoy);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)airspeeds, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 #endif
 }
 
@@ -232,11 +247,7 @@ static inline void mavlink_msg_airspeeds_send_buf(mavlink_message_t *msgbuf, mav
 	_mav_put_int16_t(buf, 12, aoa);
 	_mav_put_int16_t(buf, 14, aoy);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, buf, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, buf, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 #else
 	mavlink_airspeeds_t *packet = (mavlink_airspeeds_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -247,11 +258,7 @@ static inline void mavlink_msg_airspeeds_send_buf(mavlink_message_t *msgbuf, mav
 	packet->aoa = aoa;
 	packet->aoy = aoy;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)packet, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)packet, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AIRSPEEDS, (const char *)packet, MAVLINK_MSG_ID_AIRSPEEDS_MIN_LEN, MAVLINK_MSG_ID_AIRSPEEDS_LEN, MAVLINK_MSG_ID_AIRSPEEDS_CRC);
 #endif
 }
 #endif
@@ -339,7 +346,7 @@ static inline int16_t mavlink_msg_airspeeds_get_aoy(const mavlink_message_t* msg
  */
 static inline void mavlink_msg_airspeeds_decode(const mavlink_message_t* msg, mavlink_airspeeds_t* airspeeds)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	airspeeds->time_boot_ms = mavlink_msg_airspeeds_get_time_boot_ms(msg);
 	airspeeds->airspeed_imu = mavlink_msg_airspeeds_get_airspeed_imu(msg);
 	airspeeds->airspeed_pitot = mavlink_msg_airspeeds_get_airspeed_pitot(msg);
@@ -348,6 +355,8 @@ static inline void mavlink_msg_airspeeds_decode(const mavlink_message_t* msg, ma
 	airspeeds->aoa = mavlink_msg_airspeeds_get_aoa(msg);
 	airspeeds->aoy = mavlink_msg_airspeeds_get_aoy(msg);
 #else
-	memcpy(airspeeds, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_AIRSPEEDS_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_AIRSPEEDS_LEN? msg->len : MAVLINK_MSG_ID_AIRSPEEDS_LEN;
+        memset(airspeeds, 0, MAVLINK_MSG_ID_AIRSPEEDS_LEN);
+	memcpy(airspeeds, _MAV_PAYLOAD(msg), len);
 #endif
 }

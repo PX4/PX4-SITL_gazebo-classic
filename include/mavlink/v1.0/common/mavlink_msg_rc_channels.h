@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_RC_CHANNELS 65
 
-typedef struct __mavlink_rc_channels_t
-{
+MAVPACKED(
+typedef struct __mavlink_rc_channels_t {
  uint32_t time_boot_ms; /*< Timestamp (milliseconds since system boot)*/
  uint16_t chan1_raw; /*< RC channel 1 value, in microseconds. A value of UINT16_MAX implies the channel is unused.*/
  uint16_t chan2_raw; /*< RC channel 2 value, in microseconds. A value of UINT16_MAX implies the channel is unused.*/
@@ -25,16 +25,47 @@ typedef struct __mavlink_rc_channels_t
  uint16_t chan18_raw; /*< RC channel 18 value, in microseconds. A value of UINT16_MAX implies the channel is unused.*/
  uint8_t chancount; /*< Total number of RC channels being received. This can be larger than 18, indicating that more channels are available but not given in this message. This value should be 0 when no RC channels are available.*/
  uint8_t rssi; /*< Receive signal strength indicator, 0: 0%, 100: 100%, 255: invalid/unknown.*/
-} mavlink_rc_channels_t;
+}) mavlink_rc_channels_t;
 
 #define MAVLINK_MSG_ID_RC_CHANNELS_LEN 42
+#define MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN 42
 #define MAVLINK_MSG_ID_65_LEN 42
+#define MAVLINK_MSG_ID_65_MIN_LEN 42
 
 #define MAVLINK_MSG_ID_RC_CHANNELS_CRC 118
 #define MAVLINK_MSG_ID_65_CRC 118
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_RC_CHANNELS { \
+	65, \
+	"RC_CHANNELS", \
+	21, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_rc_channels_t, time_boot_ms) }, \
+         { "chan1_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_rc_channels_t, chan1_raw) }, \
+         { "chan2_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 6, offsetof(mavlink_rc_channels_t, chan2_raw) }, \
+         { "chan3_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 8, offsetof(mavlink_rc_channels_t, chan3_raw) }, \
+         { "chan4_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 10, offsetof(mavlink_rc_channels_t, chan4_raw) }, \
+         { "chan5_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 12, offsetof(mavlink_rc_channels_t, chan5_raw) }, \
+         { "chan6_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 14, offsetof(mavlink_rc_channels_t, chan6_raw) }, \
+         { "chan7_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 16, offsetof(mavlink_rc_channels_t, chan7_raw) }, \
+         { "chan8_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 18, offsetof(mavlink_rc_channels_t, chan8_raw) }, \
+         { "chan9_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 20, offsetof(mavlink_rc_channels_t, chan9_raw) }, \
+         { "chan10_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 22, offsetof(mavlink_rc_channels_t, chan10_raw) }, \
+         { "chan11_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 24, offsetof(mavlink_rc_channels_t, chan11_raw) }, \
+         { "chan12_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 26, offsetof(mavlink_rc_channels_t, chan12_raw) }, \
+         { "chan13_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 28, offsetof(mavlink_rc_channels_t, chan13_raw) }, \
+         { "chan14_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 30, offsetof(mavlink_rc_channels_t, chan14_raw) }, \
+         { "chan15_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 32, offsetof(mavlink_rc_channels_t, chan15_raw) }, \
+         { "chan16_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 34, offsetof(mavlink_rc_channels_t, chan16_raw) }, \
+         { "chan17_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 36, offsetof(mavlink_rc_channels_t, chan17_raw) }, \
+         { "chan18_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 38, offsetof(mavlink_rc_channels_t, chan18_raw) }, \
+         { "chancount", NULL, MAVLINK_TYPE_UINT8_T, 0, 40, offsetof(mavlink_rc_channels_t, chancount) }, \
+         { "rssi", NULL, MAVLINK_TYPE_UINT8_T, 0, 41, offsetof(mavlink_rc_channels_t, rssi) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_RC_CHANNELS { \
 	"RC_CHANNELS", \
 	21, \
@@ -61,7 +92,7 @@ typedef struct __mavlink_rc_channels_t
          { "rssi", NULL, MAVLINK_TYPE_UINT8_T, 0, 41, offsetof(mavlink_rc_channels_t, rssi) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a rc_channels message
@@ -148,11 +179,7 @@ static inline uint16_t mavlink_msg_rc_channels_pack(uint8_t system_id, uint8_t c
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RC_CHANNELS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 }
 
 /**
@@ -241,11 +268,7 @@ static inline uint16_t mavlink_msg_rc_channels_pack_chan(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RC_CHANNELS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 }
 
 /**
@@ -329,11 +352,7 @@ static inline void mavlink_msg_rc_channels_send(mavlink_channel_t chan, uint32_t
 	_mav_put_uint8_t(buf, 40, chancount);
 	_mav_put_uint8_t(buf, 41, rssi);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, buf, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, buf, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, buf, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 #else
 	mavlink_rc_channels_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -358,11 +377,21 @@ static inline void mavlink_msg_rc_channels_send(mavlink_channel_t chan, uint32_t
 	packet.chancount = chancount;
 	packet.rssi = rssi;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)&packet, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)&packet, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)&packet, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 #endif
+}
+
+/**
+ * @brief Send a rc_channels message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_rc_channels_send_struct(mavlink_channel_t chan, const mavlink_rc_channels_t* rc_channels)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_rc_channels_send(chan, rc_channels->time_boot_ms, rc_channels->chancount, rc_channels->chan1_raw, rc_channels->chan2_raw, rc_channels->chan3_raw, rc_channels->chan4_raw, rc_channels->chan5_raw, rc_channels->chan6_raw, rc_channels->chan7_raw, rc_channels->chan8_raw, rc_channels->chan9_raw, rc_channels->chan10_raw, rc_channels->chan11_raw, rc_channels->chan12_raw, rc_channels->chan13_raw, rc_channels->chan14_raw, rc_channels->chan15_raw, rc_channels->chan16_raw, rc_channels->chan17_raw, rc_channels->chan18_raw, rc_channels->rssi);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)rc_channels, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 #endif
 }
 
@@ -400,11 +429,7 @@ static inline void mavlink_msg_rc_channels_send_buf(mavlink_message_t *msgbuf, m
 	_mav_put_uint8_t(buf, 40, chancount);
 	_mav_put_uint8_t(buf, 41, rssi);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, buf, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, buf, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, buf, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 #else
 	mavlink_rc_channels_t *packet = (mavlink_rc_channels_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -429,11 +454,7 @@ static inline void mavlink_msg_rc_channels_send_buf(mavlink_message_t *msgbuf, m
 	packet->chancount = chancount;
 	packet->rssi = rssi;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)packet, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)packet, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RC_CHANNELS, (const char *)packet, MAVLINK_MSG_ID_RC_CHANNELS_MIN_LEN, MAVLINK_MSG_ID_RC_CHANNELS_LEN, MAVLINK_MSG_ID_RC_CHANNELS_CRC);
 #endif
 }
 #endif
@@ -661,7 +682,7 @@ static inline uint8_t mavlink_msg_rc_channels_get_rssi(const mavlink_message_t* 
  */
 static inline void mavlink_msg_rc_channels_decode(const mavlink_message_t* msg, mavlink_rc_channels_t* rc_channels)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	rc_channels->time_boot_ms = mavlink_msg_rc_channels_get_time_boot_ms(msg);
 	rc_channels->chan1_raw = mavlink_msg_rc_channels_get_chan1_raw(msg);
 	rc_channels->chan2_raw = mavlink_msg_rc_channels_get_chan2_raw(msg);
@@ -684,6 +705,8 @@ static inline void mavlink_msg_rc_channels_decode(const mavlink_message_t* msg, 
 	rc_channels->chancount = mavlink_msg_rc_channels_get_chancount(msg);
 	rc_channels->rssi = mavlink_msg_rc_channels_get_rssi(msg);
 #else
-	memcpy(rc_channels, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_RC_CHANNELS_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_RC_CHANNELS_LEN? msg->len : MAVLINK_MSG_ID_RC_CHANNELS_LEN;
+        memset(rc_channels, 0, MAVLINK_MSG_ID_RC_CHANNELS_LEN);
+	memcpy(rc_channels, _MAV_PAYLOAD(msg), len);
 #endif
 }

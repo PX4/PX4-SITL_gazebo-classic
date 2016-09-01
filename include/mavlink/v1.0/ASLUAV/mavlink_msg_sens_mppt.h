@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_SENS_MPPT 202
 
-typedef struct __mavlink_sens_mppt_t
-{
+MAVPACKED(
+typedef struct __mavlink_sens_mppt_t {
  uint64_t mppt_timestamp; /*<  MPPT last timestamp */
  float mppt1_volt; /*<  MPPT1 voltage */
  float mppt1_amp; /*<  MPPT1 current */
@@ -17,16 +17,39 @@ typedef struct __mavlink_sens_mppt_t
  uint8_t mppt1_status; /*<  MPPT1 status */
  uint8_t mppt2_status; /*<  MPPT2 status */
  uint8_t mppt3_status; /*<  MPPT3 status */
-} mavlink_sens_mppt_t;
+}) mavlink_sens_mppt_t;
 
 #define MAVLINK_MSG_ID_SENS_MPPT_LEN 41
+#define MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN 41
 #define MAVLINK_MSG_ID_202_LEN 41
+#define MAVLINK_MSG_ID_202_MIN_LEN 41
 
 #define MAVLINK_MSG_ID_SENS_MPPT_CRC 231
 #define MAVLINK_MSG_ID_202_CRC 231
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SENS_MPPT { \
+	202, \
+	"SENS_MPPT", \
+	13, \
+	{  { "mppt_timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_sens_mppt_t, mppt_timestamp) }, \
+         { "mppt1_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_sens_mppt_t, mppt1_volt) }, \
+         { "mppt1_amp", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_sens_mppt_t, mppt1_amp) }, \
+         { "mppt2_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_sens_mppt_t, mppt2_volt) }, \
+         { "mppt2_amp", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_sens_mppt_t, mppt2_amp) }, \
+         { "mppt3_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_sens_mppt_t, mppt3_volt) }, \
+         { "mppt3_amp", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_sens_mppt_t, mppt3_amp) }, \
+         { "mppt1_pwm", NULL, MAVLINK_TYPE_UINT16_T, 0, 32, offsetof(mavlink_sens_mppt_t, mppt1_pwm) }, \
+         { "mppt2_pwm", NULL, MAVLINK_TYPE_UINT16_T, 0, 34, offsetof(mavlink_sens_mppt_t, mppt2_pwm) }, \
+         { "mppt3_pwm", NULL, MAVLINK_TYPE_UINT16_T, 0, 36, offsetof(mavlink_sens_mppt_t, mppt3_pwm) }, \
+         { "mppt1_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 38, offsetof(mavlink_sens_mppt_t, mppt1_status) }, \
+         { "mppt2_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 39, offsetof(mavlink_sens_mppt_t, mppt2_status) }, \
+         { "mppt3_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 40, offsetof(mavlink_sens_mppt_t, mppt3_status) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SENS_MPPT { \
 	"SENS_MPPT", \
 	13, \
@@ -45,7 +68,7 @@ typedef struct __mavlink_sens_mppt_t
          { "mppt3_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 40, offsetof(mavlink_sens_mppt_t, mppt3_status) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a sens_mppt message
@@ -108,11 +131,7 @@ static inline uint16_t mavlink_msg_sens_mppt_pack(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SENS_MPPT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_MPPT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 }
 
 /**
@@ -177,11 +196,7 @@ static inline uint16_t mavlink_msg_sens_mppt_pack_chan(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SENS_MPPT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_MPPT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 }
 
 /**
@@ -249,11 +264,7 @@ static inline void mavlink_msg_sens_mppt_send(mavlink_channel_t chan, uint64_t m
 	_mav_put_uint8_t(buf, 39, mppt2_status);
 	_mav_put_uint8_t(buf, 40, mppt3_status);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, buf, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, buf, MAVLINK_MSG_ID_SENS_MPPT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, buf, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 #else
 	mavlink_sens_mppt_t packet;
 	packet.mppt_timestamp = mppt_timestamp;
@@ -270,11 +281,21 @@ static inline void mavlink_msg_sens_mppt_send(mavlink_channel_t chan, uint64_t m
 	packet.mppt2_status = mppt2_status;
 	packet.mppt3_status = mppt3_status;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)&packet, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)&packet, MAVLINK_MSG_ID_SENS_MPPT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)&packet, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a sens_mppt message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_sens_mppt_send_struct(mavlink_channel_t chan, const mavlink_sens_mppt_t* sens_mppt)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_sens_mppt_send(chan, sens_mppt->mppt_timestamp, sens_mppt->mppt1_volt, sens_mppt->mppt1_amp, sens_mppt->mppt1_pwm, sens_mppt->mppt1_status, sens_mppt->mppt2_volt, sens_mppt->mppt2_amp, sens_mppt->mppt2_pwm, sens_mppt->mppt2_status, sens_mppt->mppt3_volt, sens_mppt->mppt3_amp, sens_mppt->mppt3_pwm, sens_mppt->mppt3_status);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)sens_mppt, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 #endif
 }
 
@@ -304,11 +325,7 @@ static inline void mavlink_msg_sens_mppt_send_buf(mavlink_message_t *msgbuf, mav
 	_mav_put_uint8_t(buf, 39, mppt2_status);
 	_mav_put_uint8_t(buf, 40, mppt3_status);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, buf, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, buf, MAVLINK_MSG_ID_SENS_MPPT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, buf, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 #else
 	mavlink_sens_mppt_t *packet = (mavlink_sens_mppt_t *)msgbuf;
 	packet->mppt_timestamp = mppt_timestamp;
@@ -325,11 +342,7 @@ static inline void mavlink_msg_sens_mppt_send_buf(mavlink_message_t *msgbuf, mav
 	packet->mppt2_status = mppt2_status;
 	packet->mppt3_status = mppt3_status;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)packet, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)packet, MAVLINK_MSG_ID_SENS_MPPT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_MPPT, (const char *)packet, MAVLINK_MSG_ID_SENS_MPPT_MIN_LEN, MAVLINK_MSG_ID_SENS_MPPT_LEN, MAVLINK_MSG_ID_SENS_MPPT_CRC);
 #endif
 }
 #endif
@@ -477,7 +490,7 @@ static inline uint8_t mavlink_msg_sens_mppt_get_mppt3_status(const mavlink_messa
  */
 static inline void mavlink_msg_sens_mppt_decode(const mavlink_message_t* msg, mavlink_sens_mppt_t* sens_mppt)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	sens_mppt->mppt_timestamp = mavlink_msg_sens_mppt_get_mppt_timestamp(msg);
 	sens_mppt->mppt1_volt = mavlink_msg_sens_mppt_get_mppt1_volt(msg);
 	sens_mppt->mppt1_amp = mavlink_msg_sens_mppt_get_mppt1_amp(msg);
@@ -492,6 +505,8 @@ static inline void mavlink_msg_sens_mppt_decode(const mavlink_message_t* msg, ma
 	sens_mppt->mppt2_status = mavlink_msg_sens_mppt_get_mppt2_status(msg);
 	sens_mppt->mppt3_status = mavlink_msg_sens_mppt_get_mppt3_status(msg);
 #else
-	memcpy(sens_mppt, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SENS_MPPT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_MPPT_LEN? msg->len : MAVLINK_MSG_ID_SENS_MPPT_LEN;
+        memset(sens_mppt, 0, MAVLINK_MSG_ID_SENS_MPPT_LEN);
+	memcpy(sens_mppt, _MAV_PAYLOAD(msg), len);
 #endif
 }

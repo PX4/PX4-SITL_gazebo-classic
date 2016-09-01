@@ -2,24 +2,40 @@
 
 #define MAVLINK_MSG_ID_SERIAL_CONTROL 126
 
-typedef struct __mavlink_serial_control_t
-{
+MAVPACKED(
+typedef struct __mavlink_serial_control_t {
  uint32_t baudrate; /*< Baudrate of transfer. Zero means no change.*/
  uint16_t timeout; /*< Timeout for reply data in milliseconds*/
  uint8_t device; /*< See SERIAL_CONTROL_DEV enum*/
  uint8_t flags; /*< See SERIAL_CONTROL_FLAG enum*/
  uint8_t count; /*< how many bytes in this transfer*/
  uint8_t data[70]; /*< serial data*/
-} mavlink_serial_control_t;
+}) mavlink_serial_control_t;
 
 #define MAVLINK_MSG_ID_SERIAL_CONTROL_LEN 79
+#define MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN 79
 #define MAVLINK_MSG_ID_126_LEN 79
+#define MAVLINK_MSG_ID_126_MIN_LEN 79
 
 #define MAVLINK_MSG_ID_SERIAL_CONTROL_CRC 220
 #define MAVLINK_MSG_ID_126_CRC 220
 
 #define MAVLINK_MSG_SERIAL_CONTROL_FIELD_DATA_LEN 70
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SERIAL_CONTROL { \
+	126, \
+	"SERIAL_CONTROL", \
+	6, \
+	{  { "baudrate", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_serial_control_t, baudrate) }, \
+         { "timeout", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_serial_control_t, timeout) }, \
+         { "device", NULL, MAVLINK_TYPE_UINT8_T, 0, 6, offsetof(mavlink_serial_control_t, device) }, \
+         { "flags", NULL, MAVLINK_TYPE_UINT8_T, 0, 7, offsetof(mavlink_serial_control_t, flags) }, \
+         { "count", NULL, MAVLINK_TYPE_UINT8_T, 0, 8, offsetof(mavlink_serial_control_t, count) }, \
+         { "data", NULL, MAVLINK_TYPE_UINT8_T, 70, 9, offsetof(mavlink_serial_control_t, data) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SERIAL_CONTROL { \
 	"SERIAL_CONTROL", \
 	6, \
@@ -31,7 +47,7 @@ typedef struct __mavlink_serial_control_t
          { "data", NULL, MAVLINK_TYPE_UINT8_T, 70, 9, offsetof(mavlink_serial_control_t, data) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a serial_control message
@@ -71,11 +87,7 @@ static inline uint16_t mavlink_msg_serial_control_pack(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_CONTROL;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 }
 
 /**
@@ -117,11 +129,7 @@ static inline uint16_t mavlink_msg_serial_control_pack_chan(uint8_t system_id, u
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_CONTROL;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 }
 
 /**
@@ -174,11 +182,7 @@ static inline void mavlink_msg_serial_control_send(mavlink_channel_t chan, uint8
 	_mav_put_uint8_t(buf, 7, flags);
 	_mav_put_uint8_t(buf, 8, count);
 	_mav_put_uint8_t_array(buf, 9, data, 70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, buf, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, buf, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, buf, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 #else
 	mavlink_serial_control_t packet;
 	packet.baudrate = baudrate;
@@ -187,11 +191,21 @@ static inline void mavlink_msg_serial_control_send(mavlink_channel_t chan, uint8
 	packet.flags = flags;
 	packet.count = count;
 	mav_array_memcpy(packet.data, data, sizeof(uint8_t)*70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 #endif
+}
+
+/**
+ * @brief Send a serial_control message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_serial_control_send_struct(mavlink_channel_t chan, const mavlink_serial_control_t* serial_control)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_serial_control_send(chan, serial_control->device, serial_control->flags, serial_control->timeout, serial_control->baudrate, serial_control->count, serial_control->data);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)serial_control, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 #endif
 }
 
@@ -213,11 +227,7 @@ static inline void mavlink_msg_serial_control_send_buf(mavlink_message_t *msgbuf
 	_mav_put_uint8_t(buf, 7, flags);
 	_mav_put_uint8_t(buf, 8, count);
 	_mav_put_uint8_t_array(buf, 9, data, 70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, buf, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, buf, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, buf, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 #else
 	mavlink_serial_control_t *packet = (mavlink_serial_control_t *)msgbuf;
 	packet->baudrate = baudrate;
@@ -226,11 +236,7 @@ static inline void mavlink_msg_serial_control_send_buf(mavlink_message_t *msgbuf
 	packet->flags = flags;
 	packet->count = count;
 	mav_array_memcpy(packet->data, data, sizeof(uint8_t)*70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)packet, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)packet, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_CONTROL, (const char *)packet, MAVLINK_MSG_ID_SERIAL_CONTROL_MIN_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN, MAVLINK_MSG_ID_SERIAL_CONTROL_CRC);
 #endif
 }
 #endif
@@ -308,7 +314,7 @@ static inline uint16_t mavlink_msg_serial_control_get_data(const mavlink_message
  */
 static inline void mavlink_msg_serial_control_decode(const mavlink_message_t* msg, mavlink_serial_control_t* serial_control)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	serial_control->baudrate = mavlink_msg_serial_control_get_baudrate(msg);
 	serial_control->timeout = mavlink_msg_serial_control_get_timeout(msg);
 	serial_control->device = mavlink_msg_serial_control_get_device(msg);
@@ -316,6 +322,8 @@ static inline void mavlink_msg_serial_control_decode(const mavlink_message_t* ms
 	serial_control->count = mavlink_msg_serial_control_get_count(msg);
 	mavlink_msg_serial_control_get_data(msg, serial_control->data);
 #else
-	memcpy(serial_control, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_CONTROL_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_CONTROL_LEN;
+        memset(serial_control, 0, MAVLINK_MSG_ID_SERIAL_CONTROL_LEN);
+	memcpy(serial_control, _MAV_PAYLOAD(msg), len);
 #endif
 }

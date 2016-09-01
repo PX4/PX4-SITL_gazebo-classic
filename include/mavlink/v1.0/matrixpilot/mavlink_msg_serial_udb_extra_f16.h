@@ -2,14 +2,16 @@
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16 180
 
-typedef struct __mavlink_serial_udb_extra_f16_t
-{
+MAVPACKED(
+typedef struct __mavlink_serial_udb_extra_f16_t {
  uint8_t sue_ID_LEAD_PILOT[40]; /*< Serial UDB Extra Name of Expected Lead Pilot*/
  uint8_t sue_ID_DIY_DRONES_URL[70]; /*< Serial UDB Extra URL of Lead Pilot or Team*/
-} mavlink_serial_udb_extra_f16_t;
+}) mavlink_serial_udb_extra_f16_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN 110
+#define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN 110
 #define MAVLINK_MSG_ID_180_LEN 110
+#define MAVLINK_MSG_ID_180_MIN_LEN 110
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC 222
 #define MAVLINK_MSG_ID_180_CRC 222
@@ -17,6 +19,16 @@ typedef struct __mavlink_serial_udb_extra_f16_t
 #define MAVLINK_MSG_SERIAL_UDB_EXTRA_F16_FIELD_SUE_ID_LEAD_PILOT_LEN 40
 #define MAVLINK_MSG_SERIAL_UDB_EXTRA_F16_FIELD_SUE_ID_DIY_DRONES_URL_LEN 70
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F16 { \
+	180, \
+	"SERIAL_UDB_EXTRA_F16", \
+	2, \
+	{  { "sue_ID_LEAD_PILOT", NULL, MAVLINK_TYPE_UINT8_T, 40, 0, offsetof(mavlink_serial_udb_extra_f16_t, sue_ID_LEAD_PILOT) }, \
+         { "sue_ID_DIY_DRONES_URL", NULL, MAVLINK_TYPE_UINT8_T, 70, 40, offsetof(mavlink_serial_udb_extra_f16_t, sue_ID_DIY_DRONES_URL) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F16 { \
 	"SERIAL_UDB_EXTRA_F16", \
 	2, \
@@ -24,7 +36,7 @@ typedef struct __mavlink_serial_udb_extra_f16_t
          { "sue_ID_DIY_DRONES_URL", NULL, MAVLINK_TYPE_UINT8_T, 70, 40, offsetof(mavlink_serial_udb_extra_f16_t, sue_ID_DIY_DRONES_URL) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a serial_udb_extra_f16 message
@@ -54,11 +66,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f16_pack(uint8_t system_id, 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 }
 
 /**
@@ -90,11 +98,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f16_pack_chan(uint8_t system
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 }
 
 /**
@@ -140,21 +144,27 @@ static inline void mavlink_msg_serial_udb_extra_f16_send(mavlink_channel_t chan,
 
 	_mav_put_uint8_t_array(buf, 0, sue_ID_LEAD_PILOT, 40);
 	_mav_put_uint8_t_array(buf, 40, sue_ID_DIY_DRONES_URL, 70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 #else
 	mavlink_serial_udb_extra_f16_t packet;
 
 	mav_array_memcpy(packet.sue_ID_LEAD_PILOT, sue_ID_LEAD_PILOT, sizeof(uint8_t)*40);
 	mav_array_memcpy(packet.sue_ID_DIY_DRONES_URL, sue_ID_DIY_DRONES_URL, sizeof(uint8_t)*70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 #endif
+}
+
+/**
+ * @brief Send a serial_udb_extra_f16 message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_serial_udb_extra_f16_send_struct(mavlink_channel_t chan, const mavlink_serial_udb_extra_f16_t* serial_udb_extra_f16)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_serial_udb_extra_f16_send(chan, serial_udb_extra_f16->sue_ID_LEAD_PILOT, serial_udb_extra_f16->sue_ID_DIY_DRONES_URL);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)serial_udb_extra_f16, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 #endif
 }
 
@@ -173,21 +183,13 @@ static inline void mavlink_msg_serial_udb_extra_f16_send_buf(mavlink_message_t *
 
 	_mav_put_uint8_t_array(buf, 0, sue_ID_LEAD_PILOT, 40);
 	_mav_put_uint8_t_array(buf, 40, sue_ID_DIY_DRONES_URL, 70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 #else
 	mavlink_serial_udb_extra_f16_t *packet = (mavlink_serial_udb_extra_f16_t *)msgbuf;
 
 	mav_array_memcpy(packet->sue_ID_LEAD_PILOT, sue_ID_LEAD_PILOT, sizeof(uint8_t)*40);
 	mav_array_memcpy(packet->sue_ID_DIY_DRONES_URL, sue_ID_DIY_DRONES_URL, sizeof(uint8_t)*70);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_CRC);
 #endif
 }
 #endif
@@ -225,10 +227,12 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f16_get_sue_ID_DIY_DRONES_UR
  */
 static inline void mavlink_msg_serial_udb_extra_f16_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f16_t* serial_udb_extra_f16)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mavlink_msg_serial_udb_extra_f16_get_sue_ID_LEAD_PILOT(msg, serial_udb_extra_f16->sue_ID_LEAD_PILOT);
 	mavlink_msg_serial_udb_extra_f16_get_sue_ID_DIY_DRONES_URL(msg, serial_udb_extra_f16->sue_ID_DIY_DRONES_URL);
 #else
-	memcpy(serial_udb_extra_f16, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN;
+        memset(serial_udb_extra_f16, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F16_LEN);
+	memcpy(serial_udb_extra_f16, _MAV_PAYLOAD(msg), len);
 #endif
 }

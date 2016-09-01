@@ -21,6 +21,10 @@
 #define MAVLINK_CRC_EXTRA 1
 #endif
 
+#ifndef MAVLINK_COMMAND_24BIT
+#define MAVLINK_COMMAND_24BIT 0
+#endif
+
 #include "version.h"
 #include "common.h"
 

@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT 62
 
-typedef struct __mavlink_nav_controller_output_t
-{
+MAVPACKED(
+typedef struct __mavlink_nav_controller_output_t {
  float nav_roll; /*< Current desired roll in degrees*/
  float nav_pitch; /*< Current desired pitch in degrees*/
  float alt_error; /*< Current altitude error in meters*/
@@ -12,16 +12,34 @@ typedef struct __mavlink_nav_controller_output_t
  int16_t nav_bearing; /*< Current desired heading in degrees*/
  int16_t target_bearing; /*< Bearing to current MISSION/target in degrees*/
  uint16_t wp_dist; /*< Distance to active MISSION in meters*/
-} mavlink_nav_controller_output_t;
+}) mavlink_nav_controller_output_t;
 
 #define MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN 26
+#define MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN 26
 #define MAVLINK_MSG_ID_62_LEN 26
+#define MAVLINK_MSG_ID_62_MIN_LEN 26
 
 #define MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC 183
 #define MAVLINK_MSG_ID_62_CRC 183
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_NAV_CONTROLLER_OUTPUT { \
+	62, \
+	"NAV_CONTROLLER_OUTPUT", \
+	8, \
+	{  { "nav_roll", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_nav_controller_output_t, nav_roll) }, \
+         { "nav_pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_nav_controller_output_t, nav_pitch) }, \
+         { "alt_error", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_nav_controller_output_t, alt_error) }, \
+         { "aspd_error", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_nav_controller_output_t, aspd_error) }, \
+         { "xtrack_error", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_nav_controller_output_t, xtrack_error) }, \
+         { "nav_bearing", NULL, MAVLINK_TYPE_INT16_T, 0, 20, offsetof(mavlink_nav_controller_output_t, nav_bearing) }, \
+         { "target_bearing", NULL, MAVLINK_TYPE_INT16_T, 0, 22, offsetof(mavlink_nav_controller_output_t, target_bearing) }, \
+         { "wp_dist", NULL, MAVLINK_TYPE_UINT16_T, 0, 24, offsetof(mavlink_nav_controller_output_t, wp_dist) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_NAV_CONTROLLER_OUTPUT { \
 	"NAV_CONTROLLER_OUTPUT", \
 	8, \
@@ -35,7 +53,7 @@ typedef struct __mavlink_nav_controller_output_t
          { "wp_dist", NULL, MAVLINK_TYPE_UINT16_T, 0, 24, offsetof(mavlink_nav_controller_output_t, wp_dist) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a nav_controller_output message
@@ -83,11 +101,7 @@ static inline uint16_t mavlink_msg_nav_controller_output_pack(uint8_t system_id,
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 }
 
 /**
@@ -137,11 +151,7 @@ static inline uint16_t mavlink_msg_nav_controller_output_pack_chan(uint8_t syste
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 }
 
 /**
@@ -199,11 +209,7 @@ static inline void mavlink_msg_nav_controller_output_send(mavlink_channel_t chan
 	_mav_put_int16_t(buf, 22, target_bearing);
 	_mav_put_uint16_t(buf, 24, wp_dist);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, buf, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, buf, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, buf, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 #else
 	mavlink_nav_controller_output_t packet;
 	packet.nav_roll = nav_roll;
@@ -215,11 +221,21 @@ static inline void mavlink_msg_nav_controller_output_send(mavlink_channel_t chan
 	packet.target_bearing = target_bearing;
 	packet.wp_dist = wp_dist;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)&packet, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)&packet, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)&packet, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a nav_controller_output message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_nav_controller_output_send_struct(mavlink_channel_t chan, const mavlink_nav_controller_output_t* nav_controller_output)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_nav_controller_output_send(chan, nav_controller_output->nav_roll, nav_controller_output->nav_pitch, nav_controller_output->nav_bearing, nav_controller_output->target_bearing, nav_controller_output->wp_dist, nav_controller_output->alt_error, nav_controller_output->aspd_error, nav_controller_output->xtrack_error);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)nav_controller_output, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 #endif
 }
 
@@ -244,11 +260,7 @@ static inline void mavlink_msg_nav_controller_output_send_buf(mavlink_message_t 
 	_mav_put_int16_t(buf, 22, target_bearing);
 	_mav_put_uint16_t(buf, 24, wp_dist);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, buf, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, buf, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, buf, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 #else
 	mavlink_nav_controller_output_t *packet = (mavlink_nav_controller_output_t *)msgbuf;
 	packet->nav_roll = nav_roll;
@@ -260,11 +272,7 @@ static inline void mavlink_msg_nav_controller_output_send_buf(mavlink_message_t 
 	packet->target_bearing = target_bearing;
 	packet->wp_dist = wp_dist;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)packet, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)packet, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT, (const char *)packet, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_MIN_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_CRC);
 #endif
 }
 #endif
@@ -362,7 +370,7 @@ static inline float mavlink_msg_nav_controller_output_get_xtrack_error(const mav
  */
 static inline void mavlink_msg_nav_controller_output_decode(const mavlink_message_t* msg, mavlink_nav_controller_output_t* nav_controller_output)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	nav_controller_output->nav_roll = mavlink_msg_nav_controller_output_get_nav_roll(msg);
 	nav_controller_output->nav_pitch = mavlink_msg_nav_controller_output_get_nav_pitch(msg);
 	nav_controller_output->alt_error = mavlink_msg_nav_controller_output_get_alt_error(msg);
@@ -372,6 +380,8 @@ static inline void mavlink_msg_nav_controller_output_decode(const mavlink_messag
 	nav_controller_output->target_bearing = mavlink_msg_nav_controller_output_get_target_bearing(msg);
 	nav_controller_output->wp_dist = mavlink_msg_nav_controller_output_get_wp_dist(msg);
 #else
-	memcpy(nav_controller_output, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN? msg->len : MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN;
+        memset(nav_controller_output, 0, MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT_LEN);
+	memcpy(nav_controller_output, _MAV_PAYLOAD(msg), len);
 #endif
 }

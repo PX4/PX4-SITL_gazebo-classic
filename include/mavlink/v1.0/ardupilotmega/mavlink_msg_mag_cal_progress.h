@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_MAG_CAL_PROGRESS 191
 
-typedef struct __mavlink_mag_cal_progress_t
-{
+MAVPACKED(
+typedef struct __mavlink_mag_cal_progress_t {
  float direction_x; /*< Body frame direction vector for display*/
  float direction_y; /*< Body frame direction vector for display*/
  float direction_z; /*< Body frame direction vector for display*/
@@ -13,16 +13,35 @@ typedef struct __mavlink_mag_cal_progress_t
  uint8_t attempt; /*< Attempt number*/
  uint8_t completion_pct; /*< Completion percentage*/
  uint8_t completion_mask[10]; /*< Bitmask of sphere sections (see http://en.wikipedia.org/wiki/Geodesic_grid)*/
-} mavlink_mag_cal_progress_t;
+}) mavlink_mag_cal_progress_t;
 
 #define MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN 27
+#define MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN 27
 #define MAVLINK_MSG_ID_191_LEN 27
+#define MAVLINK_MSG_ID_191_MIN_LEN 27
 
 #define MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC 92
 #define MAVLINK_MSG_ID_191_CRC 92
 
 #define MAVLINK_MSG_MAG_CAL_PROGRESS_FIELD_COMPLETION_MASK_LEN 10
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MAG_CAL_PROGRESS { \
+	191, \
+	"MAG_CAL_PROGRESS", \
+	9, \
+	{  { "direction_x", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_mag_cal_progress_t, direction_x) }, \
+         { "direction_y", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_mag_cal_progress_t, direction_y) }, \
+         { "direction_z", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_mag_cal_progress_t, direction_z) }, \
+         { "compass_id", NULL, MAVLINK_TYPE_UINT8_T, 0, 12, offsetof(mavlink_mag_cal_progress_t, compass_id) }, \
+         { "cal_mask", NULL, MAVLINK_TYPE_UINT8_T, 0, 13, offsetof(mavlink_mag_cal_progress_t, cal_mask) }, \
+         { "cal_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 14, offsetof(mavlink_mag_cal_progress_t, cal_status) }, \
+         { "attempt", NULL, MAVLINK_TYPE_UINT8_T, 0, 15, offsetof(mavlink_mag_cal_progress_t, attempt) }, \
+         { "completion_pct", NULL, MAVLINK_TYPE_UINT8_T, 0, 16, offsetof(mavlink_mag_cal_progress_t, completion_pct) }, \
+         { "completion_mask", NULL, MAVLINK_TYPE_UINT8_T, 10, 17, offsetof(mavlink_mag_cal_progress_t, completion_mask) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MAG_CAL_PROGRESS { \
 	"MAG_CAL_PROGRESS", \
 	9, \
@@ -37,7 +56,7 @@ typedef struct __mavlink_mag_cal_progress_t
          { "completion_mask", NULL, MAVLINK_TYPE_UINT8_T, 10, 17, offsetof(mavlink_mag_cal_progress_t, completion_mask) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a mag_cal_progress message
@@ -86,11 +105,7 @@ static inline uint16_t mavlink_msg_mag_cal_progress_pack(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 }
 
 /**
@@ -141,11 +156,7 @@ static inline uint16_t mavlink_msg_mag_cal_progress_pack_chan(uint8_t system_id,
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 }
 
 /**
@@ -204,11 +215,7 @@ static inline void mavlink_msg_mag_cal_progress_send(mavlink_channel_t chan, uin
 	_mav_put_uint8_t(buf, 15, attempt);
 	_mav_put_uint8_t(buf, 16, completion_pct);
 	_mav_put_uint8_t_array(buf, 17, completion_mask, 10);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, buf, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, buf, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, buf, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 #else
 	mavlink_mag_cal_progress_t packet;
 	packet.direction_x = direction_x;
@@ -220,11 +227,21 @@ static inline void mavlink_msg_mag_cal_progress_send(mavlink_channel_t chan, uin
 	packet.attempt = attempt;
 	packet.completion_pct = completion_pct;
 	mav_array_memcpy(packet.completion_mask, completion_mask, sizeof(uint8_t)*10);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)&packet, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)&packet, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)&packet, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 #endif
+}
+
+/**
+ * @brief Send a mag_cal_progress message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_mag_cal_progress_send_struct(mavlink_channel_t chan, const mavlink_mag_cal_progress_t* mag_cal_progress)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_mag_cal_progress_send(chan, mag_cal_progress->compass_id, mag_cal_progress->cal_mask, mag_cal_progress->cal_status, mag_cal_progress->attempt, mag_cal_progress->completion_pct, mag_cal_progress->completion_mask, mag_cal_progress->direction_x, mag_cal_progress->direction_y, mag_cal_progress->direction_z);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)mag_cal_progress, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 #endif
 }
 
@@ -249,11 +266,7 @@ static inline void mavlink_msg_mag_cal_progress_send_buf(mavlink_message_t *msgb
 	_mav_put_uint8_t(buf, 15, attempt);
 	_mav_put_uint8_t(buf, 16, completion_pct);
 	_mav_put_uint8_t_array(buf, 17, completion_mask, 10);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, buf, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, buf, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, buf, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 #else
 	mavlink_mag_cal_progress_t *packet = (mavlink_mag_cal_progress_t *)msgbuf;
 	packet->direction_x = direction_x;
@@ -265,11 +278,7 @@ static inline void mavlink_msg_mag_cal_progress_send_buf(mavlink_message_t *msgb
 	packet->attempt = attempt;
 	packet->completion_pct = completion_pct;
 	mav_array_memcpy(packet->completion_mask, completion_mask, sizeof(uint8_t)*10);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)packet, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)packet, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MAG_CAL_PROGRESS, (const char *)packet, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_MIN_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_CRC);
 #endif
 }
 #endif
@@ -377,7 +386,7 @@ static inline float mavlink_msg_mag_cal_progress_get_direction_z(const mavlink_m
  */
 static inline void mavlink_msg_mag_cal_progress_decode(const mavlink_message_t* msg, mavlink_mag_cal_progress_t* mag_cal_progress)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mag_cal_progress->direction_x = mavlink_msg_mag_cal_progress_get_direction_x(msg);
 	mag_cal_progress->direction_y = mavlink_msg_mag_cal_progress_get_direction_y(msg);
 	mag_cal_progress->direction_z = mavlink_msg_mag_cal_progress_get_direction_z(msg);
@@ -388,6 +397,8 @@ static inline void mavlink_msg_mag_cal_progress_decode(const mavlink_message_t* 
 	mag_cal_progress->completion_pct = mavlink_msg_mag_cal_progress_get_completion_pct(msg);
 	mavlink_msg_mag_cal_progress_get_completion_mask(msg, mag_cal_progress->completion_mask);
 #else
-	memcpy(mag_cal_progress, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN? msg->len : MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN;
+        memset(mag_cal_progress, 0, MAVLINK_MSG_ID_MAG_CAL_PROGRESS_LEN);
+	memcpy(mag_cal_progress, _MAV_PAYLOAD(msg), len);
 #endif
 }

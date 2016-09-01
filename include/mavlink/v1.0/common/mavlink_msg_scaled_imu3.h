@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_SCALED_IMU3 129
 
-typedef struct __mavlink_scaled_imu3_t
-{
+MAVPACKED(
+typedef struct __mavlink_scaled_imu3_t {
  uint32_t time_boot_ms; /*< Timestamp (milliseconds since system boot)*/
  int16_t xacc; /*< X acceleration (mg)*/
  int16_t yacc; /*< Y acceleration (mg)*/
@@ -14,16 +14,36 @@ typedef struct __mavlink_scaled_imu3_t
  int16_t xmag; /*< X Magnetic field (milli tesla)*/
  int16_t ymag; /*< Y Magnetic field (milli tesla)*/
  int16_t zmag; /*< Z Magnetic field (milli tesla)*/
-} mavlink_scaled_imu3_t;
+}) mavlink_scaled_imu3_t;
 
 #define MAVLINK_MSG_ID_SCALED_IMU3_LEN 22
+#define MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN 22
 #define MAVLINK_MSG_ID_129_LEN 22
+#define MAVLINK_MSG_ID_129_MIN_LEN 22
 
 #define MAVLINK_MSG_ID_SCALED_IMU3_CRC 46
 #define MAVLINK_MSG_ID_129_CRC 46
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SCALED_IMU3 { \
+	129, \
+	"SCALED_IMU3", \
+	10, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_scaled_imu3_t, time_boot_ms) }, \
+         { "xacc", NULL, MAVLINK_TYPE_INT16_T, 0, 4, offsetof(mavlink_scaled_imu3_t, xacc) }, \
+         { "yacc", NULL, MAVLINK_TYPE_INT16_T, 0, 6, offsetof(mavlink_scaled_imu3_t, yacc) }, \
+         { "zacc", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_scaled_imu3_t, zacc) }, \
+         { "xgyro", NULL, MAVLINK_TYPE_INT16_T, 0, 10, offsetof(mavlink_scaled_imu3_t, xgyro) }, \
+         { "ygyro", NULL, MAVLINK_TYPE_INT16_T, 0, 12, offsetof(mavlink_scaled_imu3_t, ygyro) }, \
+         { "zgyro", NULL, MAVLINK_TYPE_INT16_T, 0, 14, offsetof(mavlink_scaled_imu3_t, zgyro) }, \
+         { "xmag", NULL, MAVLINK_TYPE_INT16_T, 0, 16, offsetof(mavlink_scaled_imu3_t, xmag) }, \
+         { "ymag", NULL, MAVLINK_TYPE_INT16_T, 0, 18, offsetof(mavlink_scaled_imu3_t, ymag) }, \
+         { "zmag", NULL, MAVLINK_TYPE_INT16_T, 0, 20, offsetof(mavlink_scaled_imu3_t, zmag) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SCALED_IMU3 { \
 	"SCALED_IMU3", \
 	10, \
@@ -39,7 +59,7 @@ typedef struct __mavlink_scaled_imu3_t
          { "zmag", NULL, MAVLINK_TYPE_INT16_T, 0, 20, offsetof(mavlink_scaled_imu3_t, zmag) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a scaled_imu3 message
@@ -93,11 +113,7 @@ static inline uint16_t mavlink_msg_scaled_imu3_pack(uint8_t system_id, uint8_t c
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SCALED_IMU3;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 }
 
 /**
@@ -153,11 +169,7 @@ static inline uint16_t mavlink_msg_scaled_imu3_pack_chan(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SCALED_IMU3;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 }
 
 /**
@@ -219,11 +231,7 @@ static inline void mavlink_msg_scaled_imu3_send(mavlink_channel_t chan, uint32_t
 	_mav_put_int16_t(buf, 18, ymag);
 	_mav_put_int16_t(buf, 20, zmag);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, buf, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, buf, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, buf, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 #else
 	mavlink_scaled_imu3_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -237,11 +245,21 @@ static inline void mavlink_msg_scaled_imu3_send(mavlink_channel_t chan, uint32_t
 	packet.ymag = ymag;
 	packet.zmag = zmag;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)&packet, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)&packet, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)&packet, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 #endif
+}
+
+/**
+ * @brief Send a scaled_imu3 message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_scaled_imu3_send_struct(mavlink_channel_t chan, const mavlink_scaled_imu3_t* scaled_imu3)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_scaled_imu3_send(chan, scaled_imu3->time_boot_ms, scaled_imu3->xacc, scaled_imu3->yacc, scaled_imu3->zacc, scaled_imu3->xgyro, scaled_imu3->ygyro, scaled_imu3->zgyro, scaled_imu3->xmag, scaled_imu3->ymag, scaled_imu3->zmag);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)scaled_imu3, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 #endif
 }
 
@@ -268,11 +286,7 @@ static inline void mavlink_msg_scaled_imu3_send_buf(mavlink_message_t *msgbuf, m
 	_mav_put_int16_t(buf, 18, ymag);
 	_mav_put_int16_t(buf, 20, zmag);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, buf, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, buf, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, buf, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 #else
 	mavlink_scaled_imu3_t *packet = (mavlink_scaled_imu3_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -286,11 +300,7 @@ static inline void mavlink_msg_scaled_imu3_send_buf(mavlink_message_t *msgbuf, m
 	packet->ymag = ymag;
 	packet->zmag = zmag;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)packet, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)packet, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU3, (const char *)packet, MAVLINK_MSG_ID_SCALED_IMU3_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU3_LEN, MAVLINK_MSG_ID_SCALED_IMU3_CRC);
 #endif
 }
 #endif
@@ -408,7 +418,7 @@ static inline int16_t mavlink_msg_scaled_imu3_get_zmag(const mavlink_message_t* 
  */
 static inline void mavlink_msg_scaled_imu3_decode(const mavlink_message_t* msg, mavlink_scaled_imu3_t* scaled_imu3)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	scaled_imu3->time_boot_ms = mavlink_msg_scaled_imu3_get_time_boot_ms(msg);
 	scaled_imu3->xacc = mavlink_msg_scaled_imu3_get_xacc(msg);
 	scaled_imu3->yacc = mavlink_msg_scaled_imu3_get_yacc(msg);
@@ -420,6 +430,8 @@ static inline void mavlink_msg_scaled_imu3_decode(const mavlink_message_t* msg, 
 	scaled_imu3->ymag = mavlink_msg_scaled_imu3_get_ymag(msg);
 	scaled_imu3->zmag = mavlink_msg_scaled_imu3_get_zmag(msg);
 #else
-	memcpy(scaled_imu3, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SCALED_IMU3_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SCALED_IMU3_LEN? msg->len : MAVLINK_MSG_ID_SCALED_IMU3_LEN;
+        memset(scaled_imu3, 0, MAVLINK_MSG_ID_SCALED_IMU3_LEN);
+	memcpy(scaled_imu3, _MAV_PAYLOAD(msg), len);
 #endif
 }

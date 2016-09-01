@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B 171
 
-typedef struct __mavlink_serial_udb_extra_f2_b_t
-{
+MAVPACKED(
+typedef struct __mavlink_serial_udb_extra_f2_b_t {
  uint32_t sue_time; /*< Serial UDB Extra Time*/
  uint32_t sue_flags; /*< Serial UDB Extra Status Flags*/
  int16_t sue_pwm_input_1; /*< Serial UDB Extra PWM Input Channel 1*/
@@ -37,16 +37,59 @@ typedef struct __mavlink_serial_udb_extra_f2_b_t
  int16_t sue_waypoint_goal_y; /*< Serial UDB Extra Current Waypoint Goal Y*/
  int16_t sue_waypoint_goal_z; /*< Serial UDB Extra Current Waypoint Goal Z*/
  int16_t sue_memory_stack_free; /*< Serial UDB Extra Stack Memory Free*/
-} mavlink_serial_udb_extra_f2_b_t;
+}) mavlink_serial_udb_extra_f2_b_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN 70
+#define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN 70
 #define MAVLINK_MSG_ID_171_LEN 70
+#define MAVLINK_MSG_ID_171_MIN_LEN 70
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC 169
 #define MAVLINK_MSG_ID_171_CRC 169
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F2_B { \
+	171, \
+	"SERIAL_UDB_EXTRA_F2_B", \
+	33, \
+	{  { "sue_time", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_time) }, \
+         { "sue_flags", NULL, MAVLINK_TYPE_UINT32_T, 0, 4, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_flags) }, \
+         { "sue_pwm_input_1", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_1) }, \
+         { "sue_pwm_input_2", NULL, MAVLINK_TYPE_INT16_T, 0, 10, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_2) }, \
+         { "sue_pwm_input_3", NULL, MAVLINK_TYPE_INT16_T, 0, 12, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_3) }, \
+         { "sue_pwm_input_4", NULL, MAVLINK_TYPE_INT16_T, 0, 14, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_4) }, \
+         { "sue_pwm_input_5", NULL, MAVLINK_TYPE_INT16_T, 0, 16, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_5) }, \
+         { "sue_pwm_input_6", NULL, MAVLINK_TYPE_INT16_T, 0, 18, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_6) }, \
+         { "sue_pwm_input_7", NULL, MAVLINK_TYPE_INT16_T, 0, 20, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_7) }, \
+         { "sue_pwm_input_8", NULL, MAVLINK_TYPE_INT16_T, 0, 22, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_8) }, \
+         { "sue_pwm_input_9", NULL, MAVLINK_TYPE_INT16_T, 0, 24, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_9) }, \
+         { "sue_pwm_input_10", NULL, MAVLINK_TYPE_INT16_T, 0, 26, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_input_10) }, \
+         { "sue_pwm_output_1", NULL, MAVLINK_TYPE_INT16_T, 0, 28, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_1) }, \
+         { "sue_pwm_output_2", NULL, MAVLINK_TYPE_INT16_T, 0, 30, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_2) }, \
+         { "sue_pwm_output_3", NULL, MAVLINK_TYPE_INT16_T, 0, 32, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_3) }, \
+         { "sue_pwm_output_4", NULL, MAVLINK_TYPE_INT16_T, 0, 34, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_4) }, \
+         { "sue_pwm_output_5", NULL, MAVLINK_TYPE_INT16_T, 0, 36, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_5) }, \
+         { "sue_pwm_output_6", NULL, MAVLINK_TYPE_INT16_T, 0, 38, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_6) }, \
+         { "sue_pwm_output_7", NULL, MAVLINK_TYPE_INT16_T, 0, 40, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_7) }, \
+         { "sue_pwm_output_8", NULL, MAVLINK_TYPE_INT16_T, 0, 42, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_8) }, \
+         { "sue_pwm_output_9", NULL, MAVLINK_TYPE_INT16_T, 0, 44, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_9) }, \
+         { "sue_pwm_output_10", NULL, MAVLINK_TYPE_INT16_T, 0, 46, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_pwm_output_10) }, \
+         { "sue_imu_location_x", NULL, MAVLINK_TYPE_INT16_T, 0, 48, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_imu_location_x) }, \
+         { "sue_imu_location_y", NULL, MAVLINK_TYPE_INT16_T, 0, 50, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_imu_location_y) }, \
+         { "sue_imu_location_z", NULL, MAVLINK_TYPE_INT16_T, 0, 52, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_imu_location_z) }, \
+         { "sue_osc_fails", NULL, MAVLINK_TYPE_INT16_T, 0, 54, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_osc_fails) }, \
+         { "sue_imu_velocity_x", NULL, MAVLINK_TYPE_INT16_T, 0, 56, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_imu_velocity_x) }, \
+         { "sue_imu_velocity_y", NULL, MAVLINK_TYPE_INT16_T, 0, 58, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_imu_velocity_y) }, \
+         { "sue_imu_velocity_z", NULL, MAVLINK_TYPE_INT16_T, 0, 60, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_imu_velocity_z) }, \
+         { "sue_waypoint_goal_x", NULL, MAVLINK_TYPE_INT16_T, 0, 62, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_waypoint_goal_x) }, \
+         { "sue_waypoint_goal_y", NULL, MAVLINK_TYPE_INT16_T, 0, 64, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_waypoint_goal_y) }, \
+         { "sue_waypoint_goal_z", NULL, MAVLINK_TYPE_INT16_T, 0, 66, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_waypoint_goal_z) }, \
+         { "sue_memory_stack_free", NULL, MAVLINK_TYPE_INT16_T, 0, 68, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_memory_stack_free) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F2_B { \
 	"SERIAL_UDB_EXTRA_F2_B", \
 	33, \
@@ -85,7 +128,7 @@ typedef struct __mavlink_serial_udb_extra_f2_b_t
          { "sue_memory_stack_free", NULL, MAVLINK_TYPE_INT16_T, 0, 68, offsetof(mavlink_serial_udb_extra_f2_b_t, sue_memory_stack_free) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a serial_udb_extra_f2_b message
@@ -208,11 +251,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_b_pack(uint8_t system_id,
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 }
 
 /**
@@ -337,11 +376,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f2_b_pack_chan(uint8_t syste
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 }
 
 /**
@@ -449,11 +484,7 @@ static inline void mavlink_msg_serial_udb_extra_f2_b_send(mavlink_channel_t chan
 	_mav_put_int16_t(buf, 66, sue_waypoint_goal_z);
 	_mav_put_int16_t(buf, 68, sue_memory_stack_free);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 #else
 	mavlink_serial_udb_extra_f2_b_t packet;
 	packet.sue_time = sue_time;
@@ -490,11 +521,21 @@ static inline void mavlink_msg_serial_udb_extra_f2_b_send(mavlink_channel_t chan
 	packet.sue_waypoint_goal_z = sue_waypoint_goal_z;
 	packet.sue_memory_stack_free = sue_memory_stack_free;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 #endif
+}
+
+/**
+ * @brief Send a serial_udb_extra_f2_b message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_serial_udb_extra_f2_b_send_struct(mavlink_channel_t chan, const mavlink_serial_udb_extra_f2_b_t* serial_udb_extra_f2_b)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_serial_udb_extra_f2_b_send(chan, serial_udb_extra_f2_b->sue_time, serial_udb_extra_f2_b->sue_pwm_input_1, serial_udb_extra_f2_b->sue_pwm_input_2, serial_udb_extra_f2_b->sue_pwm_input_3, serial_udb_extra_f2_b->sue_pwm_input_4, serial_udb_extra_f2_b->sue_pwm_input_5, serial_udb_extra_f2_b->sue_pwm_input_6, serial_udb_extra_f2_b->sue_pwm_input_7, serial_udb_extra_f2_b->sue_pwm_input_8, serial_udb_extra_f2_b->sue_pwm_input_9, serial_udb_extra_f2_b->sue_pwm_input_10, serial_udb_extra_f2_b->sue_pwm_output_1, serial_udb_extra_f2_b->sue_pwm_output_2, serial_udb_extra_f2_b->sue_pwm_output_3, serial_udb_extra_f2_b->sue_pwm_output_4, serial_udb_extra_f2_b->sue_pwm_output_5, serial_udb_extra_f2_b->sue_pwm_output_6, serial_udb_extra_f2_b->sue_pwm_output_7, serial_udb_extra_f2_b->sue_pwm_output_8, serial_udb_extra_f2_b->sue_pwm_output_9, serial_udb_extra_f2_b->sue_pwm_output_10, serial_udb_extra_f2_b->sue_imu_location_x, serial_udb_extra_f2_b->sue_imu_location_y, serial_udb_extra_f2_b->sue_imu_location_z, serial_udb_extra_f2_b->sue_flags, serial_udb_extra_f2_b->sue_osc_fails, serial_udb_extra_f2_b->sue_imu_velocity_x, serial_udb_extra_f2_b->sue_imu_velocity_y, serial_udb_extra_f2_b->sue_imu_velocity_z, serial_udb_extra_f2_b->sue_waypoint_goal_x, serial_udb_extra_f2_b->sue_waypoint_goal_y, serial_udb_extra_f2_b->sue_waypoint_goal_z, serial_udb_extra_f2_b->sue_memory_stack_free);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)serial_udb_extra_f2_b, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 #endif
 }
 
@@ -544,11 +585,7 @@ static inline void mavlink_msg_serial_udb_extra_f2_b_send_buf(mavlink_message_t 
 	_mav_put_int16_t(buf, 66, sue_waypoint_goal_z);
 	_mav_put_int16_t(buf, 68, sue_memory_stack_free);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 #else
 	mavlink_serial_udb_extra_f2_b_t *packet = (mavlink_serial_udb_extra_f2_b_t *)msgbuf;
 	packet->sue_time = sue_time;
@@ -585,11 +622,7 @@ static inline void mavlink_msg_serial_udb_extra_f2_b_send_buf(mavlink_message_t 
 	packet->sue_waypoint_goal_z = sue_waypoint_goal_z;
 	packet->sue_memory_stack_free = sue_memory_stack_free;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_CRC);
 #endif
 }
 #endif
@@ -937,7 +970,7 @@ static inline int16_t mavlink_msg_serial_udb_extra_f2_b_get_sue_memory_stack_fre
  */
 static inline void mavlink_msg_serial_udb_extra_f2_b_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f2_b_t* serial_udb_extra_f2_b)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	serial_udb_extra_f2_b->sue_time = mavlink_msg_serial_udb_extra_f2_b_get_sue_time(msg);
 	serial_udb_extra_f2_b->sue_flags = mavlink_msg_serial_udb_extra_f2_b_get_sue_flags(msg);
 	serial_udb_extra_f2_b->sue_pwm_input_1 = mavlink_msg_serial_udb_extra_f2_b_get_sue_pwm_input_1(msg);
@@ -972,6 +1005,8 @@ static inline void mavlink_msg_serial_udb_extra_f2_b_decode(const mavlink_messag
 	serial_udb_extra_f2_b->sue_waypoint_goal_z = mavlink_msg_serial_udb_extra_f2_b_get_sue_waypoint_goal_z(msg);
 	serial_udb_extra_f2_b->sue_memory_stack_free = mavlink_msg_serial_udb_extra_f2_b_get_sue_memory_stack_free(msg);
 #else
-	memcpy(serial_udb_extra_f2_b, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN;
+        memset(serial_udb_extra_f2_b, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F2_B_LEN);
+	memcpy(serial_udb_extra_f2_b, _MAV_PAYLOAD(msg), len);
 #endif
 }

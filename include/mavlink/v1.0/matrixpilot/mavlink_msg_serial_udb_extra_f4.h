@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4 172
 
-typedef struct __mavlink_serial_udb_extra_f4_t
-{
+MAVPACKED(
+typedef struct __mavlink_serial_udb_extra_f4_t {
  uint8_t sue_ROLL_STABILIZATION_AILERONS; /*< Serial UDB Extra Roll Stabilization with Ailerons Enabled*/
  uint8_t sue_ROLL_STABILIZATION_RUDDER; /*< Serial UDB Extra Roll Stabilization with Rudder Enabled*/
  uint8_t sue_PITCH_STABILIZATION; /*< Serial UDB Extra Pitch Stabilization Enabled*/
@@ -14,16 +14,36 @@ typedef struct __mavlink_serial_udb_extra_f4_t
  uint8_t sue_ALTITUDEHOLD_STABILIZED; /*< Serial UDB Extra Type of Alitude Hold when in Stabilized Mode*/
  uint8_t sue_ALTITUDEHOLD_WAYPOINT; /*< Serial UDB Extra Type of Alitude Hold when in Waypoint Mode*/
  uint8_t sue_RACING_MODE; /*< Serial UDB Extra Firmware racing mode enabled*/
-} mavlink_serial_udb_extra_f4_t;
+}) mavlink_serial_udb_extra_f4_t;
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN 10
+#define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN 10
 #define MAVLINK_MSG_ID_172_LEN 10
+#define MAVLINK_MSG_ID_172_MIN_LEN 10
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC 191
 #define MAVLINK_MSG_ID_172_CRC 191
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F4 { \
+	172, \
+	"SERIAL_UDB_EXTRA_F4", \
+	10, \
+	{  { "sue_ROLL_STABILIZATION_AILERONS", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_serial_udb_extra_f4_t, sue_ROLL_STABILIZATION_AILERONS) }, \
+         { "sue_ROLL_STABILIZATION_RUDDER", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_serial_udb_extra_f4_t, sue_ROLL_STABILIZATION_RUDDER) }, \
+         { "sue_PITCH_STABILIZATION", NULL, MAVLINK_TYPE_UINT8_T, 0, 2, offsetof(mavlink_serial_udb_extra_f4_t, sue_PITCH_STABILIZATION) }, \
+         { "sue_YAW_STABILIZATION_RUDDER", NULL, MAVLINK_TYPE_UINT8_T, 0, 3, offsetof(mavlink_serial_udb_extra_f4_t, sue_YAW_STABILIZATION_RUDDER) }, \
+         { "sue_YAW_STABILIZATION_AILERON", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_serial_udb_extra_f4_t, sue_YAW_STABILIZATION_AILERON) }, \
+         { "sue_AILERON_NAVIGATION", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_serial_udb_extra_f4_t, sue_AILERON_NAVIGATION) }, \
+         { "sue_RUDDER_NAVIGATION", NULL, MAVLINK_TYPE_UINT8_T, 0, 6, offsetof(mavlink_serial_udb_extra_f4_t, sue_RUDDER_NAVIGATION) }, \
+         { "sue_ALTITUDEHOLD_STABILIZED", NULL, MAVLINK_TYPE_UINT8_T, 0, 7, offsetof(mavlink_serial_udb_extra_f4_t, sue_ALTITUDEHOLD_STABILIZED) }, \
+         { "sue_ALTITUDEHOLD_WAYPOINT", NULL, MAVLINK_TYPE_UINT8_T, 0, 8, offsetof(mavlink_serial_udb_extra_f4_t, sue_ALTITUDEHOLD_WAYPOINT) }, \
+         { "sue_RACING_MODE", NULL, MAVLINK_TYPE_UINT8_T, 0, 9, offsetof(mavlink_serial_udb_extra_f4_t, sue_RACING_MODE) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F4 { \
 	"SERIAL_UDB_EXTRA_F4", \
 	10, \
@@ -39,7 +59,7 @@ typedef struct __mavlink_serial_udb_extra_f4_t
          { "sue_RACING_MODE", NULL, MAVLINK_TYPE_UINT8_T, 0, 9, offsetof(mavlink_serial_udb_extra_f4_t, sue_RACING_MODE) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a serial_udb_extra_f4 message
@@ -93,11 +113,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f4_pack(uint8_t system_id, u
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 }
 
 /**
@@ -153,11 +169,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f4_pack_chan(uint8_t system_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 }
 
 /**
@@ -219,11 +231,7 @@ static inline void mavlink_msg_serial_udb_extra_f4_send(mavlink_channel_t chan, 
 	_mav_put_uint8_t(buf, 8, sue_ALTITUDEHOLD_WAYPOINT);
 	_mav_put_uint8_t(buf, 9, sue_RACING_MODE);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 #else
 	mavlink_serial_udb_extra_f4_t packet;
 	packet.sue_ROLL_STABILIZATION_AILERONS = sue_ROLL_STABILIZATION_AILERONS;
@@ -237,11 +245,21 @@ static inline void mavlink_msg_serial_udb_extra_f4_send(mavlink_channel_t chan, 
 	packet.sue_ALTITUDEHOLD_WAYPOINT = sue_ALTITUDEHOLD_WAYPOINT;
 	packet.sue_RACING_MODE = sue_RACING_MODE;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 #endif
+}
+
+/**
+ * @brief Send a serial_udb_extra_f4 message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_serial_udb_extra_f4_send_struct(mavlink_channel_t chan, const mavlink_serial_udb_extra_f4_t* serial_udb_extra_f4)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_serial_udb_extra_f4_send(chan, serial_udb_extra_f4->sue_ROLL_STABILIZATION_AILERONS, serial_udb_extra_f4->sue_ROLL_STABILIZATION_RUDDER, serial_udb_extra_f4->sue_PITCH_STABILIZATION, serial_udb_extra_f4->sue_YAW_STABILIZATION_RUDDER, serial_udb_extra_f4->sue_YAW_STABILIZATION_AILERON, serial_udb_extra_f4->sue_AILERON_NAVIGATION, serial_udb_extra_f4->sue_RUDDER_NAVIGATION, serial_udb_extra_f4->sue_ALTITUDEHOLD_STABILIZED, serial_udb_extra_f4->sue_ALTITUDEHOLD_WAYPOINT, serial_udb_extra_f4->sue_RACING_MODE);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)serial_udb_extra_f4, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 #endif
 }
 
@@ -268,11 +286,7 @@ static inline void mavlink_msg_serial_udb_extra_f4_send_buf(mavlink_message_t *m
 	_mav_put_uint8_t(buf, 8, sue_ALTITUDEHOLD_WAYPOINT);
 	_mav_put_uint8_t(buf, 9, sue_RACING_MODE);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 #else
 	mavlink_serial_udb_extra_f4_t *packet = (mavlink_serial_udb_extra_f4_t *)msgbuf;
 	packet->sue_ROLL_STABILIZATION_AILERONS = sue_ROLL_STABILIZATION_AILERONS;
@@ -286,11 +300,7 @@ static inline void mavlink_msg_serial_udb_extra_f4_send_buf(mavlink_message_t *m
 	packet->sue_ALTITUDEHOLD_WAYPOINT = sue_ALTITUDEHOLD_WAYPOINT;
 	packet->sue_RACING_MODE = sue_RACING_MODE;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_CRC);
 #endif
 }
 #endif
@@ -408,7 +418,7 @@ static inline uint8_t mavlink_msg_serial_udb_extra_f4_get_sue_RACING_MODE(const 
  */
 static inline void mavlink_msg_serial_udb_extra_f4_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f4_t* serial_udb_extra_f4)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	serial_udb_extra_f4->sue_ROLL_STABILIZATION_AILERONS = mavlink_msg_serial_udb_extra_f4_get_sue_ROLL_STABILIZATION_AILERONS(msg);
 	serial_udb_extra_f4->sue_ROLL_STABILIZATION_RUDDER = mavlink_msg_serial_udb_extra_f4_get_sue_ROLL_STABILIZATION_RUDDER(msg);
 	serial_udb_extra_f4->sue_PITCH_STABILIZATION = mavlink_msg_serial_udb_extra_f4_get_sue_PITCH_STABILIZATION(msg);
@@ -420,6 +430,8 @@ static inline void mavlink_msg_serial_udb_extra_f4_decode(const mavlink_message_
 	serial_udb_extra_f4->sue_ALTITUDEHOLD_WAYPOINT = mavlink_msg_serial_udb_extra_f4_get_sue_ALTITUDEHOLD_WAYPOINT(msg);
 	serial_udb_extra_f4->sue_RACING_MODE = mavlink_msg_serial_udb_extra_f4_get_sue_RACING_MODE(msg);
 #else
-	memcpy(serial_udb_extra_f4, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN;
+        memset(serial_udb_extra_f4, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F4_LEN);
+	memcpy(serial_udb_extra_f4, _MAV_PAYLOAD(msg), len);
 #endif
 }

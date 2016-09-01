@@ -2,24 +2,40 @@
 
 #define MAVLINK_MSG_ID_EKF_STATUS_REPORT 193
 
-typedef struct __mavlink_ekf_status_report_t
-{
+MAVPACKED(
+typedef struct __mavlink_ekf_status_report_t {
  float velocity_variance; /*< Velocity variance*/
  float pos_horiz_variance; /*< Horizontal Position variance*/
  float pos_vert_variance; /*< Vertical Position variance*/
  float compass_variance; /*< Compass variance*/
  float terrain_alt_variance; /*< Terrain Altitude variance*/
  uint16_t flags; /*< Flags*/
-} mavlink_ekf_status_report_t;
+}) mavlink_ekf_status_report_t;
 
 #define MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN 22
+#define MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN 22
 #define MAVLINK_MSG_ID_193_LEN 22
+#define MAVLINK_MSG_ID_193_MIN_LEN 22
 
 #define MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC 71
 #define MAVLINK_MSG_ID_193_CRC 71
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_EKF_STATUS_REPORT { \
+	193, \
+	"EKF_STATUS_REPORT", \
+	6, \
+	{  { "velocity_variance", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_ekf_status_report_t, velocity_variance) }, \
+         { "pos_horiz_variance", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_ekf_status_report_t, pos_horiz_variance) }, \
+         { "pos_vert_variance", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_ekf_status_report_t, pos_vert_variance) }, \
+         { "compass_variance", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_ekf_status_report_t, compass_variance) }, \
+         { "terrain_alt_variance", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_ekf_status_report_t, terrain_alt_variance) }, \
+         { "flags", NULL, MAVLINK_TYPE_UINT16_T, 0, 20, offsetof(mavlink_ekf_status_report_t, flags) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_EKF_STATUS_REPORT { \
 	"EKF_STATUS_REPORT", \
 	6, \
@@ -31,7 +47,7 @@ typedef struct __mavlink_ekf_status_report_t
          { "flags", NULL, MAVLINK_TYPE_UINT16_T, 0, 20, offsetof(mavlink_ekf_status_report_t, flags) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a ekf_status_report message
@@ -73,11 +89,7 @@ static inline uint16_t mavlink_msg_ekf_status_report_pack(uint8_t system_id, uin
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_EKF_STATUS_REPORT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 }
 
 /**
@@ -121,11 +133,7 @@ static inline uint16_t mavlink_msg_ekf_status_report_pack_chan(uint8_t system_id
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_EKF_STATUS_REPORT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 }
 
 /**
@@ -179,11 +187,7 @@ static inline void mavlink_msg_ekf_status_report_send(mavlink_channel_t chan, ui
 	_mav_put_float(buf, 16, terrain_alt_variance);
 	_mav_put_uint16_t(buf, 20, flags);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, buf, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, buf, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, buf, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 #else
 	mavlink_ekf_status_report_t packet;
 	packet.velocity_variance = velocity_variance;
@@ -193,11 +197,21 @@ static inline void mavlink_msg_ekf_status_report_send(mavlink_channel_t chan, ui
 	packet.terrain_alt_variance = terrain_alt_variance;
 	packet.flags = flags;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)&packet, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)&packet, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)&packet, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a ekf_status_report message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_ekf_status_report_send_struct(mavlink_channel_t chan, const mavlink_ekf_status_report_t* ekf_status_report)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_ekf_status_report_send(chan, ekf_status_report->flags, ekf_status_report->velocity_variance, ekf_status_report->pos_horiz_variance, ekf_status_report->pos_vert_variance, ekf_status_report->compass_variance, ekf_status_report->terrain_alt_variance);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)ekf_status_report, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 #endif
 }
 
@@ -220,11 +234,7 @@ static inline void mavlink_msg_ekf_status_report_send_buf(mavlink_message_t *msg
 	_mav_put_float(buf, 16, terrain_alt_variance);
 	_mav_put_uint16_t(buf, 20, flags);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, buf, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, buf, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, buf, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 #else
 	mavlink_ekf_status_report_t *packet = (mavlink_ekf_status_report_t *)msgbuf;
 	packet->velocity_variance = velocity_variance;
@@ -234,11 +244,7 @@ static inline void mavlink_msg_ekf_status_report_send_buf(mavlink_message_t *msg
 	packet->terrain_alt_variance = terrain_alt_variance;
 	packet->flags = flags;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)packet, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)packet, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_EKF_STATUS_REPORT, (const char *)packet, MAVLINK_MSG_ID_EKF_STATUS_REPORT_MIN_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN, MAVLINK_MSG_ID_EKF_STATUS_REPORT_CRC);
 #endif
 }
 #endif
@@ -316,7 +322,7 @@ static inline float mavlink_msg_ekf_status_report_get_terrain_alt_variance(const
  */
 static inline void mavlink_msg_ekf_status_report_decode(const mavlink_message_t* msg, mavlink_ekf_status_report_t* ekf_status_report)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	ekf_status_report->velocity_variance = mavlink_msg_ekf_status_report_get_velocity_variance(msg);
 	ekf_status_report->pos_horiz_variance = mavlink_msg_ekf_status_report_get_pos_horiz_variance(msg);
 	ekf_status_report->pos_vert_variance = mavlink_msg_ekf_status_report_get_pos_vert_variance(msg);
@@ -324,6 +330,8 @@ static inline void mavlink_msg_ekf_status_report_decode(const mavlink_message_t*
 	ekf_status_report->terrain_alt_variance = mavlink_msg_ekf_status_report_get_terrain_alt_variance(msg);
 	ekf_status_report->flags = mavlink_msg_ekf_status_report_get_flags(msg);
 #else
-	memcpy(ekf_status_report, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN? msg->len : MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN;
+        memset(ekf_status_report, 0, MAVLINK_MSG_ID_EKF_STATUS_REPORT_LEN);
+	memcpy(ekf_status_report, _MAV_PAYLOAD(msg), len);
 #endif
 }

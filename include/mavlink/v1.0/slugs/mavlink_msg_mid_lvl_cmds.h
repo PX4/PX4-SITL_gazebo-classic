@@ -2,22 +2,36 @@
 
 #define MAVLINK_MSG_ID_MID_LVL_CMDS 180
 
-typedef struct __mavlink_mid_lvl_cmds_t
-{
+MAVPACKED(
+typedef struct __mavlink_mid_lvl_cmds_t {
  float hCommand; /*< Commanded Altitude in meters*/
  float uCommand; /*< Commanded Airspeed in m/s*/
  float rCommand; /*< Commanded Turnrate in rad/s*/
  uint8_t target; /*< The system setting the commands*/
-} mavlink_mid_lvl_cmds_t;
+}) mavlink_mid_lvl_cmds_t;
 
 #define MAVLINK_MSG_ID_MID_LVL_CMDS_LEN 13
+#define MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN 13
 #define MAVLINK_MSG_ID_180_LEN 13
+#define MAVLINK_MSG_ID_180_MIN_LEN 13
 
 #define MAVLINK_MSG_ID_MID_LVL_CMDS_CRC 146
 #define MAVLINK_MSG_ID_180_CRC 146
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MID_LVL_CMDS { \
+	180, \
+	"MID_LVL_CMDS", \
+	4, \
+	{  { "hCommand", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_mid_lvl_cmds_t, hCommand) }, \
+         { "uCommand", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_mid_lvl_cmds_t, uCommand) }, \
+         { "rCommand", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_mid_lvl_cmds_t, rCommand) }, \
+         { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 12, offsetof(mavlink_mid_lvl_cmds_t, target) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MID_LVL_CMDS { \
 	"MID_LVL_CMDS", \
 	4, \
@@ -27,7 +41,7 @@ typedef struct __mavlink_mid_lvl_cmds_t
          { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 12, offsetof(mavlink_mid_lvl_cmds_t, target) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a mid_lvl_cmds message
@@ -63,11 +77,7 @@ static inline uint16_t mavlink_msg_mid_lvl_cmds_pack(uint8_t system_id, uint8_t 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MID_LVL_CMDS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 }
 
 /**
@@ -105,11 +115,7 @@ static inline uint16_t mavlink_msg_mid_lvl_cmds_pack_chan(uint8_t system_id, uin
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MID_LVL_CMDS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 }
 
 /**
@@ -159,11 +165,7 @@ static inline void mavlink_msg_mid_lvl_cmds_send(mavlink_channel_t chan, uint8_t
 	_mav_put_float(buf, 8, rCommand);
 	_mav_put_uint8_t(buf, 12, target);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, buf, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, buf, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, buf, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 #else
 	mavlink_mid_lvl_cmds_t packet;
 	packet.hCommand = hCommand;
@@ -171,11 +173,21 @@ static inline void mavlink_msg_mid_lvl_cmds_send(mavlink_channel_t chan, uint8_t
 	packet.rCommand = rCommand;
 	packet.target = target;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)&packet, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)&packet, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)&packet, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 #endif
+}
+
+/**
+ * @brief Send a mid_lvl_cmds message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_mid_lvl_cmds_send_struct(mavlink_channel_t chan, const mavlink_mid_lvl_cmds_t* mid_lvl_cmds)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_mid_lvl_cmds_send(chan, mid_lvl_cmds->target, mid_lvl_cmds->hCommand, mid_lvl_cmds->uCommand, mid_lvl_cmds->rCommand);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)mid_lvl_cmds, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 #endif
 }
 
@@ -196,11 +208,7 @@ static inline void mavlink_msg_mid_lvl_cmds_send_buf(mavlink_message_t *msgbuf, 
 	_mav_put_float(buf, 8, rCommand);
 	_mav_put_uint8_t(buf, 12, target);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, buf, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, buf, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, buf, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 #else
 	mavlink_mid_lvl_cmds_t *packet = (mavlink_mid_lvl_cmds_t *)msgbuf;
 	packet->hCommand = hCommand;
@@ -208,11 +216,7 @@ static inline void mavlink_msg_mid_lvl_cmds_send_buf(mavlink_message_t *msgbuf, 
 	packet->rCommand = rCommand;
 	packet->target = target;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)packet, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)packet, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MID_LVL_CMDS, (const char *)packet, MAVLINK_MSG_ID_MID_LVL_CMDS_MIN_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN, MAVLINK_MSG_ID_MID_LVL_CMDS_CRC);
 #endif
 }
 #endif
@@ -270,12 +274,14 @@ static inline float mavlink_msg_mid_lvl_cmds_get_rCommand(const mavlink_message_
  */
 static inline void mavlink_msg_mid_lvl_cmds_decode(const mavlink_message_t* msg, mavlink_mid_lvl_cmds_t* mid_lvl_cmds)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mid_lvl_cmds->hCommand = mavlink_msg_mid_lvl_cmds_get_hCommand(msg);
 	mid_lvl_cmds->uCommand = mavlink_msg_mid_lvl_cmds_get_uCommand(msg);
 	mid_lvl_cmds->rCommand = mavlink_msg_mid_lvl_cmds_get_rCommand(msg);
 	mid_lvl_cmds->target = mavlink_msg_mid_lvl_cmds_get_target(msg);
 #else
-	memcpy(mid_lvl_cmds, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MID_LVL_CMDS_LEN? msg->len : MAVLINK_MSG_ID_MID_LVL_CMDS_LEN;
+        memset(mid_lvl_cmds, 0, MAVLINK_MSG_ID_MID_LVL_CMDS_LEN);
+	memcpy(mid_lvl_cmds, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_RADIO 166
 
-typedef struct __mavlink_radio_t
-{
+MAVPACKED(
+typedef struct __mavlink_radio_t {
  uint16_t rxerrors; /*< receive errors*/
  uint16_t fixed; /*< count of error corrected packets*/
  uint8_t rssi; /*< local signal strength*/
@@ -11,16 +11,33 @@ typedef struct __mavlink_radio_t
  uint8_t txbuf; /*< how full the tx buffer is as a percentage*/
  uint8_t noise; /*< background noise level*/
  uint8_t remnoise; /*< remote background noise level*/
-} mavlink_radio_t;
+}) mavlink_radio_t;
 
 #define MAVLINK_MSG_ID_RADIO_LEN 9
+#define MAVLINK_MSG_ID_RADIO_MIN_LEN 9
 #define MAVLINK_MSG_ID_166_LEN 9
+#define MAVLINK_MSG_ID_166_MIN_LEN 9
 
 #define MAVLINK_MSG_ID_RADIO_CRC 21
 #define MAVLINK_MSG_ID_166_CRC 21
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_RADIO { \
+	166, \
+	"RADIO", \
+	7, \
+	{  { "rxerrors", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_radio_t, rxerrors) }, \
+         { "fixed", NULL, MAVLINK_TYPE_UINT16_T, 0, 2, offsetof(mavlink_radio_t, fixed) }, \
+         { "rssi", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_radio_t, rssi) }, \
+         { "remrssi", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_radio_t, remrssi) }, \
+         { "txbuf", NULL, MAVLINK_TYPE_UINT8_T, 0, 6, offsetof(mavlink_radio_t, txbuf) }, \
+         { "noise", NULL, MAVLINK_TYPE_UINT8_T, 0, 7, offsetof(mavlink_radio_t, noise) }, \
+         { "remnoise", NULL, MAVLINK_TYPE_UINT8_T, 0, 8, offsetof(mavlink_radio_t, remnoise) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_RADIO { \
 	"RADIO", \
 	7, \
@@ -33,7 +50,7 @@ typedef struct __mavlink_radio_t
          { "remnoise", NULL, MAVLINK_TYPE_UINT8_T, 0, 8, offsetof(mavlink_radio_t, remnoise) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a radio message
@@ -78,11 +95,7 @@ static inline uint16_t mavlink_msg_radio_pack(uint8_t system_id, uint8_t compone
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RADIO;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RADIO_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 }
 
 /**
@@ -129,11 +142,7 @@ static inline uint16_t mavlink_msg_radio_pack_chan(uint8_t system_id, uint8_t co
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RADIO;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RADIO_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 }
 
 /**
@@ -189,11 +198,7 @@ static inline void mavlink_msg_radio_send(mavlink_channel_t chan, uint8_t rssi, 
 	_mav_put_uint8_t(buf, 7, noise);
 	_mav_put_uint8_t(buf, 8, remnoise);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, buf, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, buf, MAVLINK_MSG_ID_RADIO_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, buf, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 #else
 	mavlink_radio_t packet;
 	packet.rxerrors = rxerrors;
@@ -204,11 +209,21 @@ static inline void mavlink_msg_radio_send(mavlink_channel_t chan, uint8_t rssi, 
 	packet.noise = noise;
 	packet.remnoise = remnoise;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)&packet, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)&packet, MAVLINK_MSG_ID_RADIO_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)&packet, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 #endif
+}
+
+/**
+ * @brief Send a radio message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_radio_send_struct(mavlink_channel_t chan, const mavlink_radio_t* radio)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_radio_send(chan, radio->rssi, radio->remrssi, radio->txbuf, radio->noise, radio->remnoise, radio->rxerrors, radio->fixed);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)radio, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 #endif
 }
 
@@ -232,11 +247,7 @@ static inline void mavlink_msg_radio_send_buf(mavlink_message_t *msgbuf, mavlink
 	_mav_put_uint8_t(buf, 7, noise);
 	_mav_put_uint8_t(buf, 8, remnoise);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, buf, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, buf, MAVLINK_MSG_ID_RADIO_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, buf, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 #else
 	mavlink_radio_t *packet = (mavlink_radio_t *)msgbuf;
 	packet->rxerrors = rxerrors;
@@ -247,11 +258,7 @@ static inline void mavlink_msg_radio_send_buf(mavlink_message_t *msgbuf, mavlink
 	packet->noise = noise;
 	packet->remnoise = remnoise;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)packet, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)packet, MAVLINK_MSG_ID_RADIO_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RADIO, (const char *)packet, MAVLINK_MSG_ID_RADIO_MIN_LEN, MAVLINK_MSG_ID_RADIO_LEN, MAVLINK_MSG_ID_RADIO_CRC);
 #endif
 }
 #endif
@@ -339,7 +346,7 @@ static inline uint16_t mavlink_msg_radio_get_fixed(const mavlink_message_t* msg)
  */
 static inline void mavlink_msg_radio_decode(const mavlink_message_t* msg, mavlink_radio_t* radio)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	radio->rxerrors = mavlink_msg_radio_get_rxerrors(msg);
 	radio->fixed = mavlink_msg_radio_get_fixed(msg);
 	radio->rssi = mavlink_msg_radio_get_rssi(msg);
@@ -348,6 +355,8 @@ static inline void mavlink_msg_radio_decode(const mavlink_message_t* msg, mavlin
 	radio->noise = mavlink_msg_radio_get_noise(msg);
 	radio->remnoise = mavlink_msg_radio_get_remnoise(msg);
 #else
-	memcpy(radio, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_RADIO_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_RADIO_LEN? msg->len : MAVLINK_MSG_ID_RADIO_LEN;
+        memset(radio, 0, MAVLINK_MSG_ID_RADIO_LEN);
+	memcpy(radio, _MAV_PAYLOAD(msg), len);
 #endif
 }

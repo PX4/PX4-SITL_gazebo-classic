@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_AHRS 163
 
-typedef struct __mavlink_ahrs_t
-{
+MAVPACKED(
+typedef struct __mavlink_ahrs_t {
  float omegaIx; /*< X gyro drift estimate rad/s*/
  float omegaIy; /*< Y gyro drift estimate rad/s*/
  float omegaIz; /*< Z gyro drift estimate rad/s*/
@@ -11,16 +11,33 @@ typedef struct __mavlink_ahrs_t
  float renorm_val; /*< average renormalisation value*/
  float error_rp; /*< average error_roll_pitch value*/
  float error_yaw; /*< average error_yaw value*/
-} mavlink_ahrs_t;
+}) mavlink_ahrs_t;
 
 #define MAVLINK_MSG_ID_AHRS_LEN 28
+#define MAVLINK_MSG_ID_AHRS_MIN_LEN 28
 #define MAVLINK_MSG_ID_163_LEN 28
+#define MAVLINK_MSG_ID_163_MIN_LEN 28
 
 #define MAVLINK_MSG_ID_AHRS_CRC 127
 #define MAVLINK_MSG_ID_163_CRC 127
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_AHRS { \
+	163, \
+	"AHRS", \
+	7, \
+	{  { "omegaIx", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_ahrs_t, omegaIx) }, \
+         { "omegaIy", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_ahrs_t, omegaIy) }, \
+         { "omegaIz", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_ahrs_t, omegaIz) }, \
+         { "accel_weight", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_ahrs_t, accel_weight) }, \
+         { "renorm_val", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_ahrs_t, renorm_val) }, \
+         { "error_rp", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_ahrs_t, error_rp) }, \
+         { "error_yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_ahrs_t, error_yaw) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_AHRS { \
 	"AHRS", \
 	7, \
@@ -33,7 +50,7 @@ typedef struct __mavlink_ahrs_t
          { "error_yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_ahrs_t, error_yaw) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a ahrs message
@@ -78,11 +95,7 @@ static inline uint16_t mavlink_msg_ahrs_pack(uint8_t system_id, uint8_t componen
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AHRS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AHRS_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 }
 
 /**
@@ -129,11 +142,7 @@ static inline uint16_t mavlink_msg_ahrs_pack_chan(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AHRS;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AHRS_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 }
 
 /**
@@ -189,11 +198,7 @@ static inline void mavlink_msg_ahrs_send(mavlink_channel_t chan, float omegaIx, 
 	_mav_put_float(buf, 20, error_rp);
 	_mav_put_float(buf, 24, error_yaw);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, buf, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, buf, MAVLINK_MSG_ID_AHRS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, buf, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 #else
 	mavlink_ahrs_t packet;
 	packet.omegaIx = omegaIx;
@@ -204,11 +209,21 @@ static inline void mavlink_msg_ahrs_send(mavlink_channel_t chan, float omegaIx, 
 	packet.error_rp = error_rp;
 	packet.error_yaw = error_yaw;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)&packet, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)&packet, MAVLINK_MSG_ID_AHRS_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)&packet, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 #endif
+}
+
+/**
+ * @brief Send a ahrs message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_ahrs_send_struct(mavlink_channel_t chan, const mavlink_ahrs_t* ahrs)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_ahrs_send(chan, ahrs->omegaIx, ahrs->omegaIy, ahrs->omegaIz, ahrs->accel_weight, ahrs->renorm_val, ahrs->error_rp, ahrs->error_yaw);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)ahrs, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 #endif
 }
 
@@ -232,11 +247,7 @@ static inline void mavlink_msg_ahrs_send_buf(mavlink_message_t *msgbuf, mavlink_
 	_mav_put_float(buf, 20, error_rp);
 	_mav_put_float(buf, 24, error_yaw);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, buf, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, buf, MAVLINK_MSG_ID_AHRS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, buf, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 #else
 	mavlink_ahrs_t *packet = (mavlink_ahrs_t *)msgbuf;
 	packet->omegaIx = omegaIx;
@@ -247,11 +258,7 @@ static inline void mavlink_msg_ahrs_send_buf(mavlink_message_t *msgbuf, mavlink_
 	packet->error_rp = error_rp;
 	packet->error_yaw = error_yaw;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)packet, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)packet, MAVLINK_MSG_ID_AHRS_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AHRS, (const char *)packet, MAVLINK_MSG_ID_AHRS_MIN_LEN, MAVLINK_MSG_ID_AHRS_LEN, MAVLINK_MSG_ID_AHRS_CRC);
 #endif
 }
 #endif
@@ -339,7 +346,7 @@ static inline float mavlink_msg_ahrs_get_error_yaw(const mavlink_message_t* msg)
  */
 static inline void mavlink_msg_ahrs_decode(const mavlink_message_t* msg, mavlink_ahrs_t* ahrs)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	ahrs->omegaIx = mavlink_msg_ahrs_get_omegaIx(msg);
 	ahrs->omegaIy = mavlink_msg_ahrs_get_omegaIy(msg);
 	ahrs->omegaIz = mavlink_msg_ahrs_get_omegaIz(msg);
@@ -348,6 +355,8 @@ static inline void mavlink_msg_ahrs_decode(const mavlink_message_t* msg, mavlink
 	ahrs->error_rp = mavlink_msg_ahrs_get_error_rp(msg);
 	ahrs->error_yaw = mavlink_msg_ahrs_get_error_yaw(msg);
 #else
-	memcpy(ahrs, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_AHRS_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_AHRS_LEN? msg->len : MAVLINK_MSG_ID_AHRS_LEN;
+        memset(ahrs, 0, MAVLINK_MSG_ID_AHRS_LEN);
+	memcpy(ahrs, _MAV_PAYLOAD(msg), len);
 #endif
 }

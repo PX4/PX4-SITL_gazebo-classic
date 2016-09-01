@@ -2,20 +2,32 @@
 
 #define MAVLINK_MSG_ID_MESSAGE_INTERVAL 244
 
-typedef struct __mavlink_message_interval_t
-{
+MAVPACKED(
+typedef struct __mavlink_message_interval_t {
  int32_t interval_us; /*< The interval between two messages, in microseconds. A value of -1 indicates this stream is disabled, 0 indicates it is not available, > 0 indicates the interval at which it is sent.*/
  uint16_t message_id; /*< The ID of the requested MAVLink message. v1.0 is limited to 254 messages.*/
-} mavlink_message_interval_t;
+}) mavlink_message_interval_t;
 
 #define MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN 6
+#define MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN 6
 #define MAVLINK_MSG_ID_244_LEN 6
+#define MAVLINK_MSG_ID_244_MIN_LEN 6
 
 #define MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC 95
 #define MAVLINK_MSG_ID_244_CRC 95
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MESSAGE_INTERVAL { \
+	244, \
+	"MESSAGE_INTERVAL", \
+	2, \
+	{  { "interval_us", NULL, MAVLINK_TYPE_INT32_T, 0, 0, offsetof(mavlink_message_interval_t, interval_us) }, \
+         { "message_id", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_message_interval_t, message_id) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MESSAGE_INTERVAL { \
 	"MESSAGE_INTERVAL", \
 	2, \
@@ -23,7 +35,7 @@ typedef struct __mavlink_message_interval_t
          { "message_id", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_message_interval_t, message_id) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a message_interval message
@@ -53,11 +65,7 @@ static inline uint16_t mavlink_msg_message_interval_pack(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MESSAGE_INTERVAL;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 }
 
 /**
@@ -89,11 +97,7 @@ static inline uint16_t mavlink_msg_message_interval_pack_chan(uint8_t system_id,
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MESSAGE_INTERVAL;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 }
 
 /**
@@ -139,21 +143,27 @@ static inline void mavlink_msg_message_interval_send(mavlink_channel_t chan, uin
 	_mav_put_int32_t(buf, 0, interval_us);
 	_mav_put_uint16_t(buf, 4, message_id);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, buf, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, buf, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, buf, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 #else
 	mavlink_message_interval_t packet;
 	packet.interval_us = interval_us;
 	packet.message_id = message_id;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)&packet, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)&packet, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)&packet, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 #endif
+}
+
+/**
+ * @brief Send a message_interval message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_message_interval_send_struct(mavlink_channel_t chan, const mavlink_message_interval_t* message_interval)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_message_interval_send(chan, message_interval->message_id, message_interval->interval_us);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)message_interval, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 #endif
 }
 
@@ -172,21 +182,13 @@ static inline void mavlink_msg_message_interval_send_buf(mavlink_message_t *msgb
 	_mav_put_int32_t(buf, 0, interval_us);
 	_mav_put_uint16_t(buf, 4, message_id);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, buf, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, buf, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, buf, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 #else
 	mavlink_message_interval_t *packet = (mavlink_message_interval_t *)msgbuf;
 	packet->interval_us = interval_us;
 	packet->message_id = message_id;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)packet, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)packet, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MESSAGE_INTERVAL, (const char *)packet, MAVLINK_MSG_ID_MESSAGE_INTERVAL_MIN_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN, MAVLINK_MSG_ID_MESSAGE_INTERVAL_CRC);
 #endif
 }
 #endif
@@ -224,10 +226,12 @@ static inline int32_t mavlink_msg_message_interval_get_interval_us(const mavlink
  */
 static inline void mavlink_msg_message_interval_decode(const mavlink_message_t* msg, mavlink_message_interval_t* message_interval)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	message_interval->interval_us = mavlink_msg_message_interval_get_interval_us(msg);
 	message_interval->message_id = mavlink_msg_message_interval_get_message_id(msg);
 #else
-	memcpy(message_interval, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN? msg->len : MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN;
+        memset(message_interval, 0, MAVLINK_MSG_ID_MESSAGE_INTERVAL_LEN);
+	memcpy(message_interval, _MAV_PAYLOAD(msg), len);
 #endif
 }

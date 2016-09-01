@@ -2,22 +2,36 @@
 
 #define MAVLINK_MSG_ID_CONTROL_SURFACE 185
 
-typedef struct __mavlink_control_surface_t
-{
+MAVPACKED(
+typedef struct __mavlink_control_surface_t {
  float mControl; /*< Pending*/
  float bControl; /*< Order to origin*/
  uint8_t target; /*< The system setting the commands*/
  uint8_t idSurface; /*< ID control surface send 0: throttle 1: aileron 2: elevator 3: rudder*/
-} mavlink_control_surface_t;
+}) mavlink_control_surface_t;
 
 #define MAVLINK_MSG_ID_CONTROL_SURFACE_LEN 10
+#define MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN 10
 #define MAVLINK_MSG_ID_185_LEN 10
+#define MAVLINK_MSG_ID_185_MIN_LEN 10
 
 #define MAVLINK_MSG_ID_CONTROL_SURFACE_CRC 113
 #define MAVLINK_MSG_ID_185_CRC 113
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_CONTROL_SURFACE { \
+	185, \
+	"CONTROL_SURFACE", \
+	4, \
+	{  { "mControl", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_control_surface_t, mControl) }, \
+         { "bControl", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_control_surface_t, bControl) }, \
+         { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 8, offsetof(mavlink_control_surface_t, target) }, \
+         { "idSurface", NULL, MAVLINK_TYPE_UINT8_T, 0, 9, offsetof(mavlink_control_surface_t, idSurface) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_CONTROL_SURFACE { \
 	"CONTROL_SURFACE", \
 	4, \
@@ -27,7 +41,7 @@ typedef struct __mavlink_control_surface_t
          { "idSurface", NULL, MAVLINK_TYPE_UINT8_T, 0, 9, offsetof(mavlink_control_surface_t, idSurface) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a control_surface message
@@ -63,11 +77,7 @@ static inline uint16_t mavlink_msg_control_surface_pack(uint8_t system_id, uint8
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CONTROL_SURFACE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 }
 
 /**
@@ -105,11 +115,7 @@ static inline uint16_t mavlink_msg_control_surface_pack_chan(uint8_t system_id, 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_CONTROL_SURFACE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 }
 
 /**
@@ -159,11 +165,7 @@ static inline void mavlink_msg_control_surface_send(mavlink_channel_t chan, uint
 	_mav_put_uint8_t(buf, 8, target);
 	_mav_put_uint8_t(buf, 9, idSurface);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, buf, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 #else
 	mavlink_control_surface_t packet;
 	packet.mControl = mControl;
@@ -171,11 +173,21 @@ static inline void mavlink_msg_control_surface_send(mavlink_channel_t chan, uint
 	packet.target = target;
 	packet.idSurface = idSurface;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)&packet, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)&packet, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)&packet, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 #endif
+}
+
+/**
+ * @brief Send a control_surface message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_control_surface_send_struct(mavlink_channel_t chan, const mavlink_control_surface_t* control_surface)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_control_surface_send(chan, control_surface->target, control_surface->idSurface, control_surface->mControl, control_surface->bControl);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)control_surface, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 #endif
 }
 
@@ -196,11 +208,7 @@ static inline void mavlink_msg_control_surface_send_buf(mavlink_message_t *msgbu
 	_mav_put_uint8_t(buf, 8, target);
 	_mav_put_uint8_t(buf, 9, idSurface);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, buf, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, buf, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 #else
 	mavlink_control_surface_t *packet = (mavlink_control_surface_t *)msgbuf;
 	packet->mControl = mControl;
@@ -208,11 +216,7 @@ static inline void mavlink_msg_control_surface_send_buf(mavlink_message_t *msgbu
 	packet->target = target;
 	packet->idSurface = idSurface;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)packet, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)packet, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CONTROL_SURFACE, (const char *)packet, MAVLINK_MSG_ID_CONTROL_SURFACE_MIN_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN, MAVLINK_MSG_ID_CONTROL_SURFACE_CRC);
 #endif
 }
 #endif
@@ -270,12 +274,14 @@ static inline float mavlink_msg_control_surface_get_bControl(const mavlink_messa
  */
 static inline void mavlink_msg_control_surface_decode(const mavlink_message_t* msg, mavlink_control_surface_t* control_surface)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	control_surface->mControl = mavlink_msg_control_surface_get_mControl(msg);
 	control_surface->bControl = mavlink_msg_control_surface_get_bControl(msg);
 	control_surface->target = mavlink_msg_control_surface_get_target(msg);
 	control_surface->idSurface = mavlink_msg_control_surface_get_idSurface(msg);
 #else
-	memcpy(control_surface, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_CONTROL_SURFACE_LEN? msg->len : MAVLINK_MSG_ID_CONTROL_SURFACE_LEN;
+        memset(control_surface, 0, MAVLINK_MSG_ID_CONTROL_SURFACE_LEN);
+	memcpy(control_surface, _MAV_PAYLOAD(msg), len);
 #endif
 }

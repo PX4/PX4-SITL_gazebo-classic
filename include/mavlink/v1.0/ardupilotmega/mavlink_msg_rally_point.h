@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_RALLY_POINT 175
 
-typedef struct __mavlink_rally_point_t
-{
+MAVPACKED(
+typedef struct __mavlink_rally_point_t {
  int32_t lat; /*< Latitude of point in degrees * 1E7*/
  int32_t lng; /*< Longitude of point in degrees * 1E7*/
  int16_t alt; /*< Transit / loiter altitude in meters relative to home*/
@@ -14,16 +14,36 @@ typedef struct __mavlink_rally_point_t
  uint8_t idx; /*< point index (first point is 0)*/
  uint8_t count; /*< total number of points (for sanity checking)*/
  uint8_t flags; /*< See RALLY_FLAGS enum for definition of the bitmask.*/
-} mavlink_rally_point_t;
+}) mavlink_rally_point_t;
 
 #define MAVLINK_MSG_ID_RALLY_POINT_LEN 19
+#define MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN 19
 #define MAVLINK_MSG_ID_175_LEN 19
+#define MAVLINK_MSG_ID_175_MIN_LEN 19
 
 #define MAVLINK_MSG_ID_RALLY_POINT_CRC 138
 #define MAVLINK_MSG_ID_175_CRC 138
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_RALLY_POINT { \
+	175, \
+	"RALLY_POINT", \
+	10, \
+	{  { "lat", NULL, MAVLINK_TYPE_INT32_T, 0, 0, offsetof(mavlink_rally_point_t, lat) }, \
+         { "lng", NULL, MAVLINK_TYPE_INT32_T, 0, 4, offsetof(mavlink_rally_point_t, lng) }, \
+         { "alt", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_rally_point_t, alt) }, \
+         { "break_alt", NULL, MAVLINK_TYPE_INT16_T, 0, 10, offsetof(mavlink_rally_point_t, break_alt) }, \
+         { "land_dir", NULL, MAVLINK_TYPE_UINT16_T, 0, 12, offsetof(mavlink_rally_point_t, land_dir) }, \
+         { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 14, offsetof(mavlink_rally_point_t, target_system) }, \
+         { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 15, offsetof(mavlink_rally_point_t, target_component) }, \
+         { "idx", NULL, MAVLINK_TYPE_UINT8_T, 0, 16, offsetof(mavlink_rally_point_t, idx) }, \
+         { "count", NULL, MAVLINK_TYPE_UINT8_T, 0, 17, offsetof(mavlink_rally_point_t, count) }, \
+         { "flags", NULL, MAVLINK_TYPE_UINT8_T, 0, 18, offsetof(mavlink_rally_point_t, flags) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_RALLY_POINT { \
 	"RALLY_POINT", \
 	10, \
@@ -39,7 +59,7 @@ typedef struct __mavlink_rally_point_t
          { "flags", NULL, MAVLINK_TYPE_UINT8_T, 0, 18, offsetof(mavlink_rally_point_t, flags) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a rally_point message
@@ -93,11 +113,7 @@ static inline uint16_t mavlink_msg_rally_point_pack(uint8_t system_id, uint8_t c
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RALLY_POINT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RALLY_POINT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 }
 
 /**
@@ -153,11 +169,7 @@ static inline uint16_t mavlink_msg_rally_point_pack_chan(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_RALLY_POINT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RALLY_POINT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 }
 
 /**
@@ -219,11 +231,7 @@ static inline void mavlink_msg_rally_point_send(mavlink_channel_t chan, uint8_t 
 	_mav_put_uint8_t(buf, 17, count);
 	_mav_put_uint8_t(buf, 18, flags);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, buf, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, buf, MAVLINK_MSG_ID_RALLY_POINT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, buf, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 #else
 	mavlink_rally_point_t packet;
 	packet.lat = lat;
@@ -237,11 +245,21 @@ static inline void mavlink_msg_rally_point_send(mavlink_channel_t chan, uint8_t 
 	packet.count = count;
 	packet.flags = flags;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)&packet, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)&packet, MAVLINK_MSG_ID_RALLY_POINT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)&packet, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a rally_point message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_rally_point_send_struct(mavlink_channel_t chan, const mavlink_rally_point_t* rally_point)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_rally_point_send(chan, rally_point->target_system, rally_point->target_component, rally_point->idx, rally_point->count, rally_point->lat, rally_point->lng, rally_point->alt, rally_point->break_alt, rally_point->land_dir, rally_point->flags);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)rally_point, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 #endif
 }
 
@@ -268,11 +286,7 @@ static inline void mavlink_msg_rally_point_send_buf(mavlink_message_t *msgbuf, m
 	_mav_put_uint8_t(buf, 17, count);
 	_mav_put_uint8_t(buf, 18, flags);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, buf, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, buf, MAVLINK_MSG_ID_RALLY_POINT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, buf, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 #else
 	mavlink_rally_point_t *packet = (mavlink_rally_point_t *)msgbuf;
 	packet->lat = lat;
@@ -286,11 +300,7 @@ static inline void mavlink_msg_rally_point_send_buf(mavlink_message_t *msgbuf, m
 	packet->count = count;
 	packet->flags = flags;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)packet, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)packet, MAVLINK_MSG_ID_RALLY_POINT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RALLY_POINT, (const char *)packet, MAVLINK_MSG_ID_RALLY_POINT_MIN_LEN, MAVLINK_MSG_ID_RALLY_POINT_LEN, MAVLINK_MSG_ID_RALLY_POINT_CRC);
 #endif
 }
 #endif
@@ -408,7 +418,7 @@ static inline uint8_t mavlink_msg_rally_point_get_flags(const mavlink_message_t*
  */
 static inline void mavlink_msg_rally_point_decode(const mavlink_message_t* msg, mavlink_rally_point_t* rally_point)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	rally_point->lat = mavlink_msg_rally_point_get_lat(msg);
 	rally_point->lng = mavlink_msg_rally_point_get_lng(msg);
 	rally_point->alt = mavlink_msg_rally_point_get_alt(msg);
@@ -420,6 +430,8 @@ static inline void mavlink_msg_rally_point_decode(const mavlink_message_t* msg, 
 	rally_point->count = mavlink_msg_rally_point_get_count(msg);
 	rally_point->flags = mavlink_msg_rally_point_get_flags(msg);
 #else
-	memcpy(rally_point, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_RALLY_POINT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_RALLY_POINT_LEN? msg->len : MAVLINK_MSG_ID_RALLY_POINT_LEN;
+        memset(rally_point, 0, MAVLINK_MSG_ID_RALLY_POINT_LEN);
+	memcpy(rally_point, _MAV_PAYLOAD(msg), len);
 #endif
 }

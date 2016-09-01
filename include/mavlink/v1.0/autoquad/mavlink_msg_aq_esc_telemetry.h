@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY 152
 
-typedef struct __mavlink_aq_esc_telemetry_t
-{
+MAVPACKED(
+typedef struct __mavlink_aq_esc_telemetry_t {
  uint32_t time_boot_ms; /*< Timestamp of the component clock since boot time in ms.*/
  uint32_t data0[4]; /*< Data bits 1-32 for each ESC.*/
  uint32_t data1[4]; /*< Data bits 33-64 for each ESC.*/
@@ -13,10 +13,12 @@ typedef struct __mavlink_aq_esc_telemetry_t
  uint8_t num_in_seq; /*< Number of active ESCs in this sequence (1 through this many array members will be populated with data)*/
  uint8_t escid[4]; /*< ESC/Motor ID*/
  uint8_t data_version[4]; /*< Version of data structure (determines contents).*/
-} mavlink_aq_esc_telemetry_t;
+}) mavlink_aq_esc_telemetry_t;
 
 #define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN 55
+#define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN 55
 #define MAVLINK_MSG_ID_152_LEN 55
+#define MAVLINK_MSG_ID_152_MIN_LEN 55
 
 #define MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC 115
 #define MAVLINK_MSG_ID_152_CRC 115
@@ -27,6 +29,23 @@ typedef struct __mavlink_aq_esc_telemetry_t
 #define MAVLINK_MSG_AQ_ESC_TELEMETRY_FIELD_ESCID_LEN 4
 #define MAVLINK_MSG_AQ_ESC_TELEMETRY_FIELD_DATA_VERSION_LEN 4
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_AQ_ESC_TELEMETRY { \
+	152, \
+	"AQ_ESC_TELEMETRY", \
+	9, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_aq_esc_telemetry_t, time_boot_ms) }, \
+         { "data0", NULL, MAVLINK_TYPE_UINT32_T, 4, 4, offsetof(mavlink_aq_esc_telemetry_t, data0) }, \
+         { "data1", NULL, MAVLINK_TYPE_UINT32_T, 4, 20, offsetof(mavlink_aq_esc_telemetry_t, data1) }, \
+         { "status_age", NULL, MAVLINK_TYPE_UINT16_T, 4, 36, offsetof(mavlink_aq_esc_telemetry_t, status_age) }, \
+         { "seq", NULL, MAVLINK_TYPE_UINT8_T, 0, 44, offsetof(mavlink_aq_esc_telemetry_t, seq) }, \
+         { "num_motors", NULL, MAVLINK_TYPE_UINT8_T, 0, 45, offsetof(mavlink_aq_esc_telemetry_t, num_motors) }, \
+         { "num_in_seq", NULL, MAVLINK_TYPE_UINT8_T, 0, 46, offsetof(mavlink_aq_esc_telemetry_t, num_in_seq) }, \
+         { "escid", NULL, MAVLINK_TYPE_UINT8_T, 4, 47, offsetof(mavlink_aq_esc_telemetry_t, escid) }, \
+         { "data_version", NULL, MAVLINK_TYPE_UINT8_T, 4, 51, offsetof(mavlink_aq_esc_telemetry_t, data_version) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_AQ_ESC_TELEMETRY { \
 	"AQ_ESC_TELEMETRY", \
 	9, \
@@ -41,7 +60,7 @@ typedef struct __mavlink_aq_esc_telemetry_t
          { "data_version", NULL, MAVLINK_TYPE_UINT8_T, 4, 51, offsetof(mavlink_aq_esc_telemetry_t, data_version) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a aq_esc_telemetry message
@@ -90,11 +109,7 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack(uint8_t system_id, uint
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AQ_ESC_TELEMETRY;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 }
 
 /**
@@ -145,11 +160,7 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_pack_chan(uint8_t system_id,
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AQ_ESC_TELEMETRY;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 }
 
 /**
@@ -208,11 +219,7 @@ static inline void mavlink_msg_aq_esc_telemetry_send(mavlink_channel_t chan, uin
 	_mav_put_uint16_t_array(buf, 36, status_age, 4);
 	_mav_put_uint8_t_array(buf, 47, escid, 4);
 	_mav_put_uint8_t_array(buf, 51, data_version, 4);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 #else
 	mavlink_aq_esc_telemetry_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -224,11 +231,21 @@ static inline void mavlink_msg_aq_esc_telemetry_send(mavlink_channel_t chan, uin
 	mav_array_memcpy(packet.status_age, status_age, sizeof(uint16_t)*4);
 	mav_array_memcpy(packet.escid, escid, sizeof(uint8_t)*4);
 	mav_array_memcpy(packet.data_version, data_version, sizeof(uint8_t)*4);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)&packet, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)&packet, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)&packet, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 #endif
+}
+
+/**
+ * @brief Send a aq_esc_telemetry message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_aq_esc_telemetry_send_struct(mavlink_channel_t chan, const mavlink_aq_esc_telemetry_t* aq_esc_telemetry)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_aq_esc_telemetry_send(chan, aq_esc_telemetry->time_boot_ms, aq_esc_telemetry->seq, aq_esc_telemetry->num_motors, aq_esc_telemetry->num_in_seq, aq_esc_telemetry->escid, aq_esc_telemetry->status_age, aq_esc_telemetry->data_version, aq_esc_telemetry->data0, aq_esc_telemetry->data1);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)aq_esc_telemetry, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 #endif
 }
 
@@ -253,11 +270,7 @@ static inline void mavlink_msg_aq_esc_telemetry_send_buf(mavlink_message_t *msgb
 	_mav_put_uint16_t_array(buf, 36, status_age, 4);
 	_mav_put_uint8_t_array(buf, 47, escid, 4);
 	_mav_put_uint8_t_array(buf, 51, data_version, 4);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, buf, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 #else
 	mavlink_aq_esc_telemetry_t *packet = (mavlink_aq_esc_telemetry_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -269,11 +282,7 @@ static inline void mavlink_msg_aq_esc_telemetry_send_buf(mavlink_message_t *msgb
 	mav_array_memcpy(packet->status_age, status_age, sizeof(uint16_t)*4);
 	mav_array_memcpy(packet->escid, escid, sizeof(uint8_t)*4);
 	mav_array_memcpy(packet->data_version, data_version, sizeof(uint8_t)*4);
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)packet, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)packet, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY, (const char *)packet, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_MIN_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_CRC);
 #endif
 }
 #endif
@@ -381,7 +390,7 @@ static inline uint16_t mavlink_msg_aq_esc_telemetry_get_data1(const mavlink_mess
  */
 static inline void mavlink_msg_aq_esc_telemetry_decode(const mavlink_message_t* msg, mavlink_aq_esc_telemetry_t* aq_esc_telemetry)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	aq_esc_telemetry->time_boot_ms = mavlink_msg_aq_esc_telemetry_get_time_boot_ms(msg);
 	mavlink_msg_aq_esc_telemetry_get_data0(msg, aq_esc_telemetry->data0);
 	mavlink_msg_aq_esc_telemetry_get_data1(msg, aq_esc_telemetry->data1);
@@ -392,6 +401,8 @@ static inline void mavlink_msg_aq_esc_telemetry_decode(const mavlink_message_t* 
 	mavlink_msg_aq_esc_telemetry_get_escid(msg, aq_esc_telemetry->escid);
 	mavlink_msg_aq_esc_telemetry_get_data_version(msg, aq_esc_telemetry->data_version);
 #else
-	memcpy(aq_esc_telemetry, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN? msg->len : MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN;
+        memset(aq_esc_telemetry, 0, MAVLINK_MSG_ID_AQ_ESC_TELEMETRY_LEN);
+	memcpy(aq_esc_telemetry, _MAV_PAYLOAD(msg), len);
 #endif
 }

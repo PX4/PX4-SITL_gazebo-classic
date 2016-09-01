@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW 92
 
-typedef struct __mavlink_hil_rc_inputs_raw_t
-{
+MAVPACKED(
+typedef struct __mavlink_hil_rc_inputs_raw_t {
  uint64_t time_usec; /*< Timestamp (microseconds since UNIX epoch or microseconds since system boot)*/
  uint16_t chan1_raw; /*< RC channel 1 value, in microseconds*/
  uint16_t chan2_raw; /*< RC channel 2 value, in microseconds*/
@@ -18,16 +18,40 @@ typedef struct __mavlink_hil_rc_inputs_raw_t
  uint16_t chan11_raw; /*< RC channel 11 value, in microseconds*/
  uint16_t chan12_raw; /*< RC channel 12 value, in microseconds*/
  uint8_t rssi; /*< Receive signal strength indicator, 0: 0%, 255: 100%*/
-} mavlink_hil_rc_inputs_raw_t;
+}) mavlink_hil_rc_inputs_raw_t;
 
 #define MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN 33
+#define MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN 33
 #define MAVLINK_MSG_ID_92_LEN 33
+#define MAVLINK_MSG_ID_92_MIN_LEN 33
 
 #define MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC 54
 #define MAVLINK_MSG_ID_92_CRC 54
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_HIL_RC_INPUTS_RAW { \
+	92, \
+	"HIL_RC_INPUTS_RAW", \
+	14, \
+	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_rc_inputs_raw_t, time_usec) }, \
+         { "chan1_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 8, offsetof(mavlink_hil_rc_inputs_raw_t, chan1_raw) }, \
+         { "chan2_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 10, offsetof(mavlink_hil_rc_inputs_raw_t, chan2_raw) }, \
+         { "chan3_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 12, offsetof(mavlink_hil_rc_inputs_raw_t, chan3_raw) }, \
+         { "chan4_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 14, offsetof(mavlink_hil_rc_inputs_raw_t, chan4_raw) }, \
+         { "chan5_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 16, offsetof(mavlink_hil_rc_inputs_raw_t, chan5_raw) }, \
+         { "chan6_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 18, offsetof(mavlink_hil_rc_inputs_raw_t, chan6_raw) }, \
+         { "chan7_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 20, offsetof(mavlink_hil_rc_inputs_raw_t, chan7_raw) }, \
+         { "chan8_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 22, offsetof(mavlink_hil_rc_inputs_raw_t, chan8_raw) }, \
+         { "chan9_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 24, offsetof(mavlink_hil_rc_inputs_raw_t, chan9_raw) }, \
+         { "chan10_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 26, offsetof(mavlink_hil_rc_inputs_raw_t, chan10_raw) }, \
+         { "chan11_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 28, offsetof(mavlink_hil_rc_inputs_raw_t, chan11_raw) }, \
+         { "chan12_raw", NULL, MAVLINK_TYPE_UINT16_T, 0, 30, offsetof(mavlink_hil_rc_inputs_raw_t, chan12_raw) }, \
+         { "rssi", NULL, MAVLINK_TYPE_UINT8_T, 0, 32, offsetof(mavlink_hil_rc_inputs_raw_t, rssi) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_HIL_RC_INPUTS_RAW { \
 	"HIL_RC_INPUTS_RAW", \
 	14, \
@@ -47,7 +71,7 @@ typedef struct __mavlink_hil_rc_inputs_raw_t
          { "rssi", NULL, MAVLINK_TYPE_UINT8_T, 0, 32, offsetof(mavlink_hil_rc_inputs_raw_t, rssi) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a hil_rc_inputs_raw message
@@ -113,11 +137,7 @@ static inline uint16_t mavlink_msg_hil_rc_inputs_raw_pack(uint8_t system_id, uin
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 }
 
 /**
@@ -185,11 +205,7 @@ static inline uint16_t mavlink_msg_hil_rc_inputs_raw_pack_chan(uint8_t system_id
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 }
 
 /**
@@ -259,11 +275,7 @@ static inline void mavlink_msg_hil_rc_inputs_raw_send(mavlink_channel_t chan, ui
 	_mav_put_uint16_t(buf, 30, chan12_raw);
 	_mav_put_uint8_t(buf, 32, rssi);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, buf, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, buf, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, buf, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 #else
 	mavlink_hil_rc_inputs_raw_t packet;
 	packet.time_usec = time_usec;
@@ -281,11 +293,21 @@ static inline void mavlink_msg_hil_rc_inputs_raw_send(mavlink_channel_t chan, ui
 	packet.chan12_raw = chan12_raw;
 	packet.rssi = rssi;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)&packet, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)&packet, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)&packet, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 #endif
+}
+
+/**
+ * @brief Send a hil_rc_inputs_raw message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_hil_rc_inputs_raw_send_struct(mavlink_channel_t chan, const mavlink_hil_rc_inputs_raw_t* hil_rc_inputs_raw)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_hil_rc_inputs_raw_send(chan, hil_rc_inputs_raw->time_usec, hil_rc_inputs_raw->chan1_raw, hil_rc_inputs_raw->chan2_raw, hil_rc_inputs_raw->chan3_raw, hil_rc_inputs_raw->chan4_raw, hil_rc_inputs_raw->chan5_raw, hil_rc_inputs_raw->chan6_raw, hil_rc_inputs_raw->chan7_raw, hil_rc_inputs_raw->chan8_raw, hil_rc_inputs_raw->chan9_raw, hil_rc_inputs_raw->chan10_raw, hil_rc_inputs_raw->chan11_raw, hil_rc_inputs_raw->chan12_raw, hil_rc_inputs_raw->rssi);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)hil_rc_inputs_raw, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 #endif
 }
 
@@ -316,11 +338,7 @@ static inline void mavlink_msg_hil_rc_inputs_raw_send_buf(mavlink_message_t *msg
 	_mav_put_uint16_t(buf, 30, chan12_raw);
 	_mav_put_uint8_t(buf, 32, rssi);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, buf, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, buf, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, buf, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 #else
 	mavlink_hil_rc_inputs_raw_t *packet = (mavlink_hil_rc_inputs_raw_t *)msgbuf;
 	packet->time_usec = time_usec;
@@ -338,11 +356,7 @@ static inline void mavlink_msg_hil_rc_inputs_raw_send_buf(mavlink_message_t *msg
 	packet->chan12_raw = chan12_raw;
 	packet->rssi = rssi;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)packet, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)packet, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW, (const char *)packet, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_MIN_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_CRC);
 #endif
 }
 #endif
@@ -500,7 +514,7 @@ static inline uint8_t mavlink_msg_hil_rc_inputs_raw_get_rssi(const mavlink_messa
  */
 static inline void mavlink_msg_hil_rc_inputs_raw_decode(const mavlink_message_t* msg, mavlink_hil_rc_inputs_raw_t* hil_rc_inputs_raw)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	hil_rc_inputs_raw->time_usec = mavlink_msg_hil_rc_inputs_raw_get_time_usec(msg);
 	hil_rc_inputs_raw->chan1_raw = mavlink_msg_hil_rc_inputs_raw_get_chan1_raw(msg);
 	hil_rc_inputs_raw->chan2_raw = mavlink_msg_hil_rc_inputs_raw_get_chan2_raw(msg);
@@ -516,6 +530,8 @@ static inline void mavlink_msg_hil_rc_inputs_raw_decode(const mavlink_message_t*
 	hil_rc_inputs_raw->chan12_raw = mavlink_msg_hil_rc_inputs_raw_get_chan12_raw(msg);
 	hil_rc_inputs_raw->rssi = mavlink_msg_hil_rc_inputs_raw_get_rssi(msg);
 #else
-	memcpy(hil_rc_inputs_raw, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN? msg->len : MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN;
+        memset(hil_rc_inputs_raw, 0, MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW_LEN);
+	memcpy(hil_rc_inputs_raw, _MAV_PAYLOAD(msg), len);
 #endif
 }

@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_HIL_STATE 90
 
-typedef struct __mavlink_hil_state_t
-{
+MAVPACKED(
+typedef struct __mavlink_hil_state_t {
  uint64_t time_usec; /*< Timestamp (microseconds since UNIX epoch or microseconds since system boot)*/
  float roll; /*< Roll angle (rad)*/
  float pitch; /*< Pitch angle (rad)*/
@@ -20,16 +20,42 @@ typedef struct __mavlink_hil_state_t
  int16_t xacc; /*< X acceleration (mg)*/
  int16_t yacc; /*< Y acceleration (mg)*/
  int16_t zacc; /*< Z acceleration (mg)*/
-} mavlink_hil_state_t;
+}) mavlink_hil_state_t;
 
 #define MAVLINK_MSG_ID_HIL_STATE_LEN 56
+#define MAVLINK_MSG_ID_HIL_STATE_MIN_LEN 56
 #define MAVLINK_MSG_ID_90_LEN 56
+#define MAVLINK_MSG_ID_90_MIN_LEN 56
 
 #define MAVLINK_MSG_ID_HIL_STATE_CRC 183
 #define MAVLINK_MSG_ID_90_CRC 183
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_HIL_STATE { \
+	90, \
+	"HIL_STATE", \
+	16, \
+	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_t, time_usec) }, \
+         { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_hil_state_t, roll) }, \
+         { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_hil_state_t, pitch) }, \
+         { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_hil_state_t, yaw) }, \
+         { "rollspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_hil_state_t, rollspeed) }, \
+         { "pitchspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_hil_state_t, pitchspeed) }, \
+         { "yawspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_hil_state_t, yawspeed) }, \
+         { "lat", NULL, MAVLINK_TYPE_INT32_T, 0, 32, offsetof(mavlink_hil_state_t, lat) }, \
+         { "lon", NULL, MAVLINK_TYPE_INT32_T, 0, 36, offsetof(mavlink_hil_state_t, lon) }, \
+         { "alt", NULL, MAVLINK_TYPE_INT32_T, 0, 40, offsetof(mavlink_hil_state_t, alt) }, \
+         { "vx", NULL, MAVLINK_TYPE_INT16_T, 0, 44, offsetof(mavlink_hil_state_t, vx) }, \
+         { "vy", NULL, MAVLINK_TYPE_INT16_T, 0, 46, offsetof(mavlink_hil_state_t, vy) }, \
+         { "vz", NULL, MAVLINK_TYPE_INT16_T, 0, 48, offsetof(mavlink_hil_state_t, vz) }, \
+         { "xacc", NULL, MAVLINK_TYPE_INT16_T, 0, 50, offsetof(mavlink_hil_state_t, xacc) }, \
+         { "yacc", NULL, MAVLINK_TYPE_INT16_T, 0, 52, offsetof(mavlink_hil_state_t, yacc) }, \
+         { "zacc", NULL, MAVLINK_TYPE_INT16_T, 0, 54, offsetof(mavlink_hil_state_t, zacc) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_HIL_STATE { \
 	"HIL_STATE", \
 	16, \
@@ -51,7 +77,7 @@ typedef struct __mavlink_hil_state_t
          { "zacc", NULL, MAVLINK_TYPE_INT16_T, 0, 54, offsetof(mavlink_hil_state_t, zacc) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a hil_state message
@@ -123,11 +149,7 @@ static inline uint16_t mavlink_msg_hil_state_pack(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_HIL_STATE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_STATE_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 }
 
 /**
@@ -201,11 +223,7 @@ static inline uint16_t mavlink_msg_hil_state_pack_chan(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_HIL_STATE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_STATE_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 }
 
 /**
@@ -279,11 +297,7 @@ static inline void mavlink_msg_hil_state_send(mavlink_channel_t chan, uint64_t t
 	_mav_put_int16_t(buf, 52, yacc);
 	_mav_put_int16_t(buf, 54, zacc);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #else
 	mavlink_hil_state_t packet;
 	packet.time_usec = time_usec;
@@ -303,11 +317,21 @@ static inline void mavlink_msg_hil_state_send(mavlink_channel_t chan, uint64_t t
 	packet.yacc = yacc;
 	packet.zacc = zacc;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)&packet, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)&packet, MAVLINK_MSG_ID_HIL_STATE_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)&packet, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #endif
+}
+
+/**
+ * @brief Send a hil_state message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_hil_state_send_struct(mavlink_channel_t chan, const mavlink_hil_state_t* hil_state)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_hil_state_send(chan, hil_state->time_usec, hil_state->roll, hil_state->pitch, hil_state->yaw, hil_state->rollspeed, hil_state->pitchspeed, hil_state->yawspeed, hil_state->lat, hil_state->lon, hil_state->alt, hil_state->vx, hil_state->vy, hil_state->vz, hil_state->xacc, hil_state->yacc, hil_state->zacc);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)hil_state, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #endif
 }
 
@@ -340,11 +364,7 @@ static inline void mavlink_msg_hil_state_send_buf(mavlink_message_t *msgbuf, mav
 	_mav_put_int16_t(buf, 52, yacc);
 	_mav_put_int16_t(buf, 54, zacc);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #else
 	mavlink_hil_state_t *packet = (mavlink_hil_state_t *)msgbuf;
 	packet->time_usec = time_usec;
@@ -364,11 +384,7 @@ static inline void mavlink_msg_hil_state_send_buf(mavlink_message_t *msgbuf, mav
 	packet->yacc = yacc;
 	packet->zacc = zacc;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)packet, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)packet, MAVLINK_MSG_ID_HIL_STATE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)packet, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #endif
 }
 #endif
@@ -546,7 +562,7 @@ static inline int16_t mavlink_msg_hil_state_get_zacc(const mavlink_message_t* ms
  */
 static inline void mavlink_msg_hil_state_decode(const mavlink_message_t* msg, mavlink_hil_state_t* hil_state)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	hil_state->time_usec = mavlink_msg_hil_state_get_time_usec(msg);
 	hil_state->roll = mavlink_msg_hil_state_get_roll(msg);
 	hil_state->pitch = mavlink_msg_hil_state_get_pitch(msg);
@@ -564,6 +580,8 @@ static inline void mavlink_msg_hil_state_decode(const mavlink_message_t* msg, ma
 	hil_state->yacc = mavlink_msg_hil_state_get_yacc(msg);
 	hil_state->zacc = mavlink_msg_hil_state_get_zacc(msg);
 #else
-	memcpy(hil_state, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_HIL_STATE_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_HIL_STATE_LEN? msg->len : MAVLINK_MSG_ID_HIL_STATE_LEN;
+        memset(hil_state, 0, MAVLINK_MSG_ID_HIL_STATE_LEN);
+	memcpy(hil_state, _MAV_PAYLOAD(msg), len);
 #endif
 }

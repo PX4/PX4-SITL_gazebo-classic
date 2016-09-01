@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_ALTITUDES 181
 
-typedef struct __mavlink_altitudes_t
-{
+MAVPACKED(
+typedef struct __mavlink_altitudes_t {
  uint32_t time_boot_ms; /*< Timestamp (milliseconds since system boot)*/
  int32_t alt_gps; /*< GPS altitude in meters, expressed as * 1000 (millimeters), above MSL*/
  int32_t alt_imu; /*< IMU altitude above ground in meters, expressed as * 1000 (millimeters)*/
@@ -11,16 +11,33 @@ typedef struct __mavlink_altitudes_t
  int32_t alt_optical_flow; /*< Optical flow altitude above ground in meters, expressed as * 1000 (millimeters)*/
  int32_t alt_range_finder; /*< Rangefinder Altitude above ground in meters, expressed as * 1000 (millimeters)*/
  int32_t alt_extra; /*< Extra altitude above ground in meters, expressed as * 1000 (millimeters)*/
-} mavlink_altitudes_t;
+}) mavlink_altitudes_t;
 
 #define MAVLINK_MSG_ID_ALTITUDES_LEN 28
+#define MAVLINK_MSG_ID_ALTITUDES_MIN_LEN 28
 #define MAVLINK_MSG_ID_181_LEN 28
+#define MAVLINK_MSG_ID_181_MIN_LEN 28
 
 #define MAVLINK_MSG_ID_ALTITUDES_CRC 55
 #define MAVLINK_MSG_ID_181_CRC 55
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_ALTITUDES { \
+	181, \
+	"ALTITUDES", \
+	7, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_altitudes_t, time_boot_ms) }, \
+         { "alt_gps", NULL, MAVLINK_TYPE_INT32_T, 0, 4, offsetof(mavlink_altitudes_t, alt_gps) }, \
+         { "alt_imu", NULL, MAVLINK_TYPE_INT32_T, 0, 8, offsetof(mavlink_altitudes_t, alt_imu) }, \
+         { "alt_barometric", NULL, MAVLINK_TYPE_INT32_T, 0, 12, offsetof(mavlink_altitudes_t, alt_barometric) }, \
+         { "alt_optical_flow", NULL, MAVLINK_TYPE_INT32_T, 0, 16, offsetof(mavlink_altitudes_t, alt_optical_flow) }, \
+         { "alt_range_finder", NULL, MAVLINK_TYPE_INT32_T, 0, 20, offsetof(mavlink_altitudes_t, alt_range_finder) }, \
+         { "alt_extra", NULL, MAVLINK_TYPE_INT32_T, 0, 24, offsetof(mavlink_altitudes_t, alt_extra) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_ALTITUDES { \
 	"ALTITUDES", \
 	7, \
@@ -33,7 +50,7 @@ typedef struct __mavlink_altitudes_t
          { "alt_extra", NULL, MAVLINK_TYPE_INT32_T, 0, 24, offsetof(mavlink_altitudes_t, alt_extra) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a altitudes message
@@ -78,11 +95,7 @@ static inline uint16_t mavlink_msg_altitudes_pack(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ALTITUDES_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 }
 
 /**
@@ -129,11 +142,7 @@ static inline uint16_t mavlink_msg_altitudes_pack_chan(uint8_t system_id, uint8_
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ALTITUDES_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 }
 
 /**
@@ -189,11 +198,7 @@ static inline void mavlink_msg_altitudes_send(mavlink_channel_t chan, uint32_t t
 	_mav_put_int32_t(buf, 20, alt_range_finder);
 	_mav_put_int32_t(buf, 24, alt_extra);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #else
 	mavlink_altitudes_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -204,11 +209,21 @@ static inline void mavlink_msg_altitudes_send(mavlink_channel_t chan, uint32_t t
 	packet.alt_range_finder = alt_range_finder;
 	packet.alt_extra = alt_extra;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)&packet, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)&packet, MAVLINK_MSG_ID_ALTITUDES_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)&packet, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #endif
+}
+
+/**
+ * @brief Send a altitudes message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_altitudes_send_struct(mavlink_channel_t chan, const mavlink_altitudes_t* altitudes)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_altitudes_send(chan, altitudes->time_boot_ms, altitudes->alt_gps, altitudes->alt_imu, altitudes->alt_barometric, altitudes->alt_optical_flow, altitudes->alt_range_finder, altitudes->alt_extra);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)altitudes, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #endif
 }
 
@@ -232,11 +247,7 @@ static inline void mavlink_msg_altitudes_send_buf(mavlink_message_t *msgbuf, mav
 	_mav_put_int32_t(buf, 20, alt_range_finder);
 	_mav_put_int32_t(buf, 24, alt_extra);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #else
 	mavlink_altitudes_t *packet = (mavlink_altitudes_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -247,11 +258,7 @@ static inline void mavlink_msg_altitudes_send_buf(mavlink_message_t *msgbuf, mav
 	packet->alt_range_finder = alt_range_finder;
 	packet->alt_extra = alt_extra;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)packet, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)packet, MAVLINK_MSG_ID_ALTITUDES_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)packet, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #endif
 }
 #endif
@@ -339,7 +346,7 @@ static inline int32_t mavlink_msg_altitudes_get_alt_extra(const mavlink_message_
  */
 static inline void mavlink_msg_altitudes_decode(const mavlink_message_t* msg, mavlink_altitudes_t* altitudes)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	altitudes->time_boot_ms = mavlink_msg_altitudes_get_time_boot_ms(msg);
 	altitudes->alt_gps = mavlink_msg_altitudes_get_alt_gps(msg);
 	altitudes->alt_imu = mavlink_msg_altitudes_get_alt_imu(msg);
@@ -348,6 +355,8 @@ static inline void mavlink_msg_altitudes_decode(const mavlink_message_t* msg, ma
 	altitudes->alt_range_finder = mavlink_msg_altitudes_get_alt_range_finder(msg);
 	altitudes->alt_extra = mavlink_msg_altitudes_get_alt_extra(msg);
 #else
-	memcpy(altitudes, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_ALTITUDES_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_ALTITUDES_LEN? msg->len : MAVLINK_MSG_ID_ALTITUDES_LEN;
+        memset(altitudes, 0, MAVLINK_MSG_ID_ALTITUDES_LEN);
+	memcpy(altitudes, _MAV_PAYLOAD(msg), len);
 #endif
 }

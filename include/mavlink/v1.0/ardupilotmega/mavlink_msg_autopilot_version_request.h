@@ -2,20 +2,32 @@
 
 #define MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST 183
 
-typedef struct __mavlink_autopilot_version_request_t
-{
+MAVPACKED(
+typedef struct __mavlink_autopilot_version_request_t {
  uint8_t target_system; /*< System ID*/
  uint8_t target_component; /*< Component ID*/
-} mavlink_autopilot_version_request_t;
+}) mavlink_autopilot_version_request_t;
 
 #define MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN 2
+#define MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN 2
 #define MAVLINK_MSG_ID_183_LEN 2
+#define MAVLINK_MSG_ID_183_MIN_LEN 2
 
 #define MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC 85
 #define MAVLINK_MSG_ID_183_CRC 85
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_AUTOPILOT_VERSION_REQUEST { \
+	183, \
+	"AUTOPILOT_VERSION_REQUEST", \
+	2, \
+	{  { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_autopilot_version_request_t, target_system) }, \
+         { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_autopilot_version_request_t, target_component) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_AUTOPILOT_VERSION_REQUEST { \
 	"AUTOPILOT_VERSION_REQUEST", \
 	2, \
@@ -23,7 +35,7 @@ typedef struct __mavlink_autopilot_version_request_t
          { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_autopilot_version_request_t, target_component) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a autopilot_version_request message
@@ -53,11 +65,7 @@ static inline uint16_t mavlink_msg_autopilot_version_request_pack(uint8_t system
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 }
 
 /**
@@ -89,11 +97,7 @@ static inline uint16_t mavlink_msg_autopilot_version_request_pack_chan(uint8_t s
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 }
 
 /**
@@ -139,21 +143,27 @@ static inline void mavlink_msg_autopilot_version_request_send(mavlink_channel_t 
 	_mav_put_uint8_t(buf, 0, target_system);
 	_mav_put_uint8_t(buf, 1, target_component);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, buf, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, buf, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, buf, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 #else
 	mavlink_autopilot_version_request_t packet;
 	packet.target_system = target_system;
 	packet.target_component = target_component;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)&packet, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)&packet, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)&packet, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 #endif
+}
+
+/**
+ * @brief Send a autopilot_version_request message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_autopilot_version_request_send_struct(mavlink_channel_t chan, const mavlink_autopilot_version_request_t* autopilot_version_request)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_autopilot_version_request_send(chan, autopilot_version_request->target_system, autopilot_version_request->target_component);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)autopilot_version_request, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 #endif
 }
 
@@ -172,21 +182,13 @@ static inline void mavlink_msg_autopilot_version_request_send_buf(mavlink_messag
 	_mav_put_uint8_t(buf, 0, target_system);
 	_mav_put_uint8_t(buf, 1, target_component);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, buf, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, buf, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, buf, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 #else
 	mavlink_autopilot_version_request_t *packet = (mavlink_autopilot_version_request_t *)msgbuf;
 	packet->target_system = target_system;
 	packet->target_component = target_component;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)packet, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)packet, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST, (const char *)packet, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_MIN_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_CRC);
 #endif
 }
 #endif
@@ -224,10 +226,12 @@ static inline uint8_t mavlink_msg_autopilot_version_request_get_target_component
  */
 static inline void mavlink_msg_autopilot_version_request_decode(const mavlink_message_t* msg, mavlink_autopilot_version_request_t* autopilot_version_request)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	autopilot_version_request->target_system = mavlink_msg_autopilot_version_request_get_target_system(msg);
 	autopilot_version_request->target_component = mavlink_msg_autopilot_version_request_get_target_component(msg);
 #else
-	memcpy(autopilot_version_request, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN? msg->len : MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN;
+        memset(autopilot_version_request, 0, MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST_LEN);
+	memcpy(autopilot_version_request, _MAV_PAYLOAD(msg), len);
 #endif
 }

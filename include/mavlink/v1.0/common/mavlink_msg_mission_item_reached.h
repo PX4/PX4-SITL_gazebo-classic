@@ -2,26 +2,37 @@
 
 #define MAVLINK_MSG_ID_MISSION_ITEM_REACHED 46
 
-typedef struct __mavlink_mission_item_reached_t
-{
+MAVPACKED(
+typedef struct __mavlink_mission_item_reached_t {
  uint16_t seq; /*< Sequence*/
-} mavlink_mission_item_reached_t;
+}) mavlink_mission_item_reached_t;
 
 #define MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN 2
+#define MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN 2
 #define MAVLINK_MSG_ID_46_LEN 2
+#define MAVLINK_MSG_ID_46_MIN_LEN 2
 
 #define MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC 11
 #define MAVLINK_MSG_ID_46_CRC 11
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MISSION_ITEM_REACHED { \
+	46, \
+	"MISSION_ITEM_REACHED", \
+	1, \
+	{  { "seq", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_mission_item_reached_t, seq) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MISSION_ITEM_REACHED { \
 	"MISSION_ITEM_REACHED", \
 	1, \
 	{  { "seq", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_mission_item_reached_t, seq) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a mission_item_reached message
@@ -48,11 +59,7 @@ static inline uint16_t mavlink_msg_mission_item_reached_pack(uint8_t system_id, 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 }
 
 /**
@@ -81,11 +88,7 @@ static inline uint16_t mavlink_msg_mission_item_reached_pack_chan(uint8_t system
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 }
 
 /**
@@ -129,20 +132,26 @@ static inline void mavlink_msg_mission_item_reached_send(mavlink_channel_t chan,
 	char buf[MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN];
 	_mav_put_uint16_t(buf, 0, seq);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, buf, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, buf, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, buf, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 #else
 	mavlink_mission_item_reached_t packet;
 	packet.seq = seq;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)&packet, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)&packet, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)&packet, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 #endif
+}
+
+/**
+ * @brief Send a mission_item_reached message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_mission_item_reached_send_struct(mavlink_channel_t chan, const mavlink_mission_item_reached_t* mission_item_reached)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_mission_item_reached_send(chan, mission_item_reached->seq);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)mission_item_reached, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 #endif
 }
 
@@ -160,20 +169,12 @@ static inline void mavlink_msg_mission_item_reached_send_buf(mavlink_message_t *
 	char *buf = (char *)msgbuf;
 	_mav_put_uint16_t(buf, 0, seq);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, buf, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, buf, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, buf, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 #else
 	mavlink_mission_item_reached_t *packet = (mavlink_mission_item_reached_t *)msgbuf;
 	packet->seq = seq;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)packet, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)packet, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MISSION_ITEM_REACHED, (const char *)packet, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_MIN_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_CRC);
 #endif
 }
 #endif
@@ -201,9 +202,11 @@ static inline uint16_t mavlink_msg_mission_item_reached_get_seq(const mavlink_me
  */
 static inline void mavlink_msg_mission_item_reached_decode(const mavlink_message_t* msg, mavlink_mission_item_reached_t* mission_item_reached)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mission_item_reached->seq = mavlink_msg_mission_item_reached_get_seq(msg);
 #else
-	memcpy(mission_item_reached, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN? msg->len : MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN;
+        memset(mission_item_reached, 0, MAVLINK_MSG_ID_MISSION_ITEM_REACHED_LEN);
+	memcpy(mission_item_reached, _MAV_PAYLOAD(msg), len);
 #endif
 }

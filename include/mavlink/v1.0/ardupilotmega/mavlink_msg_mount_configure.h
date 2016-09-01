@@ -2,24 +2,40 @@
 
 #define MAVLINK_MSG_ID_MOUNT_CONFIGURE 156
 
-typedef struct __mavlink_mount_configure_t
-{
+MAVPACKED(
+typedef struct __mavlink_mount_configure_t {
  uint8_t target_system; /*< System ID*/
  uint8_t target_component; /*< Component ID*/
  uint8_t mount_mode; /*< mount operating mode (see MAV_MOUNT_MODE enum)*/
  uint8_t stab_roll; /*< (1 = yes, 0 = no)*/
  uint8_t stab_pitch; /*< (1 = yes, 0 = no)*/
  uint8_t stab_yaw; /*< (1 = yes, 0 = no)*/
-} mavlink_mount_configure_t;
+}) mavlink_mount_configure_t;
 
 #define MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN 6
+#define MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN 6
 #define MAVLINK_MSG_ID_156_LEN 6
+#define MAVLINK_MSG_ID_156_MIN_LEN 6
 
 #define MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC 19
 #define MAVLINK_MSG_ID_156_CRC 19
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MOUNT_CONFIGURE { \
+	156, \
+	"MOUNT_CONFIGURE", \
+	6, \
+	{  { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_mount_configure_t, target_system) }, \
+         { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_mount_configure_t, target_component) }, \
+         { "mount_mode", NULL, MAVLINK_TYPE_UINT8_T, 0, 2, offsetof(mavlink_mount_configure_t, mount_mode) }, \
+         { "stab_roll", NULL, MAVLINK_TYPE_UINT8_T, 0, 3, offsetof(mavlink_mount_configure_t, stab_roll) }, \
+         { "stab_pitch", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_mount_configure_t, stab_pitch) }, \
+         { "stab_yaw", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_mount_configure_t, stab_yaw) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MOUNT_CONFIGURE { \
 	"MOUNT_CONFIGURE", \
 	6, \
@@ -31,7 +47,7 @@ typedef struct __mavlink_mount_configure_t
          { "stab_yaw", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_mount_configure_t, stab_yaw) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a mount_configure message
@@ -73,11 +89,7 @@ static inline uint16_t mavlink_msg_mount_configure_pack(uint8_t system_id, uint8
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MOUNT_CONFIGURE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 }
 
 /**
@@ -121,11 +133,7 @@ static inline uint16_t mavlink_msg_mount_configure_pack_chan(uint8_t system_id, 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MOUNT_CONFIGURE;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 }
 
 /**
@@ -179,11 +187,7 @@ static inline void mavlink_msg_mount_configure_send(mavlink_channel_t chan, uint
 	_mav_put_uint8_t(buf, 4, stab_pitch);
 	_mav_put_uint8_t(buf, 5, stab_yaw);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, buf, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, buf, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, buf, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 #else
 	mavlink_mount_configure_t packet;
 	packet.target_system = target_system;
@@ -193,11 +197,21 @@ static inline void mavlink_msg_mount_configure_send(mavlink_channel_t chan, uint
 	packet.stab_pitch = stab_pitch;
 	packet.stab_yaw = stab_yaw;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)&packet, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)&packet, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)&packet, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 #endif
+}
+
+/**
+ * @brief Send a mount_configure message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_mount_configure_send_struct(mavlink_channel_t chan, const mavlink_mount_configure_t* mount_configure)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_mount_configure_send(chan, mount_configure->target_system, mount_configure->target_component, mount_configure->mount_mode, mount_configure->stab_roll, mount_configure->stab_pitch, mount_configure->stab_yaw);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)mount_configure, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 #endif
 }
 
@@ -220,11 +234,7 @@ static inline void mavlink_msg_mount_configure_send_buf(mavlink_message_t *msgbu
 	_mav_put_uint8_t(buf, 4, stab_pitch);
 	_mav_put_uint8_t(buf, 5, stab_yaw);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, buf, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, buf, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, buf, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 #else
 	mavlink_mount_configure_t *packet = (mavlink_mount_configure_t *)msgbuf;
 	packet->target_system = target_system;
@@ -234,11 +244,7 @@ static inline void mavlink_msg_mount_configure_send_buf(mavlink_message_t *msgbu
 	packet->stab_pitch = stab_pitch;
 	packet->stab_yaw = stab_yaw;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)packet, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)packet, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MOUNT_CONFIGURE, (const char *)packet, MAVLINK_MSG_ID_MOUNT_CONFIGURE_MIN_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN, MAVLINK_MSG_ID_MOUNT_CONFIGURE_CRC);
 #endif
 }
 #endif
@@ -316,7 +322,7 @@ static inline uint8_t mavlink_msg_mount_configure_get_stab_yaw(const mavlink_mes
  */
 static inline void mavlink_msg_mount_configure_decode(const mavlink_message_t* msg, mavlink_mount_configure_t* mount_configure)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	mount_configure->target_system = mavlink_msg_mount_configure_get_target_system(msg);
 	mount_configure->target_component = mavlink_msg_mount_configure_get_target_component(msg);
 	mount_configure->mount_mode = mavlink_msg_mount_configure_get_mount_mode(msg);
@@ -324,6 +330,8 @@ static inline void mavlink_msg_mount_configure_decode(const mavlink_message_t* m
 	mount_configure->stab_pitch = mavlink_msg_mount_configure_get_stab_pitch(msg);
 	mount_configure->stab_yaw = mavlink_msg_mount_configure_get_stab_yaw(msg);
 #else
-	memcpy(mount_configure, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN? msg->len : MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN;
+        memset(mount_configure, 0, MAVLINK_MSG_ID_MOUNT_CONFIGURE_LEN);
+	memcpy(mount_configure, _MAV_PAYLOAD(msg), len);
 #endif
 }

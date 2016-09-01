@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_ASLCTRL_DEBUG 204
 
-typedef struct __mavlink_aslctrl_debug_t
-{
+MAVPACKED(
+typedef struct __mavlink_aslctrl_debug_t {
  uint32_t i32_1; /*<  Debug data*/
  float f_1; /*<  Debug data */
  float f_2; /*<  Debug data*/
@@ -15,16 +15,37 @@ typedef struct __mavlink_aslctrl_debug_t
  float f_8; /*<  Debug data*/
  uint8_t i8_1; /*<  Debug data*/
  uint8_t i8_2; /*<  Debug data*/
-} mavlink_aslctrl_debug_t;
+}) mavlink_aslctrl_debug_t;
 
 #define MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN 38
+#define MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN 38
 #define MAVLINK_MSG_ID_204_LEN 38
+#define MAVLINK_MSG_ID_204_MIN_LEN 38
 
 #define MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC 251
 #define MAVLINK_MSG_ID_204_CRC 251
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_ASLCTRL_DEBUG { \
+	204, \
+	"ASLCTRL_DEBUG", \
+	11, \
+	{  { "i32_1", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_aslctrl_debug_t, i32_1) }, \
+         { "f_1", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_aslctrl_debug_t, f_1) }, \
+         { "f_2", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_aslctrl_debug_t, f_2) }, \
+         { "f_3", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_aslctrl_debug_t, f_3) }, \
+         { "f_4", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_aslctrl_debug_t, f_4) }, \
+         { "f_5", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_aslctrl_debug_t, f_5) }, \
+         { "f_6", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_aslctrl_debug_t, f_6) }, \
+         { "f_7", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_aslctrl_debug_t, f_7) }, \
+         { "f_8", NULL, MAVLINK_TYPE_FLOAT, 0, 32, offsetof(mavlink_aslctrl_debug_t, f_8) }, \
+         { "i8_1", NULL, MAVLINK_TYPE_UINT8_T, 0, 36, offsetof(mavlink_aslctrl_debug_t, i8_1) }, \
+         { "i8_2", NULL, MAVLINK_TYPE_UINT8_T, 0, 37, offsetof(mavlink_aslctrl_debug_t, i8_2) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_ASLCTRL_DEBUG { \
 	"ASLCTRL_DEBUG", \
 	11, \
@@ -41,7 +62,7 @@ typedef struct __mavlink_aslctrl_debug_t
          { "i8_2", NULL, MAVLINK_TYPE_UINT8_T, 0, 37, offsetof(mavlink_aslctrl_debug_t, i8_2) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a aslctrl_debug message
@@ -98,11 +119,7 @@ static inline uint16_t mavlink_msg_aslctrl_debug_pack(uint8_t system_id, uint8_t
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ASLCTRL_DEBUG;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 }
 
 /**
@@ -161,11 +178,7 @@ static inline uint16_t mavlink_msg_aslctrl_debug_pack_chan(uint8_t system_id, ui
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_ASLCTRL_DEBUG;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 }
 
 /**
@@ -229,11 +242,7 @@ static inline void mavlink_msg_aslctrl_debug_send(mavlink_channel_t chan, uint32
 	_mav_put_uint8_t(buf, 36, i8_1);
 	_mav_put_uint8_t(buf, 37, i8_2);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, buf, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, buf, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, buf, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 #else
 	mavlink_aslctrl_debug_t packet;
 	packet.i32_1 = i32_1;
@@ -248,11 +257,21 @@ static inline void mavlink_msg_aslctrl_debug_send(mavlink_channel_t chan, uint32
 	packet.i8_1 = i8_1;
 	packet.i8_2 = i8_2;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)&packet, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)&packet, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)&packet, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 #endif
+}
+
+/**
+ * @brief Send a aslctrl_debug message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_aslctrl_debug_send_struct(mavlink_channel_t chan, const mavlink_aslctrl_debug_t* aslctrl_debug)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_aslctrl_debug_send(chan, aslctrl_debug->i32_1, aslctrl_debug->i8_1, aslctrl_debug->i8_2, aslctrl_debug->f_1, aslctrl_debug->f_2, aslctrl_debug->f_3, aslctrl_debug->f_4, aslctrl_debug->f_5, aslctrl_debug->f_6, aslctrl_debug->f_7, aslctrl_debug->f_8);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)aslctrl_debug, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 #endif
 }
 
@@ -280,11 +299,7 @@ static inline void mavlink_msg_aslctrl_debug_send_buf(mavlink_message_t *msgbuf,
 	_mav_put_uint8_t(buf, 36, i8_1);
 	_mav_put_uint8_t(buf, 37, i8_2);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, buf, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, buf, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, buf, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 #else
 	mavlink_aslctrl_debug_t *packet = (mavlink_aslctrl_debug_t *)msgbuf;
 	packet->i32_1 = i32_1;
@@ -299,11 +314,7 @@ static inline void mavlink_msg_aslctrl_debug_send_buf(mavlink_message_t *msgbuf,
 	packet->i8_1 = i8_1;
 	packet->i8_2 = i8_2;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)packet, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)packet, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLCTRL_DEBUG, (const char *)packet, MAVLINK_MSG_ID_ASLCTRL_DEBUG_MIN_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN, MAVLINK_MSG_ID_ASLCTRL_DEBUG_CRC);
 #endif
 }
 #endif
@@ -431,7 +442,7 @@ static inline float mavlink_msg_aslctrl_debug_get_f_8(const mavlink_message_t* m
  */
 static inline void mavlink_msg_aslctrl_debug_decode(const mavlink_message_t* msg, mavlink_aslctrl_debug_t* aslctrl_debug)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	aslctrl_debug->i32_1 = mavlink_msg_aslctrl_debug_get_i32_1(msg);
 	aslctrl_debug->f_1 = mavlink_msg_aslctrl_debug_get_f_1(msg);
 	aslctrl_debug->f_2 = mavlink_msg_aslctrl_debug_get_f_2(msg);
@@ -444,6 +455,8 @@ static inline void mavlink_msg_aslctrl_debug_decode(const mavlink_message_t* msg
 	aslctrl_debug->i8_1 = mavlink_msg_aslctrl_debug_get_i8_1(msg);
 	aslctrl_debug->i8_2 = mavlink_msg_aslctrl_debug_get_i8_2(msg);
 #else
-	memcpy(aslctrl_debug, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN? msg->len : MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN;
+        memset(aslctrl_debug, 0, MAVLINK_MSG_ID_ASLCTRL_DEBUG_LEN);
+	memcpy(aslctrl_debug, _MAV_PAYLOAD(msg), len);
 #endif
 }

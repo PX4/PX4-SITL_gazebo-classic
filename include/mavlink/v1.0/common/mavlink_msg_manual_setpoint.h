@@ -2,8 +2,8 @@
 
 #define MAVLINK_MSG_ID_MANUAL_SETPOINT 81
 
-typedef struct __mavlink_manual_setpoint_t
-{
+MAVPACKED(
+typedef struct __mavlink_manual_setpoint_t {
  uint32_t time_boot_ms; /*< Timestamp in milliseconds since system boot*/
  float roll; /*< Desired roll rate in radians per second*/
  float pitch; /*< Desired pitch rate in radians per second*/
@@ -11,16 +11,33 @@ typedef struct __mavlink_manual_setpoint_t
  float thrust; /*< Collective thrust, normalized to 0 .. 1*/
  uint8_t mode_switch; /*< Flight mode switch position, 0.. 255*/
  uint8_t manual_override_switch; /*< Override mode switch position, 0.. 255*/
-} mavlink_manual_setpoint_t;
+}) mavlink_manual_setpoint_t;
 
 #define MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN 22
+#define MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN 22
 #define MAVLINK_MSG_ID_81_LEN 22
+#define MAVLINK_MSG_ID_81_MIN_LEN 22
 
 #define MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC 106
 #define MAVLINK_MSG_ID_81_CRC 106
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_MANUAL_SETPOINT { \
+	81, \
+	"MANUAL_SETPOINT", \
+	7, \
+	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_manual_setpoint_t, time_boot_ms) }, \
+         { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_manual_setpoint_t, roll) }, \
+         { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_manual_setpoint_t, pitch) }, \
+         { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_manual_setpoint_t, yaw) }, \
+         { "thrust", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_manual_setpoint_t, thrust) }, \
+         { "mode_switch", NULL, MAVLINK_TYPE_UINT8_T, 0, 20, offsetof(mavlink_manual_setpoint_t, mode_switch) }, \
+         { "manual_override_switch", NULL, MAVLINK_TYPE_UINT8_T, 0, 21, offsetof(mavlink_manual_setpoint_t, manual_override_switch) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_MANUAL_SETPOINT { \
 	"MANUAL_SETPOINT", \
 	7, \
@@ -33,7 +50,7 @@ typedef struct __mavlink_manual_setpoint_t
          { "manual_override_switch", NULL, MAVLINK_TYPE_UINT8_T, 0, 21, offsetof(mavlink_manual_setpoint_t, manual_override_switch) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a manual_setpoint message
@@ -78,11 +95,7 @@ static inline uint16_t mavlink_msg_manual_setpoint_pack(uint8_t system_id, uint8
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 }
 
 /**
@@ -129,11 +142,7 @@ static inline uint16_t mavlink_msg_manual_setpoint_pack_chan(uint8_t system_id, 
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 }
 
 /**
@@ -189,11 +198,7 @@ static inline void mavlink_msg_manual_setpoint_send(mavlink_channel_t chan, uint
 	_mav_put_uint8_t(buf, 20, mode_switch);
 	_mav_put_uint8_t(buf, 21, manual_override_switch);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #else
 	mavlink_manual_setpoint_t packet;
 	packet.time_boot_ms = time_boot_ms;
@@ -204,11 +209,21 @@ static inline void mavlink_msg_manual_setpoint_send(mavlink_channel_t chan, uint
 	packet.mode_switch = mode_switch;
 	packet.manual_override_switch = manual_override_switch;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)&packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)&packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)&packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a manual_setpoint message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_manual_setpoint_send_struct(mavlink_channel_t chan, const mavlink_manual_setpoint_t* manual_setpoint)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_manual_setpoint_send(chan, manual_setpoint->time_boot_ms, manual_setpoint->roll, manual_setpoint->pitch, manual_setpoint->yaw, manual_setpoint->thrust, manual_setpoint->mode_switch, manual_setpoint->manual_override_switch);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)manual_setpoint, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #endif
 }
 
@@ -232,11 +247,7 @@ static inline void mavlink_msg_manual_setpoint_send_buf(mavlink_message_t *msgbu
 	_mav_put_uint8_t(buf, 20, mode_switch);
 	_mav_put_uint8_t(buf, 21, manual_override_switch);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #else
 	mavlink_manual_setpoint_t *packet = (mavlink_manual_setpoint_t *)msgbuf;
 	packet->time_boot_ms = time_boot_ms;
@@ -247,11 +258,7 @@ static inline void mavlink_msg_manual_setpoint_send_buf(mavlink_message_t *msgbu
 	packet->mode_switch = mode_switch;
 	packet->manual_override_switch = manual_override_switch;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #endif
 }
 #endif
@@ -339,7 +346,7 @@ static inline uint8_t mavlink_msg_manual_setpoint_get_manual_override_switch(con
  */
 static inline void mavlink_msg_manual_setpoint_decode(const mavlink_message_t* msg, mavlink_manual_setpoint_t* manual_setpoint)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	manual_setpoint->time_boot_ms = mavlink_msg_manual_setpoint_get_time_boot_ms(msg);
 	manual_setpoint->roll = mavlink_msg_manual_setpoint_get_roll(msg);
 	manual_setpoint->pitch = mavlink_msg_manual_setpoint_get_pitch(msg);
@@ -348,6 +355,8 @@ static inline void mavlink_msg_manual_setpoint_decode(const mavlink_message_t* m
 	manual_setpoint->mode_switch = mavlink_msg_manual_setpoint_get_mode_switch(msg);
 	manual_setpoint->manual_override_switch = mavlink_msg_manual_setpoint_get_manual_override_switch(msg);
 #else
-	memcpy(manual_setpoint, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN? msg->len : MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN;
+        memset(manual_setpoint, 0, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
+	memcpy(manual_setpoint, _MAV_PAYLOAD(msg), len);
 #endif
 }

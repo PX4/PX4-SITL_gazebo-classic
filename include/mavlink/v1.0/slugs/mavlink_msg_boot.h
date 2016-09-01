@@ -2,26 +2,37 @@
 
 #define MAVLINK_MSG_ID_BOOT 197
 
-typedef struct __mavlink_boot_t
-{
+MAVPACKED(
+typedef struct __mavlink_boot_t {
  uint32_t version; /*< The onboard software version*/
-} mavlink_boot_t;
+}) mavlink_boot_t;
 
 #define MAVLINK_MSG_ID_BOOT_LEN 4
+#define MAVLINK_MSG_ID_BOOT_MIN_LEN 4
 #define MAVLINK_MSG_ID_197_LEN 4
+#define MAVLINK_MSG_ID_197_MIN_LEN 4
 
 #define MAVLINK_MSG_ID_BOOT_CRC 39
 #define MAVLINK_MSG_ID_197_CRC 39
 
 
 
+#if MAVLINK_COMMAND_24BIT
+#define MAVLINK_MESSAGE_INFO_BOOT { \
+	197, \
+	"BOOT", \
+	1, \
+	{  { "version", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_boot_t, version) }, \
+         } \
+}
+#else
 #define MAVLINK_MESSAGE_INFO_BOOT { \
 	"BOOT", \
 	1, \
 	{  { "version", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_boot_t, version) }, \
          } \
 }
-
+#endif
 
 /**
  * @brief Pack a boot message
@@ -48,11 +59,7 @@ static inline uint16_t mavlink_msg_boot_pack(uint8_t system_id, uint8_t componen
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_BOOT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
-#else
-    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_BOOT_LEN);
-#endif
+    return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 }
 
 /**
@@ -81,11 +88,7 @@ static inline uint16_t mavlink_msg_boot_pack_chan(uint8_t system_id, uint8_t com
 #endif
 
 	msg->msgid = MAVLINK_MSG_ID_BOOT;
-#if MAVLINK_CRC_EXTRA
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
-#else
-    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_BOOT_LEN);
-#endif
+    return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 }
 
 /**
@@ -129,20 +132,26 @@ static inline void mavlink_msg_boot_send(mavlink_channel_t chan, uint32_t versio
 	char buf[MAVLINK_MSG_ID_BOOT_LEN];
 	_mav_put_uint32_t(buf, 0, version);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, buf, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, buf, MAVLINK_MSG_ID_BOOT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, buf, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 #else
 	mavlink_boot_t packet;
 	packet.version = version;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)&packet, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)&packet, MAVLINK_MSG_ID_BOOT_LEN);
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)&packet, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 #endif
+}
+
+/**
+ * @brief Send a boot message
+ * @param chan MAVLink channel to send the message
+ * @param struct The MAVLink struct to serialize
+ */
+static inline void mavlink_msg_boot_send_struct(mavlink_channel_t chan, const mavlink_boot_t* boot)
+{
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
+    mavlink_msg_boot_send(chan, boot->version);
+#else
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)boot, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 #endif
 }
 
@@ -160,20 +169,12 @@ static inline void mavlink_msg_boot_send_buf(mavlink_message_t *msgbuf, mavlink_
 	char *buf = (char *)msgbuf;
 	_mav_put_uint32_t(buf, 0, version);
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, buf, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, buf, MAVLINK_MSG_ID_BOOT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, buf, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 #else
 	mavlink_boot_t *packet = (mavlink_boot_t *)msgbuf;
 	packet->version = version;
 
-#if MAVLINK_CRC_EXTRA
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)packet, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
-#else
-    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)packet, MAVLINK_MSG_ID_BOOT_LEN);
-#endif
+    _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_BOOT, (const char *)packet, MAVLINK_MSG_ID_BOOT_MIN_LEN, MAVLINK_MSG_ID_BOOT_LEN, MAVLINK_MSG_ID_BOOT_CRC);
 #endif
 }
 #endif
@@ -201,9 +202,11 @@ static inline uint32_t mavlink_msg_boot_get_version(const mavlink_message_t* msg
  */
 static inline void mavlink_msg_boot_decode(const mavlink_message_t* msg, mavlink_boot_t* boot)
 {
-#if MAVLINK_NEED_BYTE_SWAP
+#if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
 	boot->version = mavlink_msg_boot_get_version(msg);
 #else
-	memcpy(boot, _MAV_PAYLOAD(msg), MAVLINK_MSG_ID_BOOT_LEN);
+        uint8_t len = msg->len < MAVLINK_MSG_ID_BOOT_LEN? msg->len : MAVLINK_MSG_ID_BOOT_LEN;
+        memset(boot, 0, MAVLINK_MSG_ID_BOOT_LEN);
+	memcpy(boot, _MAV_PAYLOAD(msg), len);
 #endif
 }
