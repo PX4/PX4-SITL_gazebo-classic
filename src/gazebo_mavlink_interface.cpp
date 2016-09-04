@@ -889,7 +889,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 
     if (left_elevon_joint_!= NULL)
     {
-      double target = 0.524*(0.5*input_reference_[5] - 0.5*input_reference_[7]);
+      double target = input_reference_[5];
       if (use_left_elevon_pid_)
       {
         double left_elevon_err = left_elevon_joint_->GetAngle(0).Radian() - target;
@@ -907,16 +907,16 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         // Not desirable to use SetVelocity for parts of a moving model
         // impact on rest of the dynamic system is non-physical.
         #if GAZEBO_MAJOR_VERSION >= 6
-          left_elevon_joint_->SetPosition(0, target);
+          left_elevon_joint_->SetPosition(0, input_reference_[5]);
         #else
-          left_elevon_joint_->SetAngle(0, target);
+          left_elevon_joint_->SetAngle(0, input_reference_[5]);
         #endif
       }
     }
 
     if (right_elevon_joint_ != NULL)
     {
-      double target = 0.524*(0.5*input_reference_[6] - 0.5*input_reference_[7]);
+      double target = input_reference_[6];
       if (use_right_elevon_pid_)
       {
         double right_elevon_err = right_elevon_joint_->GetAngle(0).Radian() - target;
@@ -934,9 +934,9 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         // Not desirable to use SetVelocity for parts of a moving model
         // impact on rest of the dynamic system is non-physical.
         #if GAZEBO_MAJOR_VERSION >= 6
-          right_elevon_joint_->SetPosition(0, target);
+          right_elevon_joint_->SetPosition(0, input_reference_[6]);
         #else
-          right_elevon_joint_->SetAngle(0, target);
+          right_elevon_joint_->SetAngle(0, input_reference_[6]);
         #endif
       }
     }
