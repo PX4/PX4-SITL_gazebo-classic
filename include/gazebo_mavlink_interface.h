@@ -159,9 +159,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   static const unsigned n_out_max = 16;
 
   unsigned _rotor_count;
-  struct Inputs {
-    float control[n_out_max];
-  };
 
   double input_offset_[n_out_max];
   double input_scaling_[n_out_max];

@@ -727,62 +727,20 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       armed = true;
     }
 
-    Inputs inputs;
-    for (int i = 0; i < n_out_max; ++i) {
-        inputs.control[i] = controls.controls[i];
-    }
+    last_actuator_time_ = world_->GetSimTime();
 
-    bool is_vtol = (right_elevon_joint_ != nullptr);
-
-    // Set all scalings
-    // Initialize all outputs as motors
-    // if joints are present these will be
-    // reconfigured in the next step
     for (unsigned i = 0; i < n_out_max; i++) {
       input_index_[i] = i;
-
-      // scaling values
-      // input_offset_[i] = 1.0;
-
-      // XXX this needs re-investigation regarding
-      // the correct scaling for the correct motor
-      // model
-      // input_scaling_[i] = 550.0;
-      // zero_position_disarmed_[i] = 0.0;
-      // zero_position_armed_[i] = (is_vtol) ? 0.0 : 100.0;
     }
-
-    if (is_vtol) {
-      // Config for standard VTOL model
-
-      // Fift motor
-      input_index_[4] = 4;
-      // input_offset_[off + 4] = 1.0;
-      // input_scaling_[off + 4] = 1600;
-      // zero_position_disarmed_[off + 4] = 0.0;
-      // zero_position_armed_[off + 4] = 0.0;
-
-      // Servos
-      for (unsigned i = 5; i < n_out_max; i++) {
-        // scaling values
-        input_index_[i] = i;
-        // input_offset_[i] = 0.0;
-        // input_scaling_[i] = 1.0;
-        // zero_position_disarmed_[i] = 0.0;
-        // zero_position_armed_[i] = 0.0;
-      }
-    }
-
-    last_actuator_time_ = world_->GetSimTime();
 
     // set rotor speeds, controller targets
     input_reference_.resize(n_out_max);
     for (int i = 0; i < input_reference_.size(); i++) {
       if (armed) {
-        input_reference_[i] = (inputs.control[input_index_[i]] + input_offset_[i])
+        input_reference_[i] = (controls.controls[input_index_[i]] + input_offset_[i])
           * input_scaling_[i] + zero_position_armed_[i];
         // if (joints_[i])
-        //   gzerr << i << " : " << input_index_[i] << " : " << inputs.control[input_index_[i]] << " : " << input_reference_[i] << "\n";
+        //   gzerr << i << " : " << input_index_[i] << " : " << controls.controls[input_index_[i]] << " : " << input_reference_[i] << "\n";
       } else {
         input_reference_[i] = zero_position_disarmed_[i];
       }
