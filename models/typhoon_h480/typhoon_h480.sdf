@@ -1147,6 +1147,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <!--
       <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
@@ -1156,6 +1157,7 @@
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
       </joint_control_pid>
+      -->
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -1173,6 +1175,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/5</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <!--
       <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
@@ -1182,6 +1185,7 @@
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
       </joint_control_pid>
+      -->
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -1199,6 +1203,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <!--
       <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
@@ -1208,6 +1213,7 @@
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
       </joint_control_pid>
+      -->
     </plugin>
     <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -1225,6 +1231,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <!--
       <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
@@ -1234,6 +1241,7 @@
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
       </joint_control_pid>
+      -->
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -1251,6 +1259,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <!--
       <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
@@ -1260,6 +1269,7 @@
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
       </joint_control_pid>
+      -->
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -1277,6 +1287,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <!--
       <joint_control_pid>
         <p>0.1</p>
         <i>0</i>
@@ -1286,6 +1297,7 @@
         <cmdMax>3</cmdMax>
         <cmdMin>-3</cmdMin>
       </joint_control_pid>
+      -->
     </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>

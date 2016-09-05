@@ -25,6 +25,7 @@ namespace gazebo {
 
 GazeboMotorModel::~GazeboMotorModel() {
   event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+  use_pid_ = false;
 }
 
 void GazeboMotorModel::InitializeParams() {}
