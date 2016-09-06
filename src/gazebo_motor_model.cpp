@@ -221,7 +221,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // Apply the filter on the motor's velocity.
   double ref_motor_rot_vel;
   ref_motor_rot_vel = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
-  use_pid_ = false;
+
+#if 0 //FIXME: disable PID for now, it does not play nice with the PX4 CI system.
   if (use_pid_)
   {
     double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
@@ -242,6 +243,9 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
     joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif
   }
+#else
+  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+#endif /* if 0 */
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);
