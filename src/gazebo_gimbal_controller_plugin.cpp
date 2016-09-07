@@ -219,6 +219,9 @@ void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
 //  gzdbg << "pitch command received " << _msg->data() << std::endl;
   this->pitchCommand = atof(_msg->data().c_str());
+  this->pitchCommand = ignition::math::clamp(this->pitchCommand,
+    this->pitchJoint->GetLowerLimit(0).Radian(),
+    this->pitchJoint->GetUpperLimit(0).Radian());
 }
 
 /////////////////////////////////////////////////
@@ -226,6 +229,9 @@ void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
 //  gzdbg << "roll command received " << _msg->data() << std::endl;
   this->rollCommand = atof(_msg->data().c_str());
+  this->rollCommand = ignition::math::clamp(this->rollCommand,
+    this->rollJoint->GetLowerLimit(0).Radian(),
+    this->rollJoint->GetUpperLimit(0).Radian());
 }
 
 /////////////////////////////////////////////////
@@ -233,6 +239,10 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 {
 //  gzdbg << "yaw command received " << _msg->data() << std::endl;
   this->yawCommand = atof(_msg->data().c_str());
+  // truncate command inside joint angle limits
+  this->yawCommand = ignition::math::clamp(this->yawCommand,
+    this->yawJoint->GetLowerLimit(0).Radian(),
+    this->yawJoint->GetUpperLimit(0).Radian());
 }
 #endif
 
@@ -264,10 +274,50 @@ void GimbalControllerPlugin::OnUpdate()
 
     ignition::math::Vector3d eulers = error.Euler();
 
+    // truncate euler angles about joint limits
+    ignition::math::Vector3d currentAngle
+      (this->rollJoint->GetAngle(0).Radian(),
+       this->pitchJoint->GetAngle(0).Radian(),
+       this->yawJoint->GetAngle(0).Radian());
+    ignition::math::Vector3d lowerLimits
+      (this->rollJoint->GetLowerLimit(0).Radian(),
+       this->pitchJoint->GetLowerLimit(0).Radian(),
+       this->yawJoint->GetLowerLimit(0).Radian());
+    ignition::math::Vector3d upperLimits
+      (this->rollJoint->GetUpperLimit(0).Radian(),
+       this->pitchJoint->GetUpperLimit(0).Radian(),
+       this->yawJoint->GetUpperLimit(0).Radian());
+    // given error = current - target, then
+    // if target (current angle - error) is outside joint limit, truncate error
+    // so that current angle - error is within joint limit, e.g.
+    // i.e. lower limit < current angle - error < upper limit
+    // or   current angle - lower limit > error > current angle - upper limit
+    // re-expressed as clamps:
+    eulers.X(ignition::math::clamp(eulers.X(),
+      currentAngle.X() - upperLimits.X(),
+      currentAngle.X() - lowerLimits.X()));
+    eulers.Y(ignition::math::clamp(eulers.Y(),
+      currentAngle.Y() - upperLimits.Y(),
+      currentAngle.Y() - lowerLimits.Y()));
+    eulers.Z(ignition::math::clamp(eulers.Z(),
+      currentAngle.Z() - upperLimits.Z(),
+      currentAngle.Z() - lowerLimits.Z()));
+
     // hardcoded signs to account for model joint axis direction changes
     double rollError = this->NormalizeAbout(eulers.X(), 0.0);
     double pitchError = this->NormalizeAbout(eulers.Y(), 0.0);
     double yawError = -this->NormalizeAbout(eulers.Z(), 0.0);
+
+    // bound errors to avoid going over joint limts
+    rollError = ignition::math::clamp(rollError,
+      currentAngle.X() - upperLimits.X(),
+      currentAngle.X() - lowerLimits.X());
+    pitchError = ignition::math::clamp(pitchError,
+      currentAngle.Y() - upperLimits.Y(),
+      currentAngle.Y() - lowerLimits.Y());
+    yawError = ignition::math::clamp(yawError,
+      currentAngle.Z() - upperLimits.Z(),
+      currentAngle.Z() - lowerLimits.Z());
 
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
