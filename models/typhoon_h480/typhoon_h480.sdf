@@ -243,8 +243,8 @@
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
+          <lower>-1e16</lower>
+          <upper>1e16</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
         </limit>
@@ -305,8 +305,8 @@
       <axis>
         <xyz>-1 0 0</xyz>
         <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
+          <lower>-0.785398</lower>
+          <upper>0.785398</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
         </limit>
@@ -424,8 +424,8 @@
       <axis>
         <xyz>0 -1 0</xyz>
         <limit>
-          <lower>-1.6</lower>
-          <upper>1.9</upper>
+          <lower>-0.0872665</lower>
+          <upper>1.5708</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
         </limit>
@@ -1428,7 +1428,7 @@
         <channel name="gimbal_roll">
           <input_index>6</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>3.1415</input_scaling>
+          <input_scaling>-3.1415</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position_gztopic</joint_control_type>
@@ -1448,7 +1448,7 @@
         <channel name="gimbal_yaw">
           <input_index>8</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>3.1415</input_scaling>
+          <input_scaling>-3.1415</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position_gztopic</joint_control_type>
