@@ -28,10 +28,11 @@ GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
-  this->pitchPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
-  this->rollPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
+  /// TODO: make these gains part of sdf xml
+  this->pitchPid.Init(0.5, 0, 0, 0, 0, 0.1, -0.1);
+  this->rollPid.Init(0.5, 0, 0, 0, 0, 0.3, -0.3);
   this->yawPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
-  this->pitchCommand = 0.5* M_PI;  //  is problematic because of singularity
+  this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
   this->yawCommand = 0;
 }
@@ -247,6 +248,32 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 #endif
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d GimbalControllerPlugin::ThreeAxisRot(
+  double r11, double r12, double r21, double r31, double r32)
+{
+  return ignition::math::Vector3d(
+    atan2( r31, r32 ),
+    asin ( r21 ),
+    atan2( r11, r12 ));
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d GimbalControllerPlugin::QtoZXY(
+  const ignition::math::Quaterniond &_q)
+{
+  // taken from
+  // http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
+  // case zxy:
+  ignition::math::Vector3d result = this->ThreeAxisRot(
+    -2*(_q.X()*_q.Y() - _q.W()*_q.Z()),
+    _q.W()*_q.W() - _q.X()*_q.X() + _q.Y()*_q.Y() - _q.Z()*_q.Z(),
+    2*(_q.Y()*_q.Z() + _q.W()*_q.X()),
+    -2*(_q.X()*_q.Z() - _q.W()*_q.Y()),
+    _q.W()*_q.W() - _q.X()*_q.X() - _q.Y()*_q.Y() + _q.Z()*_q.Z());
+  return result;
+}
+
+/////////////////////////////////////////////////
 void GimbalControllerPlugin::OnUpdate()
 {
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
@@ -263,61 +290,102 @@ void GimbalControllerPlugin::OnUpdate()
   {
     double dt = (this->lastUpdateTime - time).Double();
 
+    // joint axis for roll and pitch are negative x and negative y-dir
+    // hence the negative sign
+    // hardcoded negative joint axis for pitch and roll
+    // TODO: make joint direction a parameter
+    const double pDir = -1;
+    const double rDir = -1;
+    const double yDir = 1;
     ignition::math::Quaterniond command(
-      -this->rollCommand, -this->pitchCommand, this->yawCommand);
+      pDir*this->rollCommand, rDir*this->pitchCommand, yDir*this->yawCommand);
 
-    // error defined from current to command so it's in the current frame
-    // but what we need to give to pid controllers is the negative
-    // values of rpy
-    ignition::math::Quaterniond error =
-      command * this->imuSensor->Orientation().Inverse();
+    // sensorToCommand is defined as the transform from
+    // current sensor pose to commanded sensor pose
+    //     rotation from sensor frame to command frame =
+    //     rotation from world to command frame *
+    //     inverse of rotation from world to sensor frame
+    ignition::math::Quaterniond sensorToCommand =
+      (command * this->imuSensor->Orientation().Inverse());
 
-    ignition::math::Vector3d eulers = error.Euler();
+    /// retrieve euler angles in yrp variable
+    /// errorsYPRVariable is defined in roll-pitch-yaw-fixed-axis
+    /// but gimbal is constructed using yaw-roll-pitch-variable-axis
+    /// use QtoZXY helper.
+    // The error is defined as (current - target), or the negative of
+    // above rotation.
+    /// TODO: add QtoZXY to ignition::math::Quaternion
+    ignition::math::Vector3d errorsPRYVariable = -this->QtoZXY(sensorToCommand);
 
     // truncate euler angles about joint limits
-    ignition::math::Vector3d currentAngle
-      (this->rollJoint->GetAngle(0).Radian(),
-       this->pitchJoint->GetAngle(0).Radian(),
-       this->yawJoint->GetAngle(0).Radian());
-    ignition::math::Vector3d lowerLimits
-      (this->rollJoint->GetLowerLimit(0).Radian(),
-       this->pitchJoint->GetLowerLimit(0).Radian(),
+    ignition::math::Vector3d currentAngleYPRVariable(
+      this->imuSensor->Orientation().Euler());
+
+    /// Get back targets to follow how the gimbal is setup
+    /// currentAngleYPRVariable is defined in roll-pitch-yaw-fixed-axis
+    /// but gimbal is constructed using yaw-roll-pitch-variable-axis
+    ignition::math::Vector3d currentAnglePRYVariable(
+      this->QtoZXY(currentAngleYPRVariable));
+
+    /// get joint limits (can optimize out of update loop if static)
+    /// TODO: move to Load() if limits do not change
+    ignition::math::Vector3d lowerLimitsPRY
+      (this->pitchJoint->GetLowerLimit(0).Radian(),
+       this->rollJoint->GetLowerLimit(0).Radian(),
        this->yawJoint->GetLowerLimit(0).Radian());
-    ignition::math::Vector3d upperLimits
-      (this->rollJoint->GetUpperLimit(0).Radian(),
-       this->pitchJoint->GetUpperLimit(0).Radian(),
+    ignition::math::Vector3d upperLimitsPRY
+      (this->pitchJoint->GetUpperLimit(0).Radian(),
+       this->rollJoint->GetUpperLimit(0).Radian(),
        this->yawJoint->GetUpperLimit(0).Radian());
-    // given error = current - target, then
-    // if target (current angle - error) is outside joint limit, truncate error
-    // so that current angle - error is within joint limit, e.g.
-    // i.e. lower limit < current angle - error < upper limit
-    // or   current angle - lower limit > error > current angle - upper limit
-    // re-expressed as clamps:
-    eulers.X(ignition::math::clamp(eulers.X(),
-      currentAngle.X() - upperLimits.X(),
-      currentAngle.X() - lowerLimits.X()));
-    eulers.Y(ignition::math::clamp(eulers.Y(),
-      currentAngle.Y() - upperLimits.Y(),
-      currentAngle.Y() - lowerLimits.Y()));
-    eulers.Z(ignition::math::clamp(eulers.Z(),
-      currentAngle.Z() - upperLimits.Z(),
-      currentAngle.Z() - lowerLimits.Z()));
 
     // hardcoded signs to account for model joint axis direction changes
-    double rollError = this->NormalizeAbout(eulers.X(), 0.0);
-    double pitchError = this->NormalizeAbout(eulers.Y(), 0.0);
-    double yawError = -this->NormalizeAbout(eulers.Z(), 0.0);
+    double pitchError = pDir*this->NormalizeAbout(errorsPRYVariable.X(), 0.0);
+    double rollError = rDir*this->NormalizeAbout(errorsPRYVariable.Y(), 0.0);
+    double yawError = yDir*this->NormalizeAbout(errorsPRYVariable.Z(), 0.0);
+    // gzdbg << "error (" << rollError << ", " << pitchError
+    //       << ", " << yawError << ")\n";
 
-    // bound errors to avoid going over joint limts
-    rollError = ignition::math::clamp(rollError,
-      currentAngle.X() - upperLimits.X(),
-      currentAngle.X() - lowerLimits.X());
+    // Clamp errors based on current angle and estimated errors from rotations:
+    // given error = current - target, then
+    // if target (current angle - error) is outside joint limit, truncate error
+    // so that current angle - error is within joint limit, i.e.:
+    // lower limit < current angle - error < upper limit
+    // or
+    // current angle - lower limit > error > current angle - upper limit
+    // re-expressed as clamps:
+    // hardcoded negative joint axis for pitch and roll
     pitchError = ignition::math::clamp(pitchError,
-      currentAngle.Y() - upperLimits.Y(),
-      currentAngle.Y() - lowerLimits.Y());
+      pDir*(currentAnglePRYVariable.X() - upperLimitsPRY.X()),
+      pDir*(currentAnglePRYVariable.X() - lowerLimitsPRY.X()));
+    rollError = ignition::math::clamp(rollError,
+      rDir*(currentAnglePRYVariable.Y() - upperLimitsPRY.Y()),
+      rDir*(currentAnglePRYVariable.Y() - lowerLimitsPRY.Y()));
     yawError = ignition::math::clamp(yawError,
-      currentAngle.Z() - upperLimits.Z(),
-      currentAngle.Z() - lowerLimits.Z());
+      yDir*(currentAnglePRYVariable.Z() - upperLimitsPRY.Z()),
+      yDir*(currentAnglePRYVariable.Z() - lowerLimitsPRY.Z()));
+
+    // Double check and truncate calculated command against
+    // user target in Euler angles.
+    // Basic principle:
+    // If error computed from quaternionBasedCommand is further away from
+    // error computed from user command (rollCommand, pitchCommand, yawCommand)
+    // use error computed from user command.
+    // recompute error based on user command directly
+    double pitchError1 = -currentAnglePRYVariable.X() + this->pitchCommand;
+    if (std::abs(pitchError) > std::abs(pitchError1))
+    {
+      pitchError = pitchError1;
+    }
+    double rollError1 = -currentAnglePRYVariable.Y() + this->rollCommand;
+    if (std::abs(rollError) > std::abs(rollError1))
+    {
+      rollError = rollError1;
+    }
+    double yawError1 = currentAnglePRYVariable.Z() - this->yawCommand;
+    if (std::abs(yawError) > std::abs(yawError1))
+    {
+      yawError = yawError1;
+    }
 
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pitchForce);
