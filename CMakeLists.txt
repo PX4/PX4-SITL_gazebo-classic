@@ -85,13 +85,8 @@ find_package(Boost 1.40 COMPONENTS system thread timer REQUIRED )
 ## Build ##
 ###########
 
-list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
-
-add_definitions(
-  -std=c++11
-  # Shut up warnings about std::binder1st, std::binder2nd.
-  -Wno-deprecated-declarations
-)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations")
+# -Wno-deprecated-declarations: Shut up warnings about std::binder1st, std::binder2nd.
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
