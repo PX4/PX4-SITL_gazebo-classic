@@ -326,18 +326,12 @@ void GimbalControllerPlugin::OnUpdate()
        yDir*this->yawJoint->GetUpperLimit(0).Radian());
 
     // normalize errors
-    // gzdbg << "error      (" << errorsPRYVariable << ")\n";
-    // double pitchError = this->NormalizeAbout(errorsPRYVariable.X(), 0.0);
-    // double rollError = this->NormalizeAbout(errorsPRYVariable.Y(), 0.0);
-    // double yawError = this->NormalizeAbout(errorsPRYVariable.Z(), 0.0);
     double pitchError = this->ShortestAngularDistance(
       this->pitchCommand, currentAnglePRYVariable.X());
     double rollError = this->ShortestAngularDistance(
       this->rollCommand, currentAnglePRYVariable.Y());
     double yawError = this->ShortestAngularDistance(
       this->yawCommand, currentAnglePRYVariable.Z());
-    // gzdbg << "error norm (" << pitchError << ", " << rollError
-    //       << ", " << yawError << ")\n";
 
     // Clamp errors based on current angle and estimated errors from rotations:
     // given error = current - target, then
@@ -384,24 +378,6 @@ void GimbalControllerPlugin::OnUpdate()
         currentAnglePRYVariable.Z() - lowerLimitsPRY.Z(),
         currentAnglePRYVariable.Z() - upperLimitsPRY.Z());
     }
-    // gzdbg << "error clam (" << pitchError << ", " << rollError
-    //       << ", " << yawError << ")\n";
-    // gzerr << pitchError
-    //       << ", " << currentAnglePRYVariable.X() - upperLimitsPRY.X()
-    //       << ", " << currentAnglePRYVariable.X() - lowerLimitsPRY.X()
-    //       << "\n";
-
-    // Double check and compare calculated command against
-    // user target in Euler angles.
-    // Take the larger of the two.
-    // FIXME: it appears when pry=(0,0,90) deg, pitch computed
-    // from quaternion rotation is too small, causing gimbal to
-    // drift and become unstable and pitch and roll. Taking direct Euler
-    // error fixes this issue.
-    // Basic principle:
-    // If error computed from quaternionBasedCommand is smaller than
-    // error computed from user command (rollCommand, pitchCommand, yawCommand)
-    // use error computed from user command.
 
     // apply forces to move gimbal
     double pitchForce = this->pitchPid.Update(pitchError, dt);
