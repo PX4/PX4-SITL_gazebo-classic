@@ -220,9 +220,10 @@ void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
 //  gzdbg << "pitch command received " << _msg->data() << std::endl;
   this->pitchCommand = atof(_msg->data().c_str());
+  const double pDir = -1;  // a reminder that directionality changes...
   this->pitchCommand = ignition::math::clamp(this->pitchCommand,
-    this->pitchJoint->GetLowerLimit(0).Radian(),
-    this->pitchJoint->GetUpperLimit(0).Radian());
+    pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
+    pDir*this->pitchJoint->GetLowerLimit(0).Radian());
 }
 
 /////////////////////////////////////////////////
@@ -230,9 +231,10 @@ void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
 //  gzdbg << "roll command received " << _msg->data() << std::endl;
   this->rollCommand = atof(_msg->data().c_str());
+  const double rDir = -1;  // a reminder that directionality changes...
   this->rollCommand = ignition::math::clamp(this->rollCommand,
-    this->rollJoint->GetLowerLimit(0).Radian(),
-    this->rollJoint->GetUpperLimit(0).Radian());
+    rDir*this->rollJoint->GetUpperLimit(0).Radian(),
+    rDir*this->rollJoint->GetLowerLimit(0).Radian());
 }
 
 /////////////////////////////////////////////////
@@ -241,9 +243,10 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 //  gzdbg << "yaw command received " << _msg->data() << std::endl;
   this->yawCommand = atof(_msg->data().c_str());
   // truncate command inside joint angle limits
+  const double yDir = 1;  // a reminder that directionality changes...
   this->yawCommand = ignition::math::clamp(this->yawCommand,
-    this->yawJoint->GetLowerLimit(0).Radian(),
-    this->yawJoint->GetUpperLimit(0).Radian());
+    yDir*this->yawJoint->GetLowerLimit(0).Radian(),
+    yDir*this->yawJoint->GetUpperLimit(0).Radian());
 }
 #endif
 
@@ -295,25 +298,6 @@ void GimbalControllerPlugin::OnUpdate()
     ignition::math::Quaterniond commandRPY(
       this->rollCommand, this->pitchCommand, this->yawCommand);
 
-    // sensorToCommand is defined as the transform from
-    // current sensor pose to commanded sensor pose
-    //     rotation from sensor frame to command frame =
-    //     rotation from world to command frame *
-    //     inverse of rotation from world to sensor frame
-    ignition::math::Quaterniond sensorToCommand =
-      (commandRPY * this->imuSensor->Orientation().Inverse());
-
-    /// retrieve euler angles in yrp variable
-    /// errorsYPRVariable is defined in roll-pitch-yaw-fixed-axis
-    /// but gimbal is constructed using yaw-roll-pitch-variable-axis
-    /// use QtoZXY helper.
-    /// The error is defined as (current - target), or the negative of
-    /// sensorToCommand rotation.
-    /// TODO: add QtoZXY to ignition::math::Quaternion
-    /// Note: QtoZXY returns roll, pitch, yaw angles, but
-    ignition::math::Vector3d errorsPRYVariable =
-      -this->QtoZXY(sensorToCommand);
-
     // anything to do with gazebo joint has
     // hardcoded negative joint axis for pitch and roll
     // TODO: make joint direction a parameter
@@ -323,13 +307,6 @@ void GimbalControllerPlugin::OnUpdate()
 
     /// Get current joint angles (in sensor frame):
 
-    /// use joint angles for current PRY rotations (should be similar to above)
-    // ignition::math::Vector3d currentAnglePRYVariable(
-    //   pDir*this->pitchJoint->GetAngle(0).Radian(),
-    //   rDir*this->rollJoint->GetAngle(0).Radian(),
-    //   yDir*this->yawJoint->GetAngle(0).Radian());
-
-    /// optional alternative:
     /// currentAngleYPRVariable is defined in roll-pitch-yaw-fixed-axis
     /// and gimbal is constructed using yaw-roll-pitch-variable-axis
     ignition::math::Vector3d currentAngleYPRVariable(
@@ -350,9 +327,15 @@ void GimbalControllerPlugin::OnUpdate()
 
     // normalize errors
     // gzdbg << "error      (" << errorsPRYVariable << ")\n";
-    double pitchError = this->NormalizeAbout(errorsPRYVariable.X(), 0.0);
-    double rollError = this->NormalizeAbout(errorsPRYVariable.Y(), 0.0);
-    double yawError = this->NormalizeAbout(errorsPRYVariable.Z(), 0.0);
+    // double pitchError = this->NormalizeAbout(errorsPRYVariable.X(), 0.0);
+    // double rollError = this->NormalizeAbout(errorsPRYVariable.Y(), 0.0);
+    // double yawError = this->NormalizeAbout(errorsPRYVariable.Z(), 0.0);
+    double pitchError = this->ShortestAngularDistance(
+      this->pitchCommand, currentAnglePRYVariable.X());
+    double rollError = this->ShortestAngularDistance(
+      this->rollCommand, currentAnglePRYVariable.Y());
+    double yawError = this->ShortestAngularDistance(
+      this->yawCommand, currentAnglePRYVariable.Z());
     // gzdbg << "error norm (" << pitchError << ", " << rollError
     //       << ", " << yawError << ")\n";
 
@@ -419,35 +402,6 @@ void GimbalControllerPlugin::OnUpdate()
     // If error computed from quaternionBasedCommand is smaller than
     // error computed from user command (rollCommand, pitchCommand, yawCommand)
     // use error computed from user command.
-    double pitchError1 = currentAnglePRYVariable.X() - this->pitchCommand;
-    if (std::abs(pitchError) > std::abs(pitchError1))
-    {
-      pitchError = pitchError1;
-    }
-    else
-    {
-      pitchError = pitchError1;
-    }
-    double rollError1 = currentAnglePRYVariable.Y() - this->rollCommand;
-    if (std::abs(rollError) > std::abs(rollError1))
-    {
-      rollError = rollError1;
-    }
-    else
-    {
-      rollError = rollError1;
-    }
-    double yawError1 = currentAnglePRYVariable.Z() - this->yawCommand;
-    if (std::abs(yawError) > std::abs(yawError1))
-    {
-      yawError = yawError1;
-    }
-    else
-    {
-      yawError = yawError1;
-    }
-    // gzdbg << "error lim  (" << pitchError << ", " << rollError
-    //       << ", " << yawError << ")\n";
 
     // apply forces to move gimbal
     double pitchForce = this->pitchPid.Update(pitchError, dt);
