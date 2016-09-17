@@ -508,8 +508,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   const float earth_radius = 6353000;  // m
 
   // reproject local position to gps coordinates
-  double x_rad = pos_W_I.x / earth_radius;
-  double y_rad = -pos_W_I.y / earth_radius;
+  double x_rad = pos_W_I.y / earth_radius; // north
+  double y_rad = pos_W_I.x / earth_radius; // east
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);
@@ -532,8 +532,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     hil_gps_msg.eph = 100;
     hil_gps_msg.epv = 100;
     hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
-    hil_gps_msg.vn = velocity_current_W.x * 100;
-    hil_gps_msg.ve = -velocity_current_W.y * 100;
+    hil_gps_msg.vn = velocity_current_W.y * 100;
+    hil_gps_msg.ve = velocity_current_W.x * 100;
     hil_gps_msg.vd = -velocity_current_W.z * 100;
     hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
     hil_gps_msg.satellites_visible = 10;
