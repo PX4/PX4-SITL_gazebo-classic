@@ -1447,7 +1447,7 @@
         </channel>
         <channel name="gimbal_yaw">
           <input_index>8</input_index>
-          <input_offset>0</input_offset>
+          <input_offset>-0.5</input_offset>
           <input_scaling>-3.1415</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
