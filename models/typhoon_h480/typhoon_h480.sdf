@@ -388,6 +388,7 @@
         <camera>
           <horizontal_fov>2.0</horizontal_fov>
           <image>
+            <format>R8G8B8</format>
             <width>640</width>
             <height>480</height>
           </image>
@@ -413,6 +414,14 @@
           <distortionK3>0.0</distortionK3>
           <distortionT1>0.0</distortionT1>
           <distortionT2>0.0</distortionT2>
+        </plugin>
+        -->
+        <!-- GStreamer camera plugin (needs a lot of CPU! Consider lowering the
+             camera image size when enabling) -->
+        <!--
+        <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
+            <robotNamespace></robotNamespace>
+            <udpPort>5600</udpPort>
         </plugin>
         -->
       </sensor>
