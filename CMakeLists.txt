@@ -193,6 +193,7 @@ add_library(gazebo_opticalFlow_plugin SHARED src/flow_settings.c src/flow.c
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -203,6 +204,7 @@ set(plugins
   gazebo_lidar_plugin
   rotors_gazebo_mavlink_interface
   rotors_gazebo_wind_plugin
+  gazebo_geotagged_images_plugin
   )
 
 if (GSTREAMER_FOUND)

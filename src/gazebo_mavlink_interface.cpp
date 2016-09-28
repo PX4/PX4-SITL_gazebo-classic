@@ -449,6 +449,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   fds[0].fd = _fd;
   fds[0].events = POLLIN;
+
+  gps_pub_ = node_handle_->Advertise<msgs::Vector3d>("~/gps_position");
 }
 
 // This gets called by the world update start event.
@@ -539,6 +541,12 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     hil_gps_msg.satellites_visible = 10;
 
     send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
+
+    msgs::Vector3d gps_msg;
+    gps_msg.set_x(lat_rad * 180. / M_PI);
+    gps_msg.set_y(lon_rad * 180. / M_PI);
+    gps_msg.set_z(hil_gps_msg.alt / 1000.f);
+    gps_pub_->Publish(gps_msg);
 
     last_gps_time_ = current_time;
   }
