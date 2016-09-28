@@ -390,7 +390,7 @@
           <image>
             <format>R8G8B8</format>
             <width>640</width>
-            <height>480</height>
+            <height>360</height>
           </image>
           <clip>
             <near>0.05</near>
@@ -422,6 +422,12 @@
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
             <udpPort>5600</udpPort>
+        </plugin>
+        <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
+            <robotNamespace></robotNamespace>
+            <interval>1</interval>
+            <width>3840</width>
+            <height>2160</height>
         </plugin>
         -->
       </sensor>
