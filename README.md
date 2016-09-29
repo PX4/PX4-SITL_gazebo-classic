@@ -88,6 +88,13 @@ GStreamer before running `cmake`. Eg. on Ubuntu with:
 sudo apt-get install gstreamer1.0-* libgstreamer1.0-*
 ```
 
+### Geotagging Plugin
+If you want to use the geotagging plugin, make sure you have `exiftool`
+installed on your system. On Ubuntu it can be installed with:
+```
+sudo apt-get install libimage-exiftool-perl
+```
+
 ## Install
 
 If you wish the libraries and models to be usable anywhere on your system without

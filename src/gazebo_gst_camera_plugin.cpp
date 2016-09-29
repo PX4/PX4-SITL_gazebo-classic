@@ -62,7 +62,7 @@ void GstCameraPlugin::gstCallback(GstElement *appsrc) {
 
   if (ret != GST_FLOW_OK) {
     /* something wrong, stop pushing */
-	gzerr << "g_signal_emit_by_name failed" << endl;
+    gzerr << "g_signal_emit_by_name failed" << endl;
     g_main_loop_quit(mainLoop);
   }
 }
