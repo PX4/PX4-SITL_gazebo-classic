@@ -86,10 +86,11 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   this->format_ = this->camera_->GetImageFormat();
 #endif
 
-  if (sdf->HasElement("robotNamespace"))
+  if (sdf->HasElement("robotNamespace")) {
     namespace_ = sdf->GetElement("robotNamespace")->Get<std::string>();
-  else
+  } else {
     gzwarn << "[gazebo_geotagging_images_camera_plugin] Please specify a robotNamespace.\n";
+  }
 
   this->storeIntervalSec_ = 1;
   if (sdf->HasElement("interval")) {
