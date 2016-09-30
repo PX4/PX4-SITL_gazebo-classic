@@ -32,7 +32,7 @@
  *
  ****************************************************************************/
 
-#include "settings.h"
+#include "flow_settings.h"
 #include "mavlink/v1.0/common/mavlink.h"
 
 enum global_param_id_t global_param_id;

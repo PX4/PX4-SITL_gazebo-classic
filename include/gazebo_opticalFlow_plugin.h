@@ -34,6 +34,11 @@
 #include <iostream>
 #include <boost/timer/timer.hpp>
 
+extern "C" {
+  #include "flow_settings.h"
+  #include "flow.h"
+}
+
 using namespace cv;
 using namespace std;
 

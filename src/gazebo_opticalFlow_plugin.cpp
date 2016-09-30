@@ -29,11 +29,6 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
-extern "C" {
-  #include "settings.h"
-  #include "flow.h"
-}
-
 using namespace cv;
 using namespace std;
 
@@ -104,6 +99,9 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   this->format = this->camera->GetImageFormat();
 #endif
 
+  if (this->width != 64 || this->height != 64) {
+    gzerr << "[gazebo_optical_flow_plugin] Incorrect image size, must by 64 x 64.\n";
+  }
 
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -167,13 +165,6 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   float z_gyro_rate = 0;
   float x_flow = 0;
   float y_flow = 0;
-
-  // check for correct image size
-  if (frame_gray.rows != 64 || frame_gray.cols != 64) {
-    printf("incorrect sizes, expected 64x64, got (%dx%d)\n",
-        frame_gray.rows, frame_gray.cols);
-    return;
-  }
 
   // if no old image yet, create it and return
   if (old_gray.rows != 64 || old_gray.cols != 64) {

@@ -38,8 +38,21 @@
 
 /**
  * @brief Computes pixel flow from image1 to image2
+ *
+ * Searches the corresponding position in the new image (image2) of max. 64 pixels from the old image (image1)
+ * and calculates the average offset of all.
+ *
+ * @param image1 previous image buffer
+ * @param image2 current image buffer (new)
+ * @param x_rate gyro x rate
+ * @param y_rate gyro y rate
+ * @param z_rate gyro z rate
+ * @param pixel_flow_x Computed optical flow in x direction in pixels.
+ * @param pixel_flow_y Computed optical flow in y direction in pixels.
+ *
+ * @return quality of flow calculation
  */
 uint8_t compute_flow(uint8_t *image1, uint8_t *image2, float x_rate, float y_rate, float z_rate,
-		float *histflowx, float *histflowy);
+		float *pixel_flow_x, float *pixel_flow_y);
 
 #endif /* FLOW_H_ */

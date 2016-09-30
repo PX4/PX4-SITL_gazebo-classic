@@ -39,7 +39,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "settings.h"
+#include "flow_settings.h"
 
 bool FLOAT_AS_BOOL(float f);
 int FLOAT_EQ_INT(float f , int i);
