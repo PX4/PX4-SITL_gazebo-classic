@@ -6,7 +6,7 @@ This is a flight simulator for multirotors, VTOL and fixed wing. It uses the mot
 
 ## Install Gazebo Simulator
 
-Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS users should install Gazebo 7, Linux users PGazebo 6. Failing to install the right version can render the simulation inoperational.
+Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS and Linux users should install Gazebo 7.
 
 
 ## Protobuf
@@ -16,7 +16,7 @@ Install the protobuf library, which is used as interface to Gazebo.
 ### Ubuntu Linux
 
 ```bash
-sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev libgazebo6-dev
+sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev gazebo7 libgazebo7-dev
 ```
 
 ### Mac OS
