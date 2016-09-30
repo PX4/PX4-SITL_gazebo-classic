@@ -22,8 +22,15 @@ sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-d
 ### Mac OS
 
 ```bash
-brew install graphviz sdformat3 protobuf eigen opencv
+brew install graphviz sdformat3 eigen opencv
 brew install gazebo7
+```
+
+An older version of protobuf (`< 3.0.0`) is required on Mac OS:
+
+```bash
+brew tap homebrew/versions
+brew install homebrew/versions/protobuf260
 ```
 
 ## Build Gazebo Plugins (all operating systems)
