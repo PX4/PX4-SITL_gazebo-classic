@@ -24,7 +24,7 @@
       <sensor name="PX4Flow" type="camera">
         <update_rate>100.0</update_rate>
         <camera>
-          <horizontal_fov>0.175</horizontal_fov>
+          <horizontal_fov>0.032</horizontal_fov>
           <image>
             <width>64</width>
             <height>64</height>
