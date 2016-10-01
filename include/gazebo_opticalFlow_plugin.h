@@ -34,6 +34,11 @@
 #include <iostream>
 #include <boost/timer/timer.hpp>
 
+extern "C" {
+  #include "flow_settings.h"
+  #include "flow.h"
+}
+
 using namespace cv;
 using namespace std;
 
@@ -52,8 +57,6 @@ namespace gazebo
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
-	float computeMedian(float * array, int iSize);
-
     protected: unsigned int width, height, depth;
     protected: std::string format;
 
@@ -63,19 +66,6 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
 
     private: 
-     static const int maxfeatures = 20;
-     const float qualityLevel = 0.1;
-     const float minDistance = 7;
-     const int blockSize = 7;
-     const bool useHarrisDetector = false;
-     const float k = 0.04;
-
-	 vector<Point2f> featuresPrevious;
-     vector<Point2f> featuresCurrent;
-     vector<Point2f> featuresNextPos;
-     vector<uchar> featuresFound;
-
-     Mat err;
      Mat old_gray;
      Mat frame_gray;
 
@@ -83,8 +73,6 @@ namespace gazebo
 	 transport::NodePtr node_handle_;
 	 opticalFlow_msgs::msgs::opticalFlow opticalFlow_message;
 	 std::string namespace_;
-	 float flowX_[maxfeatures];
-	 float flowY_[maxfeatures];
 	 boost::timer::cpu_timer timer_;
   };
 }

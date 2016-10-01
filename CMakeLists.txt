@@ -85,6 +85,7 @@ find_package(Boost 1.40 COMPONENTS system thread timer REQUIRED )
 ## Build ##
 ###########
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -std=c99 -Wno-deprecated-declarations")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations")
 # -Wno-deprecated-declarations: Shut up warnings about std::binder1st, std::binder2nd.
 
@@ -163,6 +164,7 @@ add_library(mav_msgs SHARED ${PROTO_SRCS})
 # Plugins #
 #---------#
 
+
 link_libraries(mav_msgs)
 
 # add_library(hello_world SHARED src/hello_world.cc)
@@ -175,7 +177,8 @@ add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_inte
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
+add_library(gazebo_opticalFlow_plugin SHARED src/flow_settings.c src/flow.c
+  src/gazebo_opticalFlow_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 
