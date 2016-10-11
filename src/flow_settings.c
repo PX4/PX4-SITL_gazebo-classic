@@ -38,7 +38,8 @@
 enum global_param_id_t global_param_id;
 struct global_struct global_data;
 
-extern uint8_t debug_int_message_buffer(const char* string, int32_t num);
+// FIXME: this lead to linking errors
+//extern uint8_t debug_int_message_buffer(const char* string, int32_t num);
 
 /**
  * @brief reset all parameters to default
@@ -229,10 +230,12 @@ void set_sensor_position_settings(uint8_t sensor_position)
 			break;
 
 		default:
-			debug_int_message_buffer("Unused sensor position:", sensor_position);
+			// FIXME: this lead to linking errors
+			//debug_int_message_buffer("Unused sensor position:", sensor_position);
 			return;
 	}
 
-	debug_int_message_buffer("Set sensor position:", sensor_position);
+	// FIXME: this lead to linking errors
+	//debug_int_message_buffer("Set sensor position:", sensor_position);
 	return;
 }
