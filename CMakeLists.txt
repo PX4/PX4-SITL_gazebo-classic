@@ -56,6 +56,10 @@ endforeach()
 find_package(Protobuf REQUIRED)
 pkg_check_modules(PROTOBUF protobuf)
 
+if ("${PROTOBUF_VERSION}" VERSION_LESS "2.5.0")
+  message(FATAL_ERROR "protobuf version: ${PROTOBUF_VERSION} not compatible, must be >= 2.5.0")
+endif()
+
 if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
 else()
@@ -75,10 +79,7 @@ if(NOT EIGEN3_FOUND)
 else()
   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 endif()
-if (NOT "${PROTOBUF_VERSION}" VERSION_LESS "3.0.0" OR
-  "${PROTOBUF_VERSION}" VERSION_LESS "2.5.0")
-  message(FATAL_ERROR "protobuf version: ${PROTOBUF_VERSION} not compatible, must be >= 2.5.0 and < 3.0.0")
-endif()
+
 find_package(Boost 1.40 COMPONENTS system thread timer REQUIRED )
 
 ###########
