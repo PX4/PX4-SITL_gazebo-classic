@@ -403,6 +403,19 @@ void GimbalControllerPlugin::OnUpdate()
   if (++i>100)
   {
     i = 0;
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+    gazebo::msgs::Any m;
+    m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
+
+    m.set_double_value(this->pitchJoint->GetAngle(0).Radian());
+    this->pitchPub->Publish(m);
+
+    m.set_double_value(this->rollJoint->GetAngle(0).Radian());
+    this->rollPub->Publish(m);
+
+    m.set_double_value(this->yawJoint->GetAngle(0).Radian());
+    this->yawPub->Publish(m);
+#else
     std::stringstream ss;
     gazebo::msgs::GzString m;
 
@@ -417,6 +430,7 @@ void GimbalControllerPlugin::OnUpdate()
     ss << this->yawJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
     this->yawPub->Publish(m);
+#endif
   }
 }
 
