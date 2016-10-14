@@ -195,21 +195,21 @@ void GimbalControllerPlugin::Init()
 #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
 /// only gazebo 7.4 and above support Any
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
 {
 //  gzdbg << "pitch command received " << _msg->double_value() << std::endl;
   this->pitchCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
 {
 //  gzdbg << "roll command received " << _msg->double_value() << std::endl;
   this->rollCommand = _msg->double_value();
 }
 
 /////////////////////////////////////////////////
-void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
+void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
 {
 //  gzdbg << "yaw command received " << _msg->double_value() << std::endl;
   this->yawCommand = _msg->double_value();
