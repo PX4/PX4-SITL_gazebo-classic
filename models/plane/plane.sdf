@@ -406,8 +406,8 @@
       <control_channels>
         <channel name="rotor4">
           <input_index>4</input_index>
-          <input_offset>1</input_offset>
-          <input_scaling>1600</input_scaling>
+          <input_offset>0</input_offset>
+          <input_scaling>3000</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
