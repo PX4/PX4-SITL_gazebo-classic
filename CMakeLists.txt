@@ -17,6 +17,7 @@ include(GNUInstallDirs)
 
 # Add search directory for CMake on OS X
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 ## System dependencies are found with CMake's conventions
 find_package(PkgConfig REQUIRED)
@@ -24,6 +25,7 @@ find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread timer)
+find_package(GStreamer)
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)
@@ -111,6 +113,7 @@ include_directories(
   # Workaround for OGRE include dirs on Mac OS
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
+  ${GSTREAMER_INCLUDE_DIRS}
   )
 
 link_libraries(
@@ -120,6 +123,7 @@ link_libraries(
   ${Boost_SYSTEM_LIBRARY_RELEASE}
   ${Boost_THREAD_LIBRARY_RELEASE}
   ${Boost_TIMER_LIBRARY_RELEASE}
+  ${GSTREAMER_LIBRARIES}
   )
 
 link_directories(
@@ -186,6 +190,7 @@ add_library(gazebo_opticalFlow_plugin SHARED src/flow_settings.c src/flow.c
   src/gazebo_opticalFlow_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
+add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -195,7 +200,17 @@ set(plugins
   gazebo_opticalFlow_plugin
   gazebo_lidar_plugin
   rotors_gazebo_mavlink_interface
+  gazebo_geotagged_images_plugin
   )
+
+if (GSTREAMER_FOUND)
+  add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
+  set(plugins
+    ${plugins}
+    gazebo_gst_camera_plugin
+  )
+  message(STATUS "Found GStreamer: adding gst_camera_plugin")
+endif()
 
 # Linux is not consistent with plugin availability, even on Gazebo 7
 #if("${GAZEBO_VERSION}" VERSION_LESS "7.0")

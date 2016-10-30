@@ -172,6 +172,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr lidar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
+  transport::PublisherPtr gps_pub_;
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
