@@ -14,17 +14,18 @@
   <!-- Instantiate iris "mechanics" -->
   <xacro:include filename="$(arg rotors_description_dir)/urdf/iris.xacro" />
 
-  <xacro:wind_plugin_macro
-      namespace="${namespace}"
-      wind_direction="0 0 1"
-      wind_force_mean="0.7"
-      xyz_offset="1 0 0"
-      wind_gust_direction="0 0 0"
-      wind_gust_duration="0"
-      wind_gust_start="0"
-      wind_gust_force_mean="0"
-      >
-    </xacro:wind_plugin_macro>
+  <xacro:if value="$(arg enable_wind)">
+    <xacro:wind_plugin_macro
+        namespace="${namespace}"
+        wind_direction="0 0 1"
+        wind_force_mean="0.7"
+        xyz_offset="1 0 0"
+        wind_gust_direction="0 0 0"
+        wind_gust_duration="0"
+        wind_gust_start="0"
+        wind_gust_force_mean="0"
+        />
+  </xacro:if>
 
   <xacro:if value="$(arg enable_mavlink_interface)">
   <!-- Instantiate mavlink telemetry interface. -->
