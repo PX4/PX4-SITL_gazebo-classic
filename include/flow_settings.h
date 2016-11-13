@@ -94,11 +94,11 @@ typedef enum
   * ALL SETTINGS VARIABLES
   */
 
-typedef struct
-{
-	/* nothing here until now */
-
-} SysState_TypeDef;
+//typedef struct
+//{
+//	/* nothing here until now */
+//
+//} SysState_TypeDef;
 
 enum global_param_id_t
 {
