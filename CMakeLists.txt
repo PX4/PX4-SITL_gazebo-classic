@@ -162,6 +162,7 @@ set (msgs
   msgs/lidar.proto
   msgs/CommandMotorSpeed.proto
   msgs/MotorSpeed.proto
+  msgs/Wind.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})

@@ -1,0 +1,11 @@
+syntax = "proto2";
+package wind_msgs.msgs;
+import "time.proto";
+import "vector3d.proto";
+
+message Wind
+{
+  required string frame_id = 1;
+  required gazebo.msgs.Time stamp = 2;
+  required gazebo.msgs.Vector3d force = 3;
+}

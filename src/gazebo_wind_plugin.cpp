@@ -21,8 +21,7 @@
 
 #include "gazebo_wind_plugin.h"
 #include "common.h"
-
-// #include <geometry_msgs/WrenchStamped.h>
+#include "Wind.pb.h"
 
 namespace gazebo {
 
@@ -79,7 +78,7 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // simulation iteration.
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboWindPlugin::OnUpdate, this, _1));
 
-  // wind_pub_ = node_handle_->Advertise<geometry_msgs::WrenchStamped>(wind_pub_topic_, 1);
+  wind_pub_ = node_handle_->Advertise<wind_msgs::msgs::Wind>(wind_pub_topic_, 1);
 }
 
 // This gets called by the world update start event.
@@ -102,19 +101,18 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
     link_->AddForceAtRelativePosition(wind_gust, xyz_offset_);
   }
 
-  // geometry_msgs::WrenchStamped wrench_msg;
+  wind_msgs::msgs::Wind wind_msg;
 
-  // wrench_msg.header.frame_id = frame_id_;
-  // wrench_msg.header.stamp.sec = now.sec;
-  // wrench_msg.header.stamp.nsec = now.nsec;
-  // wrench_msg.wrench.force.x = wind.x + wind_gust.x;
-  // wrench_msg.wrench.force.y = wind.y + wind_gust.y;
-  // wrench_msg.wrench.force.z = wind.z + wind_gust.z;
-  // wrench_msg.wrench.torque.x = 0;
-  // wrench_msg.wrench.torque.y = 0;
-  // wrench_msg.wrench.torque.z = 0;
+  gazebo::msgs::Vector3d* force = new gazebo::msgs::Vector3d();
+  force->set_x(wind.x + wind_gust.x);
+  force->set_y(wind.y + wind_gust.y);
+  force->set_z(wind.z + wind_gust.z);
 
-  // wind_pub_.publish(wrench_msg);
+  wind_msg.set_frame_id(frame_id_);
+  Set(wind_msg.mutable_stamp(), now);
+  wind_msg.set_allocated_force(force);
+  
+  wind_pub_->Publish(wind_msg);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboWindPlugin);
