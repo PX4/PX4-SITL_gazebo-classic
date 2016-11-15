@@ -104,7 +104,7 @@ class GazeboWindPlugin : public ModelPlugin {
   common::Time wind_gust_start_;
 
   transport::NodePtr node_handle_;
-  transport::PublisherPtr Publisher;
+  transport::PublisherPtr wind_pub_;
 };
 }
 
