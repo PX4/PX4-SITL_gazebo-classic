@@ -152,7 +152,7 @@ enum global_param_id_t
 
 struct global_struct
 {
-	SysState_TypeDef system_state;
+	//SysState_TypeDef system_state;
 	float param[ONBOARD_PARAM_COUNT];
 	char param_name[ONBOARD_PARAM_COUNT][ONBOARD_PARAM_NAME_LENGTH];
 	ParameterAccess_TypeDef param_access[ONBOARD_PARAM_COUNT];
