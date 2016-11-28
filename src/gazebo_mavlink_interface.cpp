@@ -24,6 +24,22 @@
 
 namespace gazebo {
 
+// Set global reference point
+// Zurich Irchel Park: 47.397742, 8.545594, 488m
+// Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
+// Moscow downtown: 55.753395, 37.625427, 155m
+
+// Zurich Irchel Park
+static const double lat_zurich = 47.397742 * M_PI / 180;  // rad
+static const double lon_zurich = 8.545594 * M_PI / 180;  // rad
+static const double alt_zurich = 488.0; // meters
+// Seattle downtown (15 deg declination): 47.592182, -122.316031
+// static const double lat_zurich = 47.592182 * M_PI / 180;  // rad
+// static const double lon_zurich = -122.316031 * M_PI / 180;  // rad
+// static const double alt_zurich = 86.0; // meters
+static const float earth_radius = 6353000;  // m
+
+
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
@@ -493,22 +509,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   math::Vector3 velocity_current_W_xy = velocity_current_W;
   velocity_current_W_xy.z = 0;
 
-  // Set global reference point
-  // Zurich Irchel Park: 47.397742, 8.545594, 488m
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
-  // Moscow downtown: 55.753395, 37.625427, 155m
-
   // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
-  // Zurich Irchel Park
-  const double lat_zurich = 47.397742 * M_PI / 180;  // rad
-  const double lon_zurich = 8.545594 * M_PI / 180;  // rad
-  const double alt_zurich = 488.0; // meters
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031
-  // const double lat_zurich = 47.592182 * M_PI / 180;  // rad
-  // const double lon_zurich = -122.316031 * M_PI / 180;  // rad
-  // const double alt_zurich = 86.0; // meters
-  const float earth_radius = 6353000;  // m
-
   // reproject local position to gps coordinates
   double x_rad = pos_W_I.y / earth_radius; // north
   double y_rad = pos_W_I.x / earth_radius; // east
@@ -639,6 +640,40 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   optflow_zgyro = imu_message->angular_velocity().z();
 
   send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);    
+
+  // send ground truth
+  mavlink_hil_state_quaternion_t hil_state_quat;
+  hil_state_quat.time_usec = world_->GetSimTime().nsec*1000;
+  math::Vector3 rot_gt_euler = T_W_I.rot.GetAsEuler(); //transform to NED
+  rot_gt_euler.y = -rot_gt_euler.y;
+  rot_gt_euler.z = -rot_gt_euler.z;
+  math::Quaternion rot_gt_quat(rot_gt_euler);
+  hil_state_quat.attitude_quaternion[0] = rot_gt_quat.w;
+  hil_state_quat.attitude_quaternion[1] = rot_gt_quat.x;
+  hil_state_quat.attitude_quaternion[2] = rot_gt_quat.y;
+  hil_state_quat.attitude_quaternion[3] = rot_gt_quat.z;
+
+  math::Vector3 rot_gt_speed = model_->GetWorldAngularVel();
+  hil_state_quat.rollspeed = rot_gt_speed.y;
+  hil_state_quat.pitchspeed = rot_gt_speed.x;
+  hil_state_quat.yawspeed = -rot_gt_speed.z;
+
+  hil_state_quat.lat = lat_rad * 180 / M_PI * 1e7;
+  hil_state_quat.lon = lon_rad * 180 / M_PI * 1e7;
+  hil_state_quat.alt = (pos_W_I.z + alt_zurich) * 1000;
+
+  hil_state_quat.vx = model_->GetWorldLinearVel().x * 100;
+  hil_state_quat.vy = -model_->GetWorldLinearVel().y * 100;
+  hil_state_quat.vz = -model_->GetWorldLinearVel().z * 100;
+
+  hil_state_quat.ind_airspeed = 0;
+  hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100; //no wind simulated
+
+  hil_state_quat.xacc = model_->GetWorldLinearAccel().x * 1000;
+  hil_state_quat.yacc = -model_->GetWorldLinearAccel().y * 1000;
+  hil_state_quat.zacc = -model_->GetWorldLinearAccel().z * 1000;
+
+  send_mavlink_message(MAVLINK_MSG_ID_HIL_STATE_QUATERNION, &hil_state_quat, 200);
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
