@@ -399,6 +399,18 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+    <plugin name='wind_plugin' filename='librotors_gazebo_wind_plugin.so'>
+      <frameId>base_link</frameId>
+      <linkName>base_link</linkName>
+      <robotNamespace/>
+      <xyzOffset>1 0 0</xyzOffset>
+      <windDirection>0 1 0</windDirection>
+      <windForceMean>0.7</windForceMean>
+      <windGustDirection>0 0 0</windGustDirection>
+      <windGustDuration>0</windGustDuration>
+      <windGustStart>0</windGustStart>
+      <windGustForceMean>0</windGustForceMean>
+    </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
