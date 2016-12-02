@@ -414,15 +414,16 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
-  // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (E, N, U))
-  //mag_W_ = {0.00771, 0.21523, -0.42741};
-  mag_W_.x = 0.0;
-  mag_W_.y = 0.21523;
+  // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E D) n-frame )
+  // mag_n_ = {0.21523, 0.00771, -0.42741};
   // We set the world Y component to zero because we apply
   // the declination based on the global position,
   // and so we need to start without any offsets.
   // The real value for Zurich would be 0.00771
-  mag_W_.z = -0.42741;
+  // frame d is the magnetic north frame
+  mag_d_.x = 0.21523;
+  mag_d_.y = 0;
+  mag_d_.z = -0.42741;
 
   //Create socket
   // udp socket data
@@ -592,86 +593,129 @@ void GazeboMavlinkInterface::send_mavlink_message(const uint8_t msgid, const voi
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
-  math::Pose T_W_I = model_->GetWorldPose();
-  math::Vector3 pos_W_I = T_W_I.pos;  // Use the models'world position for GPS and pressure alt.
-  
-  math::Quaternion C_W_I;
-  C_W_I.w = imu_message->orientation().w();
-  C_W_I.x = imu_message->orientation().x();
-  C_W_I.y = imu_message->orientation().y();
-  C_W_I.z = imu_message->orientation().z();
+  // frames
+  // g - gazebo (ENU), east, north, up
+  // r - rotors (FLU), forward, left, up
+  // b - px4 (FRD) forward, right down
+  // n - px4 (NED) north, east, down
+  math::Quaternion q_gr = model_->GetWorldPose().rot; 
 
-  // gzerr << "got imu: " << C_W_I << "\n";
+
+  // q_br
+  /*
+  tf.euler2quat(*tf.mat2euler([
+  #        F  L  U
+          [1, 0, 0],  # F
+          [0, -1, 0], # R
+          [0, 0, -1]  # D
+      ]
+  )).round(5)
+  */
+  math::Quaternion q_br(0, 1, 0, 0);
+
+
+  // q_ng
+  /*
+  tf.euler2quat(*tf.mat2euler([
+  #        N  E  D
+          [0, 1, 0],  # E
+          [1, 0, 0],  # N
+          [0, 0, -1]  # U
+      ]
+  )).round(5)
+  */
+  math::Quaternion q_ng(0, 0.70711, 0.70711, 0);
+
+  math::Quaternion q_gb = q_gr*q_br.GetInverse();
+  math::Quaternion q_nb = q_ng*q_gb;
+
+  math::Vector3 pos_g = model_->GetWorldPose().pos; 
+  math::Vector3 pos_n = q_ng.RotateVector(pos_g);
+
+  //gzerr << "got imu: " << C_W_I << "\n";
+  //gzerr << "got pose: " << T_W_I.rot << "\n";
   float declination = get_mag_declination(lat_rad, lon_rad);
 
-  math::Quaternion C_D_I(0.0, 0.0, declination);
+  math::Quaternion q_dn(0.0, 0.0, declination);
+  math::Vector3 mag_n = q_dn.RotateVectorReverse(mag_d_);
 
-  math::Vector3 mag_decl = C_D_I.RotateVectorReverse(mag_W_);
+  math::Vector3 vel_b = q_br.RotateVector(model_->GetRelativeLinearVel());
+  math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
+  math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
 
-  // TODO replace mag_W_ in the line below with mag_decl
-
-  math::Vector3 mag_I = C_W_I.RotateVectorReverse(mag_decl); // TODO: Add noise based on bais and variance like for imu and gyro
-  math::Vector3 body_vel = C_W_I.RotateVectorReverse(model_->GetWorldLinearVel());
-  
   standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
+  math::Vector3 mag_noise_b(
+    standard_normal_distribution_(random_generator_),
+    standard_normal_distribution_(random_generator_),
+    standard_normal_distribution_(random_generator_));
 
-  float mag_noise = standard_normal_distribution_(random_generator_);
+  math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
+    imu_message->linear_acceleration().x(),
+    imu_message->linear_acceleration().y(),
+    imu_message->linear_acceleration().z()));
+  math::Vector3 gyro_b = q_br.RotateVector(math::Vector3(
+    imu_message->angular_velocity().x(),
+    imu_message->angular_velocity().y(),
+    imu_message->angular_velocity().z()));
+  math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
   mavlink_hil_sensor_t sensor_msg;
   sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
-  sensor_msg.xacc = imu_message->linear_acceleration().x();
-  sensor_msg.yacc = -imu_message->linear_acceleration().y();
-  sensor_msg.zacc = -imu_message->linear_acceleration().z();
-  sensor_msg.xgyro = imu_message->angular_velocity().x();
-  sensor_msg.ygyro = -imu_message->angular_velocity().y();
-  sensor_msg.zgyro = -imu_message->angular_velocity().z();
-  sensor_msg.xmag = mag_I.x + mag_noise;
-  sensor_msg.ymag = -mag_I.y + mag_noise;
-  sensor_msg.zmag = -mag_I.z + mag_noise;
+  sensor_msg.xacc = accel_b.x;
+  sensor_msg.yacc = accel_b.y;
+  sensor_msg.zacc = accel_b.z;
+  sensor_msg.xgyro = gyro_b.x;
+  sensor_msg.ygyro = gyro_b.y;
+  sensor_msg.zgyro = gyro_b.z;
+  sensor_msg.xmag = mag_b.x;
+  sensor_msg.ymag = mag_b.y;
+  sensor_msg.zmag = mag_b.z;
   sensor_msg.abs_pressure = 0.0;
-  sensor_msg.diff_pressure = 0.5*1.2754*(body_vel.z + body_vel.x)*(body_vel.z + body_vel.x) / 100;
-  sensor_msg.pressure_alt = pos_W_I.z;
+  float rho = 1.2754f; // density of air, TODO why is this not 1.225 as given by std. atmos.
+  // assumed dynamic pressure due to flow aligned with pitot (body x and body z)
+  // TODO these velocity components should be handeled in a better way for diff_pressure
+  sensor_msg.diff_pressure = 0.5f*rho*(vel_b.x + vel_b.z)*(vel_b.x + vel_b.z) / 100;
+  sensor_msg.pressure_alt = -pos_n.z;
   sensor_msg.temperature = 0.0;
   sensor_msg.fields_updated = 4095;
 
   //gyro needed for optical flow message
-  optflow_xgyro = imu_message->angular_velocity().x();
-  optflow_ygyro = imu_message->angular_velocity().y();
-  optflow_zgyro = imu_message->angular_velocity().z();
+  optflow_xgyro = gyro_b.x;
+  optflow_ygyro = gyro_b.y;
+  optflow_zgyro = gyro_b.z;
 
   send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);    
+
+  // ground truth
+  math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
 
   // send ground truth
   mavlink_hil_state_quaternion_t hil_state_quat;
   hil_state_quat.time_usec = world_->GetSimTime().nsec*1000;
-  math::Vector3 rot_gt_euler = T_W_I.rot.GetAsEuler(); //transform to NED
-  rot_gt_euler.y = -rot_gt_euler.y;
-  rot_gt_euler.z = -rot_gt_euler.z;
-  math::Quaternion rot_gt_quat(rot_gt_euler);
-  hil_state_quat.attitude_quaternion[0] = rot_gt_quat.w;
-  hil_state_quat.attitude_quaternion[1] = rot_gt_quat.x;
-  hil_state_quat.attitude_quaternion[2] = rot_gt_quat.y;
-  hil_state_quat.attitude_quaternion[3] = rot_gt_quat.z;
+  hil_state_quat.attitude_quaternion[0] = q_nb.w;
+  hil_state_quat.attitude_quaternion[1] = q_nb.x;
+  hil_state_quat.attitude_quaternion[2] = q_nb.y;
+  hil_state_quat.attitude_quaternion[3] = q_nb.z;
 
-  math::Vector3 rot_gt_speed = model_->GetWorldAngularVel();
-  hil_state_quat.rollspeed = rot_gt_speed.y;
-  hil_state_quat.pitchspeed = rot_gt_speed.x;
-  hil_state_quat.yawspeed = -rot_gt_speed.z;
+  hil_state_quat.rollspeed = omega_nb_b.x;
+  hil_state_quat.pitchspeed = omega_nb_b.y;
+  hil_state_quat.yawspeed = omega_nb_b.z;
 
   hil_state_quat.lat = lat_rad * 180 / M_PI * 1e7;
   hil_state_quat.lon = lon_rad * 180 / M_PI * 1e7;
-  hil_state_quat.alt = (pos_W_I.z + alt_zurich) * 1000;
+  hil_state_quat.alt = (-pos_n.z + alt_zurich) * 1000;
 
-  hil_state_quat.vx = model_->GetWorldLinearVel().x * 100;
-  hil_state_quat.vy = -model_->GetWorldLinearVel().y * 100;
-  hil_state_quat.vz = -model_->GetWorldLinearVel().z * 100;
+  hil_state_quat.vx = vel_n.x * 100;
+  hil_state_quat.vy = vel_n.y * 100;
+  hil_state_quat.vz = vel_n.z * 100;
 
-  hil_state_quat.ind_airspeed = 0;
+  // assumed indicated airspeed due to flow aligned with pitot (body x)
+  hil_state_quat.ind_airspeed = vel_b.x;
   hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100; //no wind simulated
 
-  hil_state_quat.xacc = model_->GetWorldLinearAccel().x * 1000;
-  hil_state_quat.yacc = -model_->GetWorldLinearAccel().y * 1000;
-  hil_state_quat.zacc = -model_->GetWorldLinearAccel().z * 1000;
+  hil_state_quat.xacc = accel_true_b.x * 1000;
+  hil_state_quat.yacc = accel_true_b.y * 1000;
+  hil_state_quat.zacc = accel_true_b.z * 1000;
 
   send_mavlink_message(MAVLINK_MSG_ID_HIL_STATE_QUATERNION, &hil_state_quat, 200);
 }
