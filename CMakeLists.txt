@@ -19,13 +19,17 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
+
 ## System dependencies are found with CMake's conventions
 find_package(PkgConfig REQUIRED)
 find_package(gazebo REQUIRED)
 find_program(px4 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread timer)
-find_package(GStreamer)
+if (BUILD_GSTREAMER_PLUGIN)
+  find_package(GStreamer)
+endif()
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)
