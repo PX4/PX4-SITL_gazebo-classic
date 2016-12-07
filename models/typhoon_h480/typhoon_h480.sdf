@@ -1153,7 +1153,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1000</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1181,7 +1181,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1000</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1209,7 +1209,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1000</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1237,7 +1237,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1000</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1265,7 +1265,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1000</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1293,7 +1293,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1000</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -1323,7 +1323,7 @@
         <channel name="rotor0">
           <input_index>0</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1000</input_scaling>
+          <input_scaling>1500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
@@ -1343,7 +1343,7 @@
         <channel name="rotor1">
           <input_index>1</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1000</input_scaling>
+          <input_scaling>1500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
@@ -1363,7 +1363,7 @@
         <channel name="rotor2">
           <input_index>2</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1000</input_scaling>
+          <input_scaling>1500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
@@ -1383,7 +1383,7 @@
         <channel name="rotor3">
           <input_index>3</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1000</input_scaling>
+          <input_scaling>1500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
@@ -1403,7 +1403,7 @@
         <channel name="rotor4">
           <input_index>4</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1000</input_scaling>
+          <input_scaling>1500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
@@ -1423,7 +1423,7 @@
         <channel name="rotor5">
           <input_index>5</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1000</input_scaling>
+          <input_scaling>1500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
