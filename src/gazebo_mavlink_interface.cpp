@@ -676,9 +676,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   sensor_msg.zmag = mag_b.z;
   sensor_msg.abs_pressure = 0.0;
   float rho = 1.2754f; // density of air, TODO why is this not 1.225 as given by std. atmos.
-  // assumed dynamic pressure due to flow aligned with pitot (body x and body z)
-  // TODO these velocity components should be handeled in a better way for diff_pressure
-  sensor_msg.diff_pressure = 0.5f*rho*(vel_b.x + vel_b.z)*(vel_b.x + vel_b.z) / 100;
+  sensor_msg.diff_pressure = 0.5f*rho*vel_b.x*vel_b.x / 100;
   sensor_msg.pressure_alt = -pos_n.z;
   sensor_msg.temperature = 0.0;
   sensor_msg.fields_updated = 4095;
