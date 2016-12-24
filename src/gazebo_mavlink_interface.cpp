@@ -524,7 +524,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
    lat_rad = lat_zurich;
     lon_rad = lon_zurich;
   }
-  
+
   if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
     // Raw UDP mavlink
     mavlink_hil_gps_t hil_gps_msg;
@@ -633,7 +633,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Quaternion q_gb = q_gr*q_br.GetInverse();
   math::Quaternion q_nb = q_ng*q_gb;
 
-  math::Vector3 pos_g = model_->GetWorldPose().pos; 
+  math::Vector3 pos_g = model_->GetWorldPose().pos;
   math::Vector3 pos_n = q_ng.RotateVector(pos_g);
 
   //gzerr << "got imu: " << C_W_I << "\n";
@@ -677,7 +677,19 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   sensor_msg.abs_pressure = 0.0;
   float rho = 1.2754f; // density of air, TODO why is this not 1.225 as given by std. atmos.
   sensor_msg.diff_pressure = 0.5f*rho*vel_b.x*vel_b.x / 100;
-  sensor_msg.pressure_alt = -pos_n.z;
+
+  float p1, p2;
+
+  // need to add noise to pressure alt
+  do {
+      p1 = rand() * (1.0 / RAND_MAX);
+      p2 = rand() * (1.0 / RAND_MAX);
+  } while (p1 <= FLT_EPSILON);
+
+  float n = sqrtf(-2.0 * logf(p1)) * cosf(2.0f * M_PI * p2);
+  float alt_n = -pos_n.z + n * sqrtf(0.006f);
+
+  sensor_msg.pressure_alt = (std::isfinite(alt_n)) ? alt_n : -pos_n.z;
   sensor_msg.temperature = 0.0;
   sensor_msg.fields_updated = 4095;
 
@@ -686,7 +698,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   optflow_ygyro = gyro_b.y;
   optflow_zgyro = gyro_b.z;
 
-  send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);    
+  send_mavlink_message(MAVLINK_MSG_ID_HIL_SENSOR, &sensor_msg, 200);
 
   // ground truth
   math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
