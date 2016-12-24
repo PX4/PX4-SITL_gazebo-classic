@@ -742,7 +742,8 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   sensor_msg.current_distance = lidar_message->current_distance() * 100.0;
   sensor_msg.type = 0;
   sensor_msg.id = 0;
-  sensor_msg.orientation = 0;
+  // to to roll 180 (downward facing for agl measurement)
+  sensor_msg.orientation = 8;
   sensor_msg.covariance = 0;
 
   //distance needed for optical flow message
