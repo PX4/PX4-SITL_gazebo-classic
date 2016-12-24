@@ -362,7 +362,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1100</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -379,7 +379,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1100</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -396,7 +396,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1100</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -413,7 +413,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1100</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -423,10 +423,46 @@
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
-      <robotNamespace></robotNamespace>
+        <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+      <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <control_channels>
+        <channel name='rotor1'>
+          <input_index>0</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1200</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor2'>
+          <input_index>1</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1200</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor3'>
+          <input_index>2</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1200</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor4'>
+          <input_index>3</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1200</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+      </control_channels>
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
