@@ -431,7 +431,7 @@
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
+          <joint_control_type>position_kinematic</joint_control_type>
           <joint_name>left_elevon_joint</joint_name>
         </channel>
         <channel name="right_elevon">
@@ -440,7 +440,7 @@
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
+          <joint_control_type>position_kinematic</joint_control_type>
           <joint_name>right_elevon_joint</joint_name>
         </channel>
         <channel name="elevator">
@@ -449,7 +449,7 @@
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
+          <joint_control_type>position_kinematic</joint_control_type>
           <joint_name>elevator_joint</joint_name>
         </channel>
       </control_channels>
