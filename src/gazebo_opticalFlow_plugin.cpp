@@ -135,8 +135,8 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   this->parentSensor->SetActive(true);
 
   //init flow
-  // _optical_flow = new OpticalFlowOpenCV(focal_length, focal_length, 30, 1.645);
-  _optical_flow = new OpticalFlowPX4(focal_length, focal_length, this->width, 8, 30, 5000);
+  _optical_flow = new OpticalFlowOpenCV(focal_length, focal_length);
+  // _optical_flow = new OpticalFlowPX4(focal_length, focal_length, this->width);
 
 }
 
