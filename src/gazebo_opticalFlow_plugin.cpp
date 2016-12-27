@@ -116,17 +116,29 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 #else
   const string scopedName = _sensor->GetParentName();
 #endif
+
   string topicName = "~/" + scopedName + "/opticalFlow";
   boost::replace_all(topicName, "::", "/");
 
   opticalFlow_pub_ = node_handle_->Advertise<opticalFlow_msgs::msgs::opticalFlow>(topicName, 10);
 
+  #if GAZEBO_MAJOR_VERSION >= 7
+    hfov = float(this->camera->HFOV().Radian());
+  #else
+    hfov = float(this->camera->GetHFOV().Radian());
+  #endif
 
+  focal_length = (this->width/2)/tan(hfov/2);
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
       boost::bind(&OpticalFlowPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
 
   this->parentSensor->SetActive(true);
+
+  //init flow
+  // _optical_flow = new OpticalFlowOpenCV(focal_length, focal_length, 30, 1.645);
+  _optical_flow = new OpticalFlowPX4(focal_length, focal_length, this->width, 8, 30, 5000);
+
 }
 
 /////////////////////////////////////////////////
@@ -136,50 +148,40 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
                               unsigned int _depth,
                               const std::string &_format)
 {
-#if GAZEBO_MAJOR_VERSION >= 7
-  _image = this->camera->ImageData(0);
-#else
-  _image = this->camera->GetImageData(0);
-#endif
 
-#if GAZEBO_MAJOR_VERSION >= 7
-  const float hfov = float(this->camera->HFOV().Radian());
-#else
-  const float hfov = float(this->camera->GetHFOV().Radian());
-#endif
-  const float focal_length = (_width/2)/tan(hfov/2);
+  //get data depending on gazebo version
+  #if GAZEBO_MAJOR_VERSION >= 7
+    rate = this->camera->AvgFPS();
+    _image = this->camera->ImageData(0);
+  #else
+    rate = this->camera->GetAvgFPS();
+    _image = this->camera->GetImageData(0);
+  #endif
+
+  //calc delta time (interagion time)
+  dt = 1.0/rate;
 
   timer_.stop();
-  float rate = 100; // assume 100 hz
-  float dt = 1.0/rate;
-  Mat frame = Mat(_height, _width, CV_8UC3);
-  Mat frameHSV = Mat(_height, _width, CV_8UC3);
-  Mat frameBGR = Mat(_height, _width, CV_8UC3);
-  frame.data = (uchar*)_image; //frame is not the right color now -> convert
-  // dynamically scale image using HSV full conversion
-  cvtColor(frame, frameHSV, CV_RGB2HSV_FULL); 
-  cvtColor(frameHSV, frameBGR, CV_HSV2BGR); 
-  cvtColor(frameBGR, frame_gray, CV_BGR2GRAY);
-  float x_gyro_rate = 0;
-  float y_gyro_rate = 0;
-  float z_gyro_rate = 0;
-  float x_flow = 0;
-  float y_flow = 0;
 
-  // if no old image yet, create it and return
-  if (old_gray.rows != 64 || old_gray.cols != 64) {
-    old_gray = frame_gray.clone();
-    return;
-  }
+  Mat frame_gray = Mat(_height, _width, CV_8UC1);
+  frame_gray.data = (uchar*)_image;
 
-  uint8_t quality = compute_flow((uint8_t *)old_gray.data, (uint8_t * )frame_gray.data,
-      x_gyro_rate, y_gyro_rate, z_gyro_rate, &x_flow, &y_flow);
-  float flow_x_ang = atan(x_flow/focal_length);
-  float flow_y_ang = atan(y_flow/focal_length);
-  old_gray = frame_gray.clone();
-  //printf("x_flow: %10.4f y_flow: %10.4f rate: %10.2f f: %10.2f pixel flow x: %10.2f rad\t\tflow y: %10.2f rad\n",
-          //x_flow, y_flow, rate, focal_length, flow_x_ang, flow_y_ang);
-  opticalFlow_message.set_time_usec(100000000000000);//big number to prevent timeout in inav
+  // static int count = 0;
+  // count++;
+  // if(count>500){
+  //   cv::imshow("test", frame_gray);
+  //   cv::waitKey(0);
+  //   count = 0;
+  // }
+
+
+  float flow_x_ang = 0;
+  float flow_y_ang = 0;
+  //calculate angular flow
+  int quality = _optical_flow->calcFlow(frame_gray, flow_x_ang, flow_y_ang);
+
+  //prepare optical flow message
+  opticalFlow_message.set_time_usec(0);//will be filled in simulator_mavlink.cpp
   opticalFlow_message.set_sensor_id(2.0);
   opticalFlow_message.set_integration_time_us(dt * 1000000);
   opticalFlow_message.set_integrated_x(flow_x_ang);
@@ -191,7 +193,7 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   opticalFlow_message.set_quality(quality);
   opticalFlow_message.set_time_delta_distance_us(0.0);
   opticalFlow_message.set_distance(0.0); //get real values in gazebo_mavlink_interface.cpp
-
+  //send message
   opticalFlow_pub_->Publish(opticalFlow_message);
   timer_.start();
 }
