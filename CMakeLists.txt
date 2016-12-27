@@ -195,8 +195,7 @@ add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_inte
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(gazebo_opticalFlow_plugin SHARED src/flow_settings.c src/flow.c
-  src/gazebo_opticalFlow_plugin.cpp)
+add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
 target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
