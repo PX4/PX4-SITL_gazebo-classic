@@ -67,8 +67,8 @@ namespace gazebo
       opticalFlow_msgs::msgs::opticalFlow opticalFlow_message;
       std::string namespace_;
       boost::timer::cpu_timer timer_;
-      // OpticalFlowOpenCV *_optical_flow;
-      OpticalFlowPX4 *_optical_flow;
+      OpticalFlowOpenCV *_optical_flow;
+      // OpticalFlowPX4 *_optical_flow;
 
       float hfov;
       float rate;
