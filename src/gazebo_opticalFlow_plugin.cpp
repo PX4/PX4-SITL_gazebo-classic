@@ -39,8 +39,7 @@ GZ_REGISTER_SENSOR_PLUGIN(OpticalFlowPlugin)
 OpticalFlowPlugin::OpticalFlowPlugin()
 : SensorPlugin(), width(0), height(0), depth(0), timer_()
 {
-  // load optical flow parameters
-  global_data_reset_param_defaults();
+
 }
 
 /////////////////////////////////////////////////
