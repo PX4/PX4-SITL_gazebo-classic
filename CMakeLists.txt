@@ -30,6 +30,8 @@ find_package(Boost REQUIRED COMPONENTS system thread timer)
 if (BUILD_GSTREAMER_PLUGIN)
   find_package(GStreamer)
 endif()
+add_subdirectory( external/OpticalFlow OpticalFlow )
+set( OpticalFlow_LIBS "OpticalFlow" )
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)
@@ -105,6 +107,7 @@ endforeach()
 
 include_directories(
   include
+  ${OpticalFlow_INCLUDE_DIRS}
   ${GAZEBO_INCLUDE_DIRS}
   ${GAZEBO_MSG_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
@@ -194,6 +197,7 @@ add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_ba
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_opticalFlow_plugin SHARED src/flow_settings.c src/flow.c
   src/gazebo_opticalFlow_plugin.cpp)
+target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
@@ -281,4 +285,3 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${GAZEBO_MAJOR_VERSION}-${PR
 
 include(CPack)
 # vim: set et fenc= ff=unix sts=0 sw=2 ts=2 :
-
