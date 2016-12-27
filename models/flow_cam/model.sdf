@@ -33,6 +33,7 @@
           <image>
             <width>64</width>
             <height>64</height>
+            <format>L8</format>
           </image>
           <clip>
             <near>0.1</near>
