@@ -166,15 +166,6 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   Mat frame_gray = Mat(_height, _width, CV_8UC1);
   frame_gray.data = (uchar*)_image;
 
-  // static int count = 0;
-  // count++;
-  // if(count>500){
-  //   cv::imshow("test", frame_gray);
-  //   cv::waitKey(0);
-  //   count = 0;
-  // }
-
-
   float flow_x_ang = 0;
   float flow_y_ang = 0;
   //calculate angular flow
