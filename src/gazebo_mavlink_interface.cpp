@@ -760,7 +760,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   sensor_msg.integration_time_us = opticalFlow_message->integration_time_us();
   sensor_msg.integrated_x = opticalFlow_message->integrated_x();
   sensor_msg.integrated_y = opticalFlow_message->integrated_y();
-  sensor_msg.integrated_xgyro = optflow_ygyro * opticalFlow_message->integration_time_us() / 1000000.0; //xy switched
+  sensor_msg.integrated_xgyro = -optflow_ygyro * opticalFlow_message->integration_time_us() / 1000000.0; //xy switched
   sensor_msg.integrated_ygyro = optflow_xgyro * opticalFlow_message->integration_time_us() / 1000000.0; //xy switched
   sensor_msg.integrated_zgyro = -optflow_zgyro * opticalFlow_message->integration_time_us() / 1000000.0; //change direction
   sensor_msg.temperature = opticalFlow_message->temperature();
