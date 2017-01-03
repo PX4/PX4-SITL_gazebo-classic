@@ -70,7 +70,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   getSdfParam<double>(_sdf, "gyroscopeNoiseDensity",
                       imu_parameters_.gyroscope_noise_density,
                       imu_parameters_.gyroscope_noise_density);
-  getSdfParam<double>(_sdf, "gyroscopeBiasRandomWalk",
+  getSdfParam<double>(_sdf, "gyroscopeRandomWalk",
                       imu_parameters_.gyroscope_random_walk,
                       imu_parameters_.gyroscope_random_walk);
   getSdfParam<double>(_sdf, "gyroscopeBiasCorrelationTime",
