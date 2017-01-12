@@ -123,10 +123,13 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   #if GAZEBO_MAJOR_VERSION >= 7
     hfov = float(this->camera->HFOV().Radian());
+    first_frame_time = this->camera->LastRenderWallTime().Double();
   #else
     hfov = float(this->camera->GetHFOV().Radian());
+    first_frame_time = this->camera->GetLastRenderWallTime().Double();
   #endif
 
+  old_frame_time = first_frame_time;
   focal_length = (this->width/2)/tan(hfov/2);
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
@@ -135,8 +138,9 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   this->parentSensor->SetActive(true);
 
   //init flow
-  _optical_flow = new OpticalFlowOpenCV(focal_length, focal_length);
-  // _optical_flow = new OpticalFlowPX4(focal_length, focal_length, this->width);
+  const int ouput_rate = 20; // -1 means use rate of camera
+  _optical_flow = new OpticalFlowOpenCV(focal_length, focal_length, ouput_rate);
+  // _optical_flow = new OpticalFlowPX4(focal_length, focal_length, ouput_rate, this->width);
 
 }
 
@@ -152,13 +156,14 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   #if GAZEBO_MAJOR_VERSION >= 7
     rate = this->camera->AvgFPS();
     _image = this->camera->ImageData(0);
+    frame_time = this->camera->LastRenderWallTime().Double();
   #else
     rate = this->camera->GetAvgFPS();
     _image = this->camera->GetImageData(0);
+    frame_time = this->camera->GetLastRenderWallTime().Double();
   #endif
 
-  //calc delta time (interagion time)
-  dt = 1.0/rate;
+  frame_time_us = (frame_time - first_frame_time) * 1e6; //since start
 
   timer_.stop();
 
@@ -168,24 +173,26 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   float flow_x_ang = 0;
   float flow_y_ang = 0;
   //calculate angular flow
-  int quality = _optical_flow->calcFlow(frame_gray, flow_x_ang, flow_y_ang);
+  int quality = _optical_flow->calcFlow(frame_gray, frame_time_us, dt_us, flow_x_ang, flow_y_ang);
 
-  //prepare optical flow message
-  opticalFlow_message.set_time_usec(0);//will be filled in simulator_mavlink.cpp
-  opticalFlow_message.set_sensor_id(2.0);
-  opticalFlow_message.set_integration_time_us(dt * 1000000);
-  opticalFlow_message.set_integrated_x(flow_x_ang);
-  opticalFlow_message.set_integrated_y(flow_y_ang);
-  opticalFlow_message.set_integrated_xgyro(0.0); //get real values in gazebo_mavlink_interface.cpp
-  opticalFlow_message.set_integrated_ygyro(0.0); //get real values in gazebo_mavlink_interface.cpp
-  opticalFlow_message.set_integrated_zgyro(0.0); //get real values in gazebo_mavlink_interface.cpp
-  opticalFlow_message.set_temperature(20.0);
-  opticalFlow_message.set_quality(quality);
-  opticalFlow_message.set_time_delta_distance_us(0.0);
-  opticalFlow_message.set_distance(0.0); //get real values in gazebo_mavlink_interface.cpp
-  //send message
-  opticalFlow_pub_->Publish(opticalFlow_message);
-  timer_.start();
+  if (quality >= 0) { // calcFlow(...) returns -1 if data should not be published yet -> output_rate
+    //prepare optical flow message
+    opticalFlow_message.set_time_usec(0);//will be filled in simulator_mavlink.cpp
+    opticalFlow_message.set_sensor_id(2.0);
+    opticalFlow_message.set_integration_time_us(dt_us);
+    opticalFlow_message.set_integrated_x(flow_x_ang);
+    opticalFlow_message.set_integrated_y(flow_y_ang);
+    opticalFlow_message.set_integrated_xgyro(0.0); //get real values in gazebo_mavlink_interface.cpp
+    opticalFlow_message.set_integrated_ygyro(0.0); //get real values in gazebo_mavlink_interface.cpp
+    opticalFlow_message.set_integrated_zgyro(0.0); //get real values in gazebo_mavlink_interface.cpp
+    opticalFlow_message.set_temperature(20.0);
+    opticalFlow_message.set_quality(quality);
+    opticalFlow_message.set_time_delta_distance_us(0.0);
+    opticalFlow_message.set_distance(0.0); //get real values in gazebo_mavlink_interface.cpp
+    //send message
+    opticalFlow_pub_->Publish(opticalFlow_message);
+    timer_.start();
+  }
 }
 
 /* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */
