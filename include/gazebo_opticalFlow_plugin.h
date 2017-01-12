@@ -72,8 +72,12 @@ namespace gazebo
 
       float hfov;
       float rate;
-      float dt;
+      int dt_us;
       float focal_length;
+      double first_frame_time;
+      double frame_time;
+      double old_frame_time;
+      uint32_t frame_time_us;
   };
 }
 #endif
