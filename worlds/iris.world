@@ -36,5 +36,10 @@
       <real_time_update_rate>500</real_time_update_rate>
       <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     </physics>
+    <gui>
+      <camera name="user_camera">
+        <pose>-15 0 10 0 0.45 0</pose>
+      </camera>
+    </gui>
   </world>
 </sdf>
