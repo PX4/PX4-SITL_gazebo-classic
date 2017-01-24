@@ -32,8 +32,8 @@
   <xacro:mavlink_interface_macro
     namespace="${namespace}"
     imu_sub_topic="/imu"
-    mavlink_addr="INADDR_ANY"
-    mavlink_udp_port="14560"
+    mavlink_addr="$(arg mavlink_addr)"
+    mavlink_udp_port="$(arg mavlink_udp_port)"
     >
   </xacro:mavlink_interface_macro>
   </xacro:if>
