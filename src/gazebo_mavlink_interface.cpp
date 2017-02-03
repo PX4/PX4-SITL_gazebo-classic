@@ -530,7 +530,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     // turning_velocities_msg->header.stamp.sec = current_time.sec;
     // turning_velocities_msg->header.stamp.nsec = current_time.nsec;
 
-    
+
     motor_velocity_reference_pub_->Publish(turning_velocities_msg);
   }
 
@@ -648,11 +648,10 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
   math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
 
-  standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
   math::Vector3 mag_noise_b(
-    standard_normal_distribution_(random_generator_),
-    standard_normal_distribution_(random_generator_),
-    standard_normal_distribution_(random_generator_));
+    0.01*randn_(rand_),
+    0.01*randn_(rand_),
+    0.01*randn_(rand_));
 
   math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
     imu_message->linear_acceleration().x(),
@@ -771,7 +770,7 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
     // update lat_rad and lon_rad
     lat_rad = gps_msg->lat_rad();
     lon_rad = gps_msg->lon_rad();
-    
+
     //send gps
     // Raw UDP mavlink
     hil_gps_msg_.time_usec = gps_msg->time() * 1e6;
@@ -1011,3 +1010,4 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 }
 
 }
+/* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */
