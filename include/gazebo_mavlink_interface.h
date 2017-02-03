@@ -29,6 +29,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include <stdio.h>
+#include <queue>
 
 #include "common.h"
 
@@ -71,6 +72,16 @@ static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/comma
 static const std::string kDefaultImuTopic = "/imu";
 static const std::string kDefaultLidarTopic = "/lidar/link/lidar";
 static const std::string kDefaultOpticalFlowTopic = "/camera/link/opticalFlow";
+
+// gps noise params
+static const double gps_corellation_time = 60.0; // s
+static const double gps_xy_random_walk = 2.0; // (m/s) / sqrt(hz)
+static const double gps_z_random_walk = 4.0; // (m/s) / sqrt(hz)
+static const double gps_xy_noise_density = 2e-4; // (m) / sqrt(hz)
+static const double gps_z_noise_density = 4e-4; // (m) / sqrt(hz)
+static const double gps_vxy_noise_density = 2e-1; // (m/s) / sqrt(hz)
+static const double gps_vz_noise_density = 4e-1; // (m/s) / sqrt(hz)
+ 
 
 class GazeboMavlinkInterface : public ModelPlugin {
  public:
@@ -189,8 +200,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
   math::Vector3 velocity_prev_W_;
   math::Vector3 mag_d_;
 
-  std::default_random_engine random_generator_;
-  std::normal_distribution<float> standard_normal_distribution_;
+  std::default_random_engine rand_;
+  std::normal_distribution<float> randn_;
 
   int _fd;
   struct sockaddr_in _myaddr;  ///< The locally bound address
@@ -211,4 +222,11 @@ class GazeboMavlinkInterface : public ModelPlugin {
   int mavlink_udp_port_;
 
   };
+
+  std::queue<mavlink_hil_gps_t> gps_delay_buffer;
+  double gps_bias_x_;
+  double gps_bias_y_;
+  double gps_bias_z_;
 }
+
+/* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */

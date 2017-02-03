@@ -7,9 +7,6 @@
     </include>
     <!-- A ground plane -->
     <include>
-      <uri>model://iris_opt_flow</uri>
-    </include>
-    <include>
       <uri>model://uneven_ground</uri>
     </include>
     <physics name='default_physics' default='0' type='ode'>

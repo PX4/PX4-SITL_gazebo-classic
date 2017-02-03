@@ -51,6 +51,6 @@
   <export>
     <!-- Other tools can request additional information be placed here -->
 	<gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}"
-		gazebo_model_path="${prefix}/models"/>
+		gazebo_model_path="${prefix}:${prefix}/models"/>
   </export>
 </package>

@@ -33,6 +33,7 @@ namespace gazebo {
 static const double lat_zurich = 47.397742 * M_PI / 180;  // rad
 static const double lon_zurich = 8.545594 * M_PI / 180;  // rad
 static const double alt_zurich = 488.0; // meters
+static const double pressure_alt_offset = -2; // meters
 // Seattle downtown (15 deg declination): 47.592182, -122.316031
 // static const double lat_zurich = 47.592182 * M_PI / 180;  // rad
 // static const double lon_zurich = -122.316031 * M_PI / 180;  // rad
@@ -512,8 +513,25 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
   // TODO: Remove GPS message from IMU plugin. Added gazebo GPS plugin. This is temp here.
   // reproject local position to gps coordinates
-  double x_rad = pos_W_I.y / earth_radius; // north
-  double y_rad = pos_W_I.x / earth_radius; // east
+
+
+  double noise_gps_x = gps_xy_noise_density*sqrt(dt)*randn_(rand_);
+  double noise_gps_y = gps_xy_noise_density*sqrt(dt)*randn_(rand_);
+  double noise_gps_z = gps_z_noise_density*sqrt(dt)*randn_(rand_);
+  double noise_gps_vx = gps_vxy_noise_density*sqrt(dt)*randn_(rand_);
+  double noise_gps_vy = gps_vxy_noise_density*sqrt(dt)*randn_(rand_);
+  double noise_gps_vz = gps_vz_noise_density*sqrt(dt)*randn_(rand_);
+  double random_walk_gps_x = gps_xy_random_walk*sqrt(dt)*randn_(rand_);
+  double random_walk_gps_y = gps_xy_random_walk*sqrt(dt)*randn_(rand_);
+  double random_walk_gps_z = gps_z_random_walk*sqrt(dt)*randn_(rand_);
+
+  // gps bias integration
+  gps_bias_x_ += random_walk_gps_x*dt - gps_bias_x_/gps_corellation_time;
+  gps_bias_y_ += random_walk_gps_y*dt - gps_bias_y_/gps_corellation_time;
+  gps_bias_z_ += random_walk_gps_z*dt - gps_bias_z_/gps_corellation_time;
+
+  double x_rad = (pos_W_I.y + noise_gps_y + gps_bias_y_)/ earth_radius; // north
+  double y_rad = (pos_W_I.x + noise_gps_x + gps_bias_x_)/ earth_radius; // east
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);
@@ -525,22 +543,49 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     lon_rad = lon_zurich;
   }
 
+  // Raw UDP mavlink
+  mavlink_hil_gps_t hil_gps_msg;
+  hil_gps_msg.time_usec = current_time.Double()*1e6;
+  hil_gps_msg.fix_type = 3;
+  hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
+  hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
+  hil_gps_msg.alt = (pos_W_I.z + alt_zurich + noise_gps_z + gps_bias_z_) * 1000;
+  hil_gps_msg.eph = 100;
+  hil_gps_msg.epv = 100;
+  hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
+  hil_gps_msg.vn = (velocity_current_W.y + noise_gps_vx) * 100;
+  hil_gps_msg.ve = (velocity_current_W.x + noise_gps_vy) * 100;
+  hil_gps_msg.vd = (-velocity_current_W.z + noise_gps_vz) * 100;
+  hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+  hil_gps_msg.satellites_visible = 10;
+  gps_delay_buffer.push(hil_gps_msg);
+
   if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
-    // Raw UDP mavlink
-    mavlink_hil_gps_t hil_gps_msg;
-    hil_gps_msg.time_usec = current_time.nsec*1000;
-    hil_gps_msg.fix_type = 3;
-    hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
-    hil_gps_msg.eph = 100;
-    hil_gps_msg.epv = 100;
-    hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
-    hil_gps_msg.vn = velocity_current_W.y * 100;
-    hil_gps_msg.ve = velocity_current_W.x * 100;
-    hil_gps_msg.vd = -velocity_current_W.z * 100;
-    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
-    hil_gps_msg.satellites_visible = 10;
+    last_gps_time_ = current_time;
+
+    const float gps_delay = 0.3; // seconds
+    const int gps_buffer_size_max = 1000;
+    while (true) {
+      hil_gps_msg = gps_delay_buffer.front(); 
+      float current_delay = (current_time.Double() -
+          gps_delay_buffer.front().time_usec/1.0e6f);
+      //gzdbg << "current delay " << current_delay << std::endl;
+      if (gps_delay_buffer.empty()) {
+        // abort if buffer is empty already
+        break;
+      }
+
+      // remove data that is too old or if buffer size is too large
+      if (current_delay > gps_delay) {
+        gps_delay_buffer.pop(); 
+      // remove data if buffer too large
+      } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
+        gps_delay_buffer.pop(); 
+      } else {
+        // if we get here, we have good data, stop
+        break;
+      }
+    }
 
     send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
 
@@ -549,8 +594,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     gps_msg.set_y(lon_rad * 180. / M_PI);
     gps_msg.set_z(hil_gps_msg.alt / 1000.f);
     gps_pub_->Publish(gps_msg);
-
-    last_gps_time_ = current_time;
   }
 }
 
@@ -647,11 +690,10 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
   math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
 
-  standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
   math::Vector3 mag_noise_b(
-    standard_normal_distribution_(random_generator_),
-    standard_normal_distribution_(random_generator_),
-    standard_normal_distribution_(random_generator_));
+    0.01*randn_(rand_),
+    0.01*randn_(rand_),
+    0.01*randn_(rand_));
 
   math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
     imu_message->linear_acceleration().x(),
@@ -664,7 +706,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
   mavlink_hil_sensor_t sensor_msg;
-  sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
+  sensor_msg.time_usec = world_->GetSimTime().Double()*1e6;
   sensor_msg.xacc = accel_b.x;
   sensor_msg.yacc = accel_b.y;
   sensor_msg.zacc = accel_b.z;
@@ -687,7 +729,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   } while (p1 <= FLT_EPSILON);
 
   float n = sqrtf(-2.0 * logf(p1)) * cosf(2.0f * M_PI * p2);
-  float alt_n = -pos_n.z + n * sqrtf(0.006f);
+  float alt_n = -pos_n.z + n * sqrtf(0.006f) + alt_zurich + pressure_alt_offset;
 
   sensor_msg.pressure_alt = (std::isfinite(alt_n)) ? alt_n : -pos_n.z;
   sensor_msg.temperature = 0.0;
@@ -705,7 +747,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   // send ground truth
   mavlink_hil_state_quaternion_t hil_state_quat;
-  hil_state_quat.time_usec = world_->GetSimTime().nsec*1000;
+  hil_state_quat.time_usec = world_->GetSimTime().Double()*1e6;
   hil_state_quat.attitude_quaternion[0] = q_nb.w;
   hil_state_quat.attitude_quaternion[1] = q_nb.x;
   hil_state_quat.attitude_quaternion[2] = q_nb.y;
@@ -914,3 +956,4 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 }
 
 }
+/* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */
