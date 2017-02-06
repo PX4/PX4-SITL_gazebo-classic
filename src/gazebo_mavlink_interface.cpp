@@ -19,6 +19,7 @@
  */
 
 
+#include "common.h"
 #include "gazebo_mavlink_interface.h"
 #include "geo_mag_declination.h"
 
@@ -403,7 +404,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
-  
+
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
@@ -539,7 +540,10 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     hil_gps_msg.vn = velocity_current_W.y * 100;
     hil_gps_msg.ve = velocity_current_W.x * 100;
     hil_gps_msg.vd = -velocity_current_W.z * 100;
-    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+    // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
+    math::Angle cog(atan2(velocity_current_W.x, velocity_current_W.y));
+    cog.Normalize();
+    hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
     hil_gps_msg.satellites_visible = 10;
 
     send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
