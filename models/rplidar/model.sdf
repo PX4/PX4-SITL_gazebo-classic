@@ -24,8 +24,7 @@
         </geometry>
       </visual>
 
-      <sensor name="laser" type="ray">
-      <!--<sensor name="laser" type="gpu_ray">-->
+      <sensor name="laser" type="gpu_ray">
         <ray>
           <scan>
             <horizontal>
@@ -46,8 +45,7 @@
             <stddev>0.01</stddev>
           </noise>
         </ray>
-        <plugin name="laser" filename="libRayPlugin.so" />
-        <!--<plugin name="laser" filename="libgazebo_ros_gpu_laser.so" />-->
+        <plugin name="laser" filename="libGpuRayPlugin.so" />
         <always_on>1</always_on>
         <update_rate>5.5</update_rate>
         <visualize>true</visualize>
