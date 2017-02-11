@@ -46,6 +46,10 @@
           </noise>
         </ray>
         <plugin name="laser" filename="libGpuRayPlugin.so" />
+        <plugin name="gazebo_ros_head_rplidar_controller" filename="libgazebo_ros_gpu_laser.so">
+          <topicName>laser/scan</topicName>
+          <frameName>rplidar_link</frameName>
+        </plugin>
         <always_on>1</always_on>
         <update_rate>5.5</update_rate>
         <visualize>true</visualize>
