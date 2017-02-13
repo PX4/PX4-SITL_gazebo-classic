@@ -376,7 +376,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>3100</maxRotVelocity>
+      <maxRotVelocity>3500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.01</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -419,7 +419,7 @@
         <channel name="rotor4">
           <input_index>4</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>3000</input_scaling>
+          <input_scaling>3500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
