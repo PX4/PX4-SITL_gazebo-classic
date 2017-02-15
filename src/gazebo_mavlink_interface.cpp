@@ -63,15 +63,15 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   const char *env_alt = std::getenv("PX4_HOME_ALT");
 
   if (env_lat) {
-    std::cout << "Home latitude is set to " << env_lat << "." << std::endl;
+    gzmsg << "Home latitude is set to " << env_lat << ".\n";
     lat_home = std::stod(env_lat) * M_PI / 180.0;
   }
   if (env_lon) {
-    std::cout << "Home longitude is set to " << env_lon << "." << std::endl;
+    gzmsg << "Home longitude is set to " << env_lon << ".\n";
     lon_home = std::stod(env_lon) * M_PI / 180.0;
   }
   if (env_alt) {
-    std::cout << "Home altitude is set to " << env_alt << "." << std::endl;
+    gzmsg << "Home altitude is set to " << env_alt << ".\n";
     alt_home = std::stod(env_alt);
   }
 
