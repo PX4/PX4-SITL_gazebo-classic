@@ -21,6 +21,8 @@
 
 #include "gazebo_mavlink_interface.h"
 #include "geo_mag_declination.h"
+#include <cstdlib>
+#include <string>
 
 namespace gazebo {
 
@@ -29,14 +31,17 @@ namespace gazebo {
 // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
 // Moscow downtown: 55.753395, 37.625427, 155m
 
+// The home position can be specified using the environment variables:
+// PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
+
 // Zurich Irchel Park
-static const double lat_zurich = 47.397742 * M_PI / 180;  // rad
-static const double lon_zurich = 8.545594 * M_PI / 180;  // rad
-static const double alt_zurich = 488.0; // meters
+static double lat_home = 47.397742 * M_PI / 180;  // rad
+static double lon_home = 8.545594 * M_PI / 180;  // rad
+static double alt_home = 488.0; // meters
 // Seattle downtown (15 deg declination): 47.592182, -122.316031
-// static const double lat_zurich = 47.592182 * M_PI / 180;  // rad
-// static const double lon_zurich = -122.316031 * M_PI / 180;  // rad
-// static const double alt_zurich = 86.0; // meters
+// static const double lat_home = 47.592182 * M_PI / 180;  // rad
+// static const double lon_home = -122.316031 * M_PI / 180;  // rad
+// static const double alt_home = 86.0; // meters
 static const float earth_radius = 6353000;  // m
 
 
@@ -51,6 +56,24 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   model_ = _model;
 
   world_ = model_->GetWorld();
+
+  // Use environment variables if set for home position.
+  const char *env_lat = std::getenv("PX4_HOME_LAT");
+  const char *env_lon = std::getenv("PX4_HOME_LON");
+  const char *env_alt = std::getenv("PX4_HOME_ALT");
+
+  if (env_lat) {
+    std::cout << "Home latitude is set to " << env_lat << "." << std::endl;
+    lat_home = std::stod(env_lat) * M_PI / 180.0;
+  }
+  if (env_lon) {
+    std::cout << "Home longitude is set to " << env_lon << "." << std::endl;
+    lon_home = std::stod(env_lon) * M_PI / 180.0;
+  }
+  if (env_alt) {
+    std::cout << "Home altitude is set to " << env_alt << "." << std::endl;
+    alt_home = std::stod(env_alt);
+  }
 
   namespace_.clear();
   if (_sdf->HasElement("robotNamespace")) {
@@ -403,7 +426,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
-  
+
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
@@ -518,11 +541,11 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   double sin_c = sin(c);
   double cos_c = cos(c);
   if (c != 0.0) {
-    lat_rad = asin(cos_c * sin(lat_zurich) + (x_rad * sin_c * cos(lat_zurich)) / c);
-    lon_rad = (lon_zurich + atan2(y_rad * sin_c, c * cos(lat_zurich) * cos_c - x_rad * sin(lat_zurich) * sin_c));
+    lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
+    lon_rad = (lon_home + atan2(y_rad * sin_c, c * cos(lat_home) * cos_c - x_rad * sin(lat_home) * sin_c));
   } else {
-   lat_rad = lat_zurich;
-    lon_rad = lon_zurich;
+    lat_rad = lat_home;
+    lon_rad = lon_home;
   }
 
   if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
@@ -532,7 +555,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     hil_gps_msg.fix_type = 3;
     hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
     hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.alt = (pos_W_I.z + alt_zurich) * 1000;
+    hil_gps_msg.alt = (pos_W_I.z + alt_home) * 1000;
     hil_gps_msg.eph = 100;
     hil_gps_msg.epv = 100;
     hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
@@ -717,7 +740,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   hil_state_quat.lat = lat_rad * 180 / M_PI * 1e7;
   hil_state_quat.lon = lon_rad * 180 / M_PI * 1e7;
-  hil_state_quat.alt = (-pos_n.z + alt_zurich) * 1000;
+  hil_state_quat.alt = (-pos_n.z + alt_home) * 1000;
 
   hil_state_quat.vx = vel_n.x * 100;
   hil_state_quat.vy = vel_n.y * 100;
