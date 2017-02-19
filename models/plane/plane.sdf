@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <sdf version='1.5'>
   <model name='plane'>
     <pose>0 0 0.246 0 0 0</pose>
@@ -453,15 +454,6 @@
           <joint_name>elevator_joint</joint_name>
         </channel>
       </control_channels>
-      <left_elevon_joint>
-        left_elevon_joint
-      </left_elevon_joint>
-      <right_elevon_joint>
-        right_elevon_joint
-      </right_elevon_joint>
-      <elevator_joint>
-        elevator_joint
-      </elevator_joint>
     </plugin>
     <static>0</static>
   </model>
