@@ -504,7 +504,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
   handle_control(dt);
 
-  if(received_first_referenc_) {
+  if (received_first_referenc_) {
 
     mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
@@ -892,7 +892,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           double err = current - target;
           double force = pids_[i].Update(err, _dt);
           joints_[i]->SetForce(0, force);
-          // gzerr << "chan[" << i << "] curr[" << current
+          // gzdbg << "chan[" << i << "] curr[" << current
           //       << "] cmd[" << target << "] f[" << force
           //       << "] scale[" << input_scaling_[i] << "]\n";
         }
