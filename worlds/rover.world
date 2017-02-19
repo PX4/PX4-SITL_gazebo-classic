@@ -10,6 +10,9 @@
       <uri>model://ground_plane</uri>
     </include>
     <include>
+      <uri>model://asphalt_plane</uri>
+    </include>
+    <include>
       <uri>model://rover</uri>
     </include>
     <physics name='default_physics' default='0' type='ode'>
@@ -17,7 +20,7 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>10</iters>
+          <iters>25</iters>
           <sor>1.3</sor>
           <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
         </solver>
