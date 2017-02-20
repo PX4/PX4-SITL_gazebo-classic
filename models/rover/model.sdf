@@ -892,20 +892,38 @@
         <channel name="rear_left_wheel_drive">
           <input_index>5</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>400</input_scaling>
+          <input_scaling>40</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>velocity_kinematic</joint_control_type>
+          <joint_control_type>velocity</joint_control_type>
           <joint_name>rear_left_wheel_joint</joint_name>
+          <joint_control_pid>
+            <p>50</p>
+            <i>20</i>
+            <d>2</d>
+            <iMax>800</iMax>
+            <iMin>-800</iMin>
+            <cmdMax>1200</cmdMax>
+            <cmdMin>-1200</cmdMin>
+          </joint_control_pid>
         </channel>
         <channel name="rear_right_wheel_drive">
           <input_index>6</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>400</input_scaling>
+          <input_scaling>40</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>velocity_kinematic</joint_control_type>
+          <joint_control_type>velocity</joint_control_type>
           <joint_name>rear_right_wheel_joint</joint_name>
+          <joint_control_pid>
+            <p>50</p>
+            <i>20</i>
+            <d>2</d>
+            <iMax>800</iMax>
+            <iMin>-800</iMin>
+            <cmdMax>1200</cmdMax>
+            <cmdMin>-1200</cmdMin>
+          </joint_control_pid>
         </channel>
         <channel name="left_wheel_steering">
           <input_index>0</input_index>
