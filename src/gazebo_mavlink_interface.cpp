@@ -19,6 +19,7 @@
  */
 
 
+#include "common.h"
 #include "gazebo_mavlink_interface.h"
 #include "geo_mag_declination.h"
 #include <cstdlib>
@@ -562,7 +563,10 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     hil_gps_msg.vn = velocity_current_W.y * 100;
     hil_gps_msg.ve = velocity_current_W.x * 100;
     hil_gps_msg.vd = -velocity_current_W.z * 100;
-    hil_gps_msg.cog = atan2(hil_gps_msg.ve, hil_gps_msg.vn) * 180.0/3.1416 * 100.0;
+    // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
+    math::Angle cog(atan2(velocity_current_W.x, velocity_current_W.y));
+    cog.Normalize();
+    hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
     hil_gps_msg.satellites_visible = 10;
 
     send_mavlink_message(MAVLINK_MSG_ID_HIL_GPS, &hil_gps_msg, 200);
