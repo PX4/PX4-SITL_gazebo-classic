@@ -29,8 +29,8 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
   /// TODO: make these gains part of sdf xml
-  this->pitchPid.Init(5, 0, 0, 0, 0, 0.3, -0.3);
-  this->rollPid.Init(5, 0, 0, 0, 0, 0.3, -0.3);
+  this->pitchPid.Init(0.5, 0, 0, 0, 0, 5.0, -5.0);
+  this->rollPid.Init(50, 0, 0, 0, 0, 5.0, -5.0);
   this->yawPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
   this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
