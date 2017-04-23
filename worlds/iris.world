@@ -12,9 +12,9 @@
     <include>
       <uri>model://iris</uri>
     </include>
-    <include>
+    <!--<include>
       <uri>model://uneven_ground</uri>
-    </include>
+    </include>-->
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
