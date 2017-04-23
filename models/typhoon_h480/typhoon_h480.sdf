@@ -1478,13 +1478,13 @@
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_control_pid>
-            <p>0.5</p>
+            <p>3.5</p>
             <i>0.5</i>
             <d>0</d>
-            <iMax>3</iMax>
-            <iMin>-3</iMin>
-            <cmdMax>5</cmdMax>
-            <cmdMin>-5</cmdMin>
+            <iMax>4</iMax>
+            <iMin>-4</iMin>
+            <cmdMax>6</cmdMax>
+            <cmdMin>-6</cmdMin>
           </joint_control_pid>
           <joint_name>left_leg_joint</joint_name>
         </channel>
@@ -1496,13 +1496,13 @@
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_control_pid>
-            <p>0.5</p>
+            <p>3.5</p>
             <i>0.5</i>
             <d>0</d>
-            <iMax>8</iMax>
-            <iMin>-3</iMin>
-            <cmdMax>3</cmdMax>
-            <cmdMin>-5</cmdMin>
+            <iMax>4</iMax>
+            <iMin>-4</iMin>
+            <cmdMax>6</cmdMax>
+            <cmdMin>-6</cmdMin>
           </joint_control_pid>
           <joint_name>right_leg_joint</joint_name>
         </channel>
