@@ -197,7 +197,7 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
   double sigma_b_g = imu_parameters_.gyroscope_random_walk;
   // Compute exact covariance of the process after dt [Maybeck 4-114].
   double sigma_b_g_d =
-      sqrt( - sigma_b_g * sigma_b_g * tau_g / 2.0 *
+      sqrt( - sigma_b_g * sigma_b_g / tau_g / 2.0 *
       (exp(-2.0 * dt / tau_g) - 1.0));
   // Compute state-transition.
   double phi_g_d = exp(-1.0 / tau_g * dt);
@@ -219,7 +219,7 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
   double sigma_b_a = imu_parameters_.accelerometer_random_walk;
   // Compute exact covariance of the process after dt [Maybeck 4-114].
   double sigma_b_a_d =
-      sqrt( - sigma_b_a * sigma_b_a * tau_a / 2.0 *
+      sqrt( - sigma_b_a * sigma_b_a / tau_a / 2.0 *
       (exp(-2.0 * dt / tau_a) - 1.0));
   // Compute state-transition.
   double phi_a_d = exp(-1.0 / tau_a * dt);
