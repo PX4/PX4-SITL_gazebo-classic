@@ -1141,6 +1141,22 @@
       </physics>
     </joint>
 
+    <include>
+      <uri>model://sonar</uri>
+    </include>
+    <joint name="sonar_joint" type="revolute">
+      <child>sonar_model::link</child>
+      <parent>typhoon_h480::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+  
+
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>base_link</linkName>
