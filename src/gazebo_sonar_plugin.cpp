@@ -112,7 +112,6 @@ void SonarPlugin::OnNewScans()
   sonar_message.set_current_distance(parentSensor->GetRange());
 #endif
 
-//printf("%f ", sonar_message.current_distance());
   sonar_pub_->Publish(sonar_message);
 }
 
