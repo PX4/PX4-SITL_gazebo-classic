@@ -174,6 +174,7 @@ set (msgs
   msgs/CommandMotorSpeed.proto
   msgs/MotorSpeed.proto
   msgs/Wind.proto
+  msgs/sonarSens.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -201,6 +202,7 @@ add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
+add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -212,6 +214,7 @@ set(plugins
   rotors_gazebo_mavlink_interface
   rotors_gazebo_wind_plugin
   gazebo_geotagged_images_plugin
+  gazebo_sonar_plugin
   )
 
 if (GSTREAMER_FOUND)
