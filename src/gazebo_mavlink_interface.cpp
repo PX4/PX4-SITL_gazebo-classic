@@ -778,7 +778,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   //distance needed for optical flow message
   optflow_distance = lidar_message->current_distance(); //[m]
 
-  //send_mavlink_message(MAVLINK_MSG_ID_DISTANCE_SENSOR, &sensor_msg, 200);
+  send_mavlink_message(MAVLINK_MSG_ID_DISTANCE_SENSOR, &sensor_msg, 200);
 
 }
 
