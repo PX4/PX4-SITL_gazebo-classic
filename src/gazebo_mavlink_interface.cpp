@@ -807,7 +807,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
   sensor_msg.type = 1;
-  sensor_msg.id = 0;
+  sensor_msg.id = 1;
   // to to roll 90 (forward facing)
   sensor_msg.orientation = 16;
   sensor_msg.covariance = 0;
