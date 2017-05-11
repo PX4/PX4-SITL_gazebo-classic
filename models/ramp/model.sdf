@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="ramp">
+    <static>true</static>
+    <pose>0 0 0.2 0 0.15 0</pose>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>20 4 .1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>20 4 .1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://asphalt_plane/materials/scripts/asphalt.material</uri>
+            <name>vrc/asphalt</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
