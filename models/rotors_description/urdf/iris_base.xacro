@@ -4,9 +4,16 @@
   <!-- Properties that can be assigned at build time as arguments.
   Is there a reason not to make all properties arguments?
   -->
+  <xacro:arg name='name' default='iris' />
   <xacro:arg name='mavlink_addr' default='INADDR_ANY' />
   <xacro:arg name='mavlink_udp_port' default='14560' />
   <xacro:arg name='visual_material' default='DarkGrey' />
+  <xacro:arg name='enable_mavlink_interface' default='true' />
+  <xacro:arg name='enable_wind' default='false' />
+  <!-- The following causes segfault with multiple vehicles if defaults to true!!! -->
+  <xacro:arg name='enable_ground_truth' default='false' />
+  <xacro:arg name='enable_logging' default='false' />
+  <xacro:arg name='log_file' default='iris' />
 
   <!-- macros for gazebo plugins, sensors -->
   <xacro:include filename="$(arg rotors_description_dir)/urdf/component_snippets.xacro" />
