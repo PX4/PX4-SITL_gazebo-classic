@@ -211,6 +211,8 @@ add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
+add_library(rotors_gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
+add_library(rotors_gazebo_motor_rotation SHARED src/gazebo_motor_rotation.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
