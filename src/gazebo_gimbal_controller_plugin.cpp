@@ -306,10 +306,8 @@ void GimbalControllerPlugin::OnUpdate()
 
     /// currentAngleYPRVariable is defined in roll-pitch-yaw-fixed-axis
     /// and gimbal is constructed using yaw-roll-pitch-variable-axis
-    ignition::math::Vector3d currentAngleYPRVariable(
-      this->imuSensor->Orientation().Euler());
     ignition::math::Vector3d currentAnglePRYVariable(
-      this->QtoZXY(currentAngleYPRVariable));
+      this->QtoZXY(this->imuSensor->Orientation()));
 
     /// get joint limits (in sensor frame)
     /// TODO: move to Load() if limits do not change
