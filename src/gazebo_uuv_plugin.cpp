@@ -92,6 +92,10 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   M_q_ = damping_angular[1];
   N_r_ = damping_angular[2];
 
+  // variables for debugging
+  time_ = 0.0;
+  counter_ = 0.0;
+
 }
 
 // function to get the motor speed
@@ -113,6 +117,7 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
   double now = _info.simTime.Double();
   time_delta_ =  now - last_time_;
   last_time_ = now;
+  time_ = time_ + time_delta_;
 
   //std::cout << "UUV Update at " << now << ", delta " << time_delta_ << "\n";
   
@@ -126,7 +131,7 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
     math::Vector3 rotor_force(motor_force_constant_ * command_[i], 0, 0);
     rotor_links_[i+1]->AddRelativeForce(rotor_force);
     
-    forces[i] = rotor_force[2];
+    forces[i] = rotor_force[0];
     //std::cout << "Applying force " << rotor_force[2] << " to rotor " << i << "\n";
 
     // CCW 1, CW 2, CCW 3 and CW 4. Apply drag torque
@@ -139,18 +144,33 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
     //std::cout << "Applying torque " << rotor_torque[2] << " to rotor " << i << "\n";
     torques[i] = rotor_torque[0];
   }
-  
-  /*
-  std::cout << "Forces:";
-  for(int i = 0; i<4; i++) std::cout << forces[i] << ",";
-  std::cout << "\n";
-  */
 
-  /*
-  std::cout << "Torques:";
-  for(int i = 0; i<4; i++) std::cout << torques[i] << ",";
-  std::cout << "\n";
-  */
+  // for debugging
+  /*if (counter_ < time_) {
+
+        counter_ = counter_ + 1.0;
+
+        std::cout << "UUV Command Callback:"
+        << command_[0] << ","
+        << command_[1] << ","
+        << command_[2] << ","
+        << command_[3] << ","
+        << "\n";
+
+        double thrust = 0;
+        for(int i = 0; i<4; i++) thrust = thrust + forces[i];
+        std::cout << "Thrust:";
+        std::cout << thrust;
+        std::cout << "\n";
+
+        double L = 0.0481;
+        double roll = -torques[0] + torques[1] - torques[2] + torques[3];
+        double pitch = (-forces[0] - forces[1] + forces[2] + forces[3])*L;
+        double yaw = (forces[0] - forces[1] - forces[2] + forces[3])*L;
+        std::cout << "Torques:";
+        std::cout << roll << "," << pitch << "," << yaw;
+        std::cout << "\n";
+  } */
 
   // Calculate and apply body Coriolis and Drag forces and torques
   math::Vector3 linear_velocity = link_->GetRelativeLinearVel();

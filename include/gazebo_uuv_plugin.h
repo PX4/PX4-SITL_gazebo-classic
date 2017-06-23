@@ -86,6 +86,10 @@ class GazeboUUVPlugin : public ModelPlugin {
     double K_pdot_;
     double M_qdot_;
     double N_rdot_;
+
+    // variables for debugging
+    double time_;
+    double counter_;
 };
 
 }
