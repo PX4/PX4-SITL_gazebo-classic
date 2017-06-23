@@ -169,9 +169,9 @@
         at the center of the Hippocampus
     -->
     <link name='hippocampus/imu_link'>
-      <pose frame=''>0 0 0 0 -0 0</pose>
+      <pose frame=''>0 0 0 0 0 1.570796</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose frame=''>0 0 0 0 0 1.570796</pose>
         <mass>0.015</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -734,7 +734,7 @@
       <robotNamespace>hippocampus</robotNamespace>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <linkName>base_link</linkName>
-      <motorForceConstant>1.0</motorForceConstant>
+      <motorForceConstant>2</motorForceConstant>
       <motorTorqueConstant>0.5</motorTorqueConstant>
 
       <!-- Parameters for the simulation -->
