@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
+cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0054 NEW)
 
@@ -173,7 +174,7 @@ set (msgs
   msgs/lidar.proto
   msgs/CommandMotorSpeed.proto
   msgs/MotorSpeed.proto
-  msgs/Wind.proto
+  #msgs/Wind.proto
   msgs/sonarSens.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
@@ -200,7 +201,7 @@ add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
 target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
-add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+#add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 
@@ -212,7 +213,7 @@ set(plugins
   gazebo_opticalFlow_plugin
   gazebo_lidar_plugin
   rotors_gazebo_mavlink_interface
-  rotors_gazebo_wind_plugin
+  #rotors_gazebo_wind_plugin
   gazebo_geotagged_images_plugin
   gazebo_sonar_plugin
   )
