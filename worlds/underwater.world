@@ -1,12 +1,19 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
+
+  <!--
+    This is the underwater.world file which starts the Gazebo simulation based on the autonomous underwater vehicle
+    Hippocampus from the Technical University Hamburg-Harburg (TUHH).
+    https://www.tuhh.de/mum/forschung/forschungsgebiete-und-projekte/flow-field-estimation-with-a-swarm-of-auvs.html
+  -->
+
   <world name="default">
     <!-- A global light source -->
     <!--include>
       <uri>model://sun</uri>
     </include-->
 
-    <!-- Include the model of the Hippocampus -->
+    <!-- Include the model of the Hippocampus from TUHH.-->
     <include>
       <uri>model://hippocampus</uri>
       <pose>0 0 0 0 0 0</pose>
