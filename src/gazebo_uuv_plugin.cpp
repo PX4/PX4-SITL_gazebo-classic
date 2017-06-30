@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * This scripts simulates underwater froces and torques for the hippocampus model.
- *
  */
 
+/*
+ * This scripts simulates underwater froces and torques for the hippocampus model. The HippoCampus is an autonomous
+ * underwater vehicle (AUV) designed by the Technical University Hamburg-Harburg (TUHH).
+ * https://www.tuhh.de/mum/forschung/forschungsgebiete-und-projekte/flow-field-estimation-with-a-swarm-of-auvs.html
+ */
 
 
 #include "gazebo_uuv_plugin.h"

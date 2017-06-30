@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <sdf version='1.5'>
   <!--
-      Add a model named hippocampus, start with the first link, the base (hippocampus without rotors). The pose is
-      relative to the given frame ''.
+      Add a model named hippocampus, developed by the Technical University Hamburg-Harburg (TUHH),
+      start with the first link, the base (hippocampus without rotors). The pose is relative to the given frame.
+      https://www.tuhh.de/mum/forschung/forschungsgebiete-und-projekte/flow-field-estimation-with-a-swarm-of-auvs.html
   -->
   <model name='hippocampus'>
     <link name='base_link'>
