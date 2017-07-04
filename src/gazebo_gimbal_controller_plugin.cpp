@@ -135,9 +135,9 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
 void GimbalControllerPlugin::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
-  this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->lastUpdateTime = this->model->GetWorld()->SimTime();
 
   // receive pitch command via gz transport
   std::string pitchTopic = std::string("~/") +  this->model->GetName() +
@@ -269,7 +269,7 @@ void GimbalControllerPlugin::OnUpdate()
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;
 
-  common::Time time = this->model->GetWorld()->GetSimTime();
+  common::Time time = this->model->GetWorld()->SimTime();
   if (time < this->lastUpdateTime)
   {
     gzerr << "time reset event\n";
@@ -289,14 +289,14 @@ void GimbalControllerPlugin::OnUpdate()
 
     // truncate command inside joint angle limits
     double rollLimited = ignition::math::clamp(this->rollCommand,
-      rDir*this->rollJoint->GetUpperLimit(0).Radian(),
-	  rDir*this->rollJoint->GetLowerLimit(0).Radian());
+      rDir*this->rollJoint->UpperLimit(0),
+	  rDir*this->rollJoint->LowerLimit(0));
     double pitchLimited = ignition::math::clamp(this->pitchCommand,
-      pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
-      pDir*this->pitchJoint->GetLowerLimit(0).Radian());
+      pDir*this->pitchJoint->UpperLimit(0),
+      pDir*this->pitchJoint->LowerLimit(0));
     double yawLimited = ignition::math::clamp(this->yawCommand,
-      yDir*this->yawJoint->GetLowerLimit(0).Radian(),
-	  yDir*this->yawJoint->GetUpperLimit(0).Radian());
+      yDir*this->yawJoint->LowerLimit(0),
+	  yDir*this->yawJoint->UpperLimit(0));
 
     ignition::math::Quaterniond commandRPY(
       rollLimited, pitchLimited, yawLimited);
@@ -319,13 +319,13 @@ void GimbalControllerPlugin::OnUpdate()
     /// get joint limits (in sensor frame)
     /// TODO: move to Load() if limits do not change
     ignition::math::Vector3d lowerLimitsPRY
-      (pDir*this->pitchJoint->GetLowerLimit(0).Radian(),
-       rDir*this->rollJoint->GetLowerLimit(0).Radian(),
-       yDir*this->yawJoint->GetLowerLimit(0).Radian());
+      (pDir*this->pitchJoint->LowerLimit(0),
+       rDir*this->rollJoint->LowerLimit(0),
+       yDir*this->yawJoint->LowerLimit(0));
     ignition::math::Vector3d upperLimitsPRY
-      (pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
-       rDir*this->rollJoint->GetUpperLimit(0).Radian(),
-       yDir*this->yawJoint->GetUpperLimit(0).Radian());
+      (pDir*this->pitchJoint->UpperLimit(0),
+       rDir*this->rollJoint->UpperLimit(0),
+       yDir*this->yawJoint->UpperLimit(0));
 
     // normalize errors
     double pitchError = this->ShortestAngularDistance(
@@ -412,27 +412,27 @@ void GimbalControllerPlugin::OnUpdate()
     gazebo::msgs::Any m;
     m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
 
-    m.set_double_value(this->pitchJoint->GetAngle(0).Radian());
+    m.set_double_value(this->pitchJoint->Position(0));
     this->pitchPub->Publish(m);
 
-    m.set_double_value(this->rollJoint->GetAngle(0).Radian());
+    m.set_double_value(this->rollJoint->Position(0));
     this->rollPub->Publish(m);
 
-    m.set_double_value(this->yawJoint->GetAngle(0).Radian());
+    m.set_double_value(this->yawJoint->Position(0));
     this->yawPub->Publish(m);
 #else
     std::stringstream ss;
     gazebo::msgs::GzString m;
 
-    ss << this->pitchJoint->GetAngle(0).Radian();
+    ss << this->pitchJoint->Position(0);
     m.set_data(ss.str());
     this->pitchPub->Publish(m);
 
-    ss << this->rollJoint->GetAngle(0).Radian();
+    ss << this->rollJoint->Position(0);
     m.set_data(ss.str());
     this->rollPub->Publish(m);
 
-    ss << this->yawJoint->GetAngle(0).Radian();
+    ss << this->yawJoint->Position(0);
     m.set_data(ss.str());
     this->yawPub->Publish(m);
 #endif

@@ -50,12 +50,9 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-#if GAZEBO_MAJOR_VERSION >= 7
-  this->parentSensor->LaserShape()->DisconnectNewLaserScans(
-#else
-  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
-#endif
-      this->newLaserScansConnection);
+  this->newLaserScansConnection->~Connection();
+
+      
   this->newLaserScansConnection.reset();
 
   this->parentSensor.reset();

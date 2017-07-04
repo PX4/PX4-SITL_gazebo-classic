@@ -20,11 +20,13 @@
 
 
 #include "gazebo_controller_interface.h"
+#include <ignition/math.hh>
 
 namespace gazebo {
 
 GazeboControllerInterface::~GazeboControllerInterface() {
-  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+  //event::Event::DisconnectWorldUpdateBegin(updateConnection_);
+  updateConnection_->~Connection();
 }
 
 void GazeboControllerInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -66,7 +68,7 @@ void GazeboControllerInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   if(!received_first_referenc_)
     return;
 
-  common::Time now = world_->GetSimTime();
+  common::Time now = world_->SimTime();
 
   mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
