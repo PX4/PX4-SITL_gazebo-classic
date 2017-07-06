@@ -7,9 +7,9 @@
   -->
   <model name='hippocampus'>
     <link name='base_link'>
-      <pose frame=''>0 0 0 0 0 0</pose>
+      <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose frame=''>0 0 0 0 -0 0</pose>
         <!--
           These values are a compromise between the dry mass and added mass
           values used to correct for hydrodynamic effects.
@@ -167,12 +167,15 @@
 
     <!--
         A new link is defined which hold the IMU (e.g. acceleration sensors, ...). For the simulation it is positioned
-        at the center of the Hippocampus
+        at the center of the Hippocampus.
+        The orientation of the IMU is chosen in regard to the orientation of the Body coordinate system of the
+        HippoCampus. PX4 uses the data from the IMU to calculate the orientation. Therefore PX4 assumes a NED (North-
+        East-Down) coordinate frame whereas Gazebo uses a ENU (East-North-Up) coordinate frame.
     -->
     <link name='hippocampus/imu_link'>
-      <pose frame=''>0 0 0 0 0 1.570796</pose>
+      <pose frame=''>0 0 0 3.1415 0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 0 1.570796</pose>
+        <pose frame=''>0 0 0 0 0 0</pose>
         <mass>0.015</mass>
         <inertia>
           <ixx>1e-05</ixx>

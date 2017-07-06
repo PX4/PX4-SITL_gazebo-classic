@@ -13,10 +13,14 @@
       <uri>model://sun</uri>
     </include-->
 
-    <!-- Include the model of the Hippocampus from TUHH.-->
+    <!--
+        Include the model of the Hippocampus from TUHH.
+        The pose is chosen that the hippocampus starts at position (0,0,0) with its own coordinate frame equal to the
+        NED World frame.
+    -->
     <include>
       <uri>model://hippocampus</uri>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 3.1415 -1.57075</pose>
     </include>
 
     <!-- Add physics -->
