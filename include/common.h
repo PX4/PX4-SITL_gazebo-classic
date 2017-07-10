@@ -23,6 +23,7 @@
 
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
+#include <ignition/math.hh>
 
 namespace gazebo {
 
@@ -52,7 +53,7 @@ bool getSdfParam(sdf::ElementPtr sdf, const std::string& name, T& param, const T
 /**
  * \brief Get a math::Angle as an angle from [0, 360)
  */
-double GetDegrees360(const math::Angle& angle) {
+double GetDegrees360(const ignition::math::Angle& angle) {
   double degrees = angle.Degree();
   while (degrees < 0.) degrees += 360.0;
   while (degrees >= 360.0) degrees -= 360.0;
