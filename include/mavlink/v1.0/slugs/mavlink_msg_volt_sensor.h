@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE VOLT_SENSOR PACKING
 
 #define MAVLINK_MSG_ID_VOLT_SENSOR 191
@@ -21,19 +22,19 @@ typedef struct __mavlink_volt_sensor_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_VOLT_SENSOR { \
-	191, \
-	"VOLT_SENSOR", \
-	3, \
-	{  { "voltage", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_volt_sensor_t, voltage) }, \
+    191, \
+    "VOLT_SENSOR", \
+    3, \
+    {  { "voltage", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_volt_sensor_t, voltage) }, \
          { "reading2", NULL, MAVLINK_TYPE_UINT16_T, 0, 2, offsetof(mavlink_volt_sensor_t, reading2) }, \
          { "r2Type", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_volt_sensor_t, r2Type) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_VOLT_SENSOR { \
-	"VOLT_SENSOR", \
-	3, \
-	{  { "voltage", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_volt_sensor_t, voltage) }, \
+    "VOLT_SENSOR", \
+    3, \
+    {  { "voltage", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_volt_sensor_t, voltage) }, \
          { "reading2", NULL, MAVLINK_TYPE_UINT16_T, 0, 2, offsetof(mavlink_volt_sensor_t, reading2) }, \
          { "r2Type", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_volt_sensor_t, r2Type) }, \
          } \
@@ -52,25 +53,25 @@ typedef struct __mavlink_volt_sensor_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_volt_sensor_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t r2Type, uint16_t voltage, uint16_t reading2)
+                               uint8_t r2Type, uint16_t voltage, uint16_t reading2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
-	_mav_put_uint16_t(buf, 0, voltage);
-	_mav_put_uint16_t(buf, 2, reading2);
-	_mav_put_uint8_t(buf, 4, r2Type);
+    char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
+    _mav_put_uint16_t(buf, 0, voltage);
+    _mav_put_uint16_t(buf, 2, reading2);
+    _mav_put_uint8_t(buf, 4, r2Type);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
 #else
-	mavlink_volt_sensor_t packet;
-	packet.voltage = voltage;
-	packet.reading2 = reading2;
-	packet.r2Type = r2Type;
+    mavlink_volt_sensor_t packet;
+    packet.voltage = voltage;
+    packet.reading2 = reading2;
+    packet.r2Type = r2Type;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_VOLT_SENSOR;
+    msg->msgid = MAVLINK_MSG_ID_VOLT_SENSOR;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 }
 
@@ -86,26 +87,26 @@ static inline uint16_t mavlink_msg_volt_sensor_pack(uint8_t system_id, uint8_t c
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_volt_sensor_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t r2Type,uint16_t voltage,uint16_t reading2)
+                               mavlink_message_t* msg,
+                                   uint8_t r2Type,uint16_t voltage,uint16_t reading2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
-	_mav_put_uint16_t(buf, 0, voltage);
-	_mav_put_uint16_t(buf, 2, reading2);
-	_mav_put_uint8_t(buf, 4, r2Type);
+    char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
+    _mav_put_uint16_t(buf, 0, voltage);
+    _mav_put_uint16_t(buf, 2, reading2);
+    _mav_put_uint8_t(buf, 4, r2Type);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
 #else
-	mavlink_volt_sensor_t packet;
-	packet.voltage = voltage;
-	packet.reading2 = reading2;
-	packet.r2Type = r2Type;
+    mavlink_volt_sensor_t packet;
+    packet.voltage = voltage;
+    packet.reading2 = reading2;
+    packet.r2Type = r2Type;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_VOLT_SENSOR;
+    msg->msgid = MAVLINK_MSG_ID_VOLT_SENSOR;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 }
 
@@ -119,7 +120,7 @@ static inline uint16_t mavlink_msg_volt_sensor_pack_chan(uint8_t system_id, uint
  */
 static inline uint16_t mavlink_msg_volt_sensor_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_volt_sensor_t* volt_sensor)
 {
-	return mavlink_msg_volt_sensor_pack(system_id, component_id, msg, volt_sensor->r2Type, volt_sensor->voltage, volt_sensor->reading2);
+    return mavlink_msg_volt_sensor_pack(system_id, component_id, msg, volt_sensor->r2Type, volt_sensor->voltage, volt_sensor->reading2);
 }
 
 /**
@@ -133,7 +134,7 @@ static inline uint16_t mavlink_msg_volt_sensor_encode(uint8_t system_id, uint8_t
  */
 static inline uint16_t mavlink_msg_volt_sensor_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_volt_sensor_t* volt_sensor)
 {
-	return mavlink_msg_volt_sensor_pack_chan(system_id, component_id, chan, msg, volt_sensor->r2Type, volt_sensor->voltage, volt_sensor->reading2);
+    return mavlink_msg_volt_sensor_pack_chan(system_id, component_id, chan, msg, volt_sensor->r2Type, volt_sensor->voltage, volt_sensor->reading2);
 }
 
 /**
@@ -149,17 +150,17 @@ static inline uint16_t mavlink_msg_volt_sensor_encode_chan(uint8_t system_id, ui
 static inline void mavlink_msg_volt_sensor_send(mavlink_channel_t chan, uint8_t r2Type, uint16_t voltage, uint16_t reading2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
-	_mav_put_uint16_t(buf, 0, voltage);
-	_mav_put_uint16_t(buf, 2, reading2);
-	_mav_put_uint8_t(buf, 4, r2Type);
+    char buf[MAVLINK_MSG_ID_VOLT_SENSOR_LEN];
+    _mav_put_uint16_t(buf, 0, voltage);
+    _mav_put_uint16_t(buf, 2, reading2);
+    _mav_put_uint8_t(buf, 4, r2Type);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_VOLT_SENSOR, buf, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 #else
-	mavlink_volt_sensor_t packet;
-	packet.voltage = voltage;
-	packet.reading2 = reading2;
-	packet.r2Type = r2Type;
+    mavlink_volt_sensor_t packet;
+    packet.voltage = voltage;
+    packet.reading2 = reading2;
+    packet.r2Type = r2Type;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_VOLT_SENSOR, (const char *)&packet, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 #endif
@@ -190,17 +191,17 @@ static inline void mavlink_msg_volt_sensor_send_struct(mavlink_channel_t chan, c
 static inline void mavlink_msg_volt_sensor_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t r2Type, uint16_t voltage, uint16_t reading2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint16_t(buf, 0, voltage);
-	_mav_put_uint16_t(buf, 2, reading2);
-	_mav_put_uint8_t(buf, 4, r2Type);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint16_t(buf, 0, voltage);
+    _mav_put_uint16_t(buf, 2, reading2);
+    _mav_put_uint8_t(buf, 4, r2Type);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_VOLT_SENSOR, buf, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 #else
-	mavlink_volt_sensor_t *packet = (mavlink_volt_sensor_t *)msgbuf;
-	packet->voltage = voltage;
-	packet->reading2 = reading2;
-	packet->r2Type = r2Type;
+    mavlink_volt_sensor_t *packet = (mavlink_volt_sensor_t *)msgbuf;
+    packet->voltage = voltage;
+    packet->reading2 = reading2;
+    packet->r2Type = r2Type;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_VOLT_SENSOR, (const char *)packet, MAVLINK_MSG_ID_VOLT_SENSOR_MIN_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_LEN, MAVLINK_MSG_ID_VOLT_SENSOR_CRC);
 #endif
@@ -219,7 +220,7 @@ static inline void mavlink_msg_volt_sensor_send_buf(mavlink_message_t *msgbuf, m
  */
 static inline uint8_t mavlink_msg_volt_sensor_get_r2Type(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  4);
+    return _MAV_RETURN_uint8_t(msg,  4);
 }
 
 /**
@@ -229,7 +230,7 @@ static inline uint8_t mavlink_msg_volt_sensor_get_r2Type(const mavlink_message_t
  */
 static inline uint16_t mavlink_msg_volt_sensor_get_voltage(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  0);
+    return _MAV_RETURN_uint16_t(msg,  0);
 }
 
 /**
@@ -239,7 +240,7 @@ static inline uint16_t mavlink_msg_volt_sensor_get_voltage(const mavlink_message
  */
 static inline uint16_t mavlink_msg_volt_sensor_get_reading2(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  2);
+    return _MAV_RETURN_uint16_t(msg,  2);
 }
 
 /**
@@ -251,12 +252,12 @@ static inline uint16_t mavlink_msg_volt_sensor_get_reading2(const mavlink_messag
 static inline void mavlink_msg_volt_sensor_decode(const mavlink_message_t* msg, mavlink_volt_sensor_t* volt_sensor)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	volt_sensor->voltage = mavlink_msg_volt_sensor_get_voltage(msg);
-	volt_sensor->reading2 = mavlink_msg_volt_sensor_get_reading2(msg);
-	volt_sensor->r2Type = mavlink_msg_volt_sensor_get_r2Type(msg);
+    volt_sensor->voltage = mavlink_msg_volt_sensor_get_voltage(msg);
+    volt_sensor->reading2 = mavlink_msg_volt_sensor_get_reading2(msg);
+    volt_sensor->r2Type = mavlink_msg_volt_sensor_get_r2Type(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_VOLT_SENSOR_LEN? msg->len : MAVLINK_MSG_ID_VOLT_SENSOR_LEN;
         memset(volt_sensor, 0, MAVLINK_MSG_ID_VOLT_SENSOR_LEN);
-	memcpy(volt_sensor, _MAV_PAYLOAD(msg), len);
+    memcpy(volt_sensor, _MAV_PAYLOAD(msg), len);
 #endif
 }

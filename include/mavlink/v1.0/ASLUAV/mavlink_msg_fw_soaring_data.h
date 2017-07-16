@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE FW_SOARING_DATA PACKING
 
 #define MAVLINK_MSG_ID_FW_SOARING_DATA 210
@@ -43,10 +44,10 @@ typedef struct __mavlink_fw_soaring_data_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_FW_SOARING_DATA { \
-	210, \
-	"FW_SOARING_DATA", \
-	25, \
-	{  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_fw_soaring_data_t, timestamp) }, \
+    210, \
+    "FW_SOARING_DATA", \
+    25, \
+    {  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_fw_soaring_data_t, timestamp) }, \
          { "timestampModeChanged", NULL, MAVLINK_TYPE_UINT64_T, 0, 8, offsetof(mavlink_fw_soaring_data_t, timestampModeChanged) }, \
          { "xW", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_fw_soaring_data_t, xW) }, \
          { "xR", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_fw_soaring_data_t, xR) }, \
@@ -75,9 +76,9 @@ typedef struct __mavlink_fw_soaring_data_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_FW_SOARING_DATA { \
-	"FW_SOARING_DATA", \
-	25, \
-	{  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_fw_soaring_data_t, timestamp) }, \
+    "FW_SOARING_DATA", \
+    25, \
+    {  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_fw_soaring_data_t, timestamp) }, \
          { "timestampModeChanged", NULL, MAVLINK_TYPE_UINT64_T, 0, 8, offsetof(mavlink_fw_soaring_data_t, timestampModeChanged) }, \
          { "xW", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_fw_soaring_data_t, xW) }, \
          { "xR", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_fw_soaring_data_t, xR) }, \
@@ -140,69 +141,69 @@ typedef struct __mavlink_fw_soaring_data_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_fw_soaring_data_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint64_t timestamp, uint64_t timestampModeChanged, float xW, float xR, float xLat, float xLon, float VarW, float VarR, float VarLat, float VarLon, float LoiterRadius, float LoiterDirection, float DistToSoarPoint, float vSinkExp, float z1_LocalUpdraftSpeed, float z2_DeltaRoll, float z1_exp, float z2_exp, float ThermalGSNorth, float ThermalGSEast, float TSE_dot, float DebugVar1, float DebugVar2, uint8_t ControlMode, uint8_t valid)
+                               uint64_t timestamp, uint64_t timestampModeChanged, float xW, float xR, float xLat, float xLon, float VarW, float VarR, float VarLat, float VarLon, float LoiterRadius, float LoiterDirection, float DistToSoarPoint, float vSinkExp, float z1_LocalUpdraftSpeed, float z2_DeltaRoll, float z1_exp, float z2_exp, float ThermalGSNorth, float ThermalGSEast, float TSE_dot, float DebugVar1, float DebugVar2, uint8_t ControlMode, uint8_t valid)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_FW_SOARING_DATA_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_uint64_t(buf, 8, timestampModeChanged);
-	_mav_put_float(buf, 16, xW);
-	_mav_put_float(buf, 20, xR);
-	_mav_put_float(buf, 24, xLat);
-	_mav_put_float(buf, 28, xLon);
-	_mav_put_float(buf, 32, VarW);
-	_mav_put_float(buf, 36, VarR);
-	_mav_put_float(buf, 40, VarLat);
-	_mav_put_float(buf, 44, VarLon);
-	_mav_put_float(buf, 48, LoiterRadius);
-	_mav_put_float(buf, 52, LoiterDirection);
-	_mav_put_float(buf, 56, DistToSoarPoint);
-	_mav_put_float(buf, 60, vSinkExp);
-	_mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
-	_mav_put_float(buf, 68, z2_DeltaRoll);
-	_mav_put_float(buf, 72, z1_exp);
-	_mav_put_float(buf, 76, z2_exp);
-	_mav_put_float(buf, 80, ThermalGSNorth);
-	_mav_put_float(buf, 84, ThermalGSEast);
-	_mav_put_float(buf, 88, TSE_dot);
-	_mav_put_float(buf, 92, DebugVar1);
-	_mav_put_float(buf, 96, DebugVar2);
-	_mav_put_uint8_t(buf, 100, ControlMode);
-	_mav_put_uint8_t(buf, 101, valid);
+    char buf[MAVLINK_MSG_ID_FW_SOARING_DATA_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_uint64_t(buf, 8, timestampModeChanged);
+    _mav_put_float(buf, 16, xW);
+    _mav_put_float(buf, 20, xR);
+    _mav_put_float(buf, 24, xLat);
+    _mav_put_float(buf, 28, xLon);
+    _mav_put_float(buf, 32, VarW);
+    _mav_put_float(buf, 36, VarR);
+    _mav_put_float(buf, 40, VarLat);
+    _mav_put_float(buf, 44, VarLon);
+    _mav_put_float(buf, 48, LoiterRadius);
+    _mav_put_float(buf, 52, LoiterDirection);
+    _mav_put_float(buf, 56, DistToSoarPoint);
+    _mav_put_float(buf, 60, vSinkExp);
+    _mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
+    _mav_put_float(buf, 68, z2_DeltaRoll);
+    _mav_put_float(buf, 72, z1_exp);
+    _mav_put_float(buf, 76, z2_exp);
+    _mav_put_float(buf, 80, ThermalGSNorth);
+    _mav_put_float(buf, 84, ThermalGSEast);
+    _mav_put_float(buf, 88, TSE_dot);
+    _mav_put_float(buf, 92, DebugVar1);
+    _mav_put_float(buf, 96, DebugVar2);
+    _mav_put_uint8_t(buf, 100, ControlMode);
+    _mav_put_uint8_t(buf, 101, valid);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN);
 #else
-	mavlink_fw_soaring_data_t packet;
-	packet.timestamp = timestamp;
-	packet.timestampModeChanged = timestampModeChanged;
-	packet.xW = xW;
-	packet.xR = xR;
-	packet.xLat = xLat;
-	packet.xLon = xLon;
-	packet.VarW = VarW;
-	packet.VarR = VarR;
-	packet.VarLat = VarLat;
-	packet.VarLon = VarLon;
-	packet.LoiterRadius = LoiterRadius;
-	packet.LoiterDirection = LoiterDirection;
-	packet.DistToSoarPoint = DistToSoarPoint;
-	packet.vSinkExp = vSinkExp;
-	packet.z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
-	packet.z2_DeltaRoll = z2_DeltaRoll;
-	packet.z1_exp = z1_exp;
-	packet.z2_exp = z2_exp;
-	packet.ThermalGSNorth = ThermalGSNorth;
-	packet.ThermalGSEast = ThermalGSEast;
-	packet.TSE_dot = TSE_dot;
-	packet.DebugVar1 = DebugVar1;
-	packet.DebugVar2 = DebugVar2;
-	packet.ControlMode = ControlMode;
-	packet.valid = valid;
+    mavlink_fw_soaring_data_t packet;
+    packet.timestamp = timestamp;
+    packet.timestampModeChanged = timestampModeChanged;
+    packet.xW = xW;
+    packet.xR = xR;
+    packet.xLat = xLat;
+    packet.xLon = xLon;
+    packet.VarW = VarW;
+    packet.VarR = VarR;
+    packet.VarLat = VarLat;
+    packet.VarLon = VarLon;
+    packet.LoiterRadius = LoiterRadius;
+    packet.LoiterDirection = LoiterDirection;
+    packet.DistToSoarPoint = DistToSoarPoint;
+    packet.vSinkExp = vSinkExp;
+    packet.z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
+    packet.z2_DeltaRoll = z2_DeltaRoll;
+    packet.z1_exp = z1_exp;
+    packet.z2_exp = z2_exp;
+    packet.ThermalGSNorth = ThermalGSNorth;
+    packet.ThermalGSEast = ThermalGSEast;
+    packet.TSE_dot = TSE_dot;
+    packet.DebugVar1 = DebugVar1;
+    packet.DebugVar2 = DebugVar2;
+    packet.ControlMode = ControlMode;
+    packet.valid = valid;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_FW_SOARING_DATA;
+    msg->msgid = MAVLINK_MSG_ID_FW_SOARING_DATA;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_FW_SOARING_DATA_MIN_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_CRC);
 }
 
@@ -240,70 +241,70 @@ static inline uint16_t mavlink_msg_fw_soaring_data_pack(uint8_t system_id, uint8
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_fw_soaring_data_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint64_t timestamp,uint64_t timestampModeChanged,float xW,float xR,float xLat,float xLon,float VarW,float VarR,float VarLat,float VarLon,float LoiterRadius,float LoiterDirection,float DistToSoarPoint,float vSinkExp,float z1_LocalUpdraftSpeed,float z2_DeltaRoll,float z1_exp,float z2_exp,float ThermalGSNorth,float ThermalGSEast,float TSE_dot,float DebugVar1,float DebugVar2,uint8_t ControlMode,uint8_t valid)
+                               mavlink_message_t* msg,
+                                   uint64_t timestamp,uint64_t timestampModeChanged,float xW,float xR,float xLat,float xLon,float VarW,float VarR,float VarLat,float VarLon,float LoiterRadius,float LoiterDirection,float DistToSoarPoint,float vSinkExp,float z1_LocalUpdraftSpeed,float z2_DeltaRoll,float z1_exp,float z2_exp,float ThermalGSNorth,float ThermalGSEast,float TSE_dot,float DebugVar1,float DebugVar2,uint8_t ControlMode,uint8_t valid)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_FW_SOARING_DATA_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_uint64_t(buf, 8, timestampModeChanged);
-	_mav_put_float(buf, 16, xW);
-	_mav_put_float(buf, 20, xR);
-	_mav_put_float(buf, 24, xLat);
-	_mav_put_float(buf, 28, xLon);
-	_mav_put_float(buf, 32, VarW);
-	_mav_put_float(buf, 36, VarR);
-	_mav_put_float(buf, 40, VarLat);
-	_mav_put_float(buf, 44, VarLon);
-	_mav_put_float(buf, 48, LoiterRadius);
-	_mav_put_float(buf, 52, LoiterDirection);
-	_mav_put_float(buf, 56, DistToSoarPoint);
-	_mav_put_float(buf, 60, vSinkExp);
-	_mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
-	_mav_put_float(buf, 68, z2_DeltaRoll);
-	_mav_put_float(buf, 72, z1_exp);
-	_mav_put_float(buf, 76, z2_exp);
-	_mav_put_float(buf, 80, ThermalGSNorth);
-	_mav_put_float(buf, 84, ThermalGSEast);
-	_mav_put_float(buf, 88, TSE_dot);
-	_mav_put_float(buf, 92, DebugVar1);
-	_mav_put_float(buf, 96, DebugVar2);
-	_mav_put_uint8_t(buf, 100, ControlMode);
-	_mav_put_uint8_t(buf, 101, valid);
+    char buf[MAVLINK_MSG_ID_FW_SOARING_DATA_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_uint64_t(buf, 8, timestampModeChanged);
+    _mav_put_float(buf, 16, xW);
+    _mav_put_float(buf, 20, xR);
+    _mav_put_float(buf, 24, xLat);
+    _mav_put_float(buf, 28, xLon);
+    _mav_put_float(buf, 32, VarW);
+    _mav_put_float(buf, 36, VarR);
+    _mav_put_float(buf, 40, VarLat);
+    _mav_put_float(buf, 44, VarLon);
+    _mav_put_float(buf, 48, LoiterRadius);
+    _mav_put_float(buf, 52, LoiterDirection);
+    _mav_put_float(buf, 56, DistToSoarPoint);
+    _mav_put_float(buf, 60, vSinkExp);
+    _mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
+    _mav_put_float(buf, 68, z2_DeltaRoll);
+    _mav_put_float(buf, 72, z1_exp);
+    _mav_put_float(buf, 76, z2_exp);
+    _mav_put_float(buf, 80, ThermalGSNorth);
+    _mav_put_float(buf, 84, ThermalGSEast);
+    _mav_put_float(buf, 88, TSE_dot);
+    _mav_put_float(buf, 92, DebugVar1);
+    _mav_put_float(buf, 96, DebugVar2);
+    _mav_put_uint8_t(buf, 100, ControlMode);
+    _mav_put_uint8_t(buf, 101, valid);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN);
 #else
-	mavlink_fw_soaring_data_t packet;
-	packet.timestamp = timestamp;
-	packet.timestampModeChanged = timestampModeChanged;
-	packet.xW = xW;
-	packet.xR = xR;
-	packet.xLat = xLat;
-	packet.xLon = xLon;
-	packet.VarW = VarW;
-	packet.VarR = VarR;
-	packet.VarLat = VarLat;
-	packet.VarLon = VarLon;
-	packet.LoiterRadius = LoiterRadius;
-	packet.LoiterDirection = LoiterDirection;
-	packet.DistToSoarPoint = DistToSoarPoint;
-	packet.vSinkExp = vSinkExp;
-	packet.z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
-	packet.z2_DeltaRoll = z2_DeltaRoll;
-	packet.z1_exp = z1_exp;
-	packet.z2_exp = z2_exp;
-	packet.ThermalGSNorth = ThermalGSNorth;
-	packet.ThermalGSEast = ThermalGSEast;
-	packet.TSE_dot = TSE_dot;
-	packet.DebugVar1 = DebugVar1;
-	packet.DebugVar2 = DebugVar2;
-	packet.ControlMode = ControlMode;
-	packet.valid = valid;
+    mavlink_fw_soaring_data_t packet;
+    packet.timestamp = timestamp;
+    packet.timestampModeChanged = timestampModeChanged;
+    packet.xW = xW;
+    packet.xR = xR;
+    packet.xLat = xLat;
+    packet.xLon = xLon;
+    packet.VarW = VarW;
+    packet.VarR = VarR;
+    packet.VarLat = VarLat;
+    packet.VarLon = VarLon;
+    packet.LoiterRadius = LoiterRadius;
+    packet.LoiterDirection = LoiterDirection;
+    packet.DistToSoarPoint = DistToSoarPoint;
+    packet.vSinkExp = vSinkExp;
+    packet.z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
+    packet.z2_DeltaRoll = z2_DeltaRoll;
+    packet.z1_exp = z1_exp;
+    packet.z2_exp = z2_exp;
+    packet.ThermalGSNorth = ThermalGSNorth;
+    packet.ThermalGSEast = ThermalGSEast;
+    packet.TSE_dot = TSE_dot;
+    packet.DebugVar1 = DebugVar1;
+    packet.DebugVar2 = DebugVar2;
+    packet.ControlMode = ControlMode;
+    packet.valid = valid;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_FW_SOARING_DATA;
+    msg->msgid = MAVLINK_MSG_ID_FW_SOARING_DATA;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_FW_SOARING_DATA_MIN_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_CRC);
 }
 
@@ -317,7 +318,7 @@ static inline uint16_t mavlink_msg_fw_soaring_data_pack_chan(uint8_t system_id, 
  */
 static inline uint16_t mavlink_msg_fw_soaring_data_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_fw_soaring_data_t* fw_soaring_data)
 {
-	return mavlink_msg_fw_soaring_data_pack(system_id, component_id, msg, fw_soaring_data->timestamp, fw_soaring_data->timestampModeChanged, fw_soaring_data->xW, fw_soaring_data->xR, fw_soaring_data->xLat, fw_soaring_data->xLon, fw_soaring_data->VarW, fw_soaring_data->VarR, fw_soaring_data->VarLat, fw_soaring_data->VarLon, fw_soaring_data->LoiterRadius, fw_soaring_data->LoiterDirection, fw_soaring_data->DistToSoarPoint, fw_soaring_data->vSinkExp, fw_soaring_data->z1_LocalUpdraftSpeed, fw_soaring_data->z2_DeltaRoll, fw_soaring_data->z1_exp, fw_soaring_data->z2_exp, fw_soaring_data->ThermalGSNorth, fw_soaring_data->ThermalGSEast, fw_soaring_data->TSE_dot, fw_soaring_data->DebugVar1, fw_soaring_data->DebugVar2, fw_soaring_data->ControlMode, fw_soaring_data->valid);
+    return mavlink_msg_fw_soaring_data_pack(system_id, component_id, msg, fw_soaring_data->timestamp, fw_soaring_data->timestampModeChanged, fw_soaring_data->xW, fw_soaring_data->xR, fw_soaring_data->xLat, fw_soaring_data->xLon, fw_soaring_data->VarW, fw_soaring_data->VarR, fw_soaring_data->VarLat, fw_soaring_data->VarLon, fw_soaring_data->LoiterRadius, fw_soaring_data->LoiterDirection, fw_soaring_data->DistToSoarPoint, fw_soaring_data->vSinkExp, fw_soaring_data->z1_LocalUpdraftSpeed, fw_soaring_data->z2_DeltaRoll, fw_soaring_data->z1_exp, fw_soaring_data->z2_exp, fw_soaring_data->ThermalGSNorth, fw_soaring_data->ThermalGSEast, fw_soaring_data->TSE_dot, fw_soaring_data->DebugVar1, fw_soaring_data->DebugVar2, fw_soaring_data->ControlMode, fw_soaring_data->valid);
 }
 
 /**
@@ -331,7 +332,7 @@ static inline uint16_t mavlink_msg_fw_soaring_data_encode(uint8_t system_id, uin
  */
 static inline uint16_t mavlink_msg_fw_soaring_data_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_fw_soaring_data_t* fw_soaring_data)
 {
-	return mavlink_msg_fw_soaring_data_pack_chan(system_id, component_id, chan, msg, fw_soaring_data->timestamp, fw_soaring_data->timestampModeChanged, fw_soaring_data->xW, fw_soaring_data->xR, fw_soaring_data->xLat, fw_soaring_data->xLon, fw_soaring_data->VarW, fw_soaring_data->VarR, fw_soaring_data->VarLat, fw_soaring_data->VarLon, fw_soaring_data->LoiterRadius, fw_soaring_data->LoiterDirection, fw_soaring_data->DistToSoarPoint, fw_soaring_data->vSinkExp, fw_soaring_data->z1_LocalUpdraftSpeed, fw_soaring_data->z2_DeltaRoll, fw_soaring_data->z1_exp, fw_soaring_data->z2_exp, fw_soaring_data->ThermalGSNorth, fw_soaring_data->ThermalGSEast, fw_soaring_data->TSE_dot, fw_soaring_data->DebugVar1, fw_soaring_data->DebugVar2, fw_soaring_data->ControlMode, fw_soaring_data->valid);
+    return mavlink_msg_fw_soaring_data_pack_chan(system_id, component_id, chan, msg, fw_soaring_data->timestamp, fw_soaring_data->timestampModeChanged, fw_soaring_data->xW, fw_soaring_data->xR, fw_soaring_data->xLat, fw_soaring_data->xLon, fw_soaring_data->VarW, fw_soaring_data->VarR, fw_soaring_data->VarLat, fw_soaring_data->VarLon, fw_soaring_data->LoiterRadius, fw_soaring_data->LoiterDirection, fw_soaring_data->DistToSoarPoint, fw_soaring_data->vSinkExp, fw_soaring_data->z1_LocalUpdraftSpeed, fw_soaring_data->z2_DeltaRoll, fw_soaring_data->z1_exp, fw_soaring_data->z2_exp, fw_soaring_data->ThermalGSNorth, fw_soaring_data->ThermalGSEast, fw_soaring_data->TSE_dot, fw_soaring_data->DebugVar1, fw_soaring_data->DebugVar2, fw_soaring_data->ControlMode, fw_soaring_data->valid);
 }
 
 /**
@@ -369,61 +370,61 @@ static inline uint16_t mavlink_msg_fw_soaring_data_encode_chan(uint8_t system_id
 static inline void mavlink_msg_fw_soaring_data_send(mavlink_channel_t chan, uint64_t timestamp, uint64_t timestampModeChanged, float xW, float xR, float xLat, float xLon, float VarW, float VarR, float VarLat, float VarLon, float LoiterRadius, float LoiterDirection, float DistToSoarPoint, float vSinkExp, float z1_LocalUpdraftSpeed, float z2_DeltaRoll, float z1_exp, float z2_exp, float ThermalGSNorth, float ThermalGSEast, float TSE_dot, float DebugVar1, float DebugVar2, uint8_t ControlMode, uint8_t valid)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_FW_SOARING_DATA_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_uint64_t(buf, 8, timestampModeChanged);
-	_mav_put_float(buf, 16, xW);
-	_mav_put_float(buf, 20, xR);
-	_mav_put_float(buf, 24, xLat);
-	_mav_put_float(buf, 28, xLon);
-	_mav_put_float(buf, 32, VarW);
-	_mav_put_float(buf, 36, VarR);
-	_mav_put_float(buf, 40, VarLat);
-	_mav_put_float(buf, 44, VarLon);
-	_mav_put_float(buf, 48, LoiterRadius);
-	_mav_put_float(buf, 52, LoiterDirection);
-	_mav_put_float(buf, 56, DistToSoarPoint);
-	_mav_put_float(buf, 60, vSinkExp);
-	_mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
-	_mav_put_float(buf, 68, z2_DeltaRoll);
-	_mav_put_float(buf, 72, z1_exp);
-	_mav_put_float(buf, 76, z2_exp);
-	_mav_put_float(buf, 80, ThermalGSNorth);
-	_mav_put_float(buf, 84, ThermalGSEast);
-	_mav_put_float(buf, 88, TSE_dot);
-	_mav_put_float(buf, 92, DebugVar1);
-	_mav_put_float(buf, 96, DebugVar2);
-	_mav_put_uint8_t(buf, 100, ControlMode);
-	_mav_put_uint8_t(buf, 101, valid);
+    char buf[MAVLINK_MSG_ID_FW_SOARING_DATA_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_uint64_t(buf, 8, timestampModeChanged);
+    _mav_put_float(buf, 16, xW);
+    _mav_put_float(buf, 20, xR);
+    _mav_put_float(buf, 24, xLat);
+    _mav_put_float(buf, 28, xLon);
+    _mav_put_float(buf, 32, VarW);
+    _mav_put_float(buf, 36, VarR);
+    _mav_put_float(buf, 40, VarLat);
+    _mav_put_float(buf, 44, VarLon);
+    _mav_put_float(buf, 48, LoiterRadius);
+    _mav_put_float(buf, 52, LoiterDirection);
+    _mav_put_float(buf, 56, DistToSoarPoint);
+    _mav_put_float(buf, 60, vSinkExp);
+    _mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
+    _mav_put_float(buf, 68, z2_DeltaRoll);
+    _mav_put_float(buf, 72, z1_exp);
+    _mav_put_float(buf, 76, z2_exp);
+    _mav_put_float(buf, 80, ThermalGSNorth);
+    _mav_put_float(buf, 84, ThermalGSEast);
+    _mav_put_float(buf, 88, TSE_dot);
+    _mav_put_float(buf, 92, DebugVar1);
+    _mav_put_float(buf, 96, DebugVar2);
+    _mav_put_uint8_t(buf, 100, ControlMode);
+    _mav_put_uint8_t(buf, 101, valid);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FW_SOARING_DATA, buf, MAVLINK_MSG_ID_FW_SOARING_DATA_MIN_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_CRC);
 #else
-	mavlink_fw_soaring_data_t packet;
-	packet.timestamp = timestamp;
-	packet.timestampModeChanged = timestampModeChanged;
-	packet.xW = xW;
-	packet.xR = xR;
-	packet.xLat = xLat;
-	packet.xLon = xLon;
-	packet.VarW = VarW;
-	packet.VarR = VarR;
-	packet.VarLat = VarLat;
-	packet.VarLon = VarLon;
-	packet.LoiterRadius = LoiterRadius;
-	packet.LoiterDirection = LoiterDirection;
-	packet.DistToSoarPoint = DistToSoarPoint;
-	packet.vSinkExp = vSinkExp;
-	packet.z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
-	packet.z2_DeltaRoll = z2_DeltaRoll;
-	packet.z1_exp = z1_exp;
-	packet.z2_exp = z2_exp;
-	packet.ThermalGSNorth = ThermalGSNorth;
-	packet.ThermalGSEast = ThermalGSEast;
-	packet.TSE_dot = TSE_dot;
-	packet.DebugVar1 = DebugVar1;
-	packet.DebugVar2 = DebugVar2;
-	packet.ControlMode = ControlMode;
-	packet.valid = valid;
+    mavlink_fw_soaring_data_t packet;
+    packet.timestamp = timestamp;
+    packet.timestampModeChanged = timestampModeChanged;
+    packet.xW = xW;
+    packet.xR = xR;
+    packet.xLat = xLat;
+    packet.xLon = xLon;
+    packet.VarW = VarW;
+    packet.VarR = VarR;
+    packet.VarLat = VarLat;
+    packet.VarLon = VarLon;
+    packet.LoiterRadius = LoiterRadius;
+    packet.LoiterDirection = LoiterDirection;
+    packet.DistToSoarPoint = DistToSoarPoint;
+    packet.vSinkExp = vSinkExp;
+    packet.z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
+    packet.z2_DeltaRoll = z2_DeltaRoll;
+    packet.z1_exp = z1_exp;
+    packet.z2_exp = z2_exp;
+    packet.ThermalGSNorth = ThermalGSNorth;
+    packet.ThermalGSEast = ThermalGSEast;
+    packet.TSE_dot = TSE_dot;
+    packet.DebugVar1 = DebugVar1;
+    packet.DebugVar2 = DebugVar2;
+    packet.ControlMode = ControlMode;
+    packet.valid = valid;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FW_SOARING_DATA, (const char *)&packet, MAVLINK_MSG_ID_FW_SOARING_DATA_MIN_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_CRC);
 #endif
@@ -454,61 +455,61 @@ static inline void mavlink_msg_fw_soaring_data_send_struct(mavlink_channel_t cha
 static inline void mavlink_msg_fw_soaring_data_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint64_t timestamp, uint64_t timestampModeChanged, float xW, float xR, float xLat, float xLon, float VarW, float VarR, float VarLat, float VarLon, float LoiterRadius, float LoiterDirection, float DistToSoarPoint, float vSinkExp, float z1_LocalUpdraftSpeed, float z2_DeltaRoll, float z1_exp, float z2_exp, float ThermalGSNorth, float ThermalGSEast, float TSE_dot, float DebugVar1, float DebugVar2, uint8_t ControlMode, uint8_t valid)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_uint64_t(buf, 8, timestampModeChanged);
-	_mav_put_float(buf, 16, xW);
-	_mav_put_float(buf, 20, xR);
-	_mav_put_float(buf, 24, xLat);
-	_mav_put_float(buf, 28, xLon);
-	_mav_put_float(buf, 32, VarW);
-	_mav_put_float(buf, 36, VarR);
-	_mav_put_float(buf, 40, VarLat);
-	_mav_put_float(buf, 44, VarLon);
-	_mav_put_float(buf, 48, LoiterRadius);
-	_mav_put_float(buf, 52, LoiterDirection);
-	_mav_put_float(buf, 56, DistToSoarPoint);
-	_mav_put_float(buf, 60, vSinkExp);
-	_mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
-	_mav_put_float(buf, 68, z2_DeltaRoll);
-	_mav_put_float(buf, 72, z1_exp);
-	_mav_put_float(buf, 76, z2_exp);
-	_mav_put_float(buf, 80, ThermalGSNorth);
-	_mav_put_float(buf, 84, ThermalGSEast);
-	_mav_put_float(buf, 88, TSE_dot);
-	_mav_put_float(buf, 92, DebugVar1);
-	_mav_put_float(buf, 96, DebugVar2);
-	_mav_put_uint8_t(buf, 100, ControlMode);
-	_mav_put_uint8_t(buf, 101, valid);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_uint64_t(buf, 8, timestampModeChanged);
+    _mav_put_float(buf, 16, xW);
+    _mav_put_float(buf, 20, xR);
+    _mav_put_float(buf, 24, xLat);
+    _mav_put_float(buf, 28, xLon);
+    _mav_put_float(buf, 32, VarW);
+    _mav_put_float(buf, 36, VarR);
+    _mav_put_float(buf, 40, VarLat);
+    _mav_put_float(buf, 44, VarLon);
+    _mav_put_float(buf, 48, LoiterRadius);
+    _mav_put_float(buf, 52, LoiterDirection);
+    _mav_put_float(buf, 56, DistToSoarPoint);
+    _mav_put_float(buf, 60, vSinkExp);
+    _mav_put_float(buf, 64, z1_LocalUpdraftSpeed);
+    _mav_put_float(buf, 68, z2_DeltaRoll);
+    _mav_put_float(buf, 72, z1_exp);
+    _mav_put_float(buf, 76, z2_exp);
+    _mav_put_float(buf, 80, ThermalGSNorth);
+    _mav_put_float(buf, 84, ThermalGSEast);
+    _mav_put_float(buf, 88, TSE_dot);
+    _mav_put_float(buf, 92, DebugVar1);
+    _mav_put_float(buf, 96, DebugVar2);
+    _mav_put_uint8_t(buf, 100, ControlMode);
+    _mav_put_uint8_t(buf, 101, valid);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FW_SOARING_DATA, buf, MAVLINK_MSG_ID_FW_SOARING_DATA_MIN_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_CRC);
 #else
-	mavlink_fw_soaring_data_t *packet = (mavlink_fw_soaring_data_t *)msgbuf;
-	packet->timestamp = timestamp;
-	packet->timestampModeChanged = timestampModeChanged;
-	packet->xW = xW;
-	packet->xR = xR;
-	packet->xLat = xLat;
-	packet->xLon = xLon;
-	packet->VarW = VarW;
-	packet->VarR = VarR;
-	packet->VarLat = VarLat;
-	packet->VarLon = VarLon;
-	packet->LoiterRadius = LoiterRadius;
-	packet->LoiterDirection = LoiterDirection;
-	packet->DistToSoarPoint = DistToSoarPoint;
-	packet->vSinkExp = vSinkExp;
-	packet->z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
-	packet->z2_DeltaRoll = z2_DeltaRoll;
-	packet->z1_exp = z1_exp;
-	packet->z2_exp = z2_exp;
-	packet->ThermalGSNorth = ThermalGSNorth;
-	packet->ThermalGSEast = ThermalGSEast;
-	packet->TSE_dot = TSE_dot;
-	packet->DebugVar1 = DebugVar1;
-	packet->DebugVar2 = DebugVar2;
-	packet->ControlMode = ControlMode;
-	packet->valid = valid;
+    mavlink_fw_soaring_data_t *packet = (mavlink_fw_soaring_data_t *)msgbuf;
+    packet->timestamp = timestamp;
+    packet->timestampModeChanged = timestampModeChanged;
+    packet->xW = xW;
+    packet->xR = xR;
+    packet->xLat = xLat;
+    packet->xLon = xLon;
+    packet->VarW = VarW;
+    packet->VarR = VarR;
+    packet->VarLat = VarLat;
+    packet->VarLon = VarLon;
+    packet->LoiterRadius = LoiterRadius;
+    packet->LoiterDirection = LoiterDirection;
+    packet->DistToSoarPoint = DistToSoarPoint;
+    packet->vSinkExp = vSinkExp;
+    packet->z1_LocalUpdraftSpeed = z1_LocalUpdraftSpeed;
+    packet->z2_DeltaRoll = z2_DeltaRoll;
+    packet->z1_exp = z1_exp;
+    packet->z2_exp = z2_exp;
+    packet->ThermalGSNorth = ThermalGSNorth;
+    packet->ThermalGSEast = ThermalGSEast;
+    packet->TSE_dot = TSE_dot;
+    packet->DebugVar1 = DebugVar1;
+    packet->DebugVar2 = DebugVar2;
+    packet->ControlMode = ControlMode;
+    packet->valid = valid;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_FW_SOARING_DATA, (const char *)packet, MAVLINK_MSG_ID_FW_SOARING_DATA_MIN_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN, MAVLINK_MSG_ID_FW_SOARING_DATA_CRC);
 #endif
@@ -527,7 +528,7 @@ static inline void mavlink_msg_fw_soaring_data_send_buf(mavlink_message_t *msgbu
  */
 static inline uint64_t mavlink_msg_fw_soaring_data_get_timestamp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  0);
+    return _MAV_RETURN_uint64_t(msg,  0);
 }
 
 /**
@@ -537,7 +538,7 @@ static inline uint64_t mavlink_msg_fw_soaring_data_get_timestamp(const mavlink_m
  */
 static inline uint64_t mavlink_msg_fw_soaring_data_get_timestampModeChanged(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  8);
+    return _MAV_RETURN_uint64_t(msg,  8);
 }
 
 /**
@@ -547,7 +548,7 @@ static inline uint64_t mavlink_msg_fw_soaring_data_get_timestampModeChanged(cons
  */
 static inline float mavlink_msg_fw_soaring_data_get_xW(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -557,7 +558,7 @@ static inline float mavlink_msg_fw_soaring_data_get_xW(const mavlink_message_t* 
  */
 static inline float mavlink_msg_fw_soaring_data_get_xR(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  20);
+    return _MAV_RETURN_float(msg,  20);
 }
 
 /**
@@ -567,7 +568,7 @@ static inline float mavlink_msg_fw_soaring_data_get_xR(const mavlink_message_t* 
  */
 static inline float mavlink_msg_fw_soaring_data_get_xLat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  24);
+    return _MAV_RETURN_float(msg,  24);
 }
 
 /**
@@ -577,7 +578,7 @@ static inline float mavlink_msg_fw_soaring_data_get_xLat(const mavlink_message_t
  */
 static inline float mavlink_msg_fw_soaring_data_get_xLon(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  28);
+    return _MAV_RETURN_float(msg,  28);
 }
 
 /**
@@ -587,7 +588,7 @@ static inline float mavlink_msg_fw_soaring_data_get_xLon(const mavlink_message_t
  */
 static inline float mavlink_msg_fw_soaring_data_get_VarW(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  32);
+    return _MAV_RETURN_float(msg,  32);
 }
 
 /**
@@ -597,7 +598,7 @@ static inline float mavlink_msg_fw_soaring_data_get_VarW(const mavlink_message_t
  */
 static inline float mavlink_msg_fw_soaring_data_get_VarR(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  36);
+    return _MAV_RETURN_float(msg,  36);
 }
 
 /**
@@ -607,7 +608,7 @@ static inline float mavlink_msg_fw_soaring_data_get_VarR(const mavlink_message_t
  */
 static inline float mavlink_msg_fw_soaring_data_get_VarLat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  40);
+    return _MAV_RETURN_float(msg,  40);
 }
 
 /**
@@ -617,7 +618,7 @@ static inline float mavlink_msg_fw_soaring_data_get_VarLat(const mavlink_message
  */
 static inline float mavlink_msg_fw_soaring_data_get_VarLon(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  44);
+    return _MAV_RETURN_float(msg,  44);
 }
 
 /**
@@ -627,7 +628,7 @@ static inline float mavlink_msg_fw_soaring_data_get_VarLon(const mavlink_message
  */
 static inline float mavlink_msg_fw_soaring_data_get_LoiterRadius(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  48);
+    return _MAV_RETURN_float(msg,  48);
 }
 
 /**
@@ -637,7 +638,7 @@ static inline float mavlink_msg_fw_soaring_data_get_LoiterRadius(const mavlink_m
  */
 static inline float mavlink_msg_fw_soaring_data_get_LoiterDirection(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  52);
+    return _MAV_RETURN_float(msg,  52);
 }
 
 /**
@@ -647,7 +648,7 @@ static inline float mavlink_msg_fw_soaring_data_get_LoiterDirection(const mavlin
  */
 static inline float mavlink_msg_fw_soaring_data_get_DistToSoarPoint(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  56);
+    return _MAV_RETURN_float(msg,  56);
 }
 
 /**
@@ -657,7 +658,7 @@ static inline float mavlink_msg_fw_soaring_data_get_DistToSoarPoint(const mavlin
  */
 static inline float mavlink_msg_fw_soaring_data_get_vSinkExp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  60);
+    return _MAV_RETURN_float(msg,  60);
 }
 
 /**
@@ -667,7 +668,7 @@ static inline float mavlink_msg_fw_soaring_data_get_vSinkExp(const mavlink_messa
  */
 static inline float mavlink_msg_fw_soaring_data_get_z1_LocalUpdraftSpeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  64);
+    return _MAV_RETURN_float(msg,  64);
 }
 
 /**
@@ -677,7 +678,7 @@ static inline float mavlink_msg_fw_soaring_data_get_z1_LocalUpdraftSpeed(const m
  */
 static inline float mavlink_msg_fw_soaring_data_get_z2_DeltaRoll(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  68);
+    return _MAV_RETURN_float(msg,  68);
 }
 
 /**
@@ -687,7 +688,7 @@ static inline float mavlink_msg_fw_soaring_data_get_z2_DeltaRoll(const mavlink_m
  */
 static inline float mavlink_msg_fw_soaring_data_get_z1_exp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  72);
+    return _MAV_RETURN_float(msg,  72);
 }
 
 /**
@@ -697,7 +698,7 @@ static inline float mavlink_msg_fw_soaring_data_get_z1_exp(const mavlink_message
  */
 static inline float mavlink_msg_fw_soaring_data_get_z2_exp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  76);
+    return _MAV_RETURN_float(msg,  76);
 }
 
 /**
@@ -707,7 +708,7 @@ static inline float mavlink_msg_fw_soaring_data_get_z2_exp(const mavlink_message
  */
 static inline float mavlink_msg_fw_soaring_data_get_ThermalGSNorth(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  80);
+    return _MAV_RETURN_float(msg,  80);
 }
 
 /**
@@ -717,7 +718,7 @@ static inline float mavlink_msg_fw_soaring_data_get_ThermalGSNorth(const mavlink
  */
 static inline float mavlink_msg_fw_soaring_data_get_ThermalGSEast(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  84);
+    return _MAV_RETURN_float(msg,  84);
 }
 
 /**
@@ -727,7 +728,7 @@ static inline float mavlink_msg_fw_soaring_data_get_ThermalGSEast(const mavlink_
  */
 static inline float mavlink_msg_fw_soaring_data_get_TSE_dot(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  88);
+    return _MAV_RETURN_float(msg,  88);
 }
 
 /**
@@ -737,7 +738,7 @@ static inline float mavlink_msg_fw_soaring_data_get_TSE_dot(const mavlink_messag
  */
 static inline float mavlink_msg_fw_soaring_data_get_DebugVar1(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  92);
+    return _MAV_RETURN_float(msg,  92);
 }
 
 /**
@@ -747,7 +748,7 @@ static inline float mavlink_msg_fw_soaring_data_get_DebugVar1(const mavlink_mess
  */
 static inline float mavlink_msg_fw_soaring_data_get_DebugVar2(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  96);
+    return _MAV_RETURN_float(msg,  96);
 }
 
 /**
@@ -757,7 +758,7 @@ static inline float mavlink_msg_fw_soaring_data_get_DebugVar2(const mavlink_mess
  */
 static inline uint8_t mavlink_msg_fw_soaring_data_get_ControlMode(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  100);
+    return _MAV_RETURN_uint8_t(msg,  100);
 }
 
 /**
@@ -767,7 +768,7 @@ static inline uint8_t mavlink_msg_fw_soaring_data_get_ControlMode(const mavlink_
  */
 static inline uint8_t mavlink_msg_fw_soaring_data_get_valid(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  101);
+    return _MAV_RETURN_uint8_t(msg,  101);
 }
 
 /**
@@ -779,34 +780,34 @@ static inline uint8_t mavlink_msg_fw_soaring_data_get_valid(const mavlink_messag
 static inline void mavlink_msg_fw_soaring_data_decode(const mavlink_message_t* msg, mavlink_fw_soaring_data_t* fw_soaring_data)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	fw_soaring_data->timestamp = mavlink_msg_fw_soaring_data_get_timestamp(msg);
-	fw_soaring_data->timestampModeChanged = mavlink_msg_fw_soaring_data_get_timestampModeChanged(msg);
-	fw_soaring_data->xW = mavlink_msg_fw_soaring_data_get_xW(msg);
-	fw_soaring_data->xR = mavlink_msg_fw_soaring_data_get_xR(msg);
-	fw_soaring_data->xLat = mavlink_msg_fw_soaring_data_get_xLat(msg);
-	fw_soaring_data->xLon = mavlink_msg_fw_soaring_data_get_xLon(msg);
-	fw_soaring_data->VarW = mavlink_msg_fw_soaring_data_get_VarW(msg);
-	fw_soaring_data->VarR = mavlink_msg_fw_soaring_data_get_VarR(msg);
-	fw_soaring_data->VarLat = mavlink_msg_fw_soaring_data_get_VarLat(msg);
-	fw_soaring_data->VarLon = mavlink_msg_fw_soaring_data_get_VarLon(msg);
-	fw_soaring_data->LoiterRadius = mavlink_msg_fw_soaring_data_get_LoiterRadius(msg);
-	fw_soaring_data->LoiterDirection = mavlink_msg_fw_soaring_data_get_LoiterDirection(msg);
-	fw_soaring_data->DistToSoarPoint = mavlink_msg_fw_soaring_data_get_DistToSoarPoint(msg);
-	fw_soaring_data->vSinkExp = mavlink_msg_fw_soaring_data_get_vSinkExp(msg);
-	fw_soaring_data->z1_LocalUpdraftSpeed = mavlink_msg_fw_soaring_data_get_z1_LocalUpdraftSpeed(msg);
-	fw_soaring_data->z2_DeltaRoll = mavlink_msg_fw_soaring_data_get_z2_DeltaRoll(msg);
-	fw_soaring_data->z1_exp = mavlink_msg_fw_soaring_data_get_z1_exp(msg);
-	fw_soaring_data->z2_exp = mavlink_msg_fw_soaring_data_get_z2_exp(msg);
-	fw_soaring_data->ThermalGSNorth = mavlink_msg_fw_soaring_data_get_ThermalGSNorth(msg);
-	fw_soaring_data->ThermalGSEast = mavlink_msg_fw_soaring_data_get_ThermalGSEast(msg);
-	fw_soaring_data->TSE_dot = mavlink_msg_fw_soaring_data_get_TSE_dot(msg);
-	fw_soaring_data->DebugVar1 = mavlink_msg_fw_soaring_data_get_DebugVar1(msg);
-	fw_soaring_data->DebugVar2 = mavlink_msg_fw_soaring_data_get_DebugVar2(msg);
-	fw_soaring_data->ControlMode = mavlink_msg_fw_soaring_data_get_ControlMode(msg);
-	fw_soaring_data->valid = mavlink_msg_fw_soaring_data_get_valid(msg);
+    fw_soaring_data->timestamp = mavlink_msg_fw_soaring_data_get_timestamp(msg);
+    fw_soaring_data->timestampModeChanged = mavlink_msg_fw_soaring_data_get_timestampModeChanged(msg);
+    fw_soaring_data->xW = mavlink_msg_fw_soaring_data_get_xW(msg);
+    fw_soaring_data->xR = mavlink_msg_fw_soaring_data_get_xR(msg);
+    fw_soaring_data->xLat = mavlink_msg_fw_soaring_data_get_xLat(msg);
+    fw_soaring_data->xLon = mavlink_msg_fw_soaring_data_get_xLon(msg);
+    fw_soaring_data->VarW = mavlink_msg_fw_soaring_data_get_VarW(msg);
+    fw_soaring_data->VarR = mavlink_msg_fw_soaring_data_get_VarR(msg);
+    fw_soaring_data->VarLat = mavlink_msg_fw_soaring_data_get_VarLat(msg);
+    fw_soaring_data->VarLon = mavlink_msg_fw_soaring_data_get_VarLon(msg);
+    fw_soaring_data->LoiterRadius = mavlink_msg_fw_soaring_data_get_LoiterRadius(msg);
+    fw_soaring_data->LoiterDirection = mavlink_msg_fw_soaring_data_get_LoiterDirection(msg);
+    fw_soaring_data->DistToSoarPoint = mavlink_msg_fw_soaring_data_get_DistToSoarPoint(msg);
+    fw_soaring_data->vSinkExp = mavlink_msg_fw_soaring_data_get_vSinkExp(msg);
+    fw_soaring_data->z1_LocalUpdraftSpeed = mavlink_msg_fw_soaring_data_get_z1_LocalUpdraftSpeed(msg);
+    fw_soaring_data->z2_DeltaRoll = mavlink_msg_fw_soaring_data_get_z2_DeltaRoll(msg);
+    fw_soaring_data->z1_exp = mavlink_msg_fw_soaring_data_get_z1_exp(msg);
+    fw_soaring_data->z2_exp = mavlink_msg_fw_soaring_data_get_z2_exp(msg);
+    fw_soaring_data->ThermalGSNorth = mavlink_msg_fw_soaring_data_get_ThermalGSNorth(msg);
+    fw_soaring_data->ThermalGSEast = mavlink_msg_fw_soaring_data_get_ThermalGSEast(msg);
+    fw_soaring_data->TSE_dot = mavlink_msg_fw_soaring_data_get_TSE_dot(msg);
+    fw_soaring_data->DebugVar1 = mavlink_msg_fw_soaring_data_get_DebugVar1(msg);
+    fw_soaring_data->DebugVar2 = mavlink_msg_fw_soaring_data_get_DebugVar2(msg);
+    fw_soaring_data->ControlMode = mavlink_msg_fw_soaring_data_get_ControlMode(msg);
+    fw_soaring_data->valid = mavlink_msg_fw_soaring_data_get_valid(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_FW_SOARING_DATA_LEN? msg->len : MAVLINK_MSG_ID_FW_SOARING_DATA_LEN;
         memset(fw_soaring_data, 0, MAVLINK_MSG_ID_FW_SOARING_DATA_LEN);
-	memcpy(fw_soaring_data, _MAV_PAYLOAD(msg), len);
+    memcpy(fw_soaring_data, _MAV_PAYLOAD(msg), len);
 #endif
 }

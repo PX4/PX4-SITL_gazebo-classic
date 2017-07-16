@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE SERIAL_UDB_EXTRA_F15 PACKING
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15 179
@@ -21,18 +22,18 @@ typedef struct __mavlink_serial_udb_extra_f15_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F15 { \
-	179, \
-	"SERIAL_UDB_EXTRA_F15", \
-	2, \
-	{  { "sue_ID_VEHICLE_MODEL_NAME", NULL, MAVLINK_TYPE_UINT8_T, 40, 0, offsetof(mavlink_serial_udb_extra_f15_t, sue_ID_VEHICLE_MODEL_NAME) }, \
+    179, \
+    "SERIAL_UDB_EXTRA_F15", \
+    2, \
+    {  { "sue_ID_VEHICLE_MODEL_NAME", NULL, MAVLINK_TYPE_UINT8_T, 40, 0, offsetof(mavlink_serial_udb_extra_f15_t, sue_ID_VEHICLE_MODEL_NAME) }, \
          { "sue_ID_VEHICLE_REGISTRATION", NULL, MAVLINK_TYPE_UINT8_T, 20, 40, offsetof(mavlink_serial_udb_extra_f15_t, sue_ID_VEHICLE_REGISTRATION) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F15 { \
-	"SERIAL_UDB_EXTRA_F15", \
-	2, \
-	{  { "sue_ID_VEHICLE_MODEL_NAME", NULL, MAVLINK_TYPE_UINT8_T, 40, 0, offsetof(mavlink_serial_udb_extra_f15_t, sue_ID_VEHICLE_MODEL_NAME) }, \
+    "SERIAL_UDB_EXTRA_F15", \
+    2, \
+    {  { "sue_ID_VEHICLE_MODEL_NAME", NULL, MAVLINK_TYPE_UINT8_T, 40, 0, offsetof(mavlink_serial_udb_extra_f15_t, sue_ID_VEHICLE_MODEL_NAME) }, \
          { "sue_ID_VEHICLE_REGISTRATION", NULL, MAVLINK_TYPE_UINT8_T, 20, 40, offsetof(mavlink_serial_udb_extra_f15_t, sue_ID_VEHICLE_REGISTRATION) }, \
          } \
 }
@@ -49,23 +50,23 @@ typedef struct __mavlink_serial_udb_extra_f15_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f15_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       const uint8_t *sue_ID_VEHICLE_MODEL_NAME, const uint8_t *sue_ID_VEHICLE_REGISTRATION)
+                               const uint8_t *sue_ID_VEHICLE_MODEL_NAME, const uint8_t *sue_ID_VEHICLE_REGISTRATION)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN];
+    char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN];
 
-	_mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
-	_mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
+    _mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
+    _mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN);
 #else
-	mavlink_serial_udb_extra_f15_t packet;
+    mavlink_serial_udb_extra_f15_t packet;
 
-	mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
-	mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
+    mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
+    mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15;
+    msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_CRC);
 }
 
@@ -80,24 +81,24 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_pack(uint8_t system_id, 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f15_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           const uint8_t *sue_ID_VEHICLE_MODEL_NAME,const uint8_t *sue_ID_VEHICLE_REGISTRATION)
+                               mavlink_message_t* msg,
+                                   const uint8_t *sue_ID_VEHICLE_MODEL_NAME,const uint8_t *sue_ID_VEHICLE_REGISTRATION)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN];
+    char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN];
 
-	_mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
-	_mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
+    _mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
+    _mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN);
 #else
-	mavlink_serial_udb_extra_f15_t packet;
+    mavlink_serial_udb_extra_f15_t packet;
 
-	mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
-	mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
+    mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
+    mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15;
+    msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_CRC);
 }
 
@@ -111,7 +112,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_pack_chan(uint8_t system
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f15_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f15_t* serial_udb_extra_f15)
 {
-	return mavlink_msg_serial_udb_extra_f15_pack(system_id, component_id, msg, serial_udb_extra_f15->sue_ID_VEHICLE_MODEL_NAME, serial_udb_extra_f15->sue_ID_VEHICLE_REGISTRATION);
+    return mavlink_msg_serial_udb_extra_f15_pack(system_id, component_id, msg, serial_udb_extra_f15->sue_ID_VEHICLE_MODEL_NAME, serial_udb_extra_f15->sue_ID_VEHICLE_REGISTRATION);
 }
 
 /**
@@ -125,7 +126,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_encode(uint8_t system_id
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f15_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f15_t* serial_udb_extra_f15)
 {
-	return mavlink_msg_serial_udb_extra_f15_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f15->sue_ID_VEHICLE_MODEL_NAME, serial_udb_extra_f15->sue_ID_VEHICLE_REGISTRATION);
+    return mavlink_msg_serial_udb_extra_f15_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f15->sue_ID_VEHICLE_MODEL_NAME, serial_udb_extra_f15->sue_ID_VEHICLE_REGISTRATION);
 }
 
 /**
@@ -140,16 +141,16 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_encode_chan(uint8_t syst
 static inline void mavlink_msg_serial_udb_extra_f15_send(mavlink_channel_t chan, const uint8_t *sue_ID_VEHICLE_MODEL_NAME, const uint8_t *sue_ID_VEHICLE_REGISTRATION)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN];
+    char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN];
 
-	_mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
-	_mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
+    _mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
+    _mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_CRC);
 #else
-	mavlink_serial_udb_extra_f15_t packet;
+    mavlink_serial_udb_extra_f15_t packet;
 
-	mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
-	mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
+    mav_array_memcpy(packet.sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
+    mav_array_memcpy(packet.sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_CRC);
 #endif
 }
@@ -179,16 +180,16 @@ static inline void mavlink_msg_serial_udb_extra_f15_send_struct(mavlink_channel_
 static inline void mavlink_msg_serial_udb_extra_f15_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  const uint8_t *sue_ID_VEHICLE_MODEL_NAME, const uint8_t *sue_ID_VEHICLE_REGISTRATION)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
+    char *buf = (char *)msgbuf;
 
-	_mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
-	_mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
+    _mav_put_uint8_t_array(buf, 0, sue_ID_VEHICLE_MODEL_NAME, 40);
+    _mav_put_uint8_t_array(buf, 40, sue_ID_VEHICLE_REGISTRATION, 20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_CRC);
 #else
-	mavlink_serial_udb_extra_f15_t *packet = (mavlink_serial_udb_extra_f15_t *)msgbuf;
+    mavlink_serial_udb_extra_f15_t *packet = (mavlink_serial_udb_extra_f15_t *)msgbuf;
 
-	mav_array_memcpy(packet->sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
-	mav_array_memcpy(packet->sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
+    mav_array_memcpy(packet->sue_ID_VEHICLE_MODEL_NAME, sue_ID_VEHICLE_MODEL_NAME, sizeof(uint8_t)*40);
+    mav_array_memcpy(packet->sue_ID_VEHICLE_REGISTRATION, sue_ID_VEHICLE_REGISTRATION, sizeof(uint8_t)*20);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_CRC);
 #endif
 }
@@ -206,7 +207,7 @@ static inline void mavlink_msg_serial_udb_extra_f15_send_buf(mavlink_message_t *
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_MODEL_NAME(const mavlink_message_t* msg, uint8_t *sue_ID_VEHICLE_MODEL_NAME)
 {
-	return _MAV_RETURN_uint8_t_array(msg, sue_ID_VEHICLE_MODEL_NAME, 40,  0);
+    return _MAV_RETURN_uint8_t_array(msg, sue_ID_VEHICLE_MODEL_NAME, 40,  0);
 }
 
 /**
@@ -216,7 +217,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_MODEL
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_REGISTRATION(const mavlink_message_t* msg, uint8_t *sue_ID_VEHICLE_REGISTRATION)
 {
-	return _MAV_RETURN_uint8_t_array(msg, sue_ID_VEHICLE_REGISTRATION, 20,  40);
+    return _MAV_RETURN_uint8_t_array(msg, sue_ID_VEHICLE_REGISTRATION, 20,  40);
 }
 
 /**
@@ -228,11 +229,11 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_REGIS
 static inline void mavlink_msg_serial_udb_extra_f15_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f15_t* serial_udb_extra_f15)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_MODEL_NAME(msg, serial_udb_extra_f15->sue_ID_VEHICLE_MODEL_NAME);
-	mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_REGISTRATION(msg, serial_udb_extra_f15->sue_ID_VEHICLE_REGISTRATION);
+    mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_MODEL_NAME(msg, serial_udb_extra_f15->sue_ID_VEHICLE_MODEL_NAME);
+    mavlink_msg_serial_udb_extra_f15_get_sue_ID_VEHICLE_REGISTRATION(msg, serial_udb_extra_f15->sue_ID_VEHICLE_REGISTRATION);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN;
         memset(serial_udb_extra_f15, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F15_LEN);
-	memcpy(serial_udb_extra_f15, _MAV_PAYLOAD(msg), len);
+    memcpy(serial_udb_extra_f15, _MAV_PAYLOAD(msg), len);
 #endif
 }

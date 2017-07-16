@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE SENS_ATMOS PACKING
 
 #define MAVLINK_MSG_ID_SENS_ATMOS 208
@@ -20,18 +21,18 @@ typedef struct __mavlink_sens_atmos_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_SENS_ATMOS { \
-	208, \
-	"SENS_ATMOS", \
-	2, \
-	{  { "TempAmbient", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_sens_atmos_t, TempAmbient) }, \
+    208, \
+    "SENS_ATMOS", \
+    2, \
+    {  { "TempAmbient", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_sens_atmos_t, TempAmbient) }, \
          { "Humidity", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_sens_atmos_t, Humidity) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_SENS_ATMOS { \
-	"SENS_ATMOS", \
-	2, \
-	{  { "TempAmbient", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_sens_atmos_t, TempAmbient) }, \
+    "SENS_ATMOS", \
+    2, \
+    {  { "TempAmbient", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_sens_atmos_t, TempAmbient) }, \
          { "Humidity", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_sens_atmos_t, Humidity) }, \
          } \
 }
@@ -48,23 +49,23 @@ typedef struct __mavlink_sens_atmos_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_sens_atmos_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       float TempAmbient, float Humidity)
+                               float TempAmbient, float Humidity)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SENS_ATMOS_LEN];
-	_mav_put_float(buf, 0, TempAmbient);
-	_mav_put_float(buf, 4, Humidity);
+    char buf[MAVLINK_MSG_ID_SENS_ATMOS_LEN];
+    _mav_put_float(buf, 0, TempAmbient);
+    _mav_put_float(buf, 4, Humidity);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_ATMOS_LEN);
 #else
-	mavlink_sens_atmos_t packet;
-	packet.TempAmbient = TempAmbient;
-	packet.Humidity = Humidity;
+    mavlink_sens_atmos_t packet;
+    packet.TempAmbient = TempAmbient;
+    packet.Humidity = Humidity;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SENS_ATMOS_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SENS_ATMOS;
+    msg->msgid = MAVLINK_MSG_ID_SENS_ATMOS;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_ATMOS_MIN_LEN, MAVLINK_MSG_ID_SENS_ATMOS_LEN, MAVLINK_MSG_ID_SENS_ATMOS_CRC);
 }
 
@@ -79,24 +80,24 @@ static inline uint16_t mavlink_msg_sens_atmos_pack(uint8_t system_id, uint8_t co
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_sens_atmos_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           float TempAmbient,float Humidity)
+                               mavlink_message_t* msg,
+                                   float TempAmbient,float Humidity)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SENS_ATMOS_LEN];
-	_mav_put_float(buf, 0, TempAmbient);
-	_mav_put_float(buf, 4, Humidity);
+    char buf[MAVLINK_MSG_ID_SENS_ATMOS_LEN];
+    _mav_put_float(buf, 0, TempAmbient);
+    _mav_put_float(buf, 4, Humidity);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_ATMOS_LEN);
 #else
-	mavlink_sens_atmos_t packet;
-	packet.TempAmbient = TempAmbient;
-	packet.Humidity = Humidity;
+    mavlink_sens_atmos_t packet;
+    packet.TempAmbient = TempAmbient;
+    packet.Humidity = Humidity;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SENS_ATMOS_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SENS_ATMOS;
+    msg->msgid = MAVLINK_MSG_ID_SENS_ATMOS;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_ATMOS_MIN_LEN, MAVLINK_MSG_ID_SENS_ATMOS_LEN, MAVLINK_MSG_ID_SENS_ATMOS_CRC);
 }
 
@@ -110,7 +111,7 @@ static inline uint16_t mavlink_msg_sens_atmos_pack_chan(uint8_t system_id, uint8
  */
 static inline uint16_t mavlink_msg_sens_atmos_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_sens_atmos_t* sens_atmos)
 {
-	return mavlink_msg_sens_atmos_pack(system_id, component_id, msg, sens_atmos->TempAmbient, sens_atmos->Humidity);
+    return mavlink_msg_sens_atmos_pack(system_id, component_id, msg, sens_atmos->TempAmbient, sens_atmos->Humidity);
 }
 
 /**
@@ -124,7 +125,7 @@ static inline uint16_t mavlink_msg_sens_atmos_encode(uint8_t system_id, uint8_t 
  */
 static inline uint16_t mavlink_msg_sens_atmos_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_sens_atmos_t* sens_atmos)
 {
-	return mavlink_msg_sens_atmos_pack_chan(system_id, component_id, chan, msg, sens_atmos->TempAmbient, sens_atmos->Humidity);
+    return mavlink_msg_sens_atmos_pack_chan(system_id, component_id, chan, msg, sens_atmos->TempAmbient, sens_atmos->Humidity);
 }
 
 /**
@@ -139,15 +140,15 @@ static inline uint16_t mavlink_msg_sens_atmos_encode_chan(uint8_t system_id, uin
 static inline void mavlink_msg_sens_atmos_send(mavlink_channel_t chan, float TempAmbient, float Humidity)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SENS_ATMOS_LEN];
-	_mav_put_float(buf, 0, TempAmbient);
-	_mav_put_float(buf, 4, Humidity);
+    char buf[MAVLINK_MSG_ID_SENS_ATMOS_LEN];
+    _mav_put_float(buf, 0, TempAmbient);
+    _mav_put_float(buf, 4, Humidity);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_ATMOS, buf, MAVLINK_MSG_ID_SENS_ATMOS_MIN_LEN, MAVLINK_MSG_ID_SENS_ATMOS_LEN, MAVLINK_MSG_ID_SENS_ATMOS_CRC);
 #else
-	mavlink_sens_atmos_t packet;
-	packet.TempAmbient = TempAmbient;
-	packet.Humidity = Humidity;
+    mavlink_sens_atmos_t packet;
+    packet.TempAmbient = TempAmbient;
+    packet.Humidity = Humidity;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_ATMOS, (const char *)&packet, MAVLINK_MSG_ID_SENS_ATMOS_MIN_LEN, MAVLINK_MSG_ID_SENS_ATMOS_LEN, MAVLINK_MSG_ID_SENS_ATMOS_CRC);
 #endif
@@ -178,15 +179,15 @@ static inline void mavlink_msg_sens_atmos_send_struct(mavlink_channel_t chan, co
 static inline void mavlink_msg_sens_atmos_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float TempAmbient, float Humidity)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_float(buf, 0, TempAmbient);
-	_mav_put_float(buf, 4, Humidity);
+    char *buf = (char *)msgbuf;
+    _mav_put_float(buf, 0, TempAmbient);
+    _mav_put_float(buf, 4, Humidity);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_ATMOS, buf, MAVLINK_MSG_ID_SENS_ATMOS_MIN_LEN, MAVLINK_MSG_ID_SENS_ATMOS_LEN, MAVLINK_MSG_ID_SENS_ATMOS_CRC);
 #else
-	mavlink_sens_atmos_t *packet = (mavlink_sens_atmos_t *)msgbuf;
-	packet->TempAmbient = TempAmbient;
-	packet->Humidity = Humidity;
+    mavlink_sens_atmos_t *packet = (mavlink_sens_atmos_t *)msgbuf;
+    packet->TempAmbient = TempAmbient;
+    packet->Humidity = Humidity;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_ATMOS, (const char *)packet, MAVLINK_MSG_ID_SENS_ATMOS_MIN_LEN, MAVLINK_MSG_ID_SENS_ATMOS_LEN, MAVLINK_MSG_ID_SENS_ATMOS_CRC);
 #endif
@@ -205,7 +206,7 @@ static inline void mavlink_msg_sens_atmos_send_buf(mavlink_message_t *msgbuf, ma
  */
 static inline float mavlink_msg_sens_atmos_get_TempAmbient(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  0);
+    return _MAV_RETURN_float(msg,  0);
 }
 
 /**
@@ -215,7 +216,7 @@ static inline float mavlink_msg_sens_atmos_get_TempAmbient(const mavlink_message
  */
 static inline float mavlink_msg_sens_atmos_get_Humidity(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  4);
+    return _MAV_RETURN_float(msg,  4);
 }
 
 /**
@@ -227,11 +228,11 @@ static inline float mavlink_msg_sens_atmos_get_Humidity(const mavlink_message_t*
 static inline void mavlink_msg_sens_atmos_decode(const mavlink_message_t* msg, mavlink_sens_atmos_t* sens_atmos)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	sens_atmos->TempAmbient = mavlink_msg_sens_atmos_get_TempAmbient(msg);
-	sens_atmos->Humidity = mavlink_msg_sens_atmos_get_Humidity(msg);
+    sens_atmos->TempAmbient = mavlink_msg_sens_atmos_get_TempAmbient(msg);
+    sens_atmos->Humidity = mavlink_msg_sens_atmos_get_Humidity(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_ATMOS_LEN? msg->len : MAVLINK_MSG_ID_SENS_ATMOS_LEN;
         memset(sens_atmos, 0, MAVLINK_MSG_ID_SENS_ATMOS_LEN);
-	memcpy(sens_atmos, _MAV_PAYLOAD(msg), len);
+    memcpy(sens_atmos, _MAV_PAYLOAD(msg), len);
 #endif
 }

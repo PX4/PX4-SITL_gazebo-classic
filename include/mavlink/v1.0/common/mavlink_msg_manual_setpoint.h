@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE MANUAL_SETPOINT PACKING
 
 #define MAVLINK_MSG_ID_MANUAL_SETPOINT 81
@@ -25,10 +26,10 @@ typedef struct __mavlink_manual_setpoint_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_MANUAL_SETPOINT { \
-	81, \
-	"MANUAL_SETPOINT", \
-	7, \
-	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_manual_setpoint_t, time_boot_ms) }, \
+    81, \
+    "MANUAL_SETPOINT", \
+    7, \
+    {  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_manual_setpoint_t, time_boot_ms) }, \
          { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_manual_setpoint_t, roll) }, \
          { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_manual_setpoint_t, pitch) }, \
          { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_manual_setpoint_t, yaw) }, \
@@ -39,9 +40,9 @@ typedef struct __mavlink_manual_setpoint_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_MANUAL_SETPOINT { \
-	"MANUAL_SETPOINT", \
-	7, \
-	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_manual_setpoint_t, time_boot_ms) }, \
+    "MANUAL_SETPOINT", \
+    7, \
+    {  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_manual_setpoint_t, time_boot_ms) }, \
          { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_manual_setpoint_t, roll) }, \
          { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_manual_setpoint_t, pitch) }, \
          { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_manual_setpoint_t, yaw) }, \
@@ -68,33 +69,33 @@ typedef struct __mavlink_manual_setpoint_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_manual_setpoint_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint32_t time_boot_ms, float roll, float pitch, float yaw, float thrust, uint8_t mode_switch, uint8_t manual_override_switch)
+                               uint32_t time_boot_ms, float roll, float pitch, float yaw, float thrust, uint8_t mode_switch, uint8_t manual_override_switch)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_float(buf, 4, roll);
-	_mav_put_float(buf, 8, pitch);
-	_mav_put_float(buf, 12, yaw);
-	_mav_put_float(buf, 16, thrust);
-	_mav_put_uint8_t(buf, 20, mode_switch);
-	_mav_put_uint8_t(buf, 21, manual_override_switch);
+    char buf[MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_float(buf, 4, roll);
+    _mav_put_float(buf, 8, pitch);
+    _mav_put_float(buf, 12, yaw);
+    _mav_put_float(buf, 16, thrust);
+    _mav_put_uint8_t(buf, 20, mode_switch);
+    _mav_put_uint8_t(buf, 21, manual_override_switch);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
 #else
-	mavlink_manual_setpoint_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.roll = roll;
-	packet.pitch = pitch;
-	packet.yaw = yaw;
-	packet.thrust = thrust;
-	packet.mode_switch = mode_switch;
-	packet.manual_override_switch = manual_override_switch;
+    mavlink_manual_setpoint_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.roll = roll;
+    packet.pitch = pitch;
+    packet.yaw = yaw;
+    packet.thrust = thrust;
+    packet.mode_switch = mode_switch;
+    packet.manual_override_switch = manual_override_switch;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
+    msg->msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 }
 
@@ -114,34 +115,34 @@ static inline uint16_t mavlink_msg_manual_setpoint_pack(uint8_t system_id, uint8
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_manual_setpoint_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint32_t time_boot_ms,float roll,float pitch,float yaw,float thrust,uint8_t mode_switch,uint8_t manual_override_switch)
+                               mavlink_message_t* msg,
+                                   uint32_t time_boot_ms,float roll,float pitch,float yaw,float thrust,uint8_t mode_switch,uint8_t manual_override_switch)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_float(buf, 4, roll);
-	_mav_put_float(buf, 8, pitch);
-	_mav_put_float(buf, 12, yaw);
-	_mav_put_float(buf, 16, thrust);
-	_mav_put_uint8_t(buf, 20, mode_switch);
-	_mav_put_uint8_t(buf, 21, manual_override_switch);
+    char buf[MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_float(buf, 4, roll);
+    _mav_put_float(buf, 8, pitch);
+    _mav_put_float(buf, 12, yaw);
+    _mav_put_float(buf, 16, thrust);
+    _mav_put_uint8_t(buf, 20, mode_switch);
+    _mav_put_uint8_t(buf, 21, manual_override_switch);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
 #else
-	mavlink_manual_setpoint_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.roll = roll;
-	packet.pitch = pitch;
-	packet.yaw = yaw;
-	packet.thrust = thrust;
-	packet.mode_switch = mode_switch;
-	packet.manual_override_switch = manual_override_switch;
+    mavlink_manual_setpoint_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.roll = roll;
+    packet.pitch = pitch;
+    packet.yaw = yaw;
+    packet.thrust = thrust;
+    packet.mode_switch = mode_switch;
+    packet.manual_override_switch = manual_override_switch;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
+    msg->msgid = MAVLINK_MSG_ID_MANUAL_SETPOINT;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 }
 
@@ -155,7 +156,7 @@ static inline uint16_t mavlink_msg_manual_setpoint_pack_chan(uint8_t system_id, 
  */
 static inline uint16_t mavlink_msg_manual_setpoint_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_manual_setpoint_t* manual_setpoint)
 {
-	return mavlink_msg_manual_setpoint_pack(system_id, component_id, msg, manual_setpoint->time_boot_ms, manual_setpoint->roll, manual_setpoint->pitch, manual_setpoint->yaw, manual_setpoint->thrust, manual_setpoint->mode_switch, manual_setpoint->manual_override_switch);
+    return mavlink_msg_manual_setpoint_pack(system_id, component_id, msg, manual_setpoint->time_boot_ms, manual_setpoint->roll, manual_setpoint->pitch, manual_setpoint->yaw, manual_setpoint->thrust, manual_setpoint->mode_switch, manual_setpoint->manual_override_switch);
 }
 
 /**
@@ -169,7 +170,7 @@ static inline uint16_t mavlink_msg_manual_setpoint_encode(uint8_t system_id, uin
  */
 static inline uint16_t mavlink_msg_manual_setpoint_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_manual_setpoint_t* manual_setpoint)
 {
-	return mavlink_msg_manual_setpoint_pack_chan(system_id, component_id, chan, msg, manual_setpoint->time_boot_ms, manual_setpoint->roll, manual_setpoint->pitch, manual_setpoint->yaw, manual_setpoint->thrust, manual_setpoint->mode_switch, manual_setpoint->manual_override_switch);
+    return mavlink_msg_manual_setpoint_pack_chan(system_id, component_id, chan, msg, manual_setpoint->time_boot_ms, manual_setpoint->roll, manual_setpoint->pitch, manual_setpoint->yaw, manual_setpoint->thrust, manual_setpoint->mode_switch, manual_setpoint->manual_override_switch);
 }
 
 /**
@@ -189,25 +190,25 @@ static inline uint16_t mavlink_msg_manual_setpoint_encode_chan(uint8_t system_id
 static inline void mavlink_msg_manual_setpoint_send(mavlink_channel_t chan, uint32_t time_boot_ms, float roll, float pitch, float yaw, float thrust, uint8_t mode_switch, uint8_t manual_override_switch)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_float(buf, 4, roll);
-	_mav_put_float(buf, 8, pitch);
-	_mav_put_float(buf, 12, yaw);
-	_mav_put_float(buf, 16, thrust);
-	_mav_put_uint8_t(buf, 20, mode_switch);
-	_mav_put_uint8_t(buf, 21, manual_override_switch);
+    char buf[MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_float(buf, 4, roll);
+    _mav_put_float(buf, 8, pitch);
+    _mav_put_float(buf, 12, yaw);
+    _mav_put_float(buf, 16, thrust);
+    _mav_put_uint8_t(buf, 20, mode_switch);
+    _mav_put_uint8_t(buf, 21, manual_override_switch);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #else
-	mavlink_manual_setpoint_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.roll = roll;
-	packet.pitch = pitch;
-	packet.yaw = yaw;
-	packet.thrust = thrust;
-	packet.mode_switch = mode_switch;
-	packet.manual_override_switch = manual_override_switch;
+    mavlink_manual_setpoint_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.roll = roll;
+    packet.pitch = pitch;
+    packet.yaw = yaw;
+    packet.thrust = thrust;
+    packet.mode_switch = mode_switch;
+    packet.manual_override_switch = manual_override_switch;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)&packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #endif
@@ -238,25 +239,25 @@ static inline void mavlink_msg_manual_setpoint_send_struct(mavlink_channel_t cha
 static inline void mavlink_msg_manual_setpoint_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint32_t time_boot_ms, float roll, float pitch, float yaw, float thrust, uint8_t mode_switch, uint8_t manual_override_switch)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_float(buf, 4, roll);
-	_mav_put_float(buf, 8, pitch);
-	_mav_put_float(buf, 12, yaw);
-	_mav_put_float(buf, 16, thrust);
-	_mav_put_uint8_t(buf, 20, mode_switch);
-	_mav_put_uint8_t(buf, 21, manual_override_switch);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_float(buf, 4, roll);
+    _mav_put_float(buf, 8, pitch);
+    _mav_put_float(buf, 12, yaw);
+    _mav_put_float(buf, 16, thrust);
+    _mav_put_uint8_t(buf, 20, mode_switch);
+    _mav_put_uint8_t(buf, 21, manual_override_switch);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, buf, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #else
-	mavlink_manual_setpoint_t *packet = (mavlink_manual_setpoint_t *)msgbuf;
-	packet->time_boot_ms = time_boot_ms;
-	packet->roll = roll;
-	packet->pitch = pitch;
-	packet->yaw = yaw;
-	packet->thrust = thrust;
-	packet->mode_switch = mode_switch;
-	packet->manual_override_switch = manual_override_switch;
+    mavlink_manual_setpoint_t *packet = (mavlink_manual_setpoint_t *)msgbuf;
+    packet->time_boot_ms = time_boot_ms;
+    packet->roll = roll;
+    packet->pitch = pitch;
+    packet->yaw = yaw;
+    packet->thrust = thrust;
+    packet->mode_switch = mode_switch;
+    packet->manual_override_switch = manual_override_switch;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_MANUAL_SETPOINT, (const char *)packet, MAVLINK_MSG_ID_MANUAL_SETPOINT_MIN_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN, MAVLINK_MSG_ID_MANUAL_SETPOINT_CRC);
 #endif
@@ -275,7 +276,7 @@ static inline void mavlink_msg_manual_setpoint_send_buf(mavlink_message_t *msgbu
  */
 static inline uint32_t mavlink_msg_manual_setpoint_get_time_boot_ms(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint32_t(msg,  0);
+    return _MAV_RETURN_uint32_t(msg,  0);
 }
 
 /**
@@ -285,7 +286,7 @@ static inline uint32_t mavlink_msg_manual_setpoint_get_time_boot_ms(const mavlin
  */
 static inline float mavlink_msg_manual_setpoint_get_roll(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  4);
+    return _MAV_RETURN_float(msg,  4);
 }
 
 /**
@@ -295,7 +296,7 @@ static inline float mavlink_msg_manual_setpoint_get_roll(const mavlink_message_t
  */
 static inline float mavlink_msg_manual_setpoint_get_pitch(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  8);
+    return _MAV_RETURN_float(msg,  8);
 }
 
 /**
@@ -305,7 +306,7 @@ static inline float mavlink_msg_manual_setpoint_get_pitch(const mavlink_message_
  */
 static inline float mavlink_msg_manual_setpoint_get_yaw(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  12);
+    return _MAV_RETURN_float(msg,  12);
 }
 
 /**
@@ -315,7 +316,7 @@ static inline float mavlink_msg_manual_setpoint_get_yaw(const mavlink_message_t*
  */
 static inline float mavlink_msg_manual_setpoint_get_thrust(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -325,7 +326,7 @@ static inline float mavlink_msg_manual_setpoint_get_thrust(const mavlink_message
  */
 static inline uint8_t mavlink_msg_manual_setpoint_get_mode_switch(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  20);
+    return _MAV_RETURN_uint8_t(msg,  20);
 }
 
 /**
@@ -335,7 +336,7 @@ static inline uint8_t mavlink_msg_manual_setpoint_get_mode_switch(const mavlink_
  */
 static inline uint8_t mavlink_msg_manual_setpoint_get_manual_override_switch(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  21);
+    return _MAV_RETURN_uint8_t(msg,  21);
 }
 
 /**
@@ -347,16 +348,16 @@ static inline uint8_t mavlink_msg_manual_setpoint_get_manual_override_switch(con
 static inline void mavlink_msg_manual_setpoint_decode(const mavlink_message_t* msg, mavlink_manual_setpoint_t* manual_setpoint)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	manual_setpoint->time_boot_ms = mavlink_msg_manual_setpoint_get_time_boot_ms(msg);
-	manual_setpoint->roll = mavlink_msg_manual_setpoint_get_roll(msg);
-	manual_setpoint->pitch = mavlink_msg_manual_setpoint_get_pitch(msg);
-	manual_setpoint->yaw = mavlink_msg_manual_setpoint_get_yaw(msg);
-	manual_setpoint->thrust = mavlink_msg_manual_setpoint_get_thrust(msg);
-	manual_setpoint->mode_switch = mavlink_msg_manual_setpoint_get_mode_switch(msg);
-	manual_setpoint->manual_override_switch = mavlink_msg_manual_setpoint_get_manual_override_switch(msg);
+    manual_setpoint->time_boot_ms = mavlink_msg_manual_setpoint_get_time_boot_ms(msg);
+    manual_setpoint->roll = mavlink_msg_manual_setpoint_get_roll(msg);
+    manual_setpoint->pitch = mavlink_msg_manual_setpoint_get_pitch(msg);
+    manual_setpoint->yaw = mavlink_msg_manual_setpoint_get_yaw(msg);
+    manual_setpoint->thrust = mavlink_msg_manual_setpoint_get_thrust(msg);
+    manual_setpoint->mode_switch = mavlink_msg_manual_setpoint_get_mode_switch(msg);
+    manual_setpoint->manual_override_switch = mavlink_msg_manual_setpoint_get_manual_override_switch(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN? msg->len : MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN;
         memset(manual_setpoint, 0, MAVLINK_MSG_ID_MANUAL_SETPOINT_LEN);
-	memcpy(manual_setpoint, _MAV_PAYLOAD(msg), len);
+    memcpy(manual_setpoint, _MAV_PAYLOAD(msg), len);
 #endif
 }

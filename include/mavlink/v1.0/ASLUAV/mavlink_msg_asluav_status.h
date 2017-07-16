@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE ASLUAV_STATUS PACKING
 
 #define MAVLINK_MSG_ID_ASLUAV_STATUS 205
@@ -22,10 +23,10 @@ typedef struct __mavlink_asluav_status_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_ASLUAV_STATUS { \
-	205, \
-	"ASLUAV_STATUS", \
-	4, \
-	{  { "Motor_rpm", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_asluav_status_t, Motor_rpm) }, \
+    205, \
+    "ASLUAV_STATUS", \
+    4, \
+    {  { "Motor_rpm", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_asluav_status_t, Motor_rpm) }, \
          { "LED_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_asluav_status_t, LED_status) }, \
          { "SATCOM_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_asluav_status_t, SATCOM_status) }, \
          { "Servo_status", NULL, MAVLINK_TYPE_UINT8_T, 8, 6, offsetof(mavlink_asluav_status_t, Servo_status) }, \
@@ -33,9 +34,9 @@ typedef struct __mavlink_asluav_status_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_ASLUAV_STATUS { \
-	"ASLUAV_STATUS", \
-	4, \
-	{  { "Motor_rpm", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_asluav_status_t, Motor_rpm) }, \
+    "ASLUAV_STATUS", \
+    4, \
+    {  { "Motor_rpm", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_asluav_status_t, Motor_rpm) }, \
          { "LED_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_asluav_status_t, LED_status) }, \
          { "SATCOM_status", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_asluav_status_t, SATCOM_status) }, \
          { "Servo_status", NULL, MAVLINK_TYPE_UINT8_T, 8, 6, offsetof(mavlink_asluav_status_t, Servo_status) }, \
@@ -56,25 +57,25 @@ typedef struct __mavlink_asluav_status_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_asluav_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t LED_status, uint8_t SATCOM_status, const uint8_t *Servo_status, float Motor_rpm)
+                               uint8_t LED_status, uint8_t SATCOM_status, const uint8_t *Servo_status, float Motor_rpm)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ASLUAV_STATUS_LEN];
-	_mav_put_float(buf, 0, Motor_rpm);
-	_mav_put_uint8_t(buf, 4, LED_status);
-	_mav_put_uint8_t(buf, 5, SATCOM_status);
-	_mav_put_uint8_t_array(buf, 6, Servo_status, 8);
+    char buf[MAVLINK_MSG_ID_ASLUAV_STATUS_LEN];
+    _mav_put_float(buf, 0, Motor_rpm);
+    _mav_put_uint8_t(buf, 4, LED_status);
+    _mav_put_uint8_t(buf, 5, SATCOM_status);
+    _mav_put_uint8_t_array(buf, 6, Servo_status, 8);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN);
 #else
-	mavlink_asluav_status_t packet;
-	packet.Motor_rpm = Motor_rpm;
-	packet.LED_status = LED_status;
-	packet.SATCOM_status = SATCOM_status;
-	mav_array_memcpy(packet.Servo_status, Servo_status, sizeof(uint8_t)*8);
+    mavlink_asluav_status_t packet;
+    packet.Motor_rpm = Motor_rpm;
+    packet.LED_status = LED_status;
+    packet.SATCOM_status = SATCOM_status;
+    mav_array_memcpy(packet.Servo_status, Servo_status, sizeof(uint8_t)*8);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_ASLUAV_STATUS;
+    msg->msgid = MAVLINK_MSG_ID_ASLUAV_STATUS;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASLUAV_STATUS_MIN_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_CRC);
 }
 
@@ -91,26 +92,26 @@ static inline uint16_t mavlink_msg_asluav_status_pack(uint8_t system_id, uint8_t
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_asluav_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t LED_status,uint8_t SATCOM_status,const uint8_t *Servo_status,float Motor_rpm)
+                               mavlink_message_t* msg,
+                                   uint8_t LED_status,uint8_t SATCOM_status,const uint8_t *Servo_status,float Motor_rpm)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ASLUAV_STATUS_LEN];
-	_mav_put_float(buf, 0, Motor_rpm);
-	_mav_put_uint8_t(buf, 4, LED_status);
-	_mav_put_uint8_t(buf, 5, SATCOM_status);
-	_mav_put_uint8_t_array(buf, 6, Servo_status, 8);
+    char buf[MAVLINK_MSG_ID_ASLUAV_STATUS_LEN];
+    _mav_put_float(buf, 0, Motor_rpm);
+    _mav_put_uint8_t(buf, 4, LED_status);
+    _mav_put_uint8_t(buf, 5, SATCOM_status);
+    _mav_put_uint8_t_array(buf, 6, Servo_status, 8);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN);
 #else
-	mavlink_asluav_status_t packet;
-	packet.Motor_rpm = Motor_rpm;
-	packet.LED_status = LED_status;
-	packet.SATCOM_status = SATCOM_status;
-	mav_array_memcpy(packet.Servo_status, Servo_status, sizeof(uint8_t)*8);
+    mavlink_asluav_status_t packet;
+    packet.Motor_rpm = Motor_rpm;
+    packet.LED_status = LED_status;
+    packet.SATCOM_status = SATCOM_status;
+    mav_array_memcpy(packet.Servo_status, Servo_status, sizeof(uint8_t)*8);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_ASLUAV_STATUS;
+    msg->msgid = MAVLINK_MSG_ID_ASLUAV_STATUS;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ASLUAV_STATUS_MIN_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_CRC);
 }
 
@@ -124,7 +125,7 @@ static inline uint16_t mavlink_msg_asluav_status_pack_chan(uint8_t system_id, ui
  */
 static inline uint16_t mavlink_msg_asluav_status_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_asluav_status_t* asluav_status)
 {
-	return mavlink_msg_asluav_status_pack(system_id, component_id, msg, asluav_status->LED_status, asluav_status->SATCOM_status, asluav_status->Servo_status, asluav_status->Motor_rpm);
+    return mavlink_msg_asluav_status_pack(system_id, component_id, msg, asluav_status->LED_status, asluav_status->SATCOM_status, asluav_status->Servo_status, asluav_status->Motor_rpm);
 }
 
 /**
@@ -138,7 +139,7 @@ static inline uint16_t mavlink_msg_asluav_status_encode(uint8_t system_id, uint8
  */
 static inline uint16_t mavlink_msg_asluav_status_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_asluav_status_t* asluav_status)
 {
-	return mavlink_msg_asluav_status_pack_chan(system_id, component_id, chan, msg, asluav_status->LED_status, asluav_status->SATCOM_status, asluav_status->Servo_status, asluav_status->Motor_rpm);
+    return mavlink_msg_asluav_status_pack_chan(system_id, component_id, chan, msg, asluav_status->LED_status, asluav_status->SATCOM_status, asluav_status->Servo_status, asluav_status->Motor_rpm);
 }
 
 /**
@@ -155,18 +156,18 @@ static inline uint16_t mavlink_msg_asluav_status_encode_chan(uint8_t system_id, 
 static inline void mavlink_msg_asluav_status_send(mavlink_channel_t chan, uint8_t LED_status, uint8_t SATCOM_status, const uint8_t *Servo_status, float Motor_rpm)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ASLUAV_STATUS_LEN];
-	_mav_put_float(buf, 0, Motor_rpm);
-	_mav_put_uint8_t(buf, 4, LED_status);
-	_mav_put_uint8_t(buf, 5, SATCOM_status);
-	_mav_put_uint8_t_array(buf, 6, Servo_status, 8);
+    char buf[MAVLINK_MSG_ID_ASLUAV_STATUS_LEN];
+    _mav_put_float(buf, 0, Motor_rpm);
+    _mav_put_uint8_t(buf, 4, LED_status);
+    _mav_put_uint8_t(buf, 5, SATCOM_status);
+    _mav_put_uint8_t_array(buf, 6, Servo_status, 8);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLUAV_STATUS, buf, MAVLINK_MSG_ID_ASLUAV_STATUS_MIN_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_CRC);
 #else
-	mavlink_asluav_status_t packet;
-	packet.Motor_rpm = Motor_rpm;
-	packet.LED_status = LED_status;
-	packet.SATCOM_status = SATCOM_status;
-	mav_array_memcpy(packet.Servo_status, Servo_status, sizeof(uint8_t)*8);
+    mavlink_asluav_status_t packet;
+    packet.Motor_rpm = Motor_rpm;
+    packet.LED_status = LED_status;
+    packet.SATCOM_status = SATCOM_status;
+    mav_array_memcpy(packet.Servo_status, Servo_status, sizeof(uint8_t)*8);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLUAV_STATUS, (const char *)&packet, MAVLINK_MSG_ID_ASLUAV_STATUS_MIN_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_CRC);
 #endif
 }
@@ -196,18 +197,18 @@ static inline void mavlink_msg_asluav_status_send_struct(mavlink_channel_t chan,
 static inline void mavlink_msg_asluav_status_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t LED_status, uint8_t SATCOM_status, const uint8_t *Servo_status, float Motor_rpm)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_float(buf, 0, Motor_rpm);
-	_mav_put_uint8_t(buf, 4, LED_status);
-	_mav_put_uint8_t(buf, 5, SATCOM_status);
-	_mav_put_uint8_t_array(buf, 6, Servo_status, 8);
+    char *buf = (char *)msgbuf;
+    _mav_put_float(buf, 0, Motor_rpm);
+    _mav_put_uint8_t(buf, 4, LED_status);
+    _mav_put_uint8_t(buf, 5, SATCOM_status);
+    _mav_put_uint8_t_array(buf, 6, Servo_status, 8);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLUAV_STATUS, buf, MAVLINK_MSG_ID_ASLUAV_STATUS_MIN_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_CRC);
 #else
-	mavlink_asluav_status_t *packet = (mavlink_asluav_status_t *)msgbuf;
-	packet->Motor_rpm = Motor_rpm;
-	packet->LED_status = LED_status;
-	packet->SATCOM_status = SATCOM_status;
-	mav_array_memcpy(packet->Servo_status, Servo_status, sizeof(uint8_t)*8);
+    mavlink_asluav_status_t *packet = (mavlink_asluav_status_t *)msgbuf;
+    packet->Motor_rpm = Motor_rpm;
+    packet->LED_status = LED_status;
+    packet->SATCOM_status = SATCOM_status;
+    mav_array_memcpy(packet->Servo_status, Servo_status, sizeof(uint8_t)*8);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASLUAV_STATUS, (const char *)packet, MAVLINK_MSG_ID_ASLUAV_STATUS_MIN_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN, MAVLINK_MSG_ID_ASLUAV_STATUS_CRC);
 #endif
 }
@@ -225,7 +226,7 @@ static inline void mavlink_msg_asluav_status_send_buf(mavlink_message_t *msgbuf,
  */
 static inline uint8_t mavlink_msg_asluav_status_get_LED_status(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  4);
+    return _MAV_RETURN_uint8_t(msg,  4);
 }
 
 /**
@@ -235,7 +236,7 @@ static inline uint8_t mavlink_msg_asluav_status_get_LED_status(const mavlink_mes
  */
 static inline uint8_t mavlink_msg_asluav_status_get_SATCOM_status(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  5);
+    return _MAV_RETURN_uint8_t(msg,  5);
 }
 
 /**
@@ -245,7 +246,7 @@ static inline uint8_t mavlink_msg_asluav_status_get_SATCOM_status(const mavlink_
  */
 static inline uint16_t mavlink_msg_asluav_status_get_Servo_status(const mavlink_message_t* msg, uint8_t *Servo_status)
 {
-	return _MAV_RETURN_uint8_t_array(msg, Servo_status, 8,  6);
+    return _MAV_RETURN_uint8_t_array(msg, Servo_status, 8,  6);
 }
 
 /**
@@ -255,7 +256,7 @@ static inline uint16_t mavlink_msg_asluav_status_get_Servo_status(const mavlink_
  */
 static inline float mavlink_msg_asluav_status_get_Motor_rpm(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  0);
+    return _MAV_RETURN_float(msg,  0);
 }
 
 /**
@@ -267,13 +268,13 @@ static inline float mavlink_msg_asluav_status_get_Motor_rpm(const mavlink_messag
 static inline void mavlink_msg_asluav_status_decode(const mavlink_message_t* msg, mavlink_asluav_status_t* asluav_status)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	asluav_status->Motor_rpm = mavlink_msg_asluav_status_get_Motor_rpm(msg);
-	asluav_status->LED_status = mavlink_msg_asluav_status_get_LED_status(msg);
-	asluav_status->SATCOM_status = mavlink_msg_asluav_status_get_SATCOM_status(msg);
-	mavlink_msg_asluav_status_get_Servo_status(msg, asluav_status->Servo_status);
+    asluav_status->Motor_rpm = mavlink_msg_asluav_status_get_Motor_rpm(msg);
+    asluav_status->LED_status = mavlink_msg_asluav_status_get_LED_status(msg);
+    asluav_status->SATCOM_status = mavlink_msg_asluav_status_get_SATCOM_status(msg);
+    mavlink_msg_asluav_status_get_Servo_status(msg, asluav_status->Servo_status);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_ASLUAV_STATUS_LEN? msg->len : MAVLINK_MSG_ID_ASLUAV_STATUS_LEN;
         memset(asluav_status, 0, MAVLINK_MSG_ID_ASLUAV_STATUS_LEN);
-	memcpy(asluav_status, _MAV_PAYLOAD(msg), len);
+    memcpy(asluav_status, _MAV_PAYLOAD(msg), len);
 #endif
 }

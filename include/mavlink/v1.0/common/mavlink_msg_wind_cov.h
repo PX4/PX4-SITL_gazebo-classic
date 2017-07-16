@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE WIND_COV PACKING
 
 #define MAVLINK_MSG_ID_WIND_COV 231
@@ -27,10 +28,10 @@ typedef struct __mavlink_wind_cov_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_WIND_COV { \
-	231, \
-	"WIND_COV", \
-	9, \
-	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_wind_cov_t, time_usec) }, \
+    231, \
+    "WIND_COV", \
+    9, \
+    {  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_wind_cov_t, time_usec) }, \
          { "wind_x", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_wind_cov_t, wind_x) }, \
          { "wind_y", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_wind_cov_t, wind_y) }, \
          { "wind_z", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_wind_cov_t, wind_z) }, \
@@ -43,9 +44,9 @@ typedef struct __mavlink_wind_cov_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_WIND_COV { \
-	"WIND_COV", \
-	9, \
-	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_wind_cov_t, time_usec) }, \
+    "WIND_COV", \
+    9, \
+    {  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_wind_cov_t, time_usec) }, \
          { "wind_x", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_wind_cov_t, wind_x) }, \
          { "wind_y", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_wind_cov_t, wind_y) }, \
          { "wind_z", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_wind_cov_t, wind_z) }, \
@@ -76,37 +77,37 @@ typedef struct __mavlink_wind_cov_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_wind_cov_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint64_t time_usec, float wind_x, float wind_y, float wind_z, float var_horiz, float var_vert, float wind_alt, float horiz_accuracy, float vert_accuracy)
+                               uint64_t time_usec, float wind_x, float wind_y, float wind_z, float var_horiz, float var_vert, float wind_alt, float horiz_accuracy, float vert_accuracy)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_WIND_COV_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, wind_x);
-	_mav_put_float(buf, 12, wind_y);
-	_mav_put_float(buf, 16, wind_z);
-	_mav_put_float(buf, 20, var_horiz);
-	_mav_put_float(buf, 24, var_vert);
-	_mav_put_float(buf, 28, wind_alt);
-	_mav_put_float(buf, 32, horiz_accuracy);
-	_mav_put_float(buf, 36, vert_accuracy);
+    char buf[MAVLINK_MSG_ID_WIND_COV_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, wind_x);
+    _mav_put_float(buf, 12, wind_y);
+    _mav_put_float(buf, 16, wind_z);
+    _mav_put_float(buf, 20, var_horiz);
+    _mav_put_float(buf, 24, var_vert);
+    _mav_put_float(buf, 28, wind_alt);
+    _mav_put_float(buf, 32, horiz_accuracy);
+    _mav_put_float(buf, 36, vert_accuracy);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_WIND_COV_LEN);
 #else
-	mavlink_wind_cov_t packet;
-	packet.time_usec = time_usec;
-	packet.wind_x = wind_x;
-	packet.wind_y = wind_y;
-	packet.wind_z = wind_z;
-	packet.var_horiz = var_horiz;
-	packet.var_vert = var_vert;
-	packet.wind_alt = wind_alt;
-	packet.horiz_accuracy = horiz_accuracy;
-	packet.vert_accuracy = vert_accuracy;
+    mavlink_wind_cov_t packet;
+    packet.time_usec = time_usec;
+    packet.wind_x = wind_x;
+    packet.wind_y = wind_y;
+    packet.wind_z = wind_z;
+    packet.var_horiz = var_horiz;
+    packet.var_vert = var_vert;
+    packet.wind_alt = wind_alt;
+    packet.horiz_accuracy = horiz_accuracy;
+    packet.vert_accuracy = vert_accuracy;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_WIND_COV_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_WIND_COV;
+    msg->msgid = MAVLINK_MSG_ID_WIND_COV;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_WIND_COV_MIN_LEN, MAVLINK_MSG_ID_WIND_COV_LEN, MAVLINK_MSG_ID_WIND_COV_CRC);
 }
 
@@ -128,38 +129,38 @@ static inline uint16_t mavlink_msg_wind_cov_pack(uint8_t system_id, uint8_t comp
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_wind_cov_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint64_t time_usec,float wind_x,float wind_y,float wind_z,float var_horiz,float var_vert,float wind_alt,float horiz_accuracy,float vert_accuracy)
+                               mavlink_message_t* msg,
+                                   uint64_t time_usec,float wind_x,float wind_y,float wind_z,float var_horiz,float var_vert,float wind_alt,float horiz_accuracy,float vert_accuracy)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_WIND_COV_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, wind_x);
-	_mav_put_float(buf, 12, wind_y);
-	_mav_put_float(buf, 16, wind_z);
-	_mav_put_float(buf, 20, var_horiz);
-	_mav_put_float(buf, 24, var_vert);
-	_mav_put_float(buf, 28, wind_alt);
-	_mav_put_float(buf, 32, horiz_accuracy);
-	_mav_put_float(buf, 36, vert_accuracy);
+    char buf[MAVLINK_MSG_ID_WIND_COV_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, wind_x);
+    _mav_put_float(buf, 12, wind_y);
+    _mav_put_float(buf, 16, wind_z);
+    _mav_put_float(buf, 20, var_horiz);
+    _mav_put_float(buf, 24, var_vert);
+    _mav_put_float(buf, 28, wind_alt);
+    _mav_put_float(buf, 32, horiz_accuracy);
+    _mav_put_float(buf, 36, vert_accuracy);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_WIND_COV_LEN);
 #else
-	mavlink_wind_cov_t packet;
-	packet.time_usec = time_usec;
-	packet.wind_x = wind_x;
-	packet.wind_y = wind_y;
-	packet.wind_z = wind_z;
-	packet.var_horiz = var_horiz;
-	packet.var_vert = var_vert;
-	packet.wind_alt = wind_alt;
-	packet.horiz_accuracy = horiz_accuracy;
-	packet.vert_accuracy = vert_accuracy;
+    mavlink_wind_cov_t packet;
+    packet.time_usec = time_usec;
+    packet.wind_x = wind_x;
+    packet.wind_y = wind_y;
+    packet.wind_z = wind_z;
+    packet.var_horiz = var_horiz;
+    packet.var_vert = var_vert;
+    packet.wind_alt = wind_alt;
+    packet.horiz_accuracy = horiz_accuracy;
+    packet.vert_accuracy = vert_accuracy;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_WIND_COV_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_WIND_COV;
+    msg->msgid = MAVLINK_MSG_ID_WIND_COV;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_WIND_COV_MIN_LEN, MAVLINK_MSG_ID_WIND_COV_LEN, MAVLINK_MSG_ID_WIND_COV_CRC);
 }
 
@@ -173,7 +174,7 @@ static inline uint16_t mavlink_msg_wind_cov_pack_chan(uint8_t system_id, uint8_t
  */
 static inline uint16_t mavlink_msg_wind_cov_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_wind_cov_t* wind_cov)
 {
-	return mavlink_msg_wind_cov_pack(system_id, component_id, msg, wind_cov->time_usec, wind_cov->wind_x, wind_cov->wind_y, wind_cov->wind_z, wind_cov->var_horiz, wind_cov->var_vert, wind_cov->wind_alt, wind_cov->horiz_accuracy, wind_cov->vert_accuracy);
+    return mavlink_msg_wind_cov_pack(system_id, component_id, msg, wind_cov->time_usec, wind_cov->wind_x, wind_cov->wind_y, wind_cov->wind_z, wind_cov->var_horiz, wind_cov->var_vert, wind_cov->wind_alt, wind_cov->horiz_accuracy, wind_cov->vert_accuracy);
 }
 
 /**
@@ -187,7 +188,7 @@ static inline uint16_t mavlink_msg_wind_cov_encode(uint8_t system_id, uint8_t co
  */
 static inline uint16_t mavlink_msg_wind_cov_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_wind_cov_t* wind_cov)
 {
-	return mavlink_msg_wind_cov_pack_chan(system_id, component_id, chan, msg, wind_cov->time_usec, wind_cov->wind_x, wind_cov->wind_y, wind_cov->wind_z, wind_cov->var_horiz, wind_cov->var_vert, wind_cov->wind_alt, wind_cov->horiz_accuracy, wind_cov->vert_accuracy);
+    return mavlink_msg_wind_cov_pack_chan(system_id, component_id, chan, msg, wind_cov->time_usec, wind_cov->wind_x, wind_cov->wind_y, wind_cov->wind_z, wind_cov->var_horiz, wind_cov->var_vert, wind_cov->wind_alt, wind_cov->horiz_accuracy, wind_cov->vert_accuracy);
 }
 
 /**
@@ -209,29 +210,29 @@ static inline uint16_t mavlink_msg_wind_cov_encode_chan(uint8_t system_id, uint8
 static inline void mavlink_msg_wind_cov_send(mavlink_channel_t chan, uint64_t time_usec, float wind_x, float wind_y, float wind_z, float var_horiz, float var_vert, float wind_alt, float horiz_accuracy, float vert_accuracy)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_WIND_COV_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, wind_x);
-	_mav_put_float(buf, 12, wind_y);
-	_mav_put_float(buf, 16, wind_z);
-	_mav_put_float(buf, 20, var_horiz);
-	_mav_put_float(buf, 24, var_vert);
-	_mav_put_float(buf, 28, wind_alt);
-	_mav_put_float(buf, 32, horiz_accuracy);
-	_mav_put_float(buf, 36, vert_accuracy);
+    char buf[MAVLINK_MSG_ID_WIND_COV_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, wind_x);
+    _mav_put_float(buf, 12, wind_y);
+    _mav_put_float(buf, 16, wind_z);
+    _mav_put_float(buf, 20, var_horiz);
+    _mav_put_float(buf, 24, var_vert);
+    _mav_put_float(buf, 28, wind_alt);
+    _mav_put_float(buf, 32, horiz_accuracy);
+    _mav_put_float(buf, 36, vert_accuracy);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_WIND_COV, buf, MAVLINK_MSG_ID_WIND_COV_MIN_LEN, MAVLINK_MSG_ID_WIND_COV_LEN, MAVLINK_MSG_ID_WIND_COV_CRC);
 #else
-	mavlink_wind_cov_t packet;
-	packet.time_usec = time_usec;
-	packet.wind_x = wind_x;
-	packet.wind_y = wind_y;
-	packet.wind_z = wind_z;
-	packet.var_horiz = var_horiz;
-	packet.var_vert = var_vert;
-	packet.wind_alt = wind_alt;
-	packet.horiz_accuracy = horiz_accuracy;
-	packet.vert_accuracy = vert_accuracy;
+    mavlink_wind_cov_t packet;
+    packet.time_usec = time_usec;
+    packet.wind_x = wind_x;
+    packet.wind_y = wind_y;
+    packet.wind_z = wind_z;
+    packet.var_horiz = var_horiz;
+    packet.var_vert = var_vert;
+    packet.wind_alt = wind_alt;
+    packet.horiz_accuracy = horiz_accuracy;
+    packet.vert_accuracy = vert_accuracy;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_WIND_COV, (const char *)&packet, MAVLINK_MSG_ID_WIND_COV_MIN_LEN, MAVLINK_MSG_ID_WIND_COV_LEN, MAVLINK_MSG_ID_WIND_COV_CRC);
 #endif
@@ -262,29 +263,29 @@ static inline void mavlink_msg_wind_cov_send_struct(mavlink_channel_t chan, cons
 static inline void mavlink_msg_wind_cov_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint64_t time_usec, float wind_x, float wind_y, float wind_z, float var_horiz, float var_vert, float wind_alt, float horiz_accuracy, float vert_accuracy)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, wind_x);
-	_mav_put_float(buf, 12, wind_y);
-	_mav_put_float(buf, 16, wind_z);
-	_mav_put_float(buf, 20, var_horiz);
-	_mav_put_float(buf, 24, var_vert);
-	_mav_put_float(buf, 28, wind_alt);
-	_mav_put_float(buf, 32, horiz_accuracy);
-	_mav_put_float(buf, 36, vert_accuracy);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, wind_x);
+    _mav_put_float(buf, 12, wind_y);
+    _mav_put_float(buf, 16, wind_z);
+    _mav_put_float(buf, 20, var_horiz);
+    _mav_put_float(buf, 24, var_vert);
+    _mav_put_float(buf, 28, wind_alt);
+    _mav_put_float(buf, 32, horiz_accuracy);
+    _mav_put_float(buf, 36, vert_accuracy);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_WIND_COV, buf, MAVLINK_MSG_ID_WIND_COV_MIN_LEN, MAVLINK_MSG_ID_WIND_COV_LEN, MAVLINK_MSG_ID_WIND_COV_CRC);
 #else
-	mavlink_wind_cov_t *packet = (mavlink_wind_cov_t *)msgbuf;
-	packet->time_usec = time_usec;
-	packet->wind_x = wind_x;
-	packet->wind_y = wind_y;
-	packet->wind_z = wind_z;
-	packet->var_horiz = var_horiz;
-	packet->var_vert = var_vert;
-	packet->wind_alt = wind_alt;
-	packet->horiz_accuracy = horiz_accuracy;
-	packet->vert_accuracy = vert_accuracy;
+    mavlink_wind_cov_t *packet = (mavlink_wind_cov_t *)msgbuf;
+    packet->time_usec = time_usec;
+    packet->wind_x = wind_x;
+    packet->wind_y = wind_y;
+    packet->wind_z = wind_z;
+    packet->var_horiz = var_horiz;
+    packet->var_vert = var_vert;
+    packet->wind_alt = wind_alt;
+    packet->horiz_accuracy = horiz_accuracy;
+    packet->vert_accuracy = vert_accuracy;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_WIND_COV, (const char *)packet, MAVLINK_MSG_ID_WIND_COV_MIN_LEN, MAVLINK_MSG_ID_WIND_COV_LEN, MAVLINK_MSG_ID_WIND_COV_CRC);
 #endif
@@ -303,7 +304,7 @@ static inline void mavlink_msg_wind_cov_send_buf(mavlink_message_t *msgbuf, mavl
  */
 static inline uint64_t mavlink_msg_wind_cov_get_time_usec(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  0);
+    return _MAV_RETURN_uint64_t(msg,  0);
 }
 
 /**
@@ -313,7 +314,7 @@ static inline uint64_t mavlink_msg_wind_cov_get_time_usec(const mavlink_message_
  */
 static inline float mavlink_msg_wind_cov_get_wind_x(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  8);
+    return _MAV_RETURN_float(msg,  8);
 }
 
 /**
@@ -323,7 +324,7 @@ static inline float mavlink_msg_wind_cov_get_wind_x(const mavlink_message_t* msg
  */
 static inline float mavlink_msg_wind_cov_get_wind_y(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  12);
+    return _MAV_RETURN_float(msg,  12);
 }
 
 /**
@@ -333,7 +334,7 @@ static inline float mavlink_msg_wind_cov_get_wind_y(const mavlink_message_t* msg
  */
 static inline float mavlink_msg_wind_cov_get_wind_z(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -343,7 +344,7 @@ static inline float mavlink_msg_wind_cov_get_wind_z(const mavlink_message_t* msg
  */
 static inline float mavlink_msg_wind_cov_get_var_horiz(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  20);
+    return _MAV_RETURN_float(msg,  20);
 }
 
 /**
@@ -353,7 +354,7 @@ static inline float mavlink_msg_wind_cov_get_var_horiz(const mavlink_message_t* 
  */
 static inline float mavlink_msg_wind_cov_get_var_vert(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  24);
+    return _MAV_RETURN_float(msg,  24);
 }
 
 /**
@@ -363,7 +364,7 @@ static inline float mavlink_msg_wind_cov_get_var_vert(const mavlink_message_t* m
  */
 static inline float mavlink_msg_wind_cov_get_wind_alt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  28);
+    return _MAV_RETURN_float(msg,  28);
 }
 
 /**
@@ -373,7 +374,7 @@ static inline float mavlink_msg_wind_cov_get_wind_alt(const mavlink_message_t* m
  */
 static inline float mavlink_msg_wind_cov_get_horiz_accuracy(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  32);
+    return _MAV_RETURN_float(msg,  32);
 }
 
 /**
@@ -383,7 +384,7 @@ static inline float mavlink_msg_wind_cov_get_horiz_accuracy(const mavlink_messag
  */
 static inline float mavlink_msg_wind_cov_get_vert_accuracy(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  36);
+    return _MAV_RETURN_float(msg,  36);
 }
 
 /**
@@ -395,18 +396,18 @@ static inline float mavlink_msg_wind_cov_get_vert_accuracy(const mavlink_message
 static inline void mavlink_msg_wind_cov_decode(const mavlink_message_t* msg, mavlink_wind_cov_t* wind_cov)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	wind_cov->time_usec = mavlink_msg_wind_cov_get_time_usec(msg);
-	wind_cov->wind_x = mavlink_msg_wind_cov_get_wind_x(msg);
-	wind_cov->wind_y = mavlink_msg_wind_cov_get_wind_y(msg);
-	wind_cov->wind_z = mavlink_msg_wind_cov_get_wind_z(msg);
-	wind_cov->var_horiz = mavlink_msg_wind_cov_get_var_horiz(msg);
-	wind_cov->var_vert = mavlink_msg_wind_cov_get_var_vert(msg);
-	wind_cov->wind_alt = mavlink_msg_wind_cov_get_wind_alt(msg);
-	wind_cov->horiz_accuracy = mavlink_msg_wind_cov_get_horiz_accuracy(msg);
-	wind_cov->vert_accuracy = mavlink_msg_wind_cov_get_vert_accuracy(msg);
+    wind_cov->time_usec = mavlink_msg_wind_cov_get_time_usec(msg);
+    wind_cov->wind_x = mavlink_msg_wind_cov_get_wind_x(msg);
+    wind_cov->wind_y = mavlink_msg_wind_cov_get_wind_y(msg);
+    wind_cov->wind_z = mavlink_msg_wind_cov_get_wind_z(msg);
+    wind_cov->var_horiz = mavlink_msg_wind_cov_get_var_horiz(msg);
+    wind_cov->var_vert = mavlink_msg_wind_cov_get_var_vert(msg);
+    wind_cov->wind_alt = mavlink_msg_wind_cov_get_wind_alt(msg);
+    wind_cov->horiz_accuracy = mavlink_msg_wind_cov_get_horiz_accuracy(msg);
+    wind_cov->vert_accuracy = mavlink_msg_wind_cov_get_vert_accuracy(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_WIND_COV_LEN? msg->len : MAVLINK_MSG_ID_WIND_COV_LEN;
         memset(wind_cov, 0, MAVLINK_MSG_ID_WIND_COV_LEN);
-	memcpy(wind_cov, _MAV_PAYLOAD(msg), len);
+    memcpy(wind_cov, _MAV_PAYLOAD(msg), len);
 #endif
 }

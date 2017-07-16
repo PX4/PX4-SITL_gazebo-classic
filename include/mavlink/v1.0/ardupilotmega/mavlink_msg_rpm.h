@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE RPM PACKING
 
 #define MAVLINK_MSG_ID_RPM 226
@@ -20,18 +21,18 @@ typedef struct __mavlink_rpm_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_RPM { \
-	226, \
-	"RPM", \
-	2, \
-	{  { "rpm1", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_rpm_t, rpm1) }, \
+    226, \
+    "RPM", \
+    2, \
+    {  { "rpm1", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_rpm_t, rpm1) }, \
          { "rpm2", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_rpm_t, rpm2) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_RPM { \
-	"RPM", \
-	2, \
-	{  { "rpm1", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_rpm_t, rpm1) }, \
+    "RPM", \
+    2, \
+    {  { "rpm1", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_rpm_t, rpm1) }, \
          { "rpm2", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_rpm_t, rpm2) }, \
          } \
 }
@@ -48,23 +49,23 @@ typedef struct __mavlink_rpm_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_rpm_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       float rpm1, float rpm2)
+                               float rpm1, float rpm2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_RPM_LEN];
-	_mav_put_float(buf, 0, rpm1);
-	_mav_put_float(buf, 4, rpm2);
+    char buf[MAVLINK_MSG_ID_RPM_LEN];
+    _mav_put_float(buf, 0, rpm1);
+    _mav_put_float(buf, 4, rpm2);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_RPM_LEN);
 #else
-	mavlink_rpm_t packet;
-	packet.rpm1 = rpm1;
-	packet.rpm2 = rpm2;
+    mavlink_rpm_t packet;
+    packet.rpm1 = rpm1;
+    packet.rpm2 = rpm2;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_RPM_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_RPM;
+    msg->msgid = MAVLINK_MSG_ID_RPM;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_RPM_MIN_LEN, MAVLINK_MSG_ID_RPM_LEN, MAVLINK_MSG_ID_RPM_CRC);
 }
 
@@ -79,24 +80,24 @@ static inline uint16_t mavlink_msg_rpm_pack(uint8_t system_id, uint8_t component
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_rpm_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           float rpm1,float rpm2)
+                               mavlink_message_t* msg,
+                                   float rpm1,float rpm2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_RPM_LEN];
-	_mav_put_float(buf, 0, rpm1);
-	_mav_put_float(buf, 4, rpm2);
+    char buf[MAVLINK_MSG_ID_RPM_LEN];
+    _mav_put_float(buf, 0, rpm1);
+    _mav_put_float(buf, 4, rpm2);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_RPM_LEN);
 #else
-	mavlink_rpm_t packet;
-	packet.rpm1 = rpm1;
-	packet.rpm2 = rpm2;
+    mavlink_rpm_t packet;
+    packet.rpm1 = rpm1;
+    packet.rpm2 = rpm2;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_RPM_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_RPM;
+    msg->msgid = MAVLINK_MSG_ID_RPM;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_RPM_MIN_LEN, MAVLINK_MSG_ID_RPM_LEN, MAVLINK_MSG_ID_RPM_CRC);
 }
 
@@ -110,7 +111,7 @@ static inline uint16_t mavlink_msg_rpm_pack_chan(uint8_t system_id, uint8_t comp
  */
 static inline uint16_t mavlink_msg_rpm_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_rpm_t* rpm)
 {
-	return mavlink_msg_rpm_pack(system_id, component_id, msg, rpm->rpm1, rpm->rpm2);
+    return mavlink_msg_rpm_pack(system_id, component_id, msg, rpm->rpm1, rpm->rpm2);
 }
 
 /**
@@ -124,7 +125,7 @@ static inline uint16_t mavlink_msg_rpm_encode(uint8_t system_id, uint8_t compone
  */
 static inline uint16_t mavlink_msg_rpm_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_rpm_t* rpm)
 {
-	return mavlink_msg_rpm_pack_chan(system_id, component_id, chan, msg, rpm->rpm1, rpm->rpm2);
+    return mavlink_msg_rpm_pack_chan(system_id, component_id, chan, msg, rpm->rpm1, rpm->rpm2);
 }
 
 /**
@@ -139,15 +140,15 @@ static inline uint16_t mavlink_msg_rpm_encode_chan(uint8_t system_id, uint8_t co
 static inline void mavlink_msg_rpm_send(mavlink_channel_t chan, float rpm1, float rpm2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_RPM_LEN];
-	_mav_put_float(buf, 0, rpm1);
-	_mav_put_float(buf, 4, rpm2);
+    char buf[MAVLINK_MSG_ID_RPM_LEN];
+    _mav_put_float(buf, 0, rpm1);
+    _mav_put_float(buf, 4, rpm2);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RPM, buf, MAVLINK_MSG_ID_RPM_MIN_LEN, MAVLINK_MSG_ID_RPM_LEN, MAVLINK_MSG_ID_RPM_CRC);
 #else
-	mavlink_rpm_t packet;
-	packet.rpm1 = rpm1;
-	packet.rpm2 = rpm2;
+    mavlink_rpm_t packet;
+    packet.rpm1 = rpm1;
+    packet.rpm2 = rpm2;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RPM, (const char *)&packet, MAVLINK_MSG_ID_RPM_MIN_LEN, MAVLINK_MSG_ID_RPM_LEN, MAVLINK_MSG_ID_RPM_CRC);
 #endif
@@ -178,15 +179,15 @@ static inline void mavlink_msg_rpm_send_struct(mavlink_channel_t chan, const mav
 static inline void mavlink_msg_rpm_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float rpm1, float rpm2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_float(buf, 0, rpm1);
-	_mav_put_float(buf, 4, rpm2);
+    char *buf = (char *)msgbuf;
+    _mav_put_float(buf, 0, rpm1);
+    _mav_put_float(buf, 4, rpm2);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RPM, buf, MAVLINK_MSG_ID_RPM_MIN_LEN, MAVLINK_MSG_ID_RPM_LEN, MAVLINK_MSG_ID_RPM_CRC);
 #else
-	mavlink_rpm_t *packet = (mavlink_rpm_t *)msgbuf;
-	packet->rpm1 = rpm1;
-	packet->rpm2 = rpm2;
+    mavlink_rpm_t *packet = (mavlink_rpm_t *)msgbuf;
+    packet->rpm1 = rpm1;
+    packet->rpm2 = rpm2;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_RPM, (const char *)packet, MAVLINK_MSG_ID_RPM_MIN_LEN, MAVLINK_MSG_ID_RPM_LEN, MAVLINK_MSG_ID_RPM_CRC);
 #endif
@@ -205,7 +206,7 @@ static inline void mavlink_msg_rpm_send_buf(mavlink_message_t *msgbuf, mavlink_c
  */
 static inline float mavlink_msg_rpm_get_rpm1(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  0);
+    return _MAV_RETURN_float(msg,  0);
 }
 
 /**
@@ -215,7 +216,7 @@ static inline float mavlink_msg_rpm_get_rpm1(const mavlink_message_t* msg)
  */
 static inline float mavlink_msg_rpm_get_rpm2(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  4);
+    return _MAV_RETURN_float(msg,  4);
 }
 
 /**
@@ -227,11 +228,11 @@ static inline float mavlink_msg_rpm_get_rpm2(const mavlink_message_t* msg)
 static inline void mavlink_msg_rpm_decode(const mavlink_message_t* msg, mavlink_rpm_t* rpm)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	rpm->rpm1 = mavlink_msg_rpm_get_rpm1(msg);
-	rpm->rpm2 = mavlink_msg_rpm_get_rpm2(msg);
+    rpm->rpm1 = mavlink_msg_rpm_get_rpm1(msg);
+    rpm->rpm2 = mavlink_msg_rpm_get_rpm2(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_RPM_LEN? msg->len : MAVLINK_MSG_ID_RPM_LEN;
         memset(rpm, 0, MAVLINK_MSG_ID_RPM_LEN);
-	memcpy(rpm, _MAV_PAYLOAD(msg), len);
+    memcpy(rpm, _MAV_PAYLOAD(msg), len);
 #endif
 }

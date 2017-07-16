@@ -1,9 +1,12 @@
 /** @file
- *	@brief MAVLink comm protocol built from ardupilotmega.xml
- *	@see http://mavlink.org
+ *  @brief MAVLink comm protocol built from ardupilotmega.xml
+ *  @see http://mavlink.org
  */
+#pragma once
 #ifndef MAVLINK_H
 #define MAVLINK_H
+
+#define MAVLINK_PRIMARY_XML_IDX 0
 
 #ifndef MAVLINK_STX
 #define MAVLINK_STX 254

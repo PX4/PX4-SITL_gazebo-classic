@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE CTRL_SRFC_PT PACKING
 
 #define MAVLINK_MSG_ID_CTRL_SRFC_PT 181
@@ -20,18 +21,18 @@ typedef struct __mavlink_ctrl_srfc_pt_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_CTRL_SRFC_PT { \
-	181, \
-	"CTRL_SRFC_PT", \
-	2, \
-	{  { "bitfieldPt", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_ctrl_srfc_pt_t, bitfieldPt) }, \
+    181, \
+    "CTRL_SRFC_PT", \
+    2, \
+    {  { "bitfieldPt", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_ctrl_srfc_pt_t, bitfieldPt) }, \
          { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 2, offsetof(mavlink_ctrl_srfc_pt_t, target) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_CTRL_SRFC_PT { \
-	"CTRL_SRFC_PT", \
-	2, \
-	{  { "bitfieldPt", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_ctrl_srfc_pt_t, bitfieldPt) }, \
+    "CTRL_SRFC_PT", \
+    2, \
+    {  { "bitfieldPt", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_ctrl_srfc_pt_t, bitfieldPt) }, \
          { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 2, offsetof(mavlink_ctrl_srfc_pt_t, target) }, \
          } \
 }
@@ -48,23 +49,23 @@ typedef struct __mavlink_ctrl_srfc_pt_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_ctrl_srfc_pt_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t target, uint16_t bitfieldPt)
+                               uint8_t target, uint16_t bitfieldPt)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN];
-	_mav_put_uint16_t(buf, 0, bitfieldPt);
-	_mav_put_uint8_t(buf, 2, target);
+    char buf[MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN];
+    _mav_put_uint16_t(buf, 0, bitfieldPt);
+    _mav_put_uint8_t(buf, 2, target);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN);
 #else
-	mavlink_ctrl_srfc_pt_t packet;
-	packet.bitfieldPt = bitfieldPt;
-	packet.target = target;
+    mavlink_ctrl_srfc_pt_t packet;
+    packet.bitfieldPt = bitfieldPt;
+    packet.target = target;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_CTRL_SRFC_PT;
+    msg->msgid = MAVLINK_MSG_ID_CTRL_SRFC_PT;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_CTRL_SRFC_PT_MIN_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_CRC);
 }
 
@@ -79,24 +80,24 @@ static inline uint16_t mavlink_msg_ctrl_srfc_pt_pack(uint8_t system_id, uint8_t 
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_ctrl_srfc_pt_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t target,uint16_t bitfieldPt)
+                               mavlink_message_t* msg,
+                                   uint8_t target,uint16_t bitfieldPt)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN];
-	_mav_put_uint16_t(buf, 0, bitfieldPt);
-	_mav_put_uint8_t(buf, 2, target);
+    char buf[MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN];
+    _mav_put_uint16_t(buf, 0, bitfieldPt);
+    _mav_put_uint8_t(buf, 2, target);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN);
 #else
-	mavlink_ctrl_srfc_pt_t packet;
-	packet.bitfieldPt = bitfieldPt;
-	packet.target = target;
+    mavlink_ctrl_srfc_pt_t packet;
+    packet.bitfieldPt = bitfieldPt;
+    packet.target = target;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_CTRL_SRFC_PT;
+    msg->msgid = MAVLINK_MSG_ID_CTRL_SRFC_PT;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_CTRL_SRFC_PT_MIN_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_CRC);
 }
 
@@ -110,7 +111,7 @@ static inline uint16_t mavlink_msg_ctrl_srfc_pt_pack_chan(uint8_t system_id, uin
  */
 static inline uint16_t mavlink_msg_ctrl_srfc_pt_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_ctrl_srfc_pt_t* ctrl_srfc_pt)
 {
-	return mavlink_msg_ctrl_srfc_pt_pack(system_id, component_id, msg, ctrl_srfc_pt->target, ctrl_srfc_pt->bitfieldPt);
+    return mavlink_msg_ctrl_srfc_pt_pack(system_id, component_id, msg, ctrl_srfc_pt->target, ctrl_srfc_pt->bitfieldPt);
 }
 
 /**
@@ -124,7 +125,7 @@ static inline uint16_t mavlink_msg_ctrl_srfc_pt_encode(uint8_t system_id, uint8_
  */
 static inline uint16_t mavlink_msg_ctrl_srfc_pt_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_ctrl_srfc_pt_t* ctrl_srfc_pt)
 {
-	return mavlink_msg_ctrl_srfc_pt_pack_chan(system_id, component_id, chan, msg, ctrl_srfc_pt->target, ctrl_srfc_pt->bitfieldPt);
+    return mavlink_msg_ctrl_srfc_pt_pack_chan(system_id, component_id, chan, msg, ctrl_srfc_pt->target, ctrl_srfc_pt->bitfieldPt);
 }
 
 /**
@@ -139,15 +140,15 @@ static inline uint16_t mavlink_msg_ctrl_srfc_pt_encode_chan(uint8_t system_id, u
 static inline void mavlink_msg_ctrl_srfc_pt_send(mavlink_channel_t chan, uint8_t target, uint16_t bitfieldPt)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN];
-	_mav_put_uint16_t(buf, 0, bitfieldPt);
-	_mav_put_uint8_t(buf, 2, target);
+    char buf[MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN];
+    _mav_put_uint16_t(buf, 0, bitfieldPt);
+    _mav_put_uint8_t(buf, 2, target);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CTRL_SRFC_PT, buf, MAVLINK_MSG_ID_CTRL_SRFC_PT_MIN_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_CRC);
 #else
-	mavlink_ctrl_srfc_pt_t packet;
-	packet.bitfieldPt = bitfieldPt;
-	packet.target = target;
+    mavlink_ctrl_srfc_pt_t packet;
+    packet.bitfieldPt = bitfieldPt;
+    packet.target = target;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CTRL_SRFC_PT, (const char *)&packet, MAVLINK_MSG_ID_CTRL_SRFC_PT_MIN_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_CRC);
 #endif
@@ -178,15 +179,15 @@ static inline void mavlink_msg_ctrl_srfc_pt_send_struct(mavlink_channel_t chan, 
 static inline void mavlink_msg_ctrl_srfc_pt_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t target, uint16_t bitfieldPt)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint16_t(buf, 0, bitfieldPt);
-	_mav_put_uint8_t(buf, 2, target);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint16_t(buf, 0, bitfieldPt);
+    _mav_put_uint8_t(buf, 2, target);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CTRL_SRFC_PT, buf, MAVLINK_MSG_ID_CTRL_SRFC_PT_MIN_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_CRC);
 #else
-	mavlink_ctrl_srfc_pt_t *packet = (mavlink_ctrl_srfc_pt_t *)msgbuf;
-	packet->bitfieldPt = bitfieldPt;
-	packet->target = target;
+    mavlink_ctrl_srfc_pt_t *packet = (mavlink_ctrl_srfc_pt_t *)msgbuf;
+    packet->bitfieldPt = bitfieldPt;
+    packet->target = target;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_CTRL_SRFC_PT, (const char *)packet, MAVLINK_MSG_ID_CTRL_SRFC_PT_MIN_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN, MAVLINK_MSG_ID_CTRL_SRFC_PT_CRC);
 #endif
@@ -205,7 +206,7 @@ static inline void mavlink_msg_ctrl_srfc_pt_send_buf(mavlink_message_t *msgbuf, 
  */
 static inline uint8_t mavlink_msg_ctrl_srfc_pt_get_target(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  2);
+    return _MAV_RETURN_uint8_t(msg,  2);
 }
 
 /**
@@ -215,7 +216,7 @@ static inline uint8_t mavlink_msg_ctrl_srfc_pt_get_target(const mavlink_message_
  */
 static inline uint16_t mavlink_msg_ctrl_srfc_pt_get_bitfieldPt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  0);
+    return _MAV_RETURN_uint16_t(msg,  0);
 }
 
 /**
@@ -227,11 +228,11 @@ static inline uint16_t mavlink_msg_ctrl_srfc_pt_get_bitfieldPt(const mavlink_mes
 static inline void mavlink_msg_ctrl_srfc_pt_decode(const mavlink_message_t* msg, mavlink_ctrl_srfc_pt_t* ctrl_srfc_pt)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	ctrl_srfc_pt->bitfieldPt = mavlink_msg_ctrl_srfc_pt_get_bitfieldPt(msg);
-	ctrl_srfc_pt->target = mavlink_msg_ctrl_srfc_pt_get_target(msg);
+    ctrl_srfc_pt->bitfieldPt = mavlink_msg_ctrl_srfc_pt_get_bitfieldPt(msg);
+    ctrl_srfc_pt->target = mavlink_msg_ctrl_srfc_pt_get_target(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN? msg->len : MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN;
         memset(ctrl_srfc_pt, 0, MAVLINK_MSG_ID_CTRL_SRFC_PT_LEN);
-	memcpy(ctrl_srfc_pt, _MAV_PAYLOAD(msg), len);
+    memcpy(ctrl_srfc_pt, _MAV_PAYLOAD(msg), len);
 #endif
 }

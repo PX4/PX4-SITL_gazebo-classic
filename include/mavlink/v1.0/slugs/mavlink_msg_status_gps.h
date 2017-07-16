@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE STATUS_GPS PACKING
 
 #define MAVLINK_MSG_ID_STATUS_GPS 194
@@ -25,10 +26,10 @@ typedef struct __mavlink_status_gps_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_STATUS_GPS { \
-	194, \
-	"STATUS_GPS", \
-	7, \
-	{  { "magVar", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_status_gps_t, magVar) }, \
+    194, \
+    "STATUS_GPS", \
+    7, \
+    {  { "magVar", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_status_gps_t, magVar) }, \
          { "csFails", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_status_gps_t, csFails) }, \
          { "gpsQuality", NULL, MAVLINK_TYPE_UINT8_T, 0, 6, offsetof(mavlink_status_gps_t, gpsQuality) }, \
          { "msgsType", NULL, MAVLINK_TYPE_UINT8_T, 0, 7, offsetof(mavlink_status_gps_t, msgsType) }, \
@@ -39,9 +40,9 @@ typedef struct __mavlink_status_gps_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_STATUS_GPS { \
-	"STATUS_GPS", \
-	7, \
-	{  { "magVar", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_status_gps_t, magVar) }, \
+    "STATUS_GPS", \
+    7, \
+    {  { "magVar", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_status_gps_t, magVar) }, \
          { "csFails", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_status_gps_t, csFails) }, \
          { "gpsQuality", NULL, MAVLINK_TYPE_UINT8_T, 0, 6, offsetof(mavlink_status_gps_t, gpsQuality) }, \
          { "msgsType", NULL, MAVLINK_TYPE_UINT8_T, 0, 7, offsetof(mavlink_status_gps_t, msgsType) }, \
@@ -68,33 +69,33 @@ typedef struct __mavlink_status_gps_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType, uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd)
+                               uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType, uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
-	_mav_put_float(buf, 0, magVar);
-	_mav_put_uint16_t(buf, 4, csFails);
-	_mav_put_uint8_t(buf, 6, gpsQuality);
-	_mav_put_uint8_t(buf, 7, msgsType);
-	_mav_put_uint8_t(buf, 8, posStatus);
-	_mav_put_int8_t(buf, 9, magDir);
-	_mav_put_uint8_t(buf, 10, modeInd);
+    char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
+    _mav_put_float(buf, 0, magVar);
+    _mav_put_uint16_t(buf, 4, csFails);
+    _mav_put_uint8_t(buf, 6, gpsQuality);
+    _mav_put_uint8_t(buf, 7, msgsType);
+    _mav_put_uint8_t(buf, 8, posStatus);
+    _mav_put_int8_t(buf, 9, magDir);
+    _mav_put_uint8_t(buf, 10, modeInd);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_STATUS_GPS_LEN);
 #else
-	mavlink_status_gps_t packet;
-	packet.magVar = magVar;
-	packet.csFails = csFails;
-	packet.gpsQuality = gpsQuality;
-	packet.msgsType = msgsType;
-	packet.posStatus = posStatus;
-	packet.magDir = magDir;
-	packet.modeInd = modeInd;
+    mavlink_status_gps_t packet;
+    packet.magVar = magVar;
+    packet.csFails = csFails;
+    packet.gpsQuality = gpsQuality;
+    packet.msgsType = msgsType;
+    packet.posStatus = posStatus;
+    packet.magDir = magDir;
+    packet.modeInd = modeInd;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_STATUS_GPS_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_STATUS_GPS;
+    msg->msgid = MAVLINK_MSG_ID_STATUS_GPS;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 }
 
@@ -114,34 +115,34 @@ static inline uint16_t mavlink_msg_status_gps_pack(uint8_t system_id, uint8_t co
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint16_t csFails,uint8_t gpsQuality,uint8_t msgsType,uint8_t posStatus,float magVar,int8_t magDir,uint8_t modeInd)
+                               mavlink_message_t* msg,
+                                   uint16_t csFails,uint8_t gpsQuality,uint8_t msgsType,uint8_t posStatus,float magVar,int8_t magDir,uint8_t modeInd)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
-	_mav_put_float(buf, 0, magVar);
-	_mav_put_uint16_t(buf, 4, csFails);
-	_mav_put_uint8_t(buf, 6, gpsQuality);
-	_mav_put_uint8_t(buf, 7, msgsType);
-	_mav_put_uint8_t(buf, 8, posStatus);
-	_mav_put_int8_t(buf, 9, magDir);
-	_mav_put_uint8_t(buf, 10, modeInd);
+    char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
+    _mav_put_float(buf, 0, magVar);
+    _mav_put_uint16_t(buf, 4, csFails);
+    _mav_put_uint8_t(buf, 6, gpsQuality);
+    _mav_put_uint8_t(buf, 7, msgsType);
+    _mav_put_uint8_t(buf, 8, posStatus);
+    _mav_put_int8_t(buf, 9, magDir);
+    _mav_put_uint8_t(buf, 10, modeInd);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_STATUS_GPS_LEN);
 #else
-	mavlink_status_gps_t packet;
-	packet.magVar = magVar;
-	packet.csFails = csFails;
-	packet.gpsQuality = gpsQuality;
-	packet.msgsType = msgsType;
-	packet.posStatus = posStatus;
-	packet.magDir = magDir;
-	packet.modeInd = modeInd;
+    mavlink_status_gps_t packet;
+    packet.magVar = magVar;
+    packet.csFails = csFails;
+    packet.gpsQuality = gpsQuality;
+    packet.msgsType = msgsType;
+    packet.posStatus = posStatus;
+    packet.magDir = magDir;
+    packet.modeInd = modeInd;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_STATUS_GPS_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_STATUS_GPS;
+    msg->msgid = MAVLINK_MSG_ID_STATUS_GPS;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 }
 
@@ -155,7 +156,7 @@ static inline uint16_t mavlink_msg_status_gps_pack_chan(uint8_t system_id, uint8
  */
 static inline uint16_t mavlink_msg_status_gps_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_status_gps_t* status_gps)
 {
-	return mavlink_msg_status_gps_pack(system_id, component_id, msg, status_gps->csFails, status_gps->gpsQuality, status_gps->msgsType, status_gps->posStatus, status_gps->magVar, status_gps->magDir, status_gps->modeInd);
+    return mavlink_msg_status_gps_pack(system_id, component_id, msg, status_gps->csFails, status_gps->gpsQuality, status_gps->msgsType, status_gps->posStatus, status_gps->magVar, status_gps->magDir, status_gps->modeInd);
 }
 
 /**
@@ -169,7 +170,7 @@ static inline uint16_t mavlink_msg_status_gps_encode(uint8_t system_id, uint8_t 
  */
 static inline uint16_t mavlink_msg_status_gps_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_status_gps_t* status_gps)
 {
-	return mavlink_msg_status_gps_pack_chan(system_id, component_id, chan, msg, status_gps->csFails, status_gps->gpsQuality, status_gps->msgsType, status_gps->posStatus, status_gps->magVar, status_gps->magDir, status_gps->modeInd);
+    return mavlink_msg_status_gps_pack_chan(system_id, component_id, chan, msg, status_gps->csFails, status_gps->gpsQuality, status_gps->msgsType, status_gps->posStatus, status_gps->magVar, status_gps->magDir, status_gps->modeInd);
 }
 
 /**
@@ -189,25 +190,25 @@ static inline uint16_t mavlink_msg_status_gps_encode_chan(uint8_t system_id, uin
 static inline void mavlink_msg_status_gps_send(mavlink_channel_t chan, uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType, uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
-	_mav_put_float(buf, 0, magVar);
-	_mav_put_uint16_t(buf, 4, csFails);
-	_mav_put_uint8_t(buf, 6, gpsQuality);
-	_mav_put_uint8_t(buf, 7, msgsType);
-	_mav_put_uint8_t(buf, 8, posStatus);
-	_mav_put_int8_t(buf, 9, magDir);
-	_mav_put_uint8_t(buf, 10, modeInd);
+    char buf[MAVLINK_MSG_ID_STATUS_GPS_LEN];
+    _mav_put_float(buf, 0, magVar);
+    _mav_put_uint16_t(buf, 4, csFails);
+    _mav_put_uint8_t(buf, 6, gpsQuality);
+    _mav_put_uint8_t(buf, 7, msgsType);
+    _mav_put_uint8_t(buf, 8, posStatus);
+    _mav_put_int8_t(buf, 9, magDir);
+    _mav_put_uint8_t(buf, 10, modeInd);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATUS_GPS, buf, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 #else
-	mavlink_status_gps_t packet;
-	packet.magVar = magVar;
-	packet.csFails = csFails;
-	packet.gpsQuality = gpsQuality;
-	packet.msgsType = msgsType;
-	packet.posStatus = posStatus;
-	packet.magDir = magDir;
-	packet.modeInd = modeInd;
+    mavlink_status_gps_t packet;
+    packet.magVar = magVar;
+    packet.csFails = csFails;
+    packet.gpsQuality = gpsQuality;
+    packet.msgsType = msgsType;
+    packet.posStatus = posStatus;
+    packet.magDir = magDir;
+    packet.modeInd = modeInd;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATUS_GPS, (const char *)&packet, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 #endif
@@ -238,25 +239,25 @@ static inline void mavlink_msg_status_gps_send_struct(mavlink_channel_t chan, co
 static inline void mavlink_msg_status_gps_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint16_t csFails, uint8_t gpsQuality, uint8_t msgsType, uint8_t posStatus, float magVar, int8_t magDir, uint8_t modeInd)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_float(buf, 0, magVar);
-	_mav_put_uint16_t(buf, 4, csFails);
-	_mav_put_uint8_t(buf, 6, gpsQuality);
-	_mav_put_uint8_t(buf, 7, msgsType);
-	_mav_put_uint8_t(buf, 8, posStatus);
-	_mav_put_int8_t(buf, 9, magDir);
-	_mav_put_uint8_t(buf, 10, modeInd);
+    char *buf = (char *)msgbuf;
+    _mav_put_float(buf, 0, magVar);
+    _mav_put_uint16_t(buf, 4, csFails);
+    _mav_put_uint8_t(buf, 6, gpsQuality);
+    _mav_put_uint8_t(buf, 7, msgsType);
+    _mav_put_uint8_t(buf, 8, posStatus);
+    _mav_put_int8_t(buf, 9, magDir);
+    _mav_put_uint8_t(buf, 10, modeInd);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATUS_GPS, buf, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 #else
-	mavlink_status_gps_t *packet = (mavlink_status_gps_t *)msgbuf;
-	packet->magVar = magVar;
-	packet->csFails = csFails;
-	packet->gpsQuality = gpsQuality;
-	packet->msgsType = msgsType;
-	packet->posStatus = posStatus;
-	packet->magDir = magDir;
-	packet->modeInd = modeInd;
+    mavlink_status_gps_t *packet = (mavlink_status_gps_t *)msgbuf;
+    packet->magVar = magVar;
+    packet->csFails = csFails;
+    packet->gpsQuality = gpsQuality;
+    packet->msgsType = msgsType;
+    packet->posStatus = posStatus;
+    packet->magDir = magDir;
+    packet->modeInd = modeInd;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_STATUS_GPS, (const char *)packet, MAVLINK_MSG_ID_STATUS_GPS_MIN_LEN, MAVLINK_MSG_ID_STATUS_GPS_LEN, MAVLINK_MSG_ID_STATUS_GPS_CRC);
 #endif
@@ -275,7 +276,7 @@ static inline void mavlink_msg_status_gps_send_buf(mavlink_message_t *msgbuf, ma
  */
 static inline uint16_t mavlink_msg_status_gps_get_csFails(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  4);
+    return _MAV_RETURN_uint16_t(msg,  4);
 }
 
 /**
@@ -285,7 +286,7 @@ static inline uint16_t mavlink_msg_status_gps_get_csFails(const mavlink_message_
  */
 static inline uint8_t mavlink_msg_status_gps_get_gpsQuality(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  6);
+    return _MAV_RETURN_uint8_t(msg,  6);
 }
 
 /**
@@ -295,7 +296,7 @@ static inline uint8_t mavlink_msg_status_gps_get_gpsQuality(const mavlink_messag
  */
 static inline uint8_t mavlink_msg_status_gps_get_msgsType(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  7);
+    return _MAV_RETURN_uint8_t(msg,  7);
 }
 
 /**
@@ -305,7 +306,7 @@ static inline uint8_t mavlink_msg_status_gps_get_msgsType(const mavlink_message_
  */
 static inline uint8_t mavlink_msg_status_gps_get_posStatus(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  8);
+    return _MAV_RETURN_uint8_t(msg,  8);
 }
 
 /**
@@ -315,7 +316,7 @@ static inline uint8_t mavlink_msg_status_gps_get_posStatus(const mavlink_message
  */
 static inline float mavlink_msg_status_gps_get_magVar(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  0);
+    return _MAV_RETURN_float(msg,  0);
 }
 
 /**
@@ -325,7 +326,7 @@ static inline float mavlink_msg_status_gps_get_magVar(const mavlink_message_t* m
  */
 static inline int8_t mavlink_msg_status_gps_get_magDir(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int8_t(msg,  9);
+    return _MAV_RETURN_int8_t(msg,  9);
 }
 
 /**
@@ -335,7 +336,7 @@ static inline int8_t mavlink_msg_status_gps_get_magDir(const mavlink_message_t* 
  */
 static inline uint8_t mavlink_msg_status_gps_get_modeInd(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  10);
+    return _MAV_RETURN_uint8_t(msg,  10);
 }
 
 /**
@@ -347,16 +348,16 @@ static inline uint8_t mavlink_msg_status_gps_get_modeInd(const mavlink_message_t
 static inline void mavlink_msg_status_gps_decode(const mavlink_message_t* msg, mavlink_status_gps_t* status_gps)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	status_gps->magVar = mavlink_msg_status_gps_get_magVar(msg);
-	status_gps->csFails = mavlink_msg_status_gps_get_csFails(msg);
-	status_gps->gpsQuality = mavlink_msg_status_gps_get_gpsQuality(msg);
-	status_gps->msgsType = mavlink_msg_status_gps_get_msgsType(msg);
-	status_gps->posStatus = mavlink_msg_status_gps_get_posStatus(msg);
-	status_gps->magDir = mavlink_msg_status_gps_get_magDir(msg);
-	status_gps->modeInd = mavlink_msg_status_gps_get_modeInd(msg);
+    status_gps->magVar = mavlink_msg_status_gps_get_magVar(msg);
+    status_gps->csFails = mavlink_msg_status_gps_get_csFails(msg);
+    status_gps->gpsQuality = mavlink_msg_status_gps_get_gpsQuality(msg);
+    status_gps->msgsType = mavlink_msg_status_gps_get_msgsType(msg);
+    status_gps->posStatus = mavlink_msg_status_gps_get_posStatus(msg);
+    status_gps->magDir = mavlink_msg_status_gps_get_magDir(msg);
+    status_gps->modeInd = mavlink_msg_status_gps_get_modeInd(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_STATUS_GPS_LEN? msg->len : MAVLINK_MSG_ID_STATUS_GPS_LEN;
         memset(status_gps, 0, MAVLINK_MSG_ID_STATUS_GPS_LEN);
-	memcpy(status_gps, _MAV_PAYLOAD(msg), len);
+    memcpy(status_gps, _MAV_PAYLOAD(msg), len);
 #endif
 }

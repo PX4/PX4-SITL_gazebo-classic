@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE GPS_DATE_TIME PACKING
 
 #define MAVLINK_MSG_ID_GPS_DATE_TIME 179
@@ -30,10 +31,10 @@ typedef struct __mavlink_gps_date_time_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_GPS_DATE_TIME { \
-	179, \
-	"GPS_DATE_TIME", \
-	12, \
-	{  { "year", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_gps_date_time_t, year) }, \
+    179, \
+    "GPS_DATE_TIME", \
+    12, \
+    {  { "year", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_gps_date_time_t, year) }, \
          { "month", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_gps_date_time_t, month) }, \
          { "day", NULL, MAVLINK_TYPE_UINT8_T, 0, 2, offsetof(mavlink_gps_date_time_t, day) }, \
          { "hour", NULL, MAVLINK_TYPE_UINT8_T, 0, 3, offsetof(mavlink_gps_date_time_t, hour) }, \
@@ -49,9 +50,9 @@ typedef struct __mavlink_gps_date_time_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_GPS_DATE_TIME { \
-	"GPS_DATE_TIME", \
-	12, \
-	{  { "year", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_gps_date_time_t, year) }, \
+    "GPS_DATE_TIME", \
+    12, \
+    {  { "year", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_gps_date_time_t, year) }, \
          { "month", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_gps_date_time_t, month) }, \
          { "day", NULL, MAVLINK_TYPE_UINT8_T, 0, 2, offsetof(mavlink_gps_date_time_t, day) }, \
          { "hour", NULL, MAVLINK_TYPE_UINT8_T, 0, 3, offsetof(mavlink_gps_date_time_t, hour) }, \
@@ -88,43 +89,43 @@ typedef struct __mavlink_gps_date_time_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_gps_date_time_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec, uint8_t clockStat, uint8_t visSat, uint8_t useSat, uint8_t GppGl, uint8_t sigUsedMask, uint8_t percentUsed)
+                               uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec, uint8_t clockStat, uint8_t visSat, uint8_t useSat, uint8_t GppGl, uint8_t sigUsedMask, uint8_t percentUsed)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_GPS_DATE_TIME_LEN];
-	_mav_put_uint8_t(buf, 0, year);
-	_mav_put_uint8_t(buf, 1, month);
-	_mav_put_uint8_t(buf, 2, day);
-	_mav_put_uint8_t(buf, 3, hour);
-	_mav_put_uint8_t(buf, 4, min);
-	_mav_put_uint8_t(buf, 5, sec);
-	_mav_put_uint8_t(buf, 6, clockStat);
-	_mav_put_uint8_t(buf, 7, visSat);
-	_mav_put_uint8_t(buf, 8, useSat);
-	_mav_put_uint8_t(buf, 9, GppGl);
-	_mav_put_uint8_t(buf, 10, sigUsedMask);
-	_mav_put_uint8_t(buf, 11, percentUsed);
+    char buf[MAVLINK_MSG_ID_GPS_DATE_TIME_LEN];
+    _mav_put_uint8_t(buf, 0, year);
+    _mav_put_uint8_t(buf, 1, month);
+    _mav_put_uint8_t(buf, 2, day);
+    _mav_put_uint8_t(buf, 3, hour);
+    _mav_put_uint8_t(buf, 4, min);
+    _mav_put_uint8_t(buf, 5, sec);
+    _mav_put_uint8_t(buf, 6, clockStat);
+    _mav_put_uint8_t(buf, 7, visSat);
+    _mav_put_uint8_t(buf, 8, useSat);
+    _mav_put_uint8_t(buf, 9, GppGl);
+    _mav_put_uint8_t(buf, 10, sigUsedMask);
+    _mav_put_uint8_t(buf, 11, percentUsed);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN);
 #else
-	mavlink_gps_date_time_t packet;
-	packet.year = year;
-	packet.month = month;
-	packet.day = day;
-	packet.hour = hour;
-	packet.min = min;
-	packet.sec = sec;
-	packet.clockStat = clockStat;
-	packet.visSat = visSat;
-	packet.useSat = useSat;
-	packet.GppGl = GppGl;
-	packet.sigUsedMask = sigUsedMask;
-	packet.percentUsed = percentUsed;
+    mavlink_gps_date_time_t packet;
+    packet.year = year;
+    packet.month = month;
+    packet.day = day;
+    packet.hour = hour;
+    packet.min = min;
+    packet.sec = sec;
+    packet.clockStat = clockStat;
+    packet.visSat = visSat;
+    packet.useSat = useSat;
+    packet.GppGl = GppGl;
+    packet.sigUsedMask = sigUsedMask;
+    packet.percentUsed = percentUsed;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_GPS_DATE_TIME;
+    msg->msgid = MAVLINK_MSG_ID_GPS_DATE_TIME;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_GPS_DATE_TIME_MIN_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_CRC);
 }
 
@@ -149,44 +150,44 @@ static inline uint16_t mavlink_msg_gps_date_time_pack(uint8_t system_id, uint8_t
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_gps_date_time_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t year,uint8_t month,uint8_t day,uint8_t hour,uint8_t min,uint8_t sec,uint8_t clockStat,uint8_t visSat,uint8_t useSat,uint8_t GppGl,uint8_t sigUsedMask,uint8_t percentUsed)
+                               mavlink_message_t* msg,
+                                   uint8_t year,uint8_t month,uint8_t day,uint8_t hour,uint8_t min,uint8_t sec,uint8_t clockStat,uint8_t visSat,uint8_t useSat,uint8_t GppGl,uint8_t sigUsedMask,uint8_t percentUsed)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_GPS_DATE_TIME_LEN];
-	_mav_put_uint8_t(buf, 0, year);
-	_mav_put_uint8_t(buf, 1, month);
-	_mav_put_uint8_t(buf, 2, day);
-	_mav_put_uint8_t(buf, 3, hour);
-	_mav_put_uint8_t(buf, 4, min);
-	_mav_put_uint8_t(buf, 5, sec);
-	_mav_put_uint8_t(buf, 6, clockStat);
-	_mav_put_uint8_t(buf, 7, visSat);
-	_mav_put_uint8_t(buf, 8, useSat);
-	_mav_put_uint8_t(buf, 9, GppGl);
-	_mav_put_uint8_t(buf, 10, sigUsedMask);
-	_mav_put_uint8_t(buf, 11, percentUsed);
+    char buf[MAVLINK_MSG_ID_GPS_DATE_TIME_LEN];
+    _mav_put_uint8_t(buf, 0, year);
+    _mav_put_uint8_t(buf, 1, month);
+    _mav_put_uint8_t(buf, 2, day);
+    _mav_put_uint8_t(buf, 3, hour);
+    _mav_put_uint8_t(buf, 4, min);
+    _mav_put_uint8_t(buf, 5, sec);
+    _mav_put_uint8_t(buf, 6, clockStat);
+    _mav_put_uint8_t(buf, 7, visSat);
+    _mav_put_uint8_t(buf, 8, useSat);
+    _mav_put_uint8_t(buf, 9, GppGl);
+    _mav_put_uint8_t(buf, 10, sigUsedMask);
+    _mav_put_uint8_t(buf, 11, percentUsed);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN);
 #else
-	mavlink_gps_date_time_t packet;
-	packet.year = year;
-	packet.month = month;
-	packet.day = day;
-	packet.hour = hour;
-	packet.min = min;
-	packet.sec = sec;
-	packet.clockStat = clockStat;
-	packet.visSat = visSat;
-	packet.useSat = useSat;
-	packet.GppGl = GppGl;
-	packet.sigUsedMask = sigUsedMask;
-	packet.percentUsed = percentUsed;
+    mavlink_gps_date_time_t packet;
+    packet.year = year;
+    packet.month = month;
+    packet.day = day;
+    packet.hour = hour;
+    packet.min = min;
+    packet.sec = sec;
+    packet.clockStat = clockStat;
+    packet.visSat = visSat;
+    packet.useSat = useSat;
+    packet.GppGl = GppGl;
+    packet.sigUsedMask = sigUsedMask;
+    packet.percentUsed = percentUsed;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_GPS_DATE_TIME;
+    msg->msgid = MAVLINK_MSG_ID_GPS_DATE_TIME;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_GPS_DATE_TIME_MIN_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_CRC);
 }
 
@@ -200,7 +201,7 @@ static inline uint16_t mavlink_msg_gps_date_time_pack_chan(uint8_t system_id, ui
  */
 static inline uint16_t mavlink_msg_gps_date_time_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_gps_date_time_t* gps_date_time)
 {
-	return mavlink_msg_gps_date_time_pack(system_id, component_id, msg, gps_date_time->year, gps_date_time->month, gps_date_time->day, gps_date_time->hour, gps_date_time->min, gps_date_time->sec, gps_date_time->clockStat, gps_date_time->visSat, gps_date_time->useSat, gps_date_time->GppGl, gps_date_time->sigUsedMask, gps_date_time->percentUsed);
+    return mavlink_msg_gps_date_time_pack(system_id, component_id, msg, gps_date_time->year, gps_date_time->month, gps_date_time->day, gps_date_time->hour, gps_date_time->min, gps_date_time->sec, gps_date_time->clockStat, gps_date_time->visSat, gps_date_time->useSat, gps_date_time->GppGl, gps_date_time->sigUsedMask, gps_date_time->percentUsed);
 }
 
 /**
@@ -214,7 +215,7 @@ static inline uint16_t mavlink_msg_gps_date_time_encode(uint8_t system_id, uint8
  */
 static inline uint16_t mavlink_msg_gps_date_time_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_gps_date_time_t* gps_date_time)
 {
-	return mavlink_msg_gps_date_time_pack_chan(system_id, component_id, chan, msg, gps_date_time->year, gps_date_time->month, gps_date_time->day, gps_date_time->hour, gps_date_time->min, gps_date_time->sec, gps_date_time->clockStat, gps_date_time->visSat, gps_date_time->useSat, gps_date_time->GppGl, gps_date_time->sigUsedMask, gps_date_time->percentUsed);
+    return mavlink_msg_gps_date_time_pack_chan(system_id, component_id, chan, msg, gps_date_time->year, gps_date_time->month, gps_date_time->day, gps_date_time->hour, gps_date_time->min, gps_date_time->sec, gps_date_time->clockStat, gps_date_time->visSat, gps_date_time->useSat, gps_date_time->GppGl, gps_date_time->sigUsedMask, gps_date_time->percentUsed);
 }
 
 /**
@@ -239,35 +240,35 @@ static inline uint16_t mavlink_msg_gps_date_time_encode_chan(uint8_t system_id, 
 static inline void mavlink_msg_gps_date_time_send(mavlink_channel_t chan, uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec, uint8_t clockStat, uint8_t visSat, uint8_t useSat, uint8_t GppGl, uint8_t sigUsedMask, uint8_t percentUsed)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_GPS_DATE_TIME_LEN];
-	_mav_put_uint8_t(buf, 0, year);
-	_mav_put_uint8_t(buf, 1, month);
-	_mav_put_uint8_t(buf, 2, day);
-	_mav_put_uint8_t(buf, 3, hour);
-	_mav_put_uint8_t(buf, 4, min);
-	_mav_put_uint8_t(buf, 5, sec);
-	_mav_put_uint8_t(buf, 6, clockStat);
-	_mav_put_uint8_t(buf, 7, visSat);
-	_mav_put_uint8_t(buf, 8, useSat);
-	_mav_put_uint8_t(buf, 9, GppGl);
-	_mav_put_uint8_t(buf, 10, sigUsedMask);
-	_mav_put_uint8_t(buf, 11, percentUsed);
+    char buf[MAVLINK_MSG_ID_GPS_DATE_TIME_LEN];
+    _mav_put_uint8_t(buf, 0, year);
+    _mav_put_uint8_t(buf, 1, month);
+    _mav_put_uint8_t(buf, 2, day);
+    _mav_put_uint8_t(buf, 3, hour);
+    _mav_put_uint8_t(buf, 4, min);
+    _mav_put_uint8_t(buf, 5, sec);
+    _mav_put_uint8_t(buf, 6, clockStat);
+    _mav_put_uint8_t(buf, 7, visSat);
+    _mav_put_uint8_t(buf, 8, useSat);
+    _mav_put_uint8_t(buf, 9, GppGl);
+    _mav_put_uint8_t(buf, 10, sigUsedMask);
+    _mav_put_uint8_t(buf, 11, percentUsed);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_GPS_DATE_TIME, buf, MAVLINK_MSG_ID_GPS_DATE_TIME_MIN_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_CRC);
 #else
-	mavlink_gps_date_time_t packet;
-	packet.year = year;
-	packet.month = month;
-	packet.day = day;
-	packet.hour = hour;
-	packet.min = min;
-	packet.sec = sec;
-	packet.clockStat = clockStat;
-	packet.visSat = visSat;
-	packet.useSat = useSat;
-	packet.GppGl = GppGl;
-	packet.sigUsedMask = sigUsedMask;
-	packet.percentUsed = percentUsed;
+    mavlink_gps_date_time_t packet;
+    packet.year = year;
+    packet.month = month;
+    packet.day = day;
+    packet.hour = hour;
+    packet.min = min;
+    packet.sec = sec;
+    packet.clockStat = clockStat;
+    packet.visSat = visSat;
+    packet.useSat = useSat;
+    packet.GppGl = GppGl;
+    packet.sigUsedMask = sigUsedMask;
+    packet.percentUsed = percentUsed;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_GPS_DATE_TIME, (const char *)&packet, MAVLINK_MSG_ID_GPS_DATE_TIME_MIN_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_CRC);
 #endif
@@ -298,35 +299,35 @@ static inline void mavlink_msg_gps_date_time_send_struct(mavlink_channel_t chan,
 static inline void mavlink_msg_gps_date_time_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t min, uint8_t sec, uint8_t clockStat, uint8_t visSat, uint8_t useSat, uint8_t GppGl, uint8_t sigUsedMask, uint8_t percentUsed)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint8_t(buf, 0, year);
-	_mav_put_uint8_t(buf, 1, month);
-	_mav_put_uint8_t(buf, 2, day);
-	_mav_put_uint8_t(buf, 3, hour);
-	_mav_put_uint8_t(buf, 4, min);
-	_mav_put_uint8_t(buf, 5, sec);
-	_mav_put_uint8_t(buf, 6, clockStat);
-	_mav_put_uint8_t(buf, 7, visSat);
-	_mav_put_uint8_t(buf, 8, useSat);
-	_mav_put_uint8_t(buf, 9, GppGl);
-	_mav_put_uint8_t(buf, 10, sigUsedMask);
-	_mav_put_uint8_t(buf, 11, percentUsed);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint8_t(buf, 0, year);
+    _mav_put_uint8_t(buf, 1, month);
+    _mav_put_uint8_t(buf, 2, day);
+    _mav_put_uint8_t(buf, 3, hour);
+    _mav_put_uint8_t(buf, 4, min);
+    _mav_put_uint8_t(buf, 5, sec);
+    _mav_put_uint8_t(buf, 6, clockStat);
+    _mav_put_uint8_t(buf, 7, visSat);
+    _mav_put_uint8_t(buf, 8, useSat);
+    _mav_put_uint8_t(buf, 9, GppGl);
+    _mav_put_uint8_t(buf, 10, sigUsedMask);
+    _mav_put_uint8_t(buf, 11, percentUsed);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_GPS_DATE_TIME, buf, MAVLINK_MSG_ID_GPS_DATE_TIME_MIN_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_CRC);
 #else
-	mavlink_gps_date_time_t *packet = (mavlink_gps_date_time_t *)msgbuf;
-	packet->year = year;
-	packet->month = month;
-	packet->day = day;
-	packet->hour = hour;
-	packet->min = min;
-	packet->sec = sec;
-	packet->clockStat = clockStat;
-	packet->visSat = visSat;
-	packet->useSat = useSat;
-	packet->GppGl = GppGl;
-	packet->sigUsedMask = sigUsedMask;
-	packet->percentUsed = percentUsed;
+    mavlink_gps_date_time_t *packet = (mavlink_gps_date_time_t *)msgbuf;
+    packet->year = year;
+    packet->month = month;
+    packet->day = day;
+    packet->hour = hour;
+    packet->min = min;
+    packet->sec = sec;
+    packet->clockStat = clockStat;
+    packet->visSat = visSat;
+    packet->useSat = useSat;
+    packet->GppGl = GppGl;
+    packet->sigUsedMask = sigUsedMask;
+    packet->percentUsed = percentUsed;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_GPS_DATE_TIME, (const char *)packet, MAVLINK_MSG_ID_GPS_DATE_TIME_MIN_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN, MAVLINK_MSG_ID_GPS_DATE_TIME_CRC);
 #endif
@@ -345,7 +346,7 @@ static inline void mavlink_msg_gps_date_time_send_buf(mavlink_message_t *msgbuf,
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_year(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  0);
+    return _MAV_RETURN_uint8_t(msg,  0);
 }
 
 /**
@@ -355,7 +356,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_year(const mavlink_message_t
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_month(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  1);
+    return _MAV_RETURN_uint8_t(msg,  1);
 }
 
 /**
@@ -365,7 +366,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_month(const mavlink_message_
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_day(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  2);
+    return _MAV_RETURN_uint8_t(msg,  2);
 }
 
 /**
@@ -375,7 +376,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_day(const mavlink_message_t*
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_hour(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  3);
+    return _MAV_RETURN_uint8_t(msg,  3);
 }
 
 /**
@@ -385,7 +386,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_hour(const mavlink_message_t
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_min(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  4);
+    return _MAV_RETURN_uint8_t(msg,  4);
 }
 
 /**
@@ -395,7 +396,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_min(const mavlink_message_t*
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_sec(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  5);
+    return _MAV_RETURN_uint8_t(msg,  5);
 }
 
 /**
@@ -405,7 +406,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_sec(const mavlink_message_t*
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_clockStat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  6);
+    return _MAV_RETURN_uint8_t(msg,  6);
 }
 
 /**
@@ -415,7 +416,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_clockStat(const mavlink_mess
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_visSat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  7);
+    return _MAV_RETURN_uint8_t(msg,  7);
 }
 
 /**
@@ -425,7 +426,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_visSat(const mavlink_message
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_useSat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  8);
+    return _MAV_RETURN_uint8_t(msg,  8);
 }
 
 /**
@@ -435,7 +436,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_useSat(const mavlink_message
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_GppGl(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  9);
+    return _MAV_RETURN_uint8_t(msg,  9);
 }
 
 /**
@@ -445,7 +446,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_GppGl(const mavlink_message_
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_sigUsedMask(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  10);
+    return _MAV_RETURN_uint8_t(msg,  10);
 }
 
 /**
@@ -455,7 +456,7 @@ static inline uint8_t mavlink_msg_gps_date_time_get_sigUsedMask(const mavlink_me
  */
 static inline uint8_t mavlink_msg_gps_date_time_get_percentUsed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  11);
+    return _MAV_RETURN_uint8_t(msg,  11);
 }
 
 /**
@@ -467,21 +468,21 @@ static inline uint8_t mavlink_msg_gps_date_time_get_percentUsed(const mavlink_me
 static inline void mavlink_msg_gps_date_time_decode(const mavlink_message_t* msg, mavlink_gps_date_time_t* gps_date_time)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	gps_date_time->year = mavlink_msg_gps_date_time_get_year(msg);
-	gps_date_time->month = mavlink_msg_gps_date_time_get_month(msg);
-	gps_date_time->day = mavlink_msg_gps_date_time_get_day(msg);
-	gps_date_time->hour = mavlink_msg_gps_date_time_get_hour(msg);
-	gps_date_time->min = mavlink_msg_gps_date_time_get_min(msg);
-	gps_date_time->sec = mavlink_msg_gps_date_time_get_sec(msg);
-	gps_date_time->clockStat = mavlink_msg_gps_date_time_get_clockStat(msg);
-	gps_date_time->visSat = mavlink_msg_gps_date_time_get_visSat(msg);
-	gps_date_time->useSat = mavlink_msg_gps_date_time_get_useSat(msg);
-	gps_date_time->GppGl = mavlink_msg_gps_date_time_get_GppGl(msg);
-	gps_date_time->sigUsedMask = mavlink_msg_gps_date_time_get_sigUsedMask(msg);
-	gps_date_time->percentUsed = mavlink_msg_gps_date_time_get_percentUsed(msg);
+    gps_date_time->year = mavlink_msg_gps_date_time_get_year(msg);
+    gps_date_time->month = mavlink_msg_gps_date_time_get_month(msg);
+    gps_date_time->day = mavlink_msg_gps_date_time_get_day(msg);
+    gps_date_time->hour = mavlink_msg_gps_date_time_get_hour(msg);
+    gps_date_time->min = mavlink_msg_gps_date_time_get_min(msg);
+    gps_date_time->sec = mavlink_msg_gps_date_time_get_sec(msg);
+    gps_date_time->clockStat = mavlink_msg_gps_date_time_get_clockStat(msg);
+    gps_date_time->visSat = mavlink_msg_gps_date_time_get_visSat(msg);
+    gps_date_time->useSat = mavlink_msg_gps_date_time_get_useSat(msg);
+    gps_date_time->GppGl = mavlink_msg_gps_date_time_get_GppGl(msg);
+    gps_date_time->sigUsedMask = mavlink_msg_gps_date_time_get_sigUsedMask(msg);
+    gps_date_time->percentUsed = mavlink_msg_gps_date_time_get_percentUsed(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_GPS_DATE_TIME_LEN? msg->len : MAVLINK_MSG_ID_GPS_DATE_TIME_LEN;
         memset(gps_date_time, 0, MAVLINK_MSG_ID_GPS_DATE_TIME_LEN);
-	memcpy(gps_date_time, _MAV_PAYLOAD(msg), len);
+    memcpy(gps_date_time, _MAV_PAYLOAD(msg), len);
 #endif
 }

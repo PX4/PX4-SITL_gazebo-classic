@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE ALTITUDES PACKING
 
 #define MAVLINK_MSG_ID_ALTITUDES 181
@@ -25,10 +26,10 @@ typedef struct __mavlink_altitudes_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_ALTITUDES { \
-	181, \
-	"ALTITUDES", \
-	7, \
-	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_altitudes_t, time_boot_ms) }, \
+    181, \
+    "ALTITUDES", \
+    7, \
+    {  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_altitudes_t, time_boot_ms) }, \
          { "alt_gps", NULL, MAVLINK_TYPE_INT32_T, 0, 4, offsetof(mavlink_altitudes_t, alt_gps) }, \
          { "alt_imu", NULL, MAVLINK_TYPE_INT32_T, 0, 8, offsetof(mavlink_altitudes_t, alt_imu) }, \
          { "alt_barometric", NULL, MAVLINK_TYPE_INT32_T, 0, 12, offsetof(mavlink_altitudes_t, alt_barometric) }, \
@@ -39,9 +40,9 @@ typedef struct __mavlink_altitudes_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_ALTITUDES { \
-	"ALTITUDES", \
-	7, \
-	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_altitudes_t, time_boot_ms) }, \
+    "ALTITUDES", \
+    7, \
+    {  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_altitudes_t, time_boot_ms) }, \
          { "alt_gps", NULL, MAVLINK_TYPE_INT32_T, 0, 4, offsetof(mavlink_altitudes_t, alt_gps) }, \
          { "alt_imu", NULL, MAVLINK_TYPE_INT32_T, 0, 8, offsetof(mavlink_altitudes_t, alt_imu) }, \
          { "alt_barometric", NULL, MAVLINK_TYPE_INT32_T, 0, 12, offsetof(mavlink_altitudes_t, alt_barometric) }, \
@@ -68,33 +69,33 @@ typedef struct __mavlink_altitudes_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_altitudes_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint32_t time_boot_ms, int32_t alt_gps, int32_t alt_imu, int32_t alt_barometric, int32_t alt_optical_flow, int32_t alt_range_finder, int32_t alt_extra)
+                               uint32_t time_boot_ms, int32_t alt_gps, int32_t alt_imu, int32_t alt_barometric, int32_t alt_optical_flow, int32_t alt_range_finder, int32_t alt_extra)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ALTITUDES_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int32_t(buf, 4, alt_gps);
-	_mav_put_int32_t(buf, 8, alt_imu);
-	_mav_put_int32_t(buf, 12, alt_barometric);
-	_mav_put_int32_t(buf, 16, alt_optical_flow);
-	_mav_put_int32_t(buf, 20, alt_range_finder);
-	_mav_put_int32_t(buf, 24, alt_extra);
+    char buf[MAVLINK_MSG_ID_ALTITUDES_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int32_t(buf, 4, alt_gps);
+    _mav_put_int32_t(buf, 8, alt_imu);
+    _mav_put_int32_t(buf, 12, alt_barometric);
+    _mav_put_int32_t(buf, 16, alt_optical_flow);
+    _mav_put_int32_t(buf, 20, alt_range_finder);
+    _mav_put_int32_t(buf, 24, alt_extra);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ALTITUDES_LEN);
 #else
-	mavlink_altitudes_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.alt_gps = alt_gps;
-	packet.alt_imu = alt_imu;
-	packet.alt_barometric = alt_barometric;
-	packet.alt_optical_flow = alt_optical_flow;
-	packet.alt_range_finder = alt_range_finder;
-	packet.alt_extra = alt_extra;
+    mavlink_altitudes_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.alt_gps = alt_gps;
+    packet.alt_imu = alt_imu;
+    packet.alt_barometric = alt_barometric;
+    packet.alt_optical_flow = alt_optical_flow;
+    packet.alt_range_finder = alt_range_finder;
+    packet.alt_extra = alt_extra;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ALTITUDES_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
+    msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 }
 
@@ -114,34 +115,34 @@ static inline uint16_t mavlink_msg_altitudes_pack(uint8_t system_id, uint8_t com
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_altitudes_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint32_t time_boot_ms,int32_t alt_gps,int32_t alt_imu,int32_t alt_barometric,int32_t alt_optical_flow,int32_t alt_range_finder,int32_t alt_extra)
+                               mavlink_message_t* msg,
+                                   uint32_t time_boot_ms,int32_t alt_gps,int32_t alt_imu,int32_t alt_barometric,int32_t alt_optical_flow,int32_t alt_range_finder,int32_t alt_extra)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ALTITUDES_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int32_t(buf, 4, alt_gps);
-	_mav_put_int32_t(buf, 8, alt_imu);
-	_mav_put_int32_t(buf, 12, alt_barometric);
-	_mav_put_int32_t(buf, 16, alt_optical_flow);
-	_mav_put_int32_t(buf, 20, alt_range_finder);
-	_mav_put_int32_t(buf, 24, alt_extra);
+    char buf[MAVLINK_MSG_ID_ALTITUDES_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int32_t(buf, 4, alt_gps);
+    _mav_put_int32_t(buf, 8, alt_imu);
+    _mav_put_int32_t(buf, 12, alt_barometric);
+    _mav_put_int32_t(buf, 16, alt_optical_flow);
+    _mav_put_int32_t(buf, 20, alt_range_finder);
+    _mav_put_int32_t(buf, 24, alt_extra);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ALTITUDES_LEN);
 #else
-	mavlink_altitudes_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.alt_gps = alt_gps;
-	packet.alt_imu = alt_imu;
-	packet.alt_barometric = alt_barometric;
-	packet.alt_optical_flow = alt_optical_flow;
-	packet.alt_range_finder = alt_range_finder;
-	packet.alt_extra = alt_extra;
+    mavlink_altitudes_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.alt_gps = alt_gps;
+    packet.alt_imu = alt_imu;
+    packet.alt_barometric = alt_barometric;
+    packet.alt_optical_flow = alt_optical_flow;
+    packet.alt_range_finder = alt_range_finder;
+    packet.alt_extra = alt_extra;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ALTITUDES_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
+    msg->msgid = MAVLINK_MSG_ID_ALTITUDES;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 }
 
@@ -155,7 +156,7 @@ static inline uint16_t mavlink_msg_altitudes_pack_chan(uint8_t system_id, uint8_
  */
 static inline uint16_t mavlink_msg_altitudes_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_altitudes_t* altitudes)
 {
-	return mavlink_msg_altitudes_pack(system_id, component_id, msg, altitudes->time_boot_ms, altitudes->alt_gps, altitudes->alt_imu, altitudes->alt_barometric, altitudes->alt_optical_flow, altitudes->alt_range_finder, altitudes->alt_extra);
+    return mavlink_msg_altitudes_pack(system_id, component_id, msg, altitudes->time_boot_ms, altitudes->alt_gps, altitudes->alt_imu, altitudes->alt_barometric, altitudes->alt_optical_flow, altitudes->alt_range_finder, altitudes->alt_extra);
 }
 
 /**
@@ -169,7 +170,7 @@ static inline uint16_t mavlink_msg_altitudes_encode(uint8_t system_id, uint8_t c
  */
 static inline uint16_t mavlink_msg_altitudes_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_altitudes_t* altitudes)
 {
-	return mavlink_msg_altitudes_pack_chan(system_id, component_id, chan, msg, altitudes->time_boot_ms, altitudes->alt_gps, altitudes->alt_imu, altitudes->alt_barometric, altitudes->alt_optical_flow, altitudes->alt_range_finder, altitudes->alt_extra);
+    return mavlink_msg_altitudes_pack_chan(system_id, component_id, chan, msg, altitudes->time_boot_ms, altitudes->alt_gps, altitudes->alt_imu, altitudes->alt_barometric, altitudes->alt_optical_flow, altitudes->alt_range_finder, altitudes->alt_extra);
 }
 
 /**
@@ -189,25 +190,25 @@ static inline uint16_t mavlink_msg_altitudes_encode_chan(uint8_t system_id, uint
 static inline void mavlink_msg_altitudes_send(mavlink_channel_t chan, uint32_t time_boot_ms, int32_t alt_gps, int32_t alt_imu, int32_t alt_barometric, int32_t alt_optical_flow, int32_t alt_range_finder, int32_t alt_extra)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ALTITUDES_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int32_t(buf, 4, alt_gps);
-	_mav_put_int32_t(buf, 8, alt_imu);
-	_mav_put_int32_t(buf, 12, alt_barometric);
-	_mav_put_int32_t(buf, 16, alt_optical_flow);
-	_mav_put_int32_t(buf, 20, alt_range_finder);
-	_mav_put_int32_t(buf, 24, alt_extra);
+    char buf[MAVLINK_MSG_ID_ALTITUDES_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int32_t(buf, 4, alt_gps);
+    _mav_put_int32_t(buf, 8, alt_imu);
+    _mav_put_int32_t(buf, 12, alt_barometric);
+    _mav_put_int32_t(buf, 16, alt_optical_flow);
+    _mav_put_int32_t(buf, 20, alt_range_finder);
+    _mav_put_int32_t(buf, 24, alt_extra);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #else
-	mavlink_altitudes_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.alt_gps = alt_gps;
-	packet.alt_imu = alt_imu;
-	packet.alt_barometric = alt_barometric;
-	packet.alt_optical_flow = alt_optical_flow;
-	packet.alt_range_finder = alt_range_finder;
-	packet.alt_extra = alt_extra;
+    mavlink_altitudes_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.alt_gps = alt_gps;
+    packet.alt_imu = alt_imu;
+    packet.alt_barometric = alt_barometric;
+    packet.alt_optical_flow = alt_optical_flow;
+    packet.alt_range_finder = alt_range_finder;
+    packet.alt_extra = alt_extra;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)&packet, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #endif
@@ -238,25 +239,25 @@ static inline void mavlink_msg_altitudes_send_struct(mavlink_channel_t chan, con
 static inline void mavlink_msg_altitudes_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint32_t time_boot_ms, int32_t alt_gps, int32_t alt_imu, int32_t alt_barometric, int32_t alt_optical_flow, int32_t alt_range_finder, int32_t alt_extra)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int32_t(buf, 4, alt_gps);
-	_mav_put_int32_t(buf, 8, alt_imu);
-	_mav_put_int32_t(buf, 12, alt_barometric);
-	_mav_put_int32_t(buf, 16, alt_optical_flow);
-	_mav_put_int32_t(buf, 20, alt_range_finder);
-	_mav_put_int32_t(buf, 24, alt_extra);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int32_t(buf, 4, alt_gps);
+    _mav_put_int32_t(buf, 8, alt_imu);
+    _mav_put_int32_t(buf, 12, alt_barometric);
+    _mav_put_int32_t(buf, 16, alt_optical_flow);
+    _mav_put_int32_t(buf, 20, alt_range_finder);
+    _mav_put_int32_t(buf, 24, alt_extra);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, buf, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #else
-	mavlink_altitudes_t *packet = (mavlink_altitudes_t *)msgbuf;
-	packet->time_boot_ms = time_boot_ms;
-	packet->alt_gps = alt_gps;
-	packet->alt_imu = alt_imu;
-	packet->alt_barometric = alt_barometric;
-	packet->alt_optical_flow = alt_optical_flow;
-	packet->alt_range_finder = alt_range_finder;
-	packet->alt_extra = alt_extra;
+    mavlink_altitudes_t *packet = (mavlink_altitudes_t *)msgbuf;
+    packet->time_boot_ms = time_boot_ms;
+    packet->alt_gps = alt_gps;
+    packet->alt_imu = alt_imu;
+    packet->alt_barometric = alt_barometric;
+    packet->alt_optical_flow = alt_optical_flow;
+    packet->alt_range_finder = alt_range_finder;
+    packet->alt_extra = alt_extra;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ALTITUDES, (const char *)packet, MAVLINK_MSG_ID_ALTITUDES_MIN_LEN, MAVLINK_MSG_ID_ALTITUDES_LEN, MAVLINK_MSG_ID_ALTITUDES_CRC);
 #endif
@@ -275,7 +276,7 @@ static inline void mavlink_msg_altitudes_send_buf(mavlink_message_t *msgbuf, mav
  */
 static inline uint32_t mavlink_msg_altitudes_get_time_boot_ms(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint32_t(msg,  0);
+    return _MAV_RETURN_uint32_t(msg,  0);
 }
 
 /**
@@ -285,7 +286,7 @@ static inline uint32_t mavlink_msg_altitudes_get_time_boot_ms(const mavlink_mess
  */
 static inline int32_t mavlink_msg_altitudes_get_alt_gps(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  4);
+    return _MAV_RETURN_int32_t(msg,  4);
 }
 
 /**
@@ -295,7 +296,7 @@ static inline int32_t mavlink_msg_altitudes_get_alt_gps(const mavlink_message_t*
  */
 static inline int32_t mavlink_msg_altitudes_get_alt_imu(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  8);
+    return _MAV_RETURN_int32_t(msg,  8);
 }
 
 /**
@@ -305,7 +306,7 @@ static inline int32_t mavlink_msg_altitudes_get_alt_imu(const mavlink_message_t*
  */
 static inline int32_t mavlink_msg_altitudes_get_alt_barometric(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  12);
+    return _MAV_RETURN_int32_t(msg,  12);
 }
 
 /**
@@ -315,7 +316,7 @@ static inline int32_t mavlink_msg_altitudes_get_alt_barometric(const mavlink_mes
  */
 static inline int32_t mavlink_msg_altitudes_get_alt_optical_flow(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  16);
+    return _MAV_RETURN_int32_t(msg,  16);
 }
 
 /**
@@ -325,7 +326,7 @@ static inline int32_t mavlink_msg_altitudes_get_alt_optical_flow(const mavlink_m
  */
 static inline int32_t mavlink_msg_altitudes_get_alt_range_finder(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  20);
+    return _MAV_RETURN_int32_t(msg,  20);
 }
 
 /**
@@ -335,7 +336,7 @@ static inline int32_t mavlink_msg_altitudes_get_alt_range_finder(const mavlink_m
  */
 static inline int32_t mavlink_msg_altitudes_get_alt_extra(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  24);
+    return _MAV_RETURN_int32_t(msg,  24);
 }
 
 /**
@@ -347,16 +348,16 @@ static inline int32_t mavlink_msg_altitudes_get_alt_extra(const mavlink_message_
 static inline void mavlink_msg_altitudes_decode(const mavlink_message_t* msg, mavlink_altitudes_t* altitudes)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	altitudes->time_boot_ms = mavlink_msg_altitudes_get_time_boot_ms(msg);
-	altitudes->alt_gps = mavlink_msg_altitudes_get_alt_gps(msg);
-	altitudes->alt_imu = mavlink_msg_altitudes_get_alt_imu(msg);
-	altitudes->alt_barometric = mavlink_msg_altitudes_get_alt_barometric(msg);
-	altitudes->alt_optical_flow = mavlink_msg_altitudes_get_alt_optical_flow(msg);
-	altitudes->alt_range_finder = mavlink_msg_altitudes_get_alt_range_finder(msg);
-	altitudes->alt_extra = mavlink_msg_altitudes_get_alt_extra(msg);
+    altitudes->time_boot_ms = mavlink_msg_altitudes_get_time_boot_ms(msg);
+    altitudes->alt_gps = mavlink_msg_altitudes_get_alt_gps(msg);
+    altitudes->alt_imu = mavlink_msg_altitudes_get_alt_imu(msg);
+    altitudes->alt_barometric = mavlink_msg_altitudes_get_alt_barometric(msg);
+    altitudes->alt_optical_flow = mavlink_msg_altitudes_get_alt_optical_flow(msg);
+    altitudes->alt_range_finder = mavlink_msg_altitudes_get_alt_range_finder(msg);
+    altitudes->alt_extra = mavlink_msg_altitudes_get_alt_extra(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_ALTITUDES_LEN? msg->len : MAVLINK_MSG_ID_ALTITUDES_LEN;
         memset(altitudes, 0, MAVLINK_MSG_ID_ALTITUDES_LEN);
-	memcpy(altitudes, _MAV_PAYLOAD(msg), len);
+    memcpy(altitudes, _MAV_PAYLOAD(msg), len);
 #endif
 }

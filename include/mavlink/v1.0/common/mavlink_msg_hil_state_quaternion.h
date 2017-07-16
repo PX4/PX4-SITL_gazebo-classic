@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE HIL_STATE_QUATERNION PACKING
 
 #define MAVLINK_MSG_ID_HIL_STATE_QUATERNION 115
@@ -12,11 +13,11 @@ typedef struct __mavlink_hil_state_quaternion_t {
  int32_t lat; /*< Latitude, expressed as * 1E7*/
  int32_t lon; /*< Longitude, expressed as * 1E7*/
  int32_t alt; /*< Altitude in meters, expressed as * 1000 (millimeters)*/
- int16_t vx; /*< Ground X Speed (Latitude), expressed as m/s * 100*/
- int16_t vy; /*< Ground Y Speed (Longitude), expressed as m/s * 100*/
- int16_t vz; /*< Ground Z Speed (Altitude), expressed as m/s * 100*/
- uint16_t ind_airspeed; /*< Indicated airspeed, expressed as m/s * 100*/
- uint16_t true_airspeed; /*< True airspeed, expressed as m/s * 100*/
+ int16_t vx; /*< Ground X Speed (Latitude), expressed as cm/s*/
+ int16_t vy; /*< Ground Y Speed (Longitude), expressed as cm/s*/
+ int16_t vz; /*< Ground Z Speed (Altitude), expressed as cm/s*/
+ uint16_t ind_airspeed; /*< Indicated airspeed, expressed as cm/s*/
+ uint16_t true_airspeed; /*< True airspeed, expressed as cm/s*/
  int16_t xacc; /*< X acceleration (mg)*/
  int16_t yacc; /*< Y acceleration (mg)*/
  int16_t zacc; /*< Z acceleration (mg)*/
@@ -34,10 +35,10 @@ typedef struct __mavlink_hil_state_quaternion_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_HIL_STATE_QUATERNION { \
-	115, \
-	"HIL_STATE_QUATERNION", \
-	16, \
-	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_quaternion_t, time_usec) }, \
+    115, \
+    "HIL_STATE_QUATERNION", \
+    16, \
+    {  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_quaternion_t, time_usec) }, \
          { "attitude_quaternion", NULL, MAVLINK_TYPE_FLOAT, 4, 8, offsetof(mavlink_hil_state_quaternion_t, attitude_quaternion) }, \
          { "rollspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_hil_state_quaternion_t, rollspeed) }, \
          { "pitchspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_hil_state_quaternion_t, pitchspeed) }, \
@@ -57,9 +58,9 @@ typedef struct __mavlink_hil_state_quaternion_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_HIL_STATE_QUATERNION { \
-	"HIL_STATE_QUATERNION", \
-	16, \
-	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_quaternion_t, time_usec) }, \
+    "HIL_STATE_QUATERNION", \
+    16, \
+    {  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_quaternion_t, time_usec) }, \
          { "attitude_quaternion", NULL, MAVLINK_TYPE_FLOAT, 4, 8, offsetof(mavlink_hil_state_quaternion_t, attitude_quaternion) }, \
          { "rollspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 24, offsetof(mavlink_hil_state_quaternion_t, rollspeed) }, \
          { "pitchspeed", NULL, MAVLINK_TYPE_FLOAT, 0, 28, offsetof(mavlink_hil_state_quaternion_t, pitchspeed) }, \
@@ -93,60 +94,60 @@ typedef struct __mavlink_hil_state_quaternion_t {
  * @param lat Latitude, expressed as * 1E7
  * @param lon Longitude, expressed as * 1E7
  * @param alt Altitude in meters, expressed as * 1000 (millimeters)
- * @param vx Ground X Speed (Latitude), expressed as m/s * 100
- * @param vy Ground Y Speed (Longitude), expressed as m/s * 100
- * @param vz Ground Z Speed (Altitude), expressed as m/s * 100
- * @param ind_airspeed Indicated airspeed, expressed as m/s * 100
- * @param true_airspeed True airspeed, expressed as m/s * 100
+ * @param vx Ground X Speed (Latitude), expressed as cm/s
+ * @param vy Ground Y Speed (Longitude), expressed as cm/s
+ * @param vz Ground Z Speed (Altitude), expressed as cm/s
+ * @param ind_airspeed Indicated airspeed, expressed as cm/s
+ * @param true_airspeed True airspeed, expressed as cm/s
  * @param xacc X acceleration (mg)
  * @param yacc Y acceleration (mg)
  * @param zacc Z acceleration (mg)
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint64_t time_usec, const float *attitude_quaternion, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, uint16_t ind_airspeed, uint16_t true_airspeed, int16_t xacc, int16_t yacc, int16_t zacc)
+                               uint64_t time_usec, const float *attitude_quaternion, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, uint16_t ind_airspeed, uint16_t true_airspeed, int16_t xacc, int16_t yacc, int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 24, rollspeed);
-	_mav_put_float(buf, 28, pitchspeed);
-	_mav_put_float(buf, 32, yawspeed);
-	_mav_put_int32_t(buf, 36, lat);
-	_mav_put_int32_t(buf, 40, lon);
-	_mav_put_int32_t(buf, 44, alt);
-	_mav_put_int16_t(buf, 48, vx);
-	_mav_put_int16_t(buf, 50, vy);
-	_mav_put_int16_t(buf, 52, vz);
-	_mav_put_uint16_t(buf, 54, ind_airspeed);
-	_mav_put_uint16_t(buf, 56, true_airspeed);
-	_mav_put_int16_t(buf, 58, xacc);
-	_mav_put_int16_t(buf, 60, yacc);
-	_mav_put_int16_t(buf, 62, zacc);
-	_mav_put_float_array(buf, 8, attitude_quaternion, 4);
+    char buf[MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 24, rollspeed);
+    _mav_put_float(buf, 28, pitchspeed);
+    _mav_put_float(buf, 32, yawspeed);
+    _mav_put_int32_t(buf, 36, lat);
+    _mav_put_int32_t(buf, 40, lon);
+    _mav_put_int32_t(buf, 44, alt);
+    _mav_put_int16_t(buf, 48, vx);
+    _mav_put_int16_t(buf, 50, vy);
+    _mav_put_int16_t(buf, 52, vz);
+    _mav_put_uint16_t(buf, 54, ind_airspeed);
+    _mav_put_uint16_t(buf, 56, true_airspeed);
+    _mav_put_int16_t(buf, 58, xacc);
+    _mav_put_int16_t(buf, 60, yacc);
+    _mav_put_int16_t(buf, 62, zacc);
+    _mav_put_float_array(buf, 8, attitude_quaternion, 4);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN);
 #else
-	mavlink_hil_state_quaternion_t packet;
-	packet.time_usec = time_usec;
-	packet.rollspeed = rollspeed;
-	packet.pitchspeed = pitchspeed;
-	packet.yawspeed = yawspeed;
-	packet.lat = lat;
-	packet.lon = lon;
-	packet.alt = alt;
-	packet.vx = vx;
-	packet.vy = vy;
-	packet.vz = vz;
-	packet.ind_airspeed = ind_airspeed;
-	packet.true_airspeed = true_airspeed;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
-	mav_array_memcpy(packet.attitude_quaternion, attitude_quaternion, sizeof(float)*4);
+    mavlink_hil_state_quaternion_t packet;
+    packet.time_usec = time_usec;
+    packet.rollspeed = rollspeed;
+    packet.pitchspeed = pitchspeed;
+    packet.yawspeed = yawspeed;
+    packet.lat = lat;
+    packet.lon = lon;
+    packet.alt = alt;
+    packet.vx = vx;
+    packet.vy = vy;
+    packet.vz = vz;
+    packet.ind_airspeed = ind_airspeed;
+    packet.true_airspeed = true_airspeed;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
+    mav_array_memcpy(packet.attitude_quaternion, attitude_quaternion, sizeof(float)*4);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
+    msg->msgid = MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
 }
 
@@ -164,61 +165,61 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_pack(uint8_t system_id, 
  * @param lat Latitude, expressed as * 1E7
  * @param lon Longitude, expressed as * 1E7
  * @param alt Altitude in meters, expressed as * 1000 (millimeters)
- * @param vx Ground X Speed (Latitude), expressed as m/s * 100
- * @param vy Ground Y Speed (Longitude), expressed as m/s * 100
- * @param vz Ground Z Speed (Altitude), expressed as m/s * 100
- * @param ind_airspeed Indicated airspeed, expressed as m/s * 100
- * @param true_airspeed True airspeed, expressed as m/s * 100
+ * @param vx Ground X Speed (Latitude), expressed as cm/s
+ * @param vy Ground Y Speed (Longitude), expressed as cm/s
+ * @param vz Ground Z Speed (Altitude), expressed as cm/s
+ * @param ind_airspeed Indicated airspeed, expressed as cm/s
+ * @param true_airspeed True airspeed, expressed as cm/s
  * @param xacc X acceleration (mg)
  * @param yacc Y acceleration (mg)
  * @param zacc Z acceleration (mg)
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint64_t time_usec,const float *attitude_quaternion,float rollspeed,float pitchspeed,float yawspeed,int32_t lat,int32_t lon,int32_t alt,int16_t vx,int16_t vy,int16_t vz,uint16_t ind_airspeed,uint16_t true_airspeed,int16_t xacc,int16_t yacc,int16_t zacc)
+                               mavlink_message_t* msg,
+                                   uint64_t time_usec,const float *attitude_quaternion,float rollspeed,float pitchspeed,float yawspeed,int32_t lat,int32_t lon,int32_t alt,int16_t vx,int16_t vy,int16_t vz,uint16_t ind_airspeed,uint16_t true_airspeed,int16_t xacc,int16_t yacc,int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 24, rollspeed);
-	_mav_put_float(buf, 28, pitchspeed);
-	_mav_put_float(buf, 32, yawspeed);
-	_mav_put_int32_t(buf, 36, lat);
-	_mav_put_int32_t(buf, 40, lon);
-	_mav_put_int32_t(buf, 44, alt);
-	_mav_put_int16_t(buf, 48, vx);
-	_mav_put_int16_t(buf, 50, vy);
-	_mav_put_int16_t(buf, 52, vz);
-	_mav_put_uint16_t(buf, 54, ind_airspeed);
-	_mav_put_uint16_t(buf, 56, true_airspeed);
-	_mav_put_int16_t(buf, 58, xacc);
-	_mav_put_int16_t(buf, 60, yacc);
-	_mav_put_int16_t(buf, 62, zacc);
-	_mav_put_float_array(buf, 8, attitude_quaternion, 4);
+    char buf[MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 24, rollspeed);
+    _mav_put_float(buf, 28, pitchspeed);
+    _mav_put_float(buf, 32, yawspeed);
+    _mav_put_int32_t(buf, 36, lat);
+    _mav_put_int32_t(buf, 40, lon);
+    _mav_put_int32_t(buf, 44, alt);
+    _mav_put_int16_t(buf, 48, vx);
+    _mav_put_int16_t(buf, 50, vy);
+    _mav_put_int16_t(buf, 52, vz);
+    _mav_put_uint16_t(buf, 54, ind_airspeed);
+    _mav_put_uint16_t(buf, 56, true_airspeed);
+    _mav_put_int16_t(buf, 58, xacc);
+    _mav_put_int16_t(buf, 60, yacc);
+    _mav_put_int16_t(buf, 62, zacc);
+    _mav_put_float_array(buf, 8, attitude_quaternion, 4);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN);
 #else
-	mavlink_hil_state_quaternion_t packet;
-	packet.time_usec = time_usec;
-	packet.rollspeed = rollspeed;
-	packet.pitchspeed = pitchspeed;
-	packet.yawspeed = yawspeed;
-	packet.lat = lat;
-	packet.lon = lon;
-	packet.alt = alt;
-	packet.vx = vx;
-	packet.vy = vy;
-	packet.vz = vz;
-	packet.ind_airspeed = ind_airspeed;
-	packet.true_airspeed = true_airspeed;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
-	mav_array_memcpy(packet.attitude_quaternion, attitude_quaternion, sizeof(float)*4);
+    mavlink_hil_state_quaternion_t packet;
+    packet.time_usec = time_usec;
+    packet.rollspeed = rollspeed;
+    packet.pitchspeed = pitchspeed;
+    packet.yawspeed = yawspeed;
+    packet.lat = lat;
+    packet.lon = lon;
+    packet.alt = alt;
+    packet.vx = vx;
+    packet.vy = vy;
+    packet.vz = vz;
+    packet.ind_airspeed = ind_airspeed;
+    packet.true_airspeed = true_airspeed;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
+    mav_array_memcpy(packet.attitude_quaternion, attitude_quaternion, sizeof(float)*4);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
+    msg->msgid = MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
 }
 
@@ -232,7 +233,7 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_pack_chan(uint8_t system
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_hil_state_quaternion_t* hil_state_quaternion)
 {
-	return mavlink_msg_hil_state_quaternion_pack(system_id, component_id, msg, hil_state_quaternion->time_usec, hil_state_quaternion->attitude_quaternion, hil_state_quaternion->rollspeed, hil_state_quaternion->pitchspeed, hil_state_quaternion->yawspeed, hil_state_quaternion->lat, hil_state_quaternion->lon, hil_state_quaternion->alt, hil_state_quaternion->vx, hil_state_quaternion->vy, hil_state_quaternion->vz, hil_state_quaternion->ind_airspeed, hil_state_quaternion->true_airspeed, hil_state_quaternion->xacc, hil_state_quaternion->yacc, hil_state_quaternion->zacc);
+    return mavlink_msg_hil_state_quaternion_pack(system_id, component_id, msg, hil_state_quaternion->time_usec, hil_state_quaternion->attitude_quaternion, hil_state_quaternion->rollspeed, hil_state_quaternion->pitchspeed, hil_state_quaternion->yawspeed, hil_state_quaternion->lat, hil_state_quaternion->lon, hil_state_quaternion->alt, hil_state_quaternion->vx, hil_state_quaternion->vy, hil_state_quaternion->vz, hil_state_quaternion->ind_airspeed, hil_state_quaternion->true_airspeed, hil_state_quaternion->xacc, hil_state_quaternion->yacc, hil_state_quaternion->zacc);
 }
 
 /**
@@ -246,7 +247,7 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_encode(uint8_t system_id
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_hil_state_quaternion_t* hil_state_quaternion)
 {
-	return mavlink_msg_hil_state_quaternion_pack_chan(system_id, component_id, chan, msg, hil_state_quaternion->time_usec, hil_state_quaternion->attitude_quaternion, hil_state_quaternion->rollspeed, hil_state_quaternion->pitchspeed, hil_state_quaternion->yawspeed, hil_state_quaternion->lat, hil_state_quaternion->lon, hil_state_quaternion->alt, hil_state_quaternion->vx, hil_state_quaternion->vy, hil_state_quaternion->vz, hil_state_quaternion->ind_airspeed, hil_state_quaternion->true_airspeed, hil_state_quaternion->xacc, hil_state_quaternion->yacc, hil_state_quaternion->zacc);
+    return mavlink_msg_hil_state_quaternion_pack_chan(system_id, component_id, chan, msg, hil_state_quaternion->time_usec, hil_state_quaternion->attitude_quaternion, hil_state_quaternion->rollspeed, hil_state_quaternion->pitchspeed, hil_state_quaternion->yawspeed, hil_state_quaternion->lat, hil_state_quaternion->lon, hil_state_quaternion->alt, hil_state_quaternion->vx, hil_state_quaternion->vy, hil_state_quaternion->vz, hil_state_quaternion->ind_airspeed, hil_state_quaternion->true_airspeed, hil_state_quaternion->xacc, hil_state_quaternion->yacc, hil_state_quaternion->zacc);
 }
 
 /**
@@ -261,11 +262,11 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_encode_chan(uint8_t syst
  * @param lat Latitude, expressed as * 1E7
  * @param lon Longitude, expressed as * 1E7
  * @param alt Altitude in meters, expressed as * 1000 (millimeters)
- * @param vx Ground X Speed (Latitude), expressed as m/s * 100
- * @param vy Ground Y Speed (Longitude), expressed as m/s * 100
- * @param vz Ground Z Speed (Altitude), expressed as m/s * 100
- * @param ind_airspeed Indicated airspeed, expressed as m/s * 100
- * @param true_airspeed True airspeed, expressed as m/s * 100
+ * @param vx Ground X Speed (Latitude), expressed as cm/s
+ * @param vy Ground Y Speed (Longitude), expressed as cm/s
+ * @param vz Ground Z Speed (Altitude), expressed as cm/s
+ * @param ind_airspeed Indicated airspeed, expressed as cm/s
+ * @param true_airspeed True airspeed, expressed as cm/s
  * @param xacc X acceleration (mg)
  * @param yacc Y acceleration (mg)
  * @param zacc Z acceleration (mg)
@@ -275,42 +276,42 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_encode_chan(uint8_t syst
 static inline void mavlink_msg_hil_state_quaternion_send(mavlink_channel_t chan, uint64_t time_usec, const float *attitude_quaternion, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, uint16_t ind_airspeed, uint16_t true_airspeed, int16_t xacc, int16_t yacc, int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 24, rollspeed);
-	_mav_put_float(buf, 28, pitchspeed);
-	_mav_put_float(buf, 32, yawspeed);
-	_mav_put_int32_t(buf, 36, lat);
-	_mav_put_int32_t(buf, 40, lon);
-	_mav_put_int32_t(buf, 44, alt);
-	_mav_put_int16_t(buf, 48, vx);
-	_mav_put_int16_t(buf, 50, vy);
-	_mav_put_int16_t(buf, 52, vz);
-	_mav_put_uint16_t(buf, 54, ind_airspeed);
-	_mav_put_uint16_t(buf, 56, true_airspeed);
-	_mav_put_int16_t(buf, 58, xacc);
-	_mav_put_int16_t(buf, 60, yacc);
-	_mav_put_int16_t(buf, 62, zacc);
-	_mav_put_float_array(buf, 8, attitude_quaternion, 4);
+    char buf[MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 24, rollspeed);
+    _mav_put_float(buf, 28, pitchspeed);
+    _mav_put_float(buf, 32, yawspeed);
+    _mav_put_int32_t(buf, 36, lat);
+    _mav_put_int32_t(buf, 40, lon);
+    _mav_put_int32_t(buf, 44, alt);
+    _mav_put_int16_t(buf, 48, vx);
+    _mav_put_int16_t(buf, 50, vy);
+    _mav_put_int16_t(buf, 52, vz);
+    _mav_put_uint16_t(buf, 54, ind_airspeed);
+    _mav_put_uint16_t(buf, 56, true_airspeed);
+    _mav_put_int16_t(buf, 58, xacc);
+    _mav_put_int16_t(buf, 60, yacc);
+    _mav_put_int16_t(buf, 62, zacc);
+    _mav_put_float_array(buf, 8, attitude_quaternion, 4);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE_QUATERNION, buf, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
 #else
-	mavlink_hil_state_quaternion_t packet;
-	packet.time_usec = time_usec;
-	packet.rollspeed = rollspeed;
-	packet.pitchspeed = pitchspeed;
-	packet.yawspeed = yawspeed;
-	packet.lat = lat;
-	packet.lon = lon;
-	packet.alt = alt;
-	packet.vx = vx;
-	packet.vy = vy;
-	packet.vz = vz;
-	packet.ind_airspeed = ind_airspeed;
-	packet.true_airspeed = true_airspeed;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
-	mav_array_memcpy(packet.attitude_quaternion, attitude_quaternion, sizeof(float)*4);
+    mavlink_hil_state_quaternion_t packet;
+    packet.time_usec = time_usec;
+    packet.rollspeed = rollspeed;
+    packet.pitchspeed = pitchspeed;
+    packet.yawspeed = yawspeed;
+    packet.lat = lat;
+    packet.lon = lon;
+    packet.alt = alt;
+    packet.vx = vx;
+    packet.vy = vy;
+    packet.vz = vz;
+    packet.ind_airspeed = ind_airspeed;
+    packet.true_airspeed = true_airspeed;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
+    mav_array_memcpy(packet.attitude_quaternion, attitude_quaternion, sizeof(float)*4);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE_QUATERNION, (const char *)&packet, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
 #endif
 }
@@ -340,42 +341,42 @@ static inline void mavlink_msg_hil_state_quaternion_send_struct(mavlink_channel_
 static inline void mavlink_msg_hil_state_quaternion_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint64_t time_usec, const float *attitude_quaternion, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, uint16_t ind_airspeed, uint16_t true_airspeed, int16_t xacc, int16_t yacc, int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 24, rollspeed);
-	_mav_put_float(buf, 28, pitchspeed);
-	_mav_put_float(buf, 32, yawspeed);
-	_mav_put_int32_t(buf, 36, lat);
-	_mav_put_int32_t(buf, 40, lon);
-	_mav_put_int32_t(buf, 44, alt);
-	_mav_put_int16_t(buf, 48, vx);
-	_mav_put_int16_t(buf, 50, vy);
-	_mav_put_int16_t(buf, 52, vz);
-	_mav_put_uint16_t(buf, 54, ind_airspeed);
-	_mav_put_uint16_t(buf, 56, true_airspeed);
-	_mav_put_int16_t(buf, 58, xacc);
-	_mav_put_int16_t(buf, 60, yacc);
-	_mav_put_int16_t(buf, 62, zacc);
-	_mav_put_float_array(buf, 8, attitude_quaternion, 4);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 24, rollspeed);
+    _mav_put_float(buf, 28, pitchspeed);
+    _mav_put_float(buf, 32, yawspeed);
+    _mav_put_int32_t(buf, 36, lat);
+    _mav_put_int32_t(buf, 40, lon);
+    _mav_put_int32_t(buf, 44, alt);
+    _mav_put_int16_t(buf, 48, vx);
+    _mav_put_int16_t(buf, 50, vy);
+    _mav_put_int16_t(buf, 52, vz);
+    _mav_put_uint16_t(buf, 54, ind_airspeed);
+    _mav_put_uint16_t(buf, 56, true_airspeed);
+    _mav_put_int16_t(buf, 58, xacc);
+    _mav_put_int16_t(buf, 60, yacc);
+    _mav_put_int16_t(buf, 62, zacc);
+    _mav_put_float_array(buf, 8, attitude_quaternion, 4);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE_QUATERNION, buf, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
 #else
-	mavlink_hil_state_quaternion_t *packet = (mavlink_hil_state_quaternion_t *)msgbuf;
-	packet->time_usec = time_usec;
-	packet->rollspeed = rollspeed;
-	packet->pitchspeed = pitchspeed;
-	packet->yawspeed = yawspeed;
-	packet->lat = lat;
-	packet->lon = lon;
-	packet->alt = alt;
-	packet->vx = vx;
-	packet->vy = vy;
-	packet->vz = vz;
-	packet->ind_airspeed = ind_airspeed;
-	packet->true_airspeed = true_airspeed;
-	packet->xacc = xacc;
-	packet->yacc = yacc;
-	packet->zacc = zacc;
-	mav_array_memcpy(packet->attitude_quaternion, attitude_quaternion, sizeof(float)*4);
+    mavlink_hil_state_quaternion_t *packet = (mavlink_hil_state_quaternion_t *)msgbuf;
+    packet->time_usec = time_usec;
+    packet->rollspeed = rollspeed;
+    packet->pitchspeed = pitchspeed;
+    packet->yawspeed = yawspeed;
+    packet->lat = lat;
+    packet->lon = lon;
+    packet->alt = alt;
+    packet->vx = vx;
+    packet->vy = vy;
+    packet->vz = vz;
+    packet->ind_airspeed = ind_airspeed;
+    packet->true_airspeed = true_airspeed;
+    packet->xacc = xacc;
+    packet->yacc = yacc;
+    packet->zacc = zacc;
+    mav_array_memcpy(packet->attitude_quaternion, attitude_quaternion, sizeof(float)*4);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE_QUATERNION, (const char *)packet, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
 #endif
 }
@@ -393,7 +394,7 @@ static inline void mavlink_msg_hil_state_quaternion_send_buf(mavlink_message_t *
  */
 static inline uint64_t mavlink_msg_hil_state_quaternion_get_time_usec(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  0);
+    return _MAV_RETURN_uint64_t(msg,  0);
 }
 
 /**
@@ -403,7 +404,7 @@ static inline uint64_t mavlink_msg_hil_state_quaternion_get_time_usec(const mavl
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_get_attitude_quaternion(const mavlink_message_t* msg, float *attitude_quaternion)
 {
-	return _MAV_RETURN_float_array(msg, attitude_quaternion, 4,  8);
+    return _MAV_RETURN_float_array(msg, attitude_quaternion, 4,  8);
 }
 
 /**
@@ -413,7 +414,7 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_get_attitude_quaternion(
  */
 static inline float mavlink_msg_hil_state_quaternion_get_rollspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  24);
+    return _MAV_RETURN_float(msg,  24);
 }
 
 /**
@@ -423,7 +424,7 @@ static inline float mavlink_msg_hil_state_quaternion_get_rollspeed(const mavlink
  */
 static inline float mavlink_msg_hil_state_quaternion_get_pitchspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  28);
+    return _MAV_RETURN_float(msg,  28);
 }
 
 /**
@@ -433,7 +434,7 @@ static inline float mavlink_msg_hil_state_quaternion_get_pitchspeed(const mavlin
  */
 static inline float mavlink_msg_hil_state_quaternion_get_yawspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  32);
+    return _MAV_RETURN_float(msg,  32);
 }
 
 /**
@@ -443,7 +444,7 @@ static inline float mavlink_msg_hil_state_quaternion_get_yawspeed(const mavlink_
  */
 static inline int32_t mavlink_msg_hil_state_quaternion_get_lat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  36);
+    return _MAV_RETURN_int32_t(msg,  36);
 }
 
 /**
@@ -453,7 +454,7 @@ static inline int32_t mavlink_msg_hil_state_quaternion_get_lat(const mavlink_mes
  */
 static inline int32_t mavlink_msg_hil_state_quaternion_get_lon(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  40);
+    return _MAV_RETURN_int32_t(msg,  40);
 }
 
 /**
@@ -463,57 +464,57 @@ static inline int32_t mavlink_msg_hil_state_quaternion_get_lon(const mavlink_mes
  */
 static inline int32_t mavlink_msg_hil_state_quaternion_get_alt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  44);
+    return _MAV_RETURN_int32_t(msg,  44);
 }
 
 /**
  * @brief Get field vx from hil_state_quaternion message
  *
- * @return Ground X Speed (Latitude), expressed as m/s * 100
+ * @return Ground X Speed (Latitude), expressed as cm/s
  */
 static inline int16_t mavlink_msg_hil_state_quaternion_get_vx(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  48);
+    return _MAV_RETURN_int16_t(msg,  48);
 }
 
 /**
  * @brief Get field vy from hil_state_quaternion message
  *
- * @return Ground Y Speed (Longitude), expressed as m/s * 100
+ * @return Ground Y Speed (Longitude), expressed as cm/s
  */
 static inline int16_t mavlink_msg_hil_state_quaternion_get_vy(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  50);
+    return _MAV_RETURN_int16_t(msg,  50);
 }
 
 /**
  * @brief Get field vz from hil_state_quaternion message
  *
- * @return Ground Z Speed (Altitude), expressed as m/s * 100
+ * @return Ground Z Speed (Altitude), expressed as cm/s
  */
 static inline int16_t mavlink_msg_hil_state_quaternion_get_vz(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  52);
+    return _MAV_RETURN_int16_t(msg,  52);
 }
 
 /**
  * @brief Get field ind_airspeed from hil_state_quaternion message
  *
- * @return Indicated airspeed, expressed as m/s * 100
+ * @return Indicated airspeed, expressed as cm/s
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_get_ind_airspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  54);
+    return _MAV_RETURN_uint16_t(msg,  54);
 }
 
 /**
  * @brief Get field true_airspeed from hil_state_quaternion message
  *
- * @return True airspeed, expressed as m/s * 100
+ * @return True airspeed, expressed as cm/s
  */
 static inline uint16_t mavlink_msg_hil_state_quaternion_get_true_airspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  56);
+    return _MAV_RETURN_uint16_t(msg,  56);
 }
 
 /**
@@ -523,7 +524,7 @@ static inline uint16_t mavlink_msg_hil_state_quaternion_get_true_airspeed(const 
  */
 static inline int16_t mavlink_msg_hil_state_quaternion_get_xacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  58);
+    return _MAV_RETURN_int16_t(msg,  58);
 }
 
 /**
@@ -533,7 +534,7 @@ static inline int16_t mavlink_msg_hil_state_quaternion_get_xacc(const mavlink_me
  */
 static inline int16_t mavlink_msg_hil_state_quaternion_get_yacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  60);
+    return _MAV_RETURN_int16_t(msg,  60);
 }
 
 /**
@@ -543,7 +544,7 @@ static inline int16_t mavlink_msg_hil_state_quaternion_get_yacc(const mavlink_me
  */
 static inline int16_t mavlink_msg_hil_state_quaternion_get_zacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  62);
+    return _MAV_RETURN_int16_t(msg,  62);
 }
 
 /**
@@ -555,25 +556,25 @@ static inline int16_t mavlink_msg_hil_state_quaternion_get_zacc(const mavlink_me
 static inline void mavlink_msg_hil_state_quaternion_decode(const mavlink_message_t* msg, mavlink_hil_state_quaternion_t* hil_state_quaternion)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	hil_state_quaternion->time_usec = mavlink_msg_hil_state_quaternion_get_time_usec(msg);
-	mavlink_msg_hil_state_quaternion_get_attitude_quaternion(msg, hil_state_quaternion->attitude_quaternion);
-	hil_state_quaternion->rollspeed = mavlink_msg_hil_state_quaternion_get_rollspeed(msg);
-	hil_state_quaternion->pitchspeed = mavlink_msg_hil_state_quaternion_get_pitchspeed(msg);
-	hil_state_quaternion->yawspeed = mavlink_msg_hil_state_quaternion_get_yawspeed(msg);
-	hil_state_quaternion->lat = mavlink_msg_hil_state_quaternion_get_lat(msg);
-	hil_state_quaternion->lon = mavlink_msg_hil_state_quaternion_get_lon(msg);
-	hil_state_quaternion->alt = mavlink_msg_hil_state_quaternion_get_alt(msg);
-	hil_state_quaternion->vx = mavlink_msg_hil_state_quaternion_get_vx(msg);
-	hil_state_quaternion->vy = mavlink_msg_hil_state_quaternion_get_vy(msg);
-	hil_state_quaternion->vz = mavlink_msg_hil_state_quaternion_get_vz(msg);
-	hil_state_quaternion->ind_airspeed = mavlink_msg_hil_state_quaternion_get_ind_airspeed(msg);
-	hil_state_quaternion->true_airspeed = mavlink_msg_hil_state_quaternion_get_true_airspeed(msg);
-	hil_state_quaternion->xacc = mavlink_msg_hil_state_quaternion_get_xacc(msg);
-	hil_state_quaternion->yacc = mavlink_msg_hil_state_quaternion_get_yacc(msg);
-	hil_state_quaternion->zacc = mavlink_msg_hil_state_quaternion_get_zacc(msg);
+    hil_state_quaternion->time_usec = mavlink_msg_hil_state_quaternion_get_time_usec(msg);
+    mavlink_msg_hil_state_quaternion_get_attitude_quaternion(msg, hil_state_quaternion->attitude_quaternion);
+    hil_state_quaternion->rollspeed = mavlink_msg_hil_state_quaternion_get_rollspeed(msg);
+    hil_state_quaternion->pitchspeed = mavlink_msg_hil_state_quaternion_get_pitchspeed(msg);
+    hil_state_quaternion->yawspeed = mavlink_msg_hil_state_quaternion_get_yawspeed(msg);
+    hil_state_quaternion->lat = mavlink_msg_hil_state_quaternion_get_lat(msg);
+    hil_state_quaternion->lon = mavlink_msg_hil_state_quaternion_get_lon(msg);
+    hil_state_quaternion->alt = mavlink_msg_hil_state_quaternion_get_alt(msg);
+    hil_state_quaternion->vx = mavlink_msg_hil_state_quaternion_get_vx(msg);
+    hil_state_quaternion->vy = mavlink_msg_hil_state_quaternion_get_vy(msg);
+    hil_state_quaternion->vz = mavlink_msg_hil_state_quaternion_get_vz(msg);
+    hil_state_quaternion->ind_airspeed = mavlink_msg_hil_state_quaternion_get_ind_airspeed(msg);
+    hil_state_quaternion->true_airspeed = mavlink_msg_hil_state_quaternion_get_true_airspeed(msg);
+    hil_state_quaternion->xacc = mavlink_msg_hil_state_quaternion_get_xacc(msg);
+    hil_state_quaternion->yacc = mavlink_msg_hil_state_quaternion_get_yacc(msg);
+    hil_state_quaternion->zacc = mavlink_msg_hil_state_quaternion_get_zacc(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN? msg->len : MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN;
         memset(hil_state_quaternion, 0, MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN);
-	memcpy(hil_state_quaternion, _MAV_PAYLOAD(msg), len);
+    memcpy(hil_state_quaternion, _MAV_PAYLOAD(msg), len);
 #endif
 }

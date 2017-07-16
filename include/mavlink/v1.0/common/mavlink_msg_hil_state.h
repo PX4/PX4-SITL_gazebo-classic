@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE HIL_STATE PACKING
 
 #define MAVLINK_MSG_ID_HIL_STATE 90
@@ -34,10 +35,10 @@ typedef struct __mavlink_hil_state_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_HIL_STATE { \
-	90, \
-	"HIL_STATE", \
-	16, \
-	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_t, time_usec) }, \
+    90, \
+    "HIL_STATE", \
+    16, \
+    {  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_t, time_usec) }, \
          { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_hil_state_t, roll) }, \
          { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_hil_state_t, pitch) }, \
          { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_hil_state_t, yaw) }, \
@@ -57,9 +58,9 @@ typedef struct __mavlink_hil_state_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_HIL_STATE { \
-	"HIL_STATE", \
-	16, \
-	{  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_t, time_usec) }, \
+    "HIL_STATE", \
+    16, \
+    {  { "time_usec", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_hil_state_t, time_usec) }, \
          { "roll", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_hil_state_t, roll) }, \
          { "pitch", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_hil_state_t, pitch) }, \
          { "yaw", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_hil_state_t, yaw) }, \
@@ -104,51 +105,51 @@ typedef struct __mavlink_hil_state_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_hil_state_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint64_t time_usec, float roll, float pitch, float yaw, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, int16_t xacc, int16_t yacc, int16_t zacc)
+                               uint64_t time_usec, float roll, float pitch, float yaw, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, int16_t xacc, int16_t yacc, int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_HIL_STATE_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, roll);
-	_mav_put_float(buf, 12, pitch);
-	_mav_put_float(buf, 16, yaw);
-	_mav_put_float(buf, 20, rollspeed);
-	_mav_put_float(buf, 24, pitchspeed);
-	_mav_put_float(buf, 28, yawspeed);
-	_mav_put_int32_t(buf, 32, lat);
-	_mav_put_int32_t(buf, 36, lon);
-	_mav_put_int32_t(buf, 40, alt);
-	_mav_put_int16_t(buf, 44, vx);
-	_mav_put_int16_t(buf, 46, vy);
-	_mav_put_int16_t(buf, 48, vz);
-	_mav_put_int16_t(buf, 50, xacc);
-	_mav_put_int16_t(buf, 52, yacc);
-	_mav_put_int16_t(buf, 54, zacc);
+    char buf[MAVLINK_MSG_ID_HIL_STATE_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, roll);
+    _mav_put_float(buf, 12, pitch);
+    _mav_put_float(buf, 16, yaw);
+    _mav_put_float(buf, 20, rollspeed);
+    _mav_put_float(buf, 24, pitchspeed);
+    _mav_put_float(buf, 28, yawspeed);
+    _mav_put_int32_t(buf, 32, lat);
+    _mav_put_int32_t(buf, 36, lon);
+    _mav_put_int32_t(buf, 40, alt);
+    _mav_put_int16_t(buf, 44, vx);
+    _mav_put_int16_t(buf, 46, vy);
+    _mav_put_int16_t(buf, 48, vz);
+    _mav_put_int16_t(buf, 50, xacc);
+    _mav_put_int16_t(buf, 52, yacc);
+    _mav_put_int16_t(buf, 54, zacc);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_HIL_STATE_LEN);
 #else
-	mavlink_hil_state_t packet;
-	packet.time_usec = time_usec;
-	packet.roll = roll;
-	packet.pitch = pitch;
-	packet.yaw = yaw;
-	packet.rollspeed = rollspeed;
-	packet.pitchspeed = pitchspeed;
-	packet.yawspeed = yawspeed;
-	packet.lat = lat;
-	packet.lon = lon;
-	packet.alt = alt;
-	packet.vx = vx;
-	packet.vy = vy;
-	packet.vz = vz;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
+    mavlink_hil_state_t packet;
+    packet.time_usec = time_usec;
+    packet.roll = roll;
+    packet.pitch = pitch;
+    packet.yaw = yaw;
+    packet.rollspeed = rollspeed;
+    packet.pitchspeed = pitchspeed;
+    packet.yawspeed = yawspeed;
+    packet.lat = lat;
+    packet.lon = lon;
+    packet.alt = alt;
+    packet.vx = vx;
+    packet.vy = vy;
+    packet.vz = vz;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_STATE_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_HIL_STATE;
+    msg->msgid = MAVLINK_MSG_ID_HIL_STATE;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 }
 
@@ -177,52 +178,52 @@ static inline uint16_t mavlink_msg_hil_state_pack(uint8_t system_id, uint8_t com
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_hil_state_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint64_t time_usec,float roll,float pitch,float yaw,float rollspeed,float pitchspeed,float yawspeed,int32_t lat,int32_t lon,int32_t alt,int16_t vx,int16_t vy,int16_t vz,int16_t xacc,int16_t yacc,int16_t zacc)
+                               mavlink_message_t* msg,
+                                   uint64_t time_usec,float roll,float pitch,float yaw,float rollspeed,float pitchspeed,float yawspeed,int32_t lat,int32_t lon,int32_t alt,int16_t vx,int16_t vy,int16_t vz,int16_t xacc,int16_t yacc,int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_HIL_STATE_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, roll);
-	_mav_put_float(buf, 12, pitch);
-	_mav_put_float(buf, 16, yaw);
-	_mav_put_float(buf, 20, rollspeed);
-	_mav_put_float(buf, 24, pitchspeed);
-	_mav_put_float(buf, 28, yawspeed);
-	_mav_put_int32_t(buf, 32, lat);
-	_mav_put_int32_t(buf, 36, lon);
-	_mav_put_int32_t(buf, 40, alt);
-	_mav_put_int16_t(buf, 44, vx);
-	_mav_put_int16_t(buf, 46, vy);
-	_mav_put_int16_t(buf, 48, vz);
-	_mav_put_int16_t(buf, 50, xacc);
-	_mav_put_int16_t(buf, 52, yacc);
-	_mav_put_int16_t(buf, 54, zacc);
+    char buf[MAVLINK_MSG_ID_HIL_STATE_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, roll);
+    _mav_put_float(buf, 12, pitch);
+    _mav_put_float(buf, 16, yaw);
+    _mav_put_float(buf, 20, rollspeed);
+    _mav_put_float(buf, 24, pitchspeed);
+    _mav_put_float(buf, 28, yawspeed);
+    _mav_put_int32_t(buf, 32, lat);
+    _mav_put_int32_t(buf, 36, lon);
+    _mav_put_int32_t(buf, 40, alt);
+    _mav_put_int16_t(buf, 44, vx);
+    _mav_put_int16_t(buf, 46, vy);
+    _mav_put_int16_t(buf, 48, vz);
+    _mav_put_int16_t(buf, 50, xacc);
+    _mav_put_int16_t(buf, 52, yacc);
+    _mav_put_int16_t(buf, 54, zacc);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_HIL_STATE_LEN);
 #else
-	mavlink_hil_state_t packet;
-	packet.time_usec = time_usec;
-	packet.roll = roll;
-	packet.pitch = pitch;
-	packet.yaw = yaw;
-	packet.rollspeed = rollspeed;
-	packet.pitchspeed = pitchspeed;
-	packet.yawspeed = yawspeed;
-	packet.lat = lat;
-	packet.lon = lon;
-	packet.alt = alt;
-	packet.vx = vx;
-	packet.vy = vy;
-	packet.vz = vz;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
+    mavlink_hil_state_t packet;
+    packet.time_usec = time_usec;
+    packet.roll = roll;
+    packet.pitch = pitch;
+    packet.yaw = yaw;
+    packet.rollspeed = rollspeed;
+    packet.pitchspeed = pitchspeed;
+    packet.yawspeed = yawspeed;
+    packet.lat = lat;
+    packet.lon = lon;
+    packet.alt = alt;
+    packet.vx = vx;
+    packet.vy = vy;
+    packet.vz = vz;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_HIL_STATE_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_HIL_STATE;
+    msg->msgid = MAVLINK_MSG_ID_HIL_STATE;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 }
 
@@ -236,7 +237,7 @@ static inline uint16_t mavlink_msg_hil_state_pack_chan(uint8_t system_id, uint8_
  */
 static inline uint16_t mavlink_msg_hil_state_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_hil_state_t* hil_state)
 {
-	return mavlink_msg_hil_state_pack(system_id, component_id, msg, hil_state->time_usec, hil_state->roll, hil_state->pitch, hil_state->yaw, hil_state->rollspeed, hil_state->pitchspeed, hil_state->yawspeed, hil_state->lat, hil_state->lon, hil_state->alt, hil_state->vx, hil_state->vy, hil_state->vz, hil_state->xacc, hil_state->yacc, hil_state->zacc);
+    return mavlink_msg_hil_state_pack(system_id, component_id, msg, hil_state->time_usec, hil_state->roll, hil_state->pitch, hil_state->yaw, hil_state->rollspeed, hil_state->pitchspeed, hil_state->yawspeed, hil_state->lat, hil_state->lon, hil_state->alt, hil_state->vx, hil_state->vy, hil_state->vz, hil_state->xacc, hil_state->yacc, hil_state->zacc);
 }
 
 /**
@@ -250,7 +251,7 @@ static inline uint16_t mavlink_msg_hil_state_encode(uint8_t system_id, uint8_t c
  */
 static inline uint16_t mavlink_msg_hil_state_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_hil_state_t* hil_state)
 {
-	return mavlink_msg_hil_state_pack_chan(system_id, component_id, chan, msg, hil_state->time_usec, hil_state->roll, hil_state->pitch, hil_state->yaw, hil_state->rollspeed, hil_state->pitchspeed, hil_state->yawspeed, hil_state->lat, hil_state->lon, hil_state->alt, hil_state->vx, hil_state->vy, hil_state->vz, hil_state->xacc, hil_state->yacc, hil_state->zacc);
+    return mavlink_msg_hil_state_pack_chan(system_id, component_id, chan, msg, hil_state->time_usec, hil_state->roll, hil_state->pitch, hil_state->yaw, hil_state->rollspeed, hil_state->pitchspeed, hil_state->yawspeed, hil_state->lat, hil_state->lon, hil_state->alt, hil_state->vx, hil_state->vy, hil_state->vz, hil_state->xacc, hil_state->yacc, hil_state->zacc);
 }
 
 /**
@@ -279,43 +280,43 @@ static inline uint16_t mavlink_msg_hil_state_encode_chan(uint8_t system_id, uint
 static inline void mavlink_msg_hil_state_send(mavlink_channel_t chan, uint64_t time_usec, float roll, float pitch, float yaw, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, int16_t xacc, int16_t yacc, int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_HIL_STATE_LEN];
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, roll);
-	_mav_put_float(buf, 12, pitch);
-	_mav_put_float(buf, 16, yaw);
-	_mav_put_float(buf, 20, rollspeed);
-	_mav_put_float(buf, 24, pitchspeed);
-	_mav_put_float(buf, 28, yawspeed);
-	_mav_put_int32_t(buf, 32, lat);
-	_mav_put_int32_t(buf, 36, lon);
-	_mav_put_int32_t(buf, 40, alt);
-	_mav_put_int16_t(buf, 44, vx);
-	_mav_put_int16_t(buf, 46, vy);
-	_mav_put_int16_t(buf, 48, vz);
-	_mav_put_int16_t(buf, 50, xacc);
-	_mav_put_int16_t(buf, 52, yacc);
-	_mav_put_int16_t(buf, 54, zacc);
+    char buf[MAVLINK_MSG_ID_HIL_STATE_LEN];
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, roll);
+    _mav_put_float(buf, 12, pitch);
+    _mav_put_float(buf, 16, yaw);
+    _mav_put_float(buf, 20, rollspeed);
+    _mav_put_float(buf, 24, pitchspeed);
+    _mav_put_float(buf, 28, yawspeed);
+    _mav_put_int32_t(buf, 32, lat);
+    _mav_put_int32_t(buf, 36, lon);
+    _mav_put_int32_t(buf, 40, alt);
+    _mav_put_int16_t(buf, 44, vx);
+    _mav_put_int16_t(buf, 46, vy);
+    _mav_put_int16_t(buf, 48, vz);
+    _mav_put_int16_t(buf, 50, xacc);
+    _mav_put_int16_t(buf, 52, yacc);
+    _mav_put_int16_t(buf, 54, zacc);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #else
-	mavlink_hil_state_t packet;
-	packet.time_usec = time_usec;
-	packet.roll = roll;
-	packet.pitch = pitch;
-	packet.yaw = yaw;
-	packet.rollspeed = rollspeed;
-	packet.pitchspeed = pitchspeed;
-	packet.yawspeed = yawspeed;
-	packet.lat = lat;
-	packet.lon = lon;
-	packet.alt = alt;
-	packet.vx = vx;
-	packet.vy = vy;
-	packet.vz = vz;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
+    mavlink_hil_state_t packet;
+    packet.time_usec = time_usec;
+    packet.roll = roll;
+    packet.pitch = pitch;
+    packet.yaw = yaw;
+    packet.rollspeed = rollspeed;
+    packet.pitchspeed = pitchspeed;
+    packet.yawspeed = yawspeed;
+    packet.lat = lat;
+    packet.lon = lon;
+    packet.alt = alt;
+    packet.vx = vx;
+    packet.vy = vy;
+    packet.vz = vz;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)&packet, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #endif
@@ -346,43 +347,43 @@ static inline void mavlink_msg_hil_state_send_struct(mavlink_channel_t chan, con
 static inline void mavlink_msg_hil_state_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint64_t time_usec, float roll, float pitch, float yaw, float rollspeed, float pitchspeed, float yawspeed, int32_t lat, int32_t lon, int32_t alt, int16_t vx, int16_t vy, int16_t vz, int16_t xacc, int16_t yacc, int16_t zacc)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint64_t(buf, 0, time_usec);
-	_mav_put_float(buf, 8, roll);
-	_mav_put_float(buf, 12, pitch);
-	_mav_put_float(buf, 16, yaw);
-	_mav_put_float(buf, 20, rollspeed);
-	_mav_put_float(buf, 24, pitchspeed);
-	_mav_put_float(buf, 28, yawspeed);
-	_mav_put_int32_t(buf, 32, lat);
-	_mav_put_int32_t(buf, 36, lon);
-	_mav_put_int32_t(buf, 40, alt);
-	_mav_put_int16_t(buf, 44, vx);
-	_mav_put_int16_t(buf, 46, vy);
-	_mav_put_int16_t(buf, 48, vz);
-	_mav_put_int16_t(buf, 50, xacc);
-	_mav_put_int16_t(buf, 52, yacc);
-	_mav_put_int16_t(buf, 54, zacc);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint64_t(buf, 0, time_usec);
+    _mav_put_float(buf, 8, roll);
+    _mav_put_float(buf, 12, pitch);
+    _mav_put_float(buf, 16, yaw);
+    _mav_put_float(buf, 20, rollspeed);
+    _mav_put_float(buf, 24, pitchspeed);
+    _mav_put_float(buf, 28, yawspeed);
+    _mav_put_int32_t(buf, 32, lat);
+    _mav_put_int32_t(buf, 36, lon);
+    _mav_put_int32_t(buf, 40, alt);
+    _mav_put_int16_t(buf, 44, vx);
+    _mav_put_int16_t(buf, 46, vy);
+    _mav_put_int16_t(buf, 48, vz);
+    _mav_put_int16_t(buf, 50, xacc);
+    _mav_put_int16_t(buf, 52, yacc);
+    _mav_put_int16_t(buf, 54, zacc);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, buf, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #else
-	mavlink_hil_state_t *packet = (mavlink_hil_state_t *)msgbuf;
-	packet->time_usec = time_usec;
-	packet->roll = roll;
-	packet->pitch = pitch;
-	packet->yaw = yaw;
-	packet->rollspeed = rollspeed;
-	packet->pitchspeed = pitchspeed;
-	packet->yawspeed = yawspeed;
-	packet->lat = lat;
-	packet->lon = lon;
-	packet->alt = alt;
-	packet->vx = vx;
-	packet->vy = vy;
-	packet->vz = vz;
-	packet->xacc = xacc;
-	packet->yacc = yacc;
-	packet->zacc = zacc;
+    mavlink_hil_state_t *packet = (mavlink_hil_state_t *)msgbuf;
+    packet->time_usec = time_usec;
+    packet->roll = roll;
+    packet->pitch = pitch;
+    packet->yaw = yaw;
+    packet->rollspeed = rollspeed;
+    packet->pitchspeed = pitchspeed;
+    packet->yawspeed = yawspeed;
+    packet->lat = lat;
+    packet->lon = lon;
+    packet->alt = alt;
+    packet->vx = vx;
+    packet->vy = vy;
+    packet->vz = vz;
+    packet->xacc = xacc;
+    packet->yacc = yacc;
+    packet->zacc = zacc;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_HIL_STATE, (const char *)packet, MAVLINK_MSG_ID_HIL_STATE_MIN_LEN, MAVLINK_MSG_ID_HIL_STATE_LEN, MAVLINK_MSG_ID_HIL_STATE_CRC);
 #endif
@@ -401,7 +402,7 @@ static inline void mavlink_msg_hil_state_send_buf(mavlink_message_t *msgbuf, mav
  */
 static inline uint64_t mavlink_msg_hil_state_get_time_usec(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  0);
+    return _MAV_RETURN_uint64_t(msg,  0);
 }
 
 /**
@@ -411,7 +412,7 @@ static inline uint64_t mavlink_msg_hil_state_get_time_usec(const mavlink_message
  */
 static inline float mavlink_msg_hil_state_get_roll(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  8);
+    return _MAV_RETURN_float(msg,  8);
 }
 
 /**
@@ -421,7 +422,7 @@ static inline float mavlink_msg_hil_state_get_roll(const mavlink_message_t* msg)
  */
 static inline float mavlink_msg_hil_state_get_pitch(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  12);
+    return _MAV_RETURN_float(msg,  12);
 }
 
 /**
@@ -431,7 +432,7 @@ static inline float mavlink_msg_hil_state_get_pitch(const mavlink_message_t* msg
  */
 static inline float mavlink_msg_hil_state_get_yaw(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -441,7 +442,7 @@ static inline float mavlink_msg_hil_state_get_yaw(const mavlink_message_t* msg)
  */
 static inline float mavlink_msg_hil_state_get_rollspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  20);
+    return _MAV_RETURN_float(msg,  20);
 }
 
 /**
@@ -451,7 +452,7 @@ static inline float mavlink_msg_hil_state_get_rollspeed(const mavlink_message_t*
  */
 static inline float mavlink_msg_hil_state_get_pitchspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  24);
+    return _MAV_RETURN_float(msg,  24);
 }
 
 /**
@@ -461,7 +462,7 @@ static inline float mavlink_msg_hil_state_get_pitchspeed(const mavlink_message_t
  */
 static inline float mavlink_msg_hil_state_get_yawspeed(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  28);
+    return _MAV_RETURN_float(msg,  28);
 }
 
 /**
@@ -471,7 +472,7 @@ static inline float mavlink_msg_hil_state_get_yawspeed(const mavlink_message_t* 
  */
 static inline int32_t mavlink_msg_hil_state_get_lat(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  32);
+    return _MAV_RETURN_int32_t(msg,  32);
 }
 
 /**
@@ -481,7 +482,7 @@ static inline int32_t mavlink_msg_hil_state_get_lat(const mavlink_message_t* msg
  */
 static inline int32_t mavlink_msg_hil_state_get_lon(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  36);
+    return _MAV_RETURN_int32_t(msg,  36);
 }
 
 /**
@@ -491,7 +492,7 @@ static inline int32_t mavlink_msg_hil_state_get_lon(const mavlink_message_t* msg
  */
 static inline int32_t mavlink_msg_hil_state_get_alt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int32_t(msg,  40);
+    return _MAV_RETURN_int32_t(msg,  40);
 }
 
 /**
@@ -501,7 +502,7 @@ static inline int32_t mavlink_msg_hil_state_get_alt(const mavlink_message_t* msg
  */
 static inline int16_t mavlink_msg_hil_state_get_vx(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  44);
+    return _MAV_RETURN_int16_t(msg,  44);
 }
 
 /**
@@ -511,7 +512,7 @@ static inline int16_t mavlink_msg_hil_state_get_vx(const mavlink_message_t* msg)
  */
 static inline int16_t mavlink_msg_hil_state_get_vy(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  46);
+    return _MAV_RETURN_int16_t(msg,  46);
 }
 
 /**
@@ -521,7 +522,7 @@ static inline int16_t mavlink_msg_hil_state_get_vy(const mavlink_message_t* msg)
  */
 static inline int16_t mavlink_msg_hil_state_get_vz(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  48);
+    return _MAV_RETURN_int16_t(msg,  48);
 }
 
 /**
@@ -531,7 +532,7 @@ static inline int16_t mavlink_msg_hil_state_get_vz(const mavlink_message_t* msg)
  */
 static inline int16_t mavlink_msg_hil_state_get_xacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  50);
+    return _MAV_RETURN_int16_t(msg,  50);
 }
 
 /**
@@ -541,7 +542,7 @@ static inline int16_t mavlink_msg_hil_state_get_xacc(const mavlink_message_t* ms
  */
 static inline int16_t mavlink_msg_hil_state_get_yacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  52);
+    return _MAV_RETURN_int16_t(msg,  52);
 }
 
 /**
@@ -551,7 +552,7 @@ static inline int16_t mavlink_msg_hil_state_get_yacc(const mavlink_message_t* ms
  */
 static inline int16_t mavlink_msg_hil_state_get_zacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  54);
+    return _MAV_RETURN_int16_t(msg,  54);
 }
 
 /**
@@ -563,25 +564,25 @@ static inline int16_t mavlink_msg_hil_state_get_zacc(const mavlink_message_t* ms
 static inline void mavlink_msg_hil_state_decode(const mavlink_message_t* msg, mavlink_hil_state_t* hil_state)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	hil_state->time_usec = mavlink_msg_hil_state_get_time_usec(msg);
-	hil_state->roll = mavlink_msg_hil_state_get_roll(msg);
-	hil_state->pitch = mavlink_msg_hil_state_get_pitch(msg);
-	hil_state->yaw = mavlink_msg_hil_state_get_yaw(msg);
-	hil_state->rollspeed = mavlink_msg_hil_state_get_rollspeed(msg);
-	hil_state->pitchspeed = mavlink_msg_hil_state_get_pitchspeed(msg);
-	hil_state->yawspeed = mavlink_msg_hil_state_get_yawspeed(msg);
-	hil_state->lat = mavlink_msg_hil_state_get_lat(msg);
-	hil_state->lon = mavlink_msg_hil_state_get_lon(msg);
-	hil_state->alt = mavlink_msg_hil_state_get_alt(msg);
-	hil_state->vx = mavlink_msg_hil_state_get_vx(msg);
-	hil_state->vy = mavlink_msg_hil_state_get_vy(msg);
-	hil_state->vz = mavlink_msg_hil_state_get_vz(msg);
-	hil_state->xacc = mavlink_msg_hil_state_get_xacc(msg);
-	hil_state->yacc = mavlink_msg_hil_state_get_yacc(msg);
-	hil_state->zacc = mavlink_msg_hil_state_get_zacc(msg);
+    hil_state->time_usec = mavlink_msg_hil_state_get_time_usec(msg);
+    hil_state->roll = mavlink_msg_hil_state_get_roll(msg);
+    hil_state->pitch = mavlink_msg_hil_state_get_pitch(msg);
+    hil_state->yaw = mavlink_msg_hil_state_get_yaw(msg);
+    hil_state->rollspeed = mavlink_msg_hil_state_get_rollspeed(msg);
+    hil_state->pitchspeed = mavlink_msg_hil_state_get_pitchspeed(msg);
+    hil_state->yawspeed = mavlink_msg_hil_state_get_yawspeed(msg);
+    hil_state->lat = mavlink_msg_hil_state_get_lat(msg);
+    hil_state->lon = mavlink_msg_hil_state_get_lon(msg);
+    hil_state->alt = mavlink_msg_hil_state_get_alt(msg);
+    hil_state->vx = mavlink_msg_hil_state_get_vx(msg);
+    hil_state->vy = mavlink_msg_hil_state_get_vy(msg);
+    hil_state->vz = mavlink_msg_hil_state_get_vz(msg);
+    hil_state->xacc = mavlink_msg_hil_state_get_xacc(msg);
+    hil_state->yacc = mavlink_msg_hil_state_get_yacc(msg);
+    hil_state->zacc = mavlink_msg_hil_state_get_zacc(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_HIL_STATE_LEN? msg->len : MAVLINK_MSG_ID_HIL_STATE_LEN;
         memset(hil_state, 0, MAVLINK_MSG_ID_HIL_STATE_LEN);
-	memcpy(hil_state, _MAV_PAYLOAD(msg), len);
+    memcpy(hil_state, _MAV_PAYLOAD(msg), len);
 #endif
 }

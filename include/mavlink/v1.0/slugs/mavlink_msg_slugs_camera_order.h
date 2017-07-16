@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE SLUGS_CAMERA_ORDER PACKING
 
 #define MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER 184
@@ -23,10 +24,10 @@ typedef struct __mavlink_slugs_camera_order_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_SLUGS_CAMERA_ORDER { \
-	184, \
-	"SLUGS_CAMERA_ORDER", \
-	5, \
-	{  { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_slugs_camera_order_t, target) }, \
+    184, \
+    "SLUGS_CAMERA_ORDER", \
+    5, \
+    {  { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_slugs_camera_order_t, target) }, \
          { "pan", NULL, MAVLINK_TYPE_INT8_T, 0, 1, offsetof(mavlink_slugs_camera_order_t, pan) }, \
          { "tilt", NULL, MAVLINK_TYPE_INT8_T, 0, 2, offsetof(mavlink_slugs_camera_order_t, tilt) }, \
          { "zoom", NULL, MAVLINK_TYPE_INT8_T, 0, 3, offsetof(mavlink_slugs_camera_order_t, zoom) }, \
@@ -35,9 +36,9 @@ typedef struct __mavlink_slugs_camera_order_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_SLUGS_CAMERA_ORDER { \
-	"SLUGS_CAMERA_ORDER", \
-	5, \
-	{  { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_slugs_camera_order_t, target) }, \
+    "SLUGS_CAMERA_ORDER", \
+    5, \
+    {  { "target", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_slugs_camera_order_t, target) }, \
          { "pan", NULL, MAVLINK_TYPE_INT8_T, 0, 1, offsetof(mavlink_slugs_camera_order_t, pan) }, \
          { "tilt", NULL, MAVLINK_TYPE_INT8_T, 0, 2, offsetof(mavlink_slugs_camera_order_t, tilt) }, \
          { "zoom", NULL, MAVLINK_TYPE_INT8_T, 0, 3, offsetof(mavlink_slugs_camera_order_t, zoom) }, \
@@ -60,29 +61,29 @@ typedef struct __mavlink_slugs_camera_order_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_slugs_camera_order_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t target, int8_t pan, int8_t tilt, int8_t zoom, int8_t moveHome)
+                               uint8_t target, int8_t pan, int8_t tilt, int8_t zoom, int8_t moveHome)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
-	_mav_put_uint8_t(buf, 0, target);
-	_mav_put_int8_t(buf, 1, pan);
-	_mav_put_int8_t(buf, 2, tilt);
-	_mav_put_int8_t(buf, 3, zoom);
-	_mav_put_int8_t(buf, 4, moveHome);
+    char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
+    _mav_put_uint8_t(buf, 0, target);
+    _mav_put_int8_t(buf, 1, pan);
+    _mav_put_int8_t(buf, 2, tilt);
+    _mav_put_int8_t(buf, 3, zoom);
+    _mav_put_int8_t(buf, 4, moveHome);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
 #else
-	mavlink_slugs_camera_order_t packet;
-	packet.target = target;
-	packet.pan = pan;
-	packet.tilt = tilt;
-	packet.zoom = zoom;
-	packet.moveHome = moveHome;
+    mavlink_slugs_camera_order_t packet;
+    packet.target = target;
+    packet.pan = pan;
+    packet.tilt = tilt;
+    packet.zoom = zoom;
+    packet.moveHome = moveHome;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER;
+    msg->msgid = MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 }
 
@@ -100,30 +101,30 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack(uint8_t system_id, ui
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t target,int8_t pan,int8_t tilt,int8_t zoom,int8_t moveHome)
+                               mavlink_message_t* msg,
+                                   uint8_t target,int8_t pan,int8_t tilt,int8_t zoom,int8_t moveHome)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
-	_mav_put_uint8_t(buf, 0, target);
-	_mav_put_int8_t(buf, 1, pan);
-	_mav_put_int8_t(buf, 2, tilt);
-	_mav_put_int8_t(buf, 3, zoom);
-	_mav_put_int8_t(buf, 4, moveHome);
+    char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
+    _mav_put_uint8_t(buf, 0, target);
+    _mav_put_int8_t(buf, 1, pan);
+    _mav_put_int8_t(buf, 2, tilt);
+    _mav_put_int8_t(buf, 3, zoom);
+    _mav_put_int8_t(buf, 4, moveHome);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
 #else
-	mavlink_slugs_camera_order_t packet;
-	packet.target = target;
-	packet.pan = pan;
-	packet.tilt = tilt;
-	packet.zoom = zoom;
-	packet.moveHome = moveHome;
+    mavlink_slugs_camera_order_t packet;
+    packet.target = target;
+    packet.pan = pan;
+    packet.tilt = tilt;
+    packet.zoom = zoom;
+    packet.moveHome = moveHome;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER;
+    msg->msgid = MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 }
 
@@ -137,7 +138,7 @@ static inline uint16_t mavlink_msg_slugs_camera_order_pack_chan(uint8_t system_i
  */
 static inline uint16_t mavlink_msg_slugs_camera_order_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_slugs_camera_order_t* slugs_camera_order)
 {
-	return mavlink_msg_slugs_camera_order_pack(system_id, component_id, msg, slugs_camera_order->target, slugs_camera_order->pan, slugs_camera_order->tilt, slugs_camera_order->zoom, slugs_camera_order->moveHome);
+    return mavlink_msg_slugs_camera_order_pack(system_id, component_id, msg, slugs_camera_order->target, slugs_camera_order->pan, slugs_camera_order->tilt, slugs_camera_order->zoom, slugs_camera_order->moveHome);
 }
 
 /**
@@ -151,7 +152,7 @@ static inline uint16_t mavlink_msg_slugs_camera_order_encode(uint8_t system_id, 
  */
 static inline uint16_t mavlink_msg_slugs_camera_order_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_slugs_camera_order_t* slugs_camera_order)
 {
-	return mavlink_msg_slugs_camera_order_pack_chan(system_id, component_id, chan, msg, slugs_camera_order->target, slugs_camera_order->pan, slugs_camera_order->tilt, slugs_camera_order->zoom, slugs_camera_order->moveHome);
+    return mavlink_msg_slugs_camera_order_pack_chan(system_id, component_id, chan, msg, slugs_camera_order->target, slugs_camera_order->pan, slugs_camera_order->tilt, slugs_camera_order->zoom, slugs_camera_order->moveHome);
 }
 
 /**
@@ -169,21 +170,21 @@ static inline uint16_t mavlink_msg_slugs_camera_order_encode_chan(uint8_t system
 static inline void mavlink_msg_slugs_camera_order_send(mavlink_channel_t chan, uint8_t target, int8_t pan, int8_t tilt, int8_t zoom, int8_t moveHome)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
-	_mav_put_uint8_t(buf, 0, target);
-	_mav_put_int8_t(buf, 1, pan);
-	_mav_put_int8_t(buf, 2, tilt);
-	_mav_put_int8_t(buf, 3, zoom);
-	_mav_put_int8_t(buf, 4, moveHome);
+    char buf[MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN];
+    _mav_put_uint8_t(buf, 0, target);
+    _mav_put_int8_t(buf, 1, pan);
+    _mav_put_int8_t(buf, 2, tilt);
+    _mav_put_int8_t(buf, 3, zoom);
+    _mav_put_int8_t(buf, 4, moveHome);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER, buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 #else
-	mavlink_slugs_camera_order_t packet;
-	packet.target = target;
-	packet.pan = pan;
-	packet.tilt = tilt;
-	packet.zoom = zoom;
-	packet.moveHome = moveHome;
+    mavlink_slugs_camera_order_t packet;
+    packet.target = target;
+    packet.pan = pan;
+    packet.tilt = tilt;
+    packet.zoom = zoom;
+    packet.moveHome = moveHome;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER, (const char *)&packet, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 #endif
@@ -214,21 +215,21 @@ static inline void mavlink_msg_slugs_camera_order_send_struct(mavlink_channel_t 
 static inline void mavlink_msg_slugs_camera_order_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t target, int8_t pan, int8_t tilt, int8_t zoom, int8_t moveHome)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint8_t(buf, 0, target);
-	_mav_put_int8_t(buf, 1, pan);
-	_mav_put_int8_t(buf, 2, tilt);
-	_mav_put_int8_t(buf, 3, zoom);
-	_mav_put_int8_t(buf, 4, moveHome);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint8_t(buf, 0, target);
+    _mav_put_int8_t(buf, 1, pan);
+    _mav_put_int8_t(buf, 2, tilt);
+    _mav_put_int8_t(buf, 3, zoom);
+    _mav_put_int8_t(buf, 4, moveHome);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER, buf, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 #else
-	mavlink_slugs_camera_order_t *packet = (mavlink_slugs_camera_order_t *)msgbuf;
-	packet->target = target;
-	packet->pan = pan;
-	packet->tilt = tilt;
-	packet->zoom = zoom;
-	packet->moveHome = moveHome;
+    mavlink_slugs_camera_order_t *packet = (mavlink_slugs_camera_order_t *)msgbuf;
+    packet->target = target;
+    packet->pan = pan;
+    packet->tilt = tilt;
+    packet->zoom = zoom;
+    packet->moveHome = moveHome;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER, (const char *)packet, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_MIN_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_CRC);
 #endif
@@ -247,7 +248,7 @@ static inline void mavlink_msg_slugs_camera_order_send_buf(mavlink_message_t *ms
  */
 static inline uint8_t mavlink_msg_slugs_camera_order_get_target(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  0);
+    return _MAV_RETURN_uint8_t(msg,  0);
 }
 
 /**
@@ -257,7 +258,7 @@ static inline uint8_t mavlink_msg_slugs_camera_order_get_target(const mavlink_me
  */
 static inline int8_t mavlink_msg_slugs_camera_order_get_pan(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int8_t(msg,  1);
+    return _MAV_RETURN_int8_t(msg,  1);
 }
 
 /**
@@ -267,7 +268,7 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_pan(const mavlink_messag
  */
 static inline int8_t mavlink_msg_slugs_camera_order_get_tilt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int8_t(msg,  2);
+    return _MAV_RETURN_int8_t(msg,  2);
 }
 
 /**
@@ -277,7 +278,7 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_tilt(const mavlink_messa
  */
 static inline int8_t mavlink_msg_slugs_camera_order_get_zoom(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int8_t(msg,  3);
+    return _MAV_RETURN_int8_t(msg,  3);
 }
 
 /**
@@ -287,7 +288,7 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_zoom(const mavlink_messa
  */
 static inline int8_t mavlink_msg_slugs_camera_order_get_moveHome(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int8_t(msg,  4);
+    return _MAV_RETURN_int8_t(msg,  4);
 }
 
 /**
@@ -299,14 +300,14 @@ static inline int8_t mavlink_msg_slugs_camera_order_get_moveHome(const mavlink_m
 static inline void mavlink_msg_slugs_camera_order_decode(const mavlink_message_t* msg, mavlink_slugs_camera_order_t* slugs_camera_order)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	slugs_camera_order->target = mavlink_msg_slugs_camera_order_get_target(msg);
-	slugs_camera_order->pan = mavlink_msg_slugs_camera_order_get_pan(msg);
-	slugs_camera_order->tilt = mavlink_msg_slugs_camera_order_get_tilt(msg);
-	slugs_camera_order->zoom = mavlink_msg_slugs_camera_order_get_zoom(msg);
-	slugs_camera_order->moveHome = mavlink_msg_slugs_camera_order_get_moveHome(msg);
+    slugs_camera_order->target = mavlink_msg_slugs_camera_order_get_target(msg);
+    slugs_camera_order->pan = mavlink_msg_slugs_camera_order_get_pan(msg);
+    slugs_camera_order->tilt = mavlink_msg_slugs_camera_order_get_tilt(msg);
+    slugs_camera_order->zoom = mavlink_msg_slugs_camera_order_get_zoom(msg);
+    slugs_camera_order->moveHome = mavlink_msg_slugs_camera_order_get_moveHome(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN? msg->len : MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN;
         memset(slugs_camera_order, 0, MAVLINK_MSG_ID_SLUGS_CAMERA_ORDER_LEN);
-	memcpy(slugs_camera_order, _MAV_PAYLOAD(msg), len);
+    memcpy(slugs_camera_order, _MAV_PAYLOAD(msg), len);
 #endif
 }

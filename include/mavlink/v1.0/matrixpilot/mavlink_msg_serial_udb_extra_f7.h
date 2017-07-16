@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE SERIAL_UDB_EXTRA_F7 PACKING
 
 #define MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7 175
@@ -24,10 +25,10 @@ typedef struct __mavlink_serial_udb_extra_f7_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F7 { \
-	175, \
-	"SERIAL_UDB_EXTRA_F7", \
-	6, \
-	{  { "sue_YAWKP_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_serial_udb_extra_f7_t, sue_YAWKP_RUDDER) }, \
+    175, \
+    "SERIAL_UDB_EXTRA_F7", \
+    6, \
+    {  { "sue_YAWKP_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_serial_udb_extra_f7_t, sue_YAWKP_RUDDER) }, \
          { "sue_YAWKD_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_serial_udb_extra_f7_t, sue_YAWKD_RUDDER) }, \
          { "sue_ROLLKP_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_serial_udb_extra_f7_t, sue_ROLLKP_RUDDER) }, \
          { "sue_ROLLKD_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_serial_udb_extra_f7_t, sue_ROLLKD_RUDDER) }, \
@@ -37,9 +38,9 @@ typedef struct __mavlink_serial_udb_extra_f7_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_SERIAL_UDB_EXTRA_F7 { \
-	"SERIAL_UDB_EXTRA_F7", \
-	6, \
-	{  { "sue_YAWKP_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_serial_udb_extra_f7_t, sue_YAWKP_RUDDER) }, \
+    "SERIAL_UDB_EXTRA_F7", \
+    6, \
+    {  { "sue_YAWKP_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_serial_udb_extra_f7_t, sue_YAWKP_RUDDER) }, \
          { "sue_YAWKD_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 4, offsetof(mavlink_serial_udb_extra_f7_t, sue_YAWKD_RUDDER) }, \
          { "sue_ROLLKP_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_serial_udb_extra_f7_t, sue_ROLLKP_RUDDER) }, \
          { "sue_ROLLKD_RUDDER", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_serial_udb_extra_f7_t, sue_ROLLKD_RUDDER) }, \
@@ -64,31 +65,31 @@ typedef struct __mavlink_serial_udb_extra_f7_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       float sue_YAWKP_RUDDER, float sue_YAWKD_RUDDER, float sue_ROLLKP_RUDDER, float sue_ROLLKD_RUDDER, float sue_RUDDER_BOOST, float sue_RTL_PITCH_DOWN)
+                               float sue_YAWKP_RUDDER, float sue_YAWKD_RUDDER, float sue_ROLLKP_RUDDER, float sue_ROLLKD_RUDDER, float sue_RUDDER_BOOST, float sue_RTL_PITCH_DOWN)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN];
-	_mav_put_float(buf, 0, sue_YAWKP_RUDDER);
-	_mav_put_float(buf, 4, sue_YAWKD_RUDDER);
-	_mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
-	_mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
-	_mav_put_float(buf, 16, sue_RUDDER_BOOST);
-	_mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
+    char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN];
+    _mav_put_float(buf, 0, sue_YAWKP_RUDDER);
+    _mav_put_float(buf, 4, sue_YAWKD_RUDDER);
+    _mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
+    _mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
+    _mav_put_float(buf, 16, sue_RUDDER_BOOST);
+    _mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN);
 #else
-	mavlink_serial_udb_extra_f7_t packet;
-	packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
-	packet.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
-	packet.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
-	packet.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
-	packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
-	packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
+    mavlink_serial_udb_extra_f7_t packet;
+    packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
+    packet.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
+    packet.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
+    packet.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
+    packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
+    packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7;
+    msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_CRC);
 }
 
@@ -107,32 +108,32 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack(uint8_t system_id, u
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           float sue_YAWKP_RUDDER,float sue_YAWKD_RUDDER,float sue_ROLLKP_RUDDER,float sue_ROLLKD_RUDDER,float sue_RUDDER_BOOST,float sue_RTL_PITCH_DOWN)
+                               mavlink_message_t* msg,
+                                   float sue_YAWKP_RUDDER,float sue_YAWKD_RUDDER,float sue_ROLLKP_RUDDER,float sue_ROLLKD_RUDDER,float sue_RUDDER_BOOST,float sue_RTL_PITCH_DOWN)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN];
-	_mav_put_float(buf, 0, sue_YAWKP_RUDDER);
-	_mav_put_float(buf, 4, sue_YAWKD_RUDDER);
-	_mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
-	_mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
-	_mav_put_float(buf, 16, sue_RUDDER_BOOST);
-	_mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
+    char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN];
+    _mav_put_float(buf, 0, sue_YAWKP_RUDDER);
+    _mav_put_float(buf, 4, sue_YAWKD_RUDDER);
+    _mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
+    _mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
+    _mav_put_float(buf, 16, sue_RUDDER_BOOST);
+    _mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN);
 #else
-	mavlink_serial_udb_extra_f7_t packet;
-	packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
-	packet.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
-	packet.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
-	packet.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
-	packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
-	packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
+    mavlink_serial_udb_extra_f7_t packet;
+    packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
+    packet.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
+    packet.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
+    packet.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
+    packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
+    packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7;
+    msg->msgid = MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_CRC);
 }
 
@@ -146,7 +147,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_pack_chan(uint8_t system_
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f7_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_serial_udb_extra_f7_t* serial_udb_extra_f7)
 {
-	return mavlink_msg_serial_udb_extra_f7_pack(system_id, component_id, msg, serial_udb_extra_f7->sue_YAWKP_RUDDER, serial_udb_extra_f7->sue_YAWKD_RUDDER, serial_udb_extra_f7->sue_ROLLKP_RUDDER, serial_udb_extra_f7->sue_ROLLKD_RUDDER, serial_udb_extra_f7->sue_RUDDER_BOOST, serial_udb_extra_f7->sue_RTL_PITCH_DOWN);
+    return mavlink_msg_serial_udb_extra_f7_pack(system_id, component_id, msg, serial_udb_extra_f7->sue_YAWKP_RUDDER, serial_udb_extra_f7->sue_YAWKD_RUDDER, serial_udb_extra_f7->sue_ROLLKP_RUDDER, serial_udb_extra_f7->sue_ROLLKD_RUDDER, serial_udb_extra_f7->sue_RUDDER_BOOST, serial_udb_extra_f7->sue_RTL_PITCH_DOWN);
 }
 
 /**
@@ -160,7 +161,7 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_encode(uint8_t system_id,
  */
 static inline uint16_t mavlink_msg_serial_udb_extra_f7_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_serial_udb_extra_f7_t* serial_udb_extra_f7)
 {
-	return mavlink_msg_serial_udb_extra_f7_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f7->sue_YAWKP_RUDDER, serial_udb_extra_f7->sue_YAWKD_RUDDER, serial_udb_extra_f7->sue_ROLLKP_RUDDER, serial_udb_extra_f7->sue_ROLLKD_RUDDER, serial_udb_extra_f7->sue_RUDDER_BOOST, serial_udb_extra_f7->sue_RTL_PITCH_DOWN);
+    return mavlink_msg_serial_udb_extra_f7_pack_chan(system_id, component_id, chan, msg, serial_udb_extra_f7->sue_YAWKP_RUDDER, serial_udb_extra_f7->sue_YAWKD_RUDDER, serial_udb_extra_f7->sue_ROLLKP_RUDDER, serial_udb_extra_f7->sue_ROLLKD_RUDDER, serial_udb_extra_f7->sue_RUDDER_BOOST, serial_udb_extra_f7->sue_RTL_PITCH_DOWN);
 }
 
 /**
@@ -179,23 +180,23 @@ static inline uint16_t mavlink_msg_serial_udb_extra_f7_encode_chan(uint8_t syste
 static inline void mavlink_msg_serial_udb_extra_f7_send(mavlink_channel_t chan, float sue_YAWKP_RUDDER, float sue_YAWKD_RUDDER, float sue_ROLLKP_RUDDER, float sue_ROLLKD_RUDDER, float sue_RUDDER_BOOST, float sue_RTL_PITCH_DOWN)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN];
-	_mav_put_float(buf, 0, sue_YAWKP_RUDDER);
-	_mav_put_float(buf, 4, sue_YAWKD_RUDDER);
-	_mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
-	_mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
-	_mav_put_float(buf, 16, sue_RUDDER_BOOST);
-	_mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
+    char buf[MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN];
+    _mav_put_float(buf, 0, sue_YAWKP_RUDDER);
+    _mav_put_float(buf, 4, sue_YAWKD_RUDDER);
+    _mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
+    _mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
+    _mav_put_float(buf, 16, sue_RUDDER_BOOST);
+    _mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_CRC);
 #else
-	mavlink_serial_udb_extra_f7_t packet;
-	packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
-	packet.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
-	packet.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
-	packet.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
-	packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
-	packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
+    mavlink_serial_udb_extra_f7_t packet;
+    packet.sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
+    packet.sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
+    packet.sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
+    packet.sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
+    packet.sue_RUDDER_BOOST = sue_RUDDER_BOOST;
+    packet.sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7, (const char *)&packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_CRC);
 #endif
@@ -226,23 +227,23 @@ static inline void mavlink_msg_serial_udb_extra_f7_send_struct(mavlink_channel_t
 static inline void mavlink_msg_serial_udb_extra_f7_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float sue_YAWKP_RUDDER, float sue_YAWKD_RUDDER, float sue_ROLLKP_RUDDER, float sue_ROLLKD_RUDDER, float sue_RUDDER_BOOST, float sue_RTL_PITCH_DOWN)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_float(buf, 0, sue_YAWKP_RUDDER);
-	_mav_put_float(buf, 4, sue_YAWKD_RUDDER);
-	_mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
-	_mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
-	_mav_put_float(buf, 16, sue_RUDDER_BOOST);
-	_mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
+    char *buf = (char *)msgbuf;
+    _mav_put_float(buf, 0, sue_YAWKP_RUDDER);
+    _mav_put_float(buf, 4, sue_YAWKD_RUDDER);
+    _mav_put_float(buf, 8, sue_ROLLKP_RUDDER);
+    _mav_put_float(buf, 12, sue_ROLLKD_RUDDER);
+    _mav_put_float(buf, 16, sue_RUDDER_BOOST);
+    _mav_put_float(buf, 20, sue_RTL_PITCH_DOWN);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7, buf, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_CRC);
 #else
-	mavlink_serial_udb_extra_f7_t *packet = (mavlink_serial_udb_extra_f7_t *)msgbuf;
-	packet->sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
-	packet->sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
-	packet->sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
-	packet->sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
-	packet->sue_RUDDER_BOOST = sue_RUDDER_BOOST;
-	packet->sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
+    mavlink_serial_udb_extra_f7_t *packet = (mavlink_serial_udb_extra_f7_t *)msgbuf;
+    packet->sue_YAWKP_RUDDER = sue_YAWKP_RUDDER;
+    packet->sue_YAWKD_RUDDER = sue_YAWKD_RUDDER;
+    packet->sue_ROLLKP_RUDDER = sue_ROLLKP_RUDDER;
+    packet->sue_ROLLKD_RUDDER = sue_ROLLKD_RUDDER;
+    packet->sue_RUDDER_BOOST = sue_RUDDER_BOOST;
+    packet->sue_RTL_PITCH_DOWN = sue_RTL_PITCH_DOWN;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7, (const char *)packet, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_MIN_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_CRC);
 #endif
@@ -261,7 +262,7 @@ static inline void mavlink_msg_serial_udb_extra_f7_send_buf(mavlink_message_t *m
  */
 static inline float mavlink_msg_serial_udb_extra_f7_get_sue_YAWKP_RUDDER(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  0);
+    return _MAV_RETURN_float(msg,  0);
 }
 
 /**
@@ -271,7 +272,7 @@ static inline float mavlink_msg_serial_udb_extra_f7_get_sue_YAWKP_RUDDER(const m
  */
 static inline float mavlink_msg_serial_udb_extra_f7_get_sue_YAWKD_RUDDER(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  4);
+    return _MAV_RETURN_float(msg,  4);
 }
 
 /**
@@ -281,7 +282,7 @@ static inline float mavlink_msg_serial_udb_extra_f7_get_sue_YAWKD_RUDDER(const m
  */
 static inline float mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKP_RUDDER(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  8);
+    return _MAV_RETURN_float(msg,  8);
 }
 
 /**
@@ -291,7 +292,7 @@ static inline float mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKP_RUDDER(const 
  */
 static inline float mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKD_RUDDER(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  12);
+    return _MAV_RETURN_float(msg,  12);
 }
 
 /**
@@ -301,7 +302,7 @@ static inline float mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKD_RUDDER(const 
  */
 static inline float mavlink_msg_serial_udb_extra_f7_get_sue_RUDDER_BOOST(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -311,7 +312,7 @@ static inline float mavlink_msg_serial_udb_extra_f7_get_sue_RUDDER_BOOST(const m
  */
 static inline float mavlink_msg_serial_udb_extra_f7_get_sue_RTL_PITCH_DOWN(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  20);
+    return _MAV_RETURN_float(msg,  20);
 }
 
 /**
@@ -323,15 +324,15 @@ static inline float mavlink_msg_serial_udb_extra_f7_get_sue_RTL_PITCH_DOWN(const
 static inline void mavlink_msg_serial_udb_extra_f7_decode(const mavlink_message_t* msg, mavlink_serial_udb_extra_f7_t* serial_udb_extra_f7)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	serial_udb_extra_f7->sue_YAWKP_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_YAWKP_RUDDER(msg);
-	serial_udb_extra_f7->sue_YAWKD_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_YAWKD_RUDDER(msg);
-	serial_udb_extra_f7->sue_ROLLKP_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKP_RUDDER(msg);
-	serial_udb_extra_f7->sue_ROLLKD_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKD_RUDDER(msg);
-	serial_udb_extra_f7->sue_RUDDER_BOOST = mavlink_msg_serial_udb_extra_f7_get_sue_RUDDER_BOOST(msg);
-	serial_udb_extra_f7->sue_RTL_PITCH_DOWN = mavlink_msg_serial_udb_extra_f7_get_sue_RTL_PITCH_DOWN(msg);
+    serial_udb_extra_f7->sue_YAWKP_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_YAWKP_RUDDER(msg);
+    serial_udb_extra_f7->sue_YAWKD_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_YAWKD_RUDDER(msg);
+    serial_udb_extra_f7->sue_ROLLKP_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKP_RUDDER(msg);
+    serial_udb_extra_f7->sue_ROLLKD_RUDDER = mavlink_msg_serial_udb_extra_f7_get_sue_ROLLKD_RUDDER(msg);
+    serial_udb_extra_f7->sue_RUDDER_BOOST = mavlink_msg_serial_udb_extra_f7_get_sue_RUDDER_BOOST(msg);
+    serial_udb_extra_f7->sue_RTL_PITCH_DOWN = mavlink_msg_serial_udb_extra_f7_get_sue_RTL_PITCH_DOWN(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN? msg->len : MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN;
         memset(serial_udb_extra_f7, 0, MAVLINK_MSG_ID_SERIAL_UDB_EXTRA_F7_LEN);
-	memcpy(serial_udb_extra_f7, _MAV_PAYLOAD(msg), len);
+    memcpy(serial_udb_extra_f7, _MAV_PAYLOAD(msg), len);
 #endif
 }

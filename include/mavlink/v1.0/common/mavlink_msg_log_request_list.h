@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE LOG_REQUEST_LIST PACKING
 
 #define MAVLINK_MSG_ID_LOG_REQUEST_LIST 117
@@ -22,10 +23,10 @@ typedef struct __mavlink_log_request_list_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_LOG_REQUEST_LIST { \
-	117, \
-	"LOG_REQUEST_LIST", \
-	4, \
-	{  { "start", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_log_request_list_t, start) }, \
+    117, \
+    "LOG_REQUEST_LIST", \
+    4, \
+    {  { "start", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_log_request_list_t, start) }, \
          { "end", NULL, MAVLINK_TYPE_UINT16_T, 0, 2, offsetof(mavlink_log_request_list_t, end) }, \
          { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_log_request_list_t, target_system) }, \
          { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_log_request_list_t, target_component) }, \
@@ -33,9 +34,9 @@ typedef struct __mavlink_log_request_list_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_LOG_REQUEST_LIST { \
-	"LOG_REQUEST_LIST", \
-	4, \
-	{  { "start", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_log_request_list_t, start) }, \
+    "LOG_REQUEST_LIST", \
+    4, \
+    {  { "start", NULL, MAVLINK_TYPE_UINT16_T, 0, 0, offsetof(mavlink_log_request_list_t, start) }, \
          { "end", NULL, MAVLINK_TYPE_UINT16_T, 0, 2, offsetof(mavlink_log_request_list_t, end) }, \
          { "target_system", NULL, MAVLINK_TYPE_UINT8_T, 0, 4, offsetof(mavlink_log_request_list_t, target_system) }, \
          { "target_component", NULL, MAVLINK_TYPE_UINT8_T, 0, 5, offsetof(mavlink_log_request_list_t, target_component) }, \
@@ -56,27 +57,27 @@ typedef struct __mavlink_log_request_list_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_log_request_list_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t target_system, uint8_t target_component, uint16_t start, uint16_t end)
+                               uint8_t target_system, uint8_t target_component, uint16_t start, uint16_t end)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN];
-	_mav_put_uint16_t(buf, 0, start);
-	_mav_put_uint16_t(buf, 2, end);
-	_mav_put_uint8_t(buf, 4, target_system);
-	_mav_put_uint8_t(buf, 5, target_component);
+    char buf[MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN];
+    _mav_put_uint16_t(buf, 0, start);
+    _mav_put_uint16_t(buf, 2, end);
+    _mav_put_uint8_t(buf, 4, target_system);
+    _mav_put_uint8_t(buf, 5, target_component);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN);
 #else
-	mavlink_log_request_list_t packet;
-	packet.start = start;
-	packet.end = end;
-	packet.target_system = target_system;
-	packet.target_component = target_component;
+    mavlink_log_request_list_t packet;
+    packet.start = start;
+    packet.end = end;
+    packet.target_system = target_system;
+    packet.target_component = target_component;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
+    msg->msgid = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_LOG_REQUEST_LIST_MIN_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC);
 }
 
@@ -93,28 +94,28 @@ static inline uint16_t mavlink_msg_log_request_list_pack(uint8_t system_id, uint
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_log_request_list_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t target_system,uint8_t target_component,uint16_t start,uint16_t end)
+                               mavlink_message_t* msg,
+                                   uint8_t target_system,uint8_t target_component,uint16_t start,uint16_t end)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN];
-	_mav_put_uint16_t(buf, 0, start);
-	_mav_put_uint16_t(buf, 2, end);
-	_mav_put_uint8_t(buf, 4, target_system);
-	_mav_put_uint8_t(buf, 5, target_component);
+    char buf[MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN];
+    _mav_put_uint16_t(buf, 0, start);
+    _mav_put_uint16_t(buf, 2, end);
+    _mav_put_uint8_t(buf, 4, target_system);
+    _mav_put_uint8_t(buf, 5, target_component);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN);
 #else
-	mavlink_log_request_list_t packet;
-	packet.start = start;
-	packet.end = end;
-	packet.target_system = target_system;
-	packet.target_component = target_component;
+    mavlink_log_request_list_t packet;
+    packet.start = start;
+    packet.end = end;
+    packet.target_system = target_system;
+    packet.target_component = target_component;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
+    msg->msgid = MAVLINK_MSG_ID_LOG_REQUEST_LIST;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_LOG_REQUEST_LIST_MIN_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC);
 }
 
@@ -128,7 +129,7 @@ static inline uint16_t mavlink_msg_log_request_list_pack_chan(uint8_t system_id,
  */
 static inline uint16_t mavlink_msg_log_request_list_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_log_request_list_t* log_request_list)
 {
-	return mavlink_msg_log_request_list_pack(system_id, component_id, msg, log_request_list->target_system, log_request_list->target_component, log_request_list->start, log_request_list->end);
+    return mavlink_msg_log_request_list_pack(system_id, component_id, msg, log_request_list->target_system, log_request_list->target_component, log_request_list->start, log_request_list->end);
 }
 
 /**
@@ -142,7 +143,7 @@ static inline uint16_t mavlink_msg_log_request_list_encode(uint8_t system_id, ui
  */
 static inline uint16_t mavlink_msg_log_request_list_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_log_request_list_t* log_request_list)
 {
-	return mavlink_msg_log_request_list_pack_chan(system_id, component_id, chan, msg, log_request_list->target_system, log_request_list->target_component, log_request_list->start, log_request_list->end);
+    return mavlink_msg_log_request_list_pack_chan(system_id, component_id, chan, msg, log_request_list->target_system, log_request_list->target_component, log_request_list->start, log_request_list->end);
 }
 
 /**
@@ -159,19 +160,19 @@ static inline uint16_t mavlink_msg_log_request_list_encode_chan(uint8_t system_i
 static inline void mavlink_msg_log_request_list_send(mavlink_channel_t chan, uint8_t target_system, uint8_t target_component, uint16_t start, uint16_t end)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN];
-	_mav_put_uint16_t(buf, 0, start);
-	_mav_put_uint16_t(buf, 2, end);
-	_mav_put_uint8_t(buf, 4, target_system);
-	_mav_put_uint8_t(buf, 5, target_component);
+    char buf[MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN];
+    _mav_put_uint16_t(buf, 0, start);
+    _mav_put_uint16_t(buf, 2, end);
+    _mav_put_uint8_t(buf, 4, target_system);
+    _mav_put_uint8_t(buf, 5, target_component);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_LOG_REQUEST_LIST, buf, MAVLINK_MSG_ID_LOG_REQUEST_LIST_MIN_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC);
 #else
-	mavlink_log_request_list_t packet;
-	packet.start = start;
-	packet.end = end;
-	packet.target_system = target_system;
-	packet.target_component = target_component;
+    mavlink_log_request_list_t packet;
+    packet.start = start;
+    packet.end = end;
+    packet.target_system = target_system;
+    packet.target_component = target_component;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_LOG_REQUEST_LIST, (const char *)&packet, MAVLINK_MSG_ID_LOG_REQUEST_LIST_MIN_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC);
 #endif
@@ -202,19 +203,19 @@ static inline void mavlink_msg_log_request_list_send_struct(mavlink_channel_t ch
 static inline void mavlink_msg_log_request_list_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t target_system, uint8_t target_component, uint16_t start, uint16_t end)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint16_t(buf, 0, start);
-	_mav_put_uint16_t(buf, 2, end);
-	_mav_put_uint8_t(buf, 4, target_system);
-	_mav_put_uint8_t(buf, 5, target_component);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint16_t(buf, 0, start);
+    _mav_put_uint16_t(buf, 2, end);
+    _mav_put_uint8_t(buf, 4, target_system);
+    _mav_put_uint8_t(buf, 5, target_component);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_LOG_REQUEST_LIST, buf, MAVLINK_MSG_ID_LOG_REQUEST_LIST_MIN_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC);
 #else
-	mavlink_log_request_list_t *packet = (mavlink_log_request_list_t *)msgbuf;
-	packet->start = start;
-	packet->end = end;
-	packet->target_system = target_system;
-	packet->target_component = target_component;
+    mavlink_log_request_list_t *packet = (mavlink_log_request_list_t *)msgbuf;
+    packet->start = start;
+    packet->end = end;
+    packet->target_system = target_system;
+    packet->target_component = target_component;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_LOG_REQUEST_LIST, (const char *)packet, MAVLINK_MSG_ID_LOG_REQUEST_LIST_MIN_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN, MAVLINK_MSG_ID_LOG_REQUEST_LIST_CRC);
 #endif
@@ -233,7 +234,7 @@ static inline void mavlink_msg_log_request_list_send_buf(mavlink_message_t *msgb
  */
 static inline uint8_t mavlink_msg_log_request_list_get_target_system(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  4);
+    return _MAV_RETURN_uint8_t(msg,  4);
 }
 
 /**
@@ -243,7 +244,7 @@ static inline uint8_t mavlink_msg_log_request_list_get_target_system(const mavli
  */
 static inline uint8_t mavlink_msg_log_request_list_get_target_component(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  5);
+    return _MAV_RETURN_uint8_t(msg,  5);
 }
 
 /**
@@ -253,7 +254,7 @@ static inline uint8_t mavlink_msg_log_request_list_get_target_component(const ma
  */
 static inline uint16_t mavlink_msg_log_request_list_get_start(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  0);
+    return _MAV_RETURN_uint16_t(msg,  0);
 }
 
 /**
@@ -263,7 +264,7 @@ static inline uint16_t mavlink_msg_log_request_list_get_start(const mavlink_mess
  */
 static inline uint16_t mavlink_msg_log_request_list_get_end(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  2);
+    return _MAV_RETURN_uint16_t(msg,  2);
 }
 
 /**
@@ -275,13 +276,13 @@ static inline uint16_t mavlink_msg_log_request_list_get_end(const mavlink_messag
 static inline void mavlink_msg_log_request_list_decode(const mavlink_message_t* msg, mavlink_log_request_list_t* log_request_list)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	log_request_list->start = mavlink_msg_log_request_list_get_start(msg);
-	log_request_list->end = mavlink_msg_log_request_list_get_end(msg);
-	log_request_list->target_system = mavlink_msg_log_request_list_get_target_system(msg);
-	log_request_list->target_component = mavlink_msg_log_request_list_get_target_component(msg);
+    log_request_list->start = mavlink_msg_log_request_list_get_start(msg);
+    log_request_list->end = mavlink_msg_log_request_list_get_end(msg);
+    log_request_list->target_system = mavlink_msg_log_request_list_get_target_system(msg);
+    log_request_list->target_component = mavlink_msg_log_request_list_get_target_component(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN? msg->len : MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN;
         memset(log_request_list, 0, MAVLINK_MSG_ID_LOG_REQUEST_LIST_LEN);
-	memcpy(log_request_list, _MAV_PAYLOAD(msg), len);
+    memcpy(log_request_list, _MAV_PAYLOAD(msg), len);
 #endif
 }

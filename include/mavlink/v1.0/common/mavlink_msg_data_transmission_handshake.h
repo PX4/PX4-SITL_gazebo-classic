@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE DATA_TRANSMISSION_HANDSHAKE PACKING
 
 #define MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE 130
@@ -25,10 +26,10 @@ typedef struct __mavlink_data_transmission_handshake_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_DATA_TRANSMISSION_HANDSHAKE { \
-	130, \
-	"DATA_TRANSMISSION_HANDSHAKE", \
-	7, \
-	{  { "size", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_data_transmission_handshake_t, size) }, \
+    130, \
+    "DATA_TRANSMISSION_HANDSHAKE", \
+    7, \
+    {  { "size", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_data_transmission_handshake_t, size) }, \
          { "width", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_data_transmission_handshake_t, width) }, \
          { "height", NULL, MAVLINK_TYPE_UINT16_T, 0, 6, offsetof(mavlink_data_transmission_handshake_t, height) }, \
          { "packets", NULL, MAVLINK_TYPE_UINT16_T, 0, 8, offsetof(mavlink_data_transmission_handshake_t, packets) }, \
@@ -39,9 +40,9 @@ typedef struct __mavlink_data_transmission_handshake_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_DATA_TRANSMISSION_HANDSHAKE { \
-	"DATA_TRANSMISSION_HANDSHAKE", \
-	7, \
-	{  { "size", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_data_transmission_handshake_t, size) }, \
+    "DATA_TRANSMISSION_HANDSHAKE", \
+    7, \
+    {  { "size", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_data_transmission_handshake_t, size) }, \
          { "width", NULL, MAVLINK_TYPE_UINT16_T, 0, 4, offsetof(mavlink_data_transmission_handshake_t, width) }, \
          { "height", NULL, MAVLINK_TYPE_UINT16_T, 0, 6, offsetof(mavlink_data_transmission_handshake_t, height) }, \
          { "packets", NULL, MAVLINK_TYPE_UINT16_T, 0, 8, offsetof(mavlink_data_transmission_handshake_t, packets) }, \
@@ -68,33 +69,33 @@ typedef struct __mavlink_data_transmission_handshake_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t type, uint32_t size, uint16_t width, uint16_t height, uint16_t packets, uint8_t payload, uint8_t jpg_quality)
+                               uint8_t type, uint32_t size, uint16_t width, uint16_t height, uint16_t packets, uint8_t payload, uint8_t jpg_quality)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN];
-	_mav_put_uint32_t(buf, 0, size);
-	_mav_put_uint16_t(buf, 4, width);
-	_mav_put_uint16_t(buf, 6, height);
-	_mav_put_uint16_t(buf, 8, packets);
-	_mav_put_uint8_t(buf, 10, type);
-	_mav_put_uint8_t(buf, 11, payload);
-	_mav_put_uint8_t(buf, 12, jpg_quality);
+    char buf[MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN];
+    _mav_put_uint32_t(buf, 0, size);
+    _mav_put_uint16_t(buf, 4, width);
+    _mav_put_uint16_t(buf, 6, height);
+    _mav_put_uint16_t(buf, 8, packets);
+    _mav_put_uint8_t(buf, 10, type);
+    _mav_put_uint8_t(buf, 11, payload);
+    _mav_put_uint8_t(buf, 12, jpg_quality);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN);
 #else
-	mavlink_data_transmission_handshake_t packet;
-	packet.size = size;
-	packet.width = width;
-	packet.height = height;
-	packet.packets = packets;
-	packet.type = type;
-	packet.payload = payload;
-	packet.jpg_quality = jpg_quality;
+    mavlink_data_transmission_handshake_t packet;
+    packet.size = size;
+    packet.width = width;
+    packet.height = height;
+    packet.packets = packets;
+    packet.type = type;
+    packet.payload = payload;
+    packet.jpg_quality = jpg_quality;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE;
+    msg->msgid = MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_MIN_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC);
 }
 
@@ -114,34 +115,34 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_pack(uint8_t syst
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t type,uint32_t size,uint16_t width,uint16_t height,uint16_t packets,uint8_t payload,uint8_t jpg_quality)
+                               mavlink_message_t* msg,
+                                   uint8_t type,uint32_t size,uint16_t width,uint16_t height,uint16_t packets,uint8_t payload,uint8_t jpg_quality)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN];
-	_mav_put_uint32_t(buf, 0, size);
-	_mav_put_uint16_t(buf, 4, width);
-	_mav_put_uint16_t(buf, 6, height);
-	_mav_put_uint16_t(buf, 8, packets);
-	_mav_put_uint8_t(buf, 10, type);
-	_mav_put_uint8_t(buf, 11, payload);
-	_mav_put_uint8_t(buf, 12, jpg_quality);
+    char buf[MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN];
+    _mav_put_uint32_t(buf, 0, size);
+    _mav_put_uint16_t(buf, 4, width);
+    _mav_put_uint16_t(buf, 6, height);
+    _mav_put_uint16_t(buf, 8, packets);
+    _mav_put_uint8_t(buf, 10, type);
+    _mav_put_uint8_t(buf, 11, payload);
+    _mav_put_uint8_t(buf, 12, jpg_quality);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN);
 #else
-	mavlink_data_transmission_handshake_t packet;
-	packet.size = size;
-	packet.width = width;
-	packet.height = height;
-	packet.packets = packets;
-	packet.type = type;
-	packet.payload = payload;
-	packet.jpg_quality = jpg_quality;
+    mavlink_data_transmission_handshake_t packet;
+    packet.size = size;
+    packet.width = width;
+    packet.height = height;
+    packet.packets = packets;
+    packet.type = type;
+    packet.payload = payload;
+    packet.jpg_quality = jpg_quality;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE;
+    msg->msgid = MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_MIN_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC);
 }
 
@@ -155,7 +156,7 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_pack_chan(uint8_t
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_data_transmission_handshake_t* data_transmission_handshake)
 {
-	return mavlink_msg_data_transmission_handshake_pack(system_id, component_id, msg, data_transmission_handshake->type, data_transmission_handshake->size, data_transmission_handshake->width, data_transmission_handshake->height, data_transmission_handshake->packets, data_transmission_handshake->payload, data_transmission_handshake->jpg_quality);
+    return mavlink_msg_data_transmission_handshake_pack(system_id, component_id, msg, data_transmission_handshake->type, data_transmission_handshake->size, data_transmission_handshake->width, data_transmission_handshake->height, data_transmission_handshake->packets, data_transmission_handshake->payload, data_transmission_handshake->jpg_quality);
 }
 
 /**
@@ -169,7 +170,7 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_encode(uint8_t sy
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_data_transmission_handshake_t* data_transmission_handshake)
 {
-	return mavlink_msg_data_transmission_handshake_pack_chan(system_id, component_id, chan, msg, data_transmission_handshake->type, data_transmission_handshake->size, data_transmission_handshake->width, data_transmission_handshake->height, data_transmission_handshake->packets, data_transmission_handshake->payload, data_transmission_handshake->jpg_quality);
+    return mavlink_msg_data_transmission_handshake_pack_chan(system_id, component_id, chan, msg, data_transmission_handshake->type, data_transmission_handshake->size, data_transmission_handshake->width, data_transmission_handshake->height, data_transmission_handshake->packets, data_transmission_handshake->payload, data_transmission_handshake->jpg_quality);
 }
 
 /**
@@ -189,25 +190,25 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_encode_chan(uint8
 static inline void mavlink_msg_data_transmission_handshake_send(mavlink_channel_t chan, uint8_t type, uint32_t size, uint16_t width, uint16_t height, uint16_t packets, uint8_t payload, uint8_t jpg_quality)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN];
-	_mav_put_uint32_t(buf, 0, size);
-	_mav_put_uint16_t(buf, 4, width);
-	_mav_put_uint16_t(buf, 6, height);
-	_mav_put_uint16_t(buf, 8, packets);
-	_mav_put_uint8_t(buf, 10, type);
-	_mav_put_uint8_t(buf, 11, payload);
-	_mav_put_uint8_t(buf, 12, jpg_quality);
+    char buf[MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN];
+    _mav_put_uint32_t(buf, 0, size);
+    _mav_put_uint16_t(buf, 4, width);
+    _mav_put_uint16_t(buf, 6, height);
+    _mav_put_uint16_t(buf, 8, packets);
+    _mav_put_uint8_t(buf, 10, type);
+    _mav_put_uint8_t(buf, 11, payload);
+    _mav_put_uint8_t(buf, 12, jpg_quality);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE, buf, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_MIN_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC);
 #else
-	mavlink_data_transmission_handshake_t packet;
-	packet.size = size;
-	packet.width = width;
-	packet.height = height;
-	packet.packets = packets;
-	packet.type = type;
-	packet.payload = payload;
-	packet.jpg_quality = jpg_quality;
+    mavlink_data_transmission_handshake_t packet;
+    packet.size = size;
+    packet.width = width;
+    packet.height = height;
+    packet.packets = packets;
+    packet.type = type;
+    packet.payload = payload;
+    packet.jpg_quality = jpg_quality;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE, (const char *)&packet, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_MIN_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC);
 #endif
@@ -238,25 +239,25 @@ static inline void mavlink_msg_data_transmission_handshake_send_struct(mavlink_c
 static inline void mavlink_msg_data_transmission_handshake_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t type, uint32_t size, uint16_t width, uint16_t height, uint16_t packets, uint8_t payload, uint8_t jpg_quality)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint32_t(buf, 0, size);
-	_mav_put_uint16_t(buf, 4, width);
-	_mav_put_uint16_t(buf, 6, height);
-	_mav_put_uint16_t(buf, 8, packets);
-	_mav_put_uint8_t(buf, 10, type);
-	_mav_put_uint8_t(buf, 11, payload);
-	_mav_put_uint8_t(buf, 12, jpg_quality);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint32_t(buf, 0, size);
+    _mav_put_uint16_t(buf, 4, width);
+    _mav_put_uint16_t(buf, 6, height);
+    _mav_put_uint16_t(buf, 8, packets);
+    _mav_put_uint8_t(buf, 10, type);
+    _mav_put_uint8_t(buf, 11, payload);
+    _mav_put_uint8_t(buf, 12, jpg_quality);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE, buf, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_MIN_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC);
 #else
-	mavlink_data_transmission_handshake_t *packet = (mavlink_data_transmission_handshake_t *)msgbuf;
-	packet->size = size;
-	packet->width = width;
-	packet->height = height;
-	packet->packets = packets;
-	packet->type = type;
-	packet->payload = payload;
-	packet->jpg_quality = jpg_quality;
+    mavlink_data_transmission_handshake_t *packet = (mavlink_data_transmission_handshake_t *)msgbuf;
+    packet->size = size;
+    packet->width = width;
+    packet->height = height;
+    packet->packets = packets;
+    packet->type = type;
+    packet->payload = payload;
+    packet->jpg_quality = jpg_quality;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE, (const char *)packet, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_MIN_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_CRC);
 #endif
@@ -275,7 +276,7 @@ static inline void mavlink_msg_data_transmission_handshake_send_buf(mavlink_mess
  */
 static inline uint8_t mavlink_msg_data_transmission_handshake_get_type(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  10);
+    return _MAV_RETURN_uint8_t(msg,  10);
 }
 
 /**
@@ -285,7 +286,7 @@ static inline uint8_t mavlink_msg_data_transmission_handshake_get_type(const mav
  */
 static inline uint32_t mavlink_msg_data_transmission_handshake_get_size(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint32_t(msg,  0);
+    return _MAV_RETURN_uint32_t(msg,  0);
 }
 
 /**
@@ -295,7 +296,7 @@ static inline uint32_t mavlink_msg_data_transmission_handshake_get_size(const ma
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_get_width(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  4);
+    return _MAV_RETURN_uint16_t(msg,  4);
 }
 
 /**
@@ -305,7 +306,7 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_get_width(const m
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_get_height(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  6);
+    return _MAV_RETURN_uint16_t(msg,  6);
 }
 
 /**
@@ -315,7 +316,7 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_get_height(const 
  */
 static inline uint16_t mavlink_msg_data_transmission_handshake_get_packets(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint16_t(msg,  8);
+    return _MAV_RETURN_uint16_t(msg,  8);
 }
 
 /**
@@ -325,7 +326,7 @@ static inline uint16_t mavlink_msg_data_transmission_handshake_get_packets(const
  */
 static inline uint8_t mavlink_msg_data_transmission_handshake_get_payload(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  11);
+    return _MAV_RETURN_uint8_t(msg,  11);
 }
 
 /**
@@ -335,7 +336,7 @@ static inline uint8_t mavlink_msg_data_transmission_handshake_get_payload(const 
  */
 static inline uint8_t mavlink_msg_data_transmission_handshake_get_jpg_quality(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  12);
+    return _MAV_RETURN_uint8_t(msg,  12);
 }
 
 /**
@@ -347,16 +348,16 @@ static inline uint8_t mavlink_msg_data_transmission_handshake_get_jpg_quality(co
 static inline void mavlink_msg_data_transmission_handshake_decode(const mavlink_message_t* msg, mavlink_data_transmission_handshake_t* data_transmission_handshake)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	data_transmission_handshake->size = mavlink_msg_data_transmission_handshake_get_size(msg);
-	data_transmission_handshake->width = mavlink_msg_data_transmission_handshake_get_width(msg);
-	data_transmission_handshake->height = mavlink_msg_data_transmission_handshake_get_height(msg);
-	data_transmission_handshake->packets = mavlink_msg_data_transmission_handshake_get_packets(msg);
-	data_transmission_handshake->type = mavlink_msg_data_transmission_handshake_get_type(msg);
-	data_transmission_handshake->payload = mavlink_msg_data_transmission_handshake_get_payload(msg);
-	data_transmission_handshake->jpg_quality = mavlink_msg_data_transmission_handshake_get_jpg_quality(msg);
+    data_transmission_handshake->size = mavlink_msg_data_transmission_handshake_get_size(msg);
+    data_transmission_handshake->width = mavlink_msg_data_transmission_handshake_get_width(msg);
+    data_transmission_handshake->height = mavlink_msg_data_transmission_handshake_get_height(msg);
+    data_transmission_handshake->packets = mavlink_msg_data_transmission_handshake_get_packets(msg);
+    data_transmission_handshake->type = mavlink_msg_data_transmission_handshake_get_type(msg);
+    data_transmission_handshake->payload = mavlink_msg_data_transmission_handshake_get_payload(msg);
+    data_transmission_handshake->jpg_quality = mavlink_msg_data_transmission_handshake_get_jpg_quality(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN? msg->len : MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN;
         memset(data_transmission_handshake, 0, MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE_LEN);
-	memcpy(data_transmission_handshake, _MAV_PAYLOAD(msg), len);
+    memcpy(data_transmission_handshake, _MAV_PAYLOAD(msg), len);
 #endif
 }

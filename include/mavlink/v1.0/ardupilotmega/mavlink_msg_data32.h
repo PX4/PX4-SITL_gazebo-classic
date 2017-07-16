@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE DATA32 PACKING
 
 #define MAVLINK_MSG_ID_DATA32 170
@@ -21,19 +22,19 @@ typedef struct __mavlink_data32_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_DATA32 { \
-	170, \
-	"DATA32", \
-	3, \
-	{  { "type", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_data32_t, type) }, \
+    170, \
+    "DATA32", \
+    3, \
+    {  { "type", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_data32_t, type) }, \
          { "len", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_data32_t, len) }, \
          { "data", NULL, MAVLINK_TYPE_UINT8_T, 32, 2, offsetof(mavlink_data32_t, data) }, \
          } \
 }
 #else
 #define MAVLINK_MESSAGE_INFO_DATA32 { \
-	"DATA32", \
-	3, \
-	{  { "type", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_data32_t, type) }, \
+    "DATA32", \
+    3, \
+    {  { "type", NULL, MAVLINK_TYPE_UINT8_T, 0, 0, offsetof(mavlink_data32_t, type) }, \
          { "len", NULL, MAVLINK_TYPE_UINT8_T, 0, 1, offsetof(mavlink_data32_t, len) }, \
          { "data", NULL, MAVLINK_TYPE_UINT8_T, 32, 2, offsetof(mavlink_data32_t, data) }, \
          } \
@@ -52,23 +53,23 @@ typedef struct __mavlink_data32_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_data32_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint8_t type, uint8_t len, const uint8_t *data)
+                               uint8_t type, uint8_t len, const uint8_t *data)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_DATA32_LEN];
-	_mav_put_uint8_t(buf, 0, type);
-	_mav_put_uint8_t(buf, 1, len);
-	_mav_put_uint8_t_array(buf, 2, data, 32);
+    char buf[MAVLINK_MSG_ID_DATA32_LEN];
+    _mav_put_uint8_t(buf, 0, type);
+    _mav_put_uint8_t(buf, 1, len);
+    _mav_put_uint8_t_array(buf, 2, data, 32);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA32_LEN);
 #else
-	mavlink_data32_t packet;
-	packet.type = type;
-	packet.len = len;
-	mav_array_memcpy(packet.data, data, sizeof(uint8_t)*32);
+    mavlink_data32_t packet;
+    packet.type = type;
+    packet.len = len;
+    mav_array_memcpy(packet.data, data, sizeof(uint8_t)*32);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DATA32_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_DATA32;
+    msg->msgid = MAVLINK_MSG_ID_DATA32;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_DATA32_MIN_LEN, MAVLINK_MSG_ID_DATA32_LEN, MAVLINK_MSG_ID_DATA32_CRC);
 }
 
@@ -84,24 +85,24 @@ static inline uint16_t mavlink_msg_data32_pack(uint8_t system_id, uint8_t compon
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_data32_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint8_t type,uint8_t len,const uint8_t *data)
+                               mavlink_message_t* msg,
+                                   uint8_t type,uint8_t len,const uint8_t *data)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_DATA32_LEN];
-	_mav_put_uint8_t(buf, 0, type);
-	_mav_put_uint8_t(buf, 1, len);
-	_mav_put_uint8_t_array(buf, 2, data, 32);
+    char buf[MAVLINK_MSG_ID_DATA32_LEN];
+    _mav_put_uint8_t(buf, 0, type);
+    _mav_put_uint8_t(buf, 1, len);
+    _mav_put_uint8_t_array(buf, 2, data, 32);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_DATA32_LEN);
 #else
-	mavlink_data32_t packet;
-	packet.type = type;
-	packet.len = len;
-	mav_array_memcpy(packet.data, data, sizeof(uint8_t)*32);
+    mavlink_data32_t packet;
+    packet.type = type;
+    packet.len = len;
+    mav_array_memcpy(packet.data, data, sizeof(uint8_t)*32);
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_DATA32_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_DATA32;
+    msg->msgid = MAVLINK_MSG_ID_DATA32;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_DATA32_MIN_LEN, MAVLINK_MSG_ID_DATA32_LEN, MAVLINK_MSG_ID_DATA32_CRC);
 }
 
@@ -115,7 +116,7 @@ static inline uint16_t mavlink_msg_data32_pack_chan(uint8_t system_id, uint8_t c
  */
 static inline uint16_t mavlink_msg_data32_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_data32_t* data32)
 {
-	return mavlink_msg_data32_pack(system_id, component_id, msg, data32->type, data32->len, data32->data);
+    return mavlink_msg_data32_pack(system_id, component_id, msg, data32->type, data32->len, data32->data);
 }
 
 /**
@@ -129,7 +130,7 @@ static inline uint16_t mavlink_msg_data32_encode(uint8_t system_id, uint8_t comp
  */
 static inline uint16_t mavlink_msg_data32_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_data32_t* data32)
 {
-	return mavlink_msg_data32_pack_chan(system_id, component_id, chan, msg, data32->type, data32->len, data32->data);
+    return mavlink_msg_data32_pack_chan(system_id, component_id, chan, msg, data32->type, data32->len, data32->data);
 }
 
 /**
@@ -145,16 +146,16 @@ static inline uint16_t mavlink_msg_data32_encode_chan(uint8_t system_id, uint8_t
 static inline void mavlink_msg_data32_send(mavlink_channel_t chan, uint8_t type, uint8_t len, const uint8_t *data)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_DATA32_LEN];
-	_mav_put_uint8_t(buf, 0, type);
-	_mav_put_uint8_t(buf, 1, len);
-	_mav_put_uint8_t_array(buf, 2, data, 32);
+    char buf[MAVLINK_MSG_ID_DATA32_LEN];
+    _mav_put_uint8_t(buf, 0, type);
+    _mav_put_uint8_t(buf, 1, len);
+    _mav_put_uint8_t_array(buf, 2, data, 32);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA32, buf, MAVLINK_MSG_ID_DATA32_MIN_LEN, MAVLINK_MSG_ID_DATA32_LEN, MAVLINK_MSG_ID_DATA32_CRC);
 #else
-	mavlink_data32_t packet;
-	packet.type = type;
-	packet.len = len;
-	mav_array_memcpy(packet.data, data, sizeof(uint8_t)*32);
+    mavlink_data32_t packet;
+    packet.type = type;
+    packet.len = len;
+    mav_array_memcpy(packet.data, data, sizeof(uint8_t)*32);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA32, (const char *)&packet, MAVLINK_MSG_ID_DATA32_MIN_LEN, MAVLINK_MSG_ID_DATA32_LEN, MAVLINK_MSG_ID_DATA32_CRC);
 #endif
 }
@@ -184,16 +185,16 @@ static inline void mavlink_msg_data32_send_struct(mavlink_channel_t chan, const 
 static inline void mavlink_msg_data32_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint8_t type, uint8_t len, const uint8_t *data)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint8_t(buf, 0, type);
-	_mav_put_uint8_t(buf, 1, len);
-	_mav_put_uint8_t_array(buf, 2, data, 32);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint8_t(buf, 0, type);
+    _mav_put_uint8_t(buf, 1, len);
+    _mav_put_uint8_t_array(buf, 2, data, 32);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA32, buf, MAVLINK_MSG_ID_DATA32_MIN_LEN, MAVLINK_MSG_ID_DATA32_LEN, MAVLINK_MSG_ID_DATA32_CRC);
 #else
-	mavlink_data32_t *packet = (mavlink_data32_t *)msgbuf;
-	packet->type = type;
-	packet->len = len;
-	mav_array_memcpy(packet->data, data, sizeof(uint8_t)*32);
+    mavlink_data32_t *packet = (mavlink_data32_t *)msgbuf;
+    packet->type = type;
+    packet->len = len;
+    mav_array_memcpy(packet->data, data, sizeof(uint8_t)*32);
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DATA32, (const char *)packet, MAVLINK_MSG_ID_DATA32_MIN_LEN, MAVLINK_MSG_ID_DATA32_LEN, MAVLINK_MSG_ID_DATA32_CRC);
 #endif
 }
@@ -211,7 +212,7 @@ static inline void mavlink_msg_data32_send_buf(mavlink_message_t *msgbuf, mavlin
  */
 static inline uint8_t mavlink_msg_data32_get_type(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  0);
+    return _MAV_RETURN_uint8_t(msg,  0);
 }
 
 /**
@@ -221,7 +222,7 @@ static inline uint8_t mavlink_msg_data32_get_type(const mavlink_message_t* msg)
  */
 static inline uint8_t mavlink_msg_data32_get_len(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  1);
+    return _MAV_RETURN_uint8_t(msg,  1);
 }
 
 /**
@@ -231,7 +232,7 @@ static inline uint8_t mavlink_msg_data32_get_len(const mavlink_message_t* msg)
  */
 static inline uint16_t mavlink_msg_data32_get_data(const mavlink_message_t* msg, uint8_t *data)
 {
-	return _MAV_RETURN_uint8_t_array(msg, data, 32,  2);
+    return _MAV_RETURN_uint8_t_array(msg, data, 32,  2);
 }
 
 /**
@@ -243,12 +244,12 @@ static inline uint16_t mavlink_msg_data32_get_data(const mavlink_message_t* msg,
 static inline void mavlink_msg_data32_decode(const mavlink_message_t* msg, mavlink_data32_t* data32)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	data32->type = mavlink_msg_data32_get_type(msg);
-	data32->len = mavlink_msg_data32_get_len(msg);
-	mavlink_msg_data32_get_data(msg, data32->data);
+    data32->type = mavlink_msg_data32_get_type(msg);
+    data32->len = mavlink_msg_data32_get_len(msg);
+    mavlink_msg_data32_get_data(msg, data32->data);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_DATA32_LEN? msg->len : MAVLINK_MSG_ID_DATA32_LEN;
         memset(data32, 0, MAVLINK_MSG_ID_DATA32_LEN);
-	memcpy(data32, _MAV_PAYLOAD(msg), len);
+    memcpy(data32, _MAV_PAYLOAD(msg), len);
 #endif
 }

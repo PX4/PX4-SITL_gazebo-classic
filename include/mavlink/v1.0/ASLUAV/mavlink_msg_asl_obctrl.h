@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE ASL_OBCTRL PACKING
 
 #define MAVLINK_MSG_ID_ASL_OBCTRL 207
@@ -26,10 +27,10 @@ typedef struct __mavlink_asl_obctrl_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_ASL_OBCTRL { \
-	207, \
-	"ASL_OBCTRL", \
-	8, \
-	{  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_asl_obctrl_t, timestamp) }, \
+    207, \
+    "ASL_OBCTRL", \
+    8, \
+    {  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_asl_obctrl_t, timestamp) }, \
          { "uElev", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_asl_obctrl_t, uElev) }, \
          { "uThrot", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_asl_obctrl_t, uThrot) }, \
          { "uThrot2", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_asl_obctrl_t, uThrot2) }, \
@@ -41,9 +42,9 @@ typedef struct __mavlink_asl_obctrl_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_ASL_OBCTRL { \
-	"ASL_OBCTRL", \
-	8, \
-	{  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_asl_obctrl_t, timestamp) }, \
+    "ASL_OBCTRL", \
+    8, \
+    {  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_asl_obctrl_t, timestamp) }, \
          { "uElev", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_asl_obctrl_t, uElev) }, \
          { "uThrot", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_asl_obctrl_t, uThrot) }, \
          { "uThrot2", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_asl_obctrl_t, uThrot2) }, \
@@ -72,35 +73,35 @@ typedef struct __mavlink_asl_obctrl_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint64_t timestamp, float uElev, float uThrot, float uThrot2, float uAilL, float uAilR, float uRud, uint8_t obctrl_status)
+                               uint64_t timestamp, float uElev, float uThrot, float uThrot2, float uAilL, float uAilR, float uRud, uint8_t obctrl_status)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, uElev);
-	_mav_put_float(buf, 12, uThrot);
-	_mav_put_float(buf, 16, uThrot2);
-	_mav_put_float(buf, 20, uAilL);
-	_mav_put_float(buf, 24, uAilR);
-	_mav_put_float(buf, 28, uRud);
-	_mav_put_uint8_t(buf, 32, obctrl_status);
+    char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, uElev);
+    _mav_put_float(buf, 12, uThrot);
+    _mav_put_float(buf, 16, uThrot2);
+    _mav_put_float(buf, 20, uAilL);
+    _mav_put_float(buf, 24, uAilR);
+    _mav_put_float(buf, 28, uRud);
+    _mav_put_uint8_t(buf, 32, obctrl_status);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
 #else
-	mavlink_asl_obctrl_t packet;
-	packet.timestamp = timestamp;
-	packet.uElev = uElev;
-	packet.uThrot = uThrot;
-	packet.uThrot2 = uThrot2;
-	packet.uAilL = uAilL;
-	packet.uAilR = uAilR;
-	packet.uRud = uRud;
-	packet.obctrl_status = obctrl_status;
+    mavlink_asl_obctrl_t packet;
+    packet.timestamp = timestamp;
+    packet.uElev = uElev;
+    packet.uThrot = uThrot;
+    packet.uThrot2 = uThrot2;
+    packet.uAilL = uAilL;
+    packet.uAilR = uAilR;
+    packet.uRud = uRud;
+    packet.obctrl_status = obctrl_status;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_ASL_OBCTRL;
+    msg->msgid = MAVLINK_MSG_ID_ASL_OBCTRL;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 }
 
@@ -121,36 +122,36 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack(uint8_t system_id, uint8_t co
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint64_t timestamp,float uElev,float uThrot,float uThrot2,float uAilL,float uAilR,float uRud,uint8_t obctrl_status)
+                               mavlink_message_t* msg,
+                                   uint64_t timestamp,float uElev,float uThrot,float uThrot2,float uAilL,float uAilR,float uRud,uint8_t obctrl_status)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, uElev);
-	_mav_put_float(buf, 12, uThrot);
-	_mav_put_float(buf, 16, uThrot2);
-	_mav_put_float(buf, 20, uAilL);
-	_mav_put_float(buf, 24, uAilR);
-	_mav_put_float(buf, 28, uRud);
-	_mav_put_uint8_t(buf, 32, obctrl_status);
+    char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, uElev);
+    _mav_put_float(buf, 12, uThrot);
+    _mav_put_float(buf, 16, uThrot2);
+    _mav_put_float(buf, 20, uAilL);
+    _mav_put_float(buf, 24, uAilR);
+    _mav_put_float(buf, 28, uRud);
+    _mav_put_uint8_t(buf, 32, obctrl_status);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
 #else
-	mavlink_asl_obctrl_t packet;
-	packet.timestamp = timestamp;
-	packet.uElev = uElev;
-	packet.uThrot = uThrot;
-	packet.uThrot2 = uThrot2;
-	packet.uAilL = uAilL;
-	packet.uAilR = uAilR;
-	packet.uRud = uRud;
-	packet.obctrl_status = obctrl_status;
+    mavlink_asl_obctrl_t packet;
+    packet.timestamp = timestamp;
+    packet.uElev = uElev;
+    packet.uThrot = uThrot;
+    packet.uThrot2 = uThrot2;
+    packet.uAilL = uAilL;
+    packet.uAilR = uAilR;
+    packet.uRud = uRud;
+    packet.obctrl_status = obctrl_status;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_ASL_OBCTRL;
+    msg->msgid = MAVLINK_MSG_ID_ASL_OBCTRL;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 }
 
@@ -164,7 +165,7 @@ static inline uint16_t mavlink_msg_asl_obctrl_pack_chan(uint8_t system_id, uint8
  */
 static inline uint16_t mavlink_msg_asl_obctrl_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_asl_obctrl_t* asl_obctrl)
 {
-	return mavlink_msg_asl_obctrl_pack(system_id, component_id, msg, asl_obctrl->timestamp, asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2, asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud, asl_obctrl->obctrl_status);
+    return mavlink_msg_asl_obctrl_pack(system_id, component_id, msg, asl_obctrl->timestamp, asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2, asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud, asl_obctrl->obctrl_status);
 }
 
 /**
@@ -178,7 +179,7 @@ static inline uint16_t mavlink_msg_asl_obctrl_encode(uint8_t system_id, uint8_t 
  */
 static inline uint16_t mavlink_msg_asl_obctrl_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_asl_obctrl_t* asl_obctrl)
 {
-	return mavlink_msg_asl_obctrl_pack_chan(system_id, component_id, chan, msg, asl_obctrl->timestamp, asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2, asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud, asl_obctrl->obctrl_status);
+    return mavlink_msg_asl_obctrl_pack_chan(system_id, component_id, chan, msg, asl_obctrl->timestamp, asl_obctrl->uElev, asl_obctrl->uThrot, asl_obctrl->uThrot2, asl_obctrl->uAilL, asl_obctrl->uAilR, asl_obctrl->uRud, asl_obctrl->obctrl_status);
 }
 
 /**
@@ -199,27 +200,27 @@ static inline uint16_t mavlink_msg_asl_obctrl_encode_chan(uint8_t system_id, uin
 static inline void mavlink_msg_asl_obctrl_send(mavlink_channel_t chan, uint64_t timestamp, float uElev, float uThrot, float uThrot2, float uAilL, float uAilR, float uRud, uint8_t obctrl_status)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, uElev);
-	_mav_put_float(buf, 12, uThrot);
-	_mav_put_float(buf, 16, uThrot2);
-	_mav_put_float(buf, 20, uAilL);
-	_mav_put_float(buf, 24, uAilR);
-	_mav_put_float(buf, 28, uRud);
-	_mav_put_uint8_t(buf, 32, obctrl_status);
+    char buf[MAVLINK_MSG_ID_ASL_OBCTRL_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, uElev);
+    _mav_put_float(buf, 12, uThrot);
+    _mav_put_float(buf, 16, uThrot2);
+    _mav_put_float(buf, 20, uAilL);
+    _mav_put_float(buf, 24, uAilR);
+    _mav_put_float(buf, 28, uRud);
+    _mav_put_uint8_t(buf, 32, obctrl_status);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASL_OBCTRL, buf, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 #else
-	mavlink_asl_obctrl_t packet;
-	packet.timestamp = timestamp;
-	packet.uElev = uElev;
-	packet.uThrot = uThrot;
-	packet.uThrot2 = uThrot2;
-	packet.uAilL = uAilL;
-	packet.uAilR = uAilR;
-	packet.uRud = uRud;
-	packet.obctrl_status = obctrl_status;
+    mavlink_asl_obctrl_t packet;
+    packet.timestamp = timestamp;
+    packet.uElev = uElev;
+    packet.uThrot = uThrot;
+    packet.uThrot2 = uThrot2;
+    packet.uAilL = uAilL;
+    packet.uAilR = uAilR;
+    packet.uRud = uRud;
+    packet.obctrl_status = obctrl_status;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASL_OBCTRL, (const char *)&packet, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 #endif
@@ -250,27 +251,27 @@ static inline void mavlink_msg_asl_obctrl_send_struct(mavlink_channel_t chan, co
 static inline void mavlink_msg_asl_obctrl_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint64_t timestamp, float uElev, float uThrot, float uThrot2, float uAilL, float uAilR, float uRud, uint8_t obctrl_status)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, uElev);
-	_mav_put_float(buf, 12, uThrot);
-	_mav_put_float(buf, 16, uThrot2);
-	_mav_put_float(buf, 20, uAilL);
-	_mav_put_float(buf, 24, uAilR);
-	_mav_put_float(buf, 28, uRud);
-	_mav_put_uint8_t(buf, 32, obctrl_status);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, uElev);
+    _mav_put_float(buf, 12, uThrot);
+    _mav_put_float(buf, 16, uThrot2);
+    _mav_put_float(buf, 20, uAilL);
+    _mav_put_float(buf, 24, uAilR);
+    _mav_put_float(buf, 28, uRud);
+    _mav_put_uint8_t(buf, 32, obctrl_status);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASL_OBCTRL, buf, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 #else
-	mavlink_asl_obctrl_t *packet = (mavlink_asl_obctrl_t *)msgbuf;
-	packet->timestamp = timestamp;
-	packet->uElev = uElev;
-	packet->uThrot = uThrot;
-	packet->uThrot2 = uThrot2;
-	packet->uAilL = uAilL;
-	packet->uAilR = uAilR;
-	packet->uRud = uRud;
-	packet->obctrl_status = obctrl_status;
+    mavlink_asl_obctrl_t *packet = (mavlink_asl_obctrl_t *)msgbuf;
+    packet->timestamp = timestamp;
+    packet->uElev = uElev;
+    packet->uThrot = uThrot;
+    packet->uThrot2 = uThrot2;
+    packet->uAilL = uAilL;
+    packet->uAilR = uAilR;
+    packet->uRud = uRud;
+    packet->obctrl_status = obctrl_status;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_ASL_OBCTRL, (const char *)packet, MAVLINK_MSG_ID_ASL_OBCTRL_MIN_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_LEN, MAVLINK_MSG_ID_ASL_OBCTRL_CRC);
 #endif
@@ -289,7 +290,7 @@ static inline void mavlink_msg_asl_obctrl_send_buf(mavlink_message_t *msgbuf, ma
  */
 static inline uint64_t mavlink_msg_asl_obctrl_get_timestamp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  0);
+    return _MAV_RETURN_uint64_t(msg,  0);
 }
 
 /**
@@ -299,7 +300,7 @@ static inline uint64_t mavlink_msg_asl_obctrl_get_timestamp(const mavlink_messag
  */
 static inline float mavlink_msg_asl_obctrl_get_uElev(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  8);
+    return _MAV_RETURN_float(msg,  8);
 }
 
 /**
@@ -309,7 +310,7 @@ static inline float mavlink_msg_asl_obctrl_get_uElev(const mavlink_message_t* ms
  */
 static inline float mavlink_msg_asl_obctrl_get_uThrot(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  12);
+    return _MAV_RETURN_float(msg,  12);
 }
 
 /**
@@ -319,7 +320,7 @@ static inline float mavlink_msg_asl_obctrl_get_uThrot(const mavlink_message_t* m
  */
 static inline float mavlink_msg_asl_obctrl_get_uThrot2(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -329,7 +330,7 @@ static inline float mavlink_msg_asl_obctrl_get_uThrot2(const mavlink_message_t* 
  */
 static inline float mavlink_msg_asl_obctrl_get_uAilL(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  20);
+    return _MAV_RETURN_float(msg,  20);
 }
 
 /**
@@ -339,7 +340,7 @@ static inline float mavlink_msg_asl_obctrl_get_uAilL(const mavlink_message_t* ms
  */
 static inline float mavlink_msg_asl_obctrl_get_uAilR(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  24);
+    return _MAV_RETURN_float(msg,  24);
 }
 
 /**
@@ -349,7 +350,7 @@ static inline float mavlink_msg_asl_obctrl_get_uAilR(const mavlink_message_t* ms
  */
 static inline float mavlink_msg_asl_obctrl_get_uRud(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  28);
+    return _MAV_RETURN_float(msg,  28);
 }
 
 /**
@@ -359,7 +360,7 @@ static inline float mavlink_msg_asl_obctrl_get_uRud(const mavlink_message_t* msg
  */
 static inline uint8_t mavlink_msg_asl_obctrl_get_obctrl_status(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  32);
+    return _MAV_RETURN_uint8_t(msg,  32);
 }
 
 /**
@@ -371,17 +372,17 @@ static inline uint8_t mavlink_msg_asl_obctrl_get_obctrl_status(const mavlink_mes
 static inline void mavlink_msg_asl_obctrl_decode(const mavlink_message_t* msg, mavlink_asl_obctrl_t* asl_obctrl)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	asl_obctrl->timestamp = mavlink_msg_asl_obctrl_get_timestamp(msg);
-	asl_obctrl->uElev = mavlink_msg_asl_obctrl_get_uElev(msg);
-	asl_obctrl->uThrot = mavlink_msg_asl_obctrl_get_uThrot(msg);
-	asl_obctrl->uThrot2 = mavlink_msg_asl_obctrl_get_uThrot2(msg);
-	asl_obctrl->uAilL = mavlink_msg_asl_obctrl_get_uAilL(msg);
-	asl_obctrl->uAilR = mavlink_msg_asl_obctrl_get_uAilR(msg);
-	asl_obctrl->uRud = mavlink_msg_asl_obctrl_get_uRud(msg);
-	asl_obctrl->obctrl_status = mavlink_msg_asl_obctrl_get_obctrl_status(msg);
+    asl_obctrl->timestamp = mavlink_msg_asl_obctrl_get_timestamp(msg);
+    asl_obctrl->uElev = mavlink_msg_asl_obctrl_get_uElev(msg);
+    asl_obctrl->uThrot = mavlink_msg_asl_obctrl_get_uThrot(msg);
+    asl_obctrl->uThrot2 = mavlink_msg_asl_obctrl_get_uThrot2(msg);
+    asl_obctrl->uAilL = mavlink_msg_asl_obctrl_get_uAilL(msg);
+    asl_obctrl->uAilR = mavlink_msg_asl_obctrl_get_uAilR(msg);
+    asl_obctrl->uRud = mavlink_msg_asl_obctrl_get_uRud(msg);
+    asl_obctrl->obctrl_status = mavlink_msg_asl_obctrl_get_obctrl_status(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_ASL_OBCTRL_LEN? msg->len : MAVLINK_MSG_ID_ASL_OBCTRL_LEN;
         memset(asl_obctrl, 0, MAVLINK_MSG_ID_ASL_OBCTRL_LEN);
-	memcpy(asl_obctrl, _MAV_PAYLOAD(msg), len);
+    memcpy(asl_obctrl, _MAV_PAYLOAD(msg), len);
 #endif
 }

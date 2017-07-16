@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE SENS_POWER_BOARD PACKING
 
 #define MAVLINK_MSG_ID_SENS_POWER_BOARD 212
@@ -30,10 +31,10 @@ typedef struct __mavlink_sens_power_board_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_SENS_POWER_BOARD { \
-	212, \
-	"SENS_POWER_BOARD", \
-	12, \
-	{  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_sens_power_board_t, timestamp) }, \
+    212, \
+    "SENS_POWER_BOARD", \
+    12, \
+    {  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_sens_power_board_t, timestamp) }, \
          { "pwr_brd_system_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_sens_power_board_t, pwr_brd_system_volt) }, \
          { "pwr_brd_servo_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_sens_power_board_t, pwr_brd_servo_volt) }, \
          { "pwr_brd_mot_l_amp", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_sens_power_board_t, pwr_brd_mot_l_amp) }, \
@@ -49,9 +50,9 @@ typedef struct __mavlink_sens_power_board_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_SENS_POWER_BOARD { \
-	"SENS_POWER_BOARD", \
-	12, \
-	{  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_sens_power_board_t, timestamp) }, \
+    "SENS_POWER_BOARD", \
+    12, \
+    {  { "timestamp", NULL, MAVLINK_TYPE_UINT64_T, 0, 0, offsetof(mavlink_sens_power_board_t, timestamp) }, \
          { "pwr_brd_system_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 8, offsetof(mavlink_sens_power_board_t, pwr_brd_system_volt) }, \
          { "pwr_brd_servo_volt", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_sens_power_board_t, pwr_brd_servo_volt) }, \
          { "pwr_brd_mot_l_amp", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_sens_power_board_t, pwr_brd_mot_l_amp) }, \
@@ -88,43 +89,43 @@ typedef struct __mavlink_sens_power_board_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_sens_power_board_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint64_t timestamp, uint8_t pwr_brd_status, uint8_t pwr_brd_led_status, float pwr_brd_system_volt, float pwr_brd_servo_volt, float pwr_brd_mot_l_amp, float pwr_brd_mot_r_amp, float pwr_brd_servo_1_amp, float pwr_brd_servo_2_amp, float pwr_brd_servo_3_amp, float pwr_brd_servo_4_amp, float pwr_brd_aux_amp)
+                               uint64_t timestamp, uint8_t pwr_brd_status, uint8_t pwr_brd_led_status, float pwr_brd_system_volt, float pwr_brd_servo_volt, float pwr_brd_mot_l_amp, float pwr_brd_mot_r_amp, float pwr_brd_servo_1_amp, float pwr_brd_servo_2_amp, float pwr_brd_servo_3_amp, float pwr_brd_servo_4_amp, float pwr_brd_aux_amp)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, pwr_brd_system_volt);
-	_mav_put_float(buf, 12, pwr_brd_servo_volt);
-	_mav_put_float(buf, 16, pwr_brd_mot_l_amp);
-	_mav_put_float(buf, 20, pwr_brd_mot_r_amp);
-	_mav_put_float(buf, 24, pwr_brd_servo_1_amp);
-	_mav_put_float(buf, 28, pwr_brd_servo_2_amp);
-	_mav_put_float(buf, 32, pwr_brd_servo_3_amp);
-	_mav_put_float(buf, 36, pwr_brd_servo_4_amp);
-	_mav_put_float(buf, 40, pwr_brd_aux_amp);
-	_mav_put_uint8_t(buf, 44, pwr_brd_status);
-	_mav_put_uint8_t(buf, 45, pwr_brd_led_status);
+    char buf[MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, pwr_brd_system_volt);
+    _mav_put_float(buf, 12, pwr_brd_servo_volt);
+    _mav_put_float(buf, 16, pwr_brd_mot_l_amp);
+    _mav_put_float(buf, 20, pwr_brd_mot_r_amp);
+    _mav_put_float(buf, 24, pwr_brd_servo_1_amp);
+    _mav_put_float(buf, 28, pwr_brd_servo_2_amp);
+    _mav_put_float(buf, 32, pwr_brd_servo_3_amp);
+    _mav_put_float(buf, 36, pwr_brd_servo_4_amp);
+    _mav_put_float(buf, 40, pwr_brd_aux_amp);
+    _mav_put_uint8_t(buf, 44, pwr_brd_status);
+    _mav_put_uint8_t(buf, 45, pwr_brd_led_status);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN);
 #else
-	mavlink_sens_power_board_t packet;
-	packet.timestamp = timestamp;
-	packet.pwr_brd_system_volt = pwr_brd_system_volt;
-	packet.pwr_brd_servo_volt = pwr_brd_servo_volt;
-	packet.pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
-	packet.pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
-	packet.pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
-	packet.pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
-	packet.pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
-	packet.pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
-	packet.pwr_brd_aux_amp = pwr_brd_aux_amp;
-	packet.pwr_brd_status = pwr_brd_status;
-	packet.pwr_brd_led_status = pwr_brd_led_status;
+    mavlink_sens_power_board_t packet;
+    packet.timestamp = timestamp;
+    packet.pwr_brd_system_volt = pwr_brd_system_volt;
+    packet.pwr_brd_servo_volt = pwr_brd_servo_volt;
+    packet.pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
+    packet.pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
+    packet.pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
+    packet.pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
+    packet.pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
+    packet.pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
+    packet.pwr_brd_aux_amp = pwr_brd_aux_amp;
+    packet.pwr_brd_status = pwr_brd_status;
+    packet.pwr_brd_led_status = pwr_brd_led_status;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SENS_POWER_BOARD;
+    msg->msgid = MAVLINK_MSG_ID_SENS_POWER_BOARD;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SENS_POWER_BOARD_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_CRC);
 }
 
@@ -149,44 +150,44 @@ static inline uint16_t mavlink_msg_sens_power_board_pack(uint8_t system_id, uint
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_sens_power_board_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint64_t timestamp,uint8_t pwr_brd_status,uint8_t pwr_brd_led_status,float pwr_brd_system_volt,float pwr_brd_servo_volt,float pwr_brd_mot_l_amp,float pwr_brd_mot_r_amp,float pwr_brd_servo_1_amp,float pwr_brd_servo_2_amp,float pwr_brd_servo_3_amp,float pwr_brd_servo_4_amp,float pwr_brd_aux_amp)
+                               mavlink_message_t* msg,
+                                   uint64_t timestamp,uint8_t pwr_brd_status,uint8_t pwr_brd_led_status,float pwr_brd_system_volt,float pwr_brd_servo_volt,float pwr_brd_mot_l_amp,float pwr_brd_mot_r_amp,float pwr_brd_servo_1_amp,float pwr_brd_servo_2_amp,float pwr_brd_servo_3_amp,float pwr_brd_servo_4_amp,float pwr_brd_aux_amp)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, pwr_brd_system_volt);
-	_mav_put_float(buf, 12, pwr_brd_servo_volt);
-	_mav_put_float(buf, 16, pwr_brd_mot_l_amp);
-	_mav_put_float(buf, 20, pwr_brd_mot_r_amp);
-	_mav_put_float(buf, 24, pwr_brd_servo_1_amp);
-	_mav_put_float(buf, 28, pwr_brd_servo_2_amp);
-	_mav_put_float(buf, 32, pwr_brd_servo_3_amp);
-	_mav_put_float(buf, 36, pwr_brd_servo_4_amp);
-	_mav_put_float(buf, 40, pwr_brd_aux_amp);
-	_mav_put_uint8_t(buf, 44, pwr_brd_status);
-	_mav_put_uint8_t(buf, 45, pwr_brd_led_status);
+    char buf[MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, pwr_brd_system_volt);
+    _mav_put_float(buf, 12, pwr_brd_servo_volt);
+    _mav_put_float(buf, 16, pwr_brd_mot_l_amp);
+    _mav_put_float(buf, 20, pwr_brd_mot_r_amp);
+    _mav_put_float(buf, 24, pwr_brd_servo_1_amp);
+    _mav_put_float(buf, 28, pwr_brd_servo_2_amp);
+    _mav_put_float(buf, 32, pwr_brd_servo_3_amp);
+    _mav_put_float(buf, 36, pwr_brd_servo_4_amp);
+    _mav_put_float(buf, 40, pwr_brd_aux_amp);
+    _mav_put_uint8_t(buf, 44, pwr_brd_status);
+    _mav_put_uint8_t(buf, 45, pwr_brd_led_status);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN);
 #else
-	mavlink_sens_power_board_t packet;
-	packet.timestamp = timestamp;
-	packet.pwr_brd_system_volt = pwr_brd_system_volt;
-	packet.pwr_brd_servo_volt = pwr_brd_servo_volt;
-	packet.pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
-	packet.pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
-	packet.pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
-	packet.pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
-	packet.pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
-	packet.pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
-	packet.pwr_brd_aux_amp = pwr_brd_aux_amp;
-	packet.pwr_brd_status = pwr_brd_status;
-	packet.pwr_brd_led_status = pwr_brd_led_status;
+    mavlink_sens_power_board_t packet;
+    packet.timestamp = timestamp;
+    packet.pwr_brd_system_volt = pwr_brd_system_volt;
+    packet.pwr_brd_servo_volt = pwr_brd_servo_volt;
+    packet.pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
+    packet.pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
+    packet.pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
+    packet.pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
+    packet.pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
+    packet.pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
+    packet.pwr_brd_aux_amp = pwr_brd_aux_amp;
+    packet.pwr_brd_status = pwr_brd_status;
+    packet.pwr_brd_led_status = pwr_brd_led_status;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SENS_POWER_BOARD;
+    msg->msgid = MAVLINK_MSG_ID_SENS_POWER_BOARD;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SENS_POWER_BOARD_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_CRC);
 }
 
@@ -200,7 +201,7 @@ static inline uint16_t mavlink_msg_sens_power_board_pack_chan(uint8_t system_id,
  */
 static inline uint16_t mavlink_msg_sens_power_board_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_sens_power_board_t* sens_power_board)
 {
-	return mavlink_msg_sens_power_board_pack(system_id, component_id, msg, sens_power_board->timestamp, sens_power_board->pwr_brd_status, sens_power_board->pwr_brd_led_status, sens_power_board->pwr_brd_system_volt, sens_power_board->pwr_brd_servo_volt, sens_power_board->pwr_brd_mot_l_amp, sens_power_board->pwr_brd_mot_r_amp, sens_power_board->pwr_brd_servo_1_amp, sens_power_board->pwr_brd_servo_2_amp, sens_power_board->pwr_brd_servo_3_amp, sens_power_board->pwr_brd_servo_4_amp, sens_power_board->pwr_brd_aux_amp);
+    return mavlink_msg_sens_power_board_pack(system_id, component_id, msg, sens_power_board->timestamp, sens_power_board->pwr_brd_status, sens_power_board->pwr_brd_led_status, sens_power_board->pwr_brd_system_volt, sens_power_board->pwr_brd_servo_volt, sens_power_board->pwr_brd_mot_l_amp, sens_power_board->pwr_brd_mot_r_amp, sens_power_board->pwr_brd_servo_1_amp, sens_power_board->pwr_brd_servo_2_amp, sens_power_board->pwr_brd_servo_3_amp, sens_power_board->pwr_brd_servo_4_amp, sens_power_board->pwr_brd_aux_amp);
 }
 
 /**
@@ -214,7 +215,7 @@ static inline uint16_t mavlink_msg_sens_power_board_encode(uint8_t system_id, ui
  */
 static inline uint16_t mavlink_msg_sens_power_board_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_sens_power_board_t* sens_power_board)
 {
-	return mavlink_msg_sens_power_board_pack_chan(system_id, component_id, chan, msg, sens_power_board->timestamp, sens_power_board->pwr_brd_status, sens_power_board->pwr_brd_led_status, sens_power_board->pwr_brd_system_volt, sens_power_board->pwr_brd_servo_volt, sens_power_board->pwr_brd_mot_l_amp, sens_power_board->pwr_brd_mot_r_amp, sens_power_board->pwr_brd_servo_1_amp, sens_power_board->pwr_brd_servo_2_amp, sens_power_board->pwr_brd_servo_3_amp, sens_power_board->pwr_brd_servo_4_amp, sens_power_board->pwr_brd_aux_amp);
+    return mavlink_msg_sens_power_board_pack_chan(system_id, component_id, chan, msg, sens_power_board->timestamp, sens_power_board->pwr_brd_status, sens_power_board->pwr_brd_led_status, sens_power_board->pwr_brd_system_volt, sens_power_board->pwr_brd_servo_volt, sens_power_board->pwr_brd_mot_l_amp, sens_power_board->pwr_brd_mot_r_amp, sens_power_board->pwr_brd_servo_1_amp, sens_power_board->pwr_brd_servo_2_amp, sens_power_board->pwr_brd_servo_3_amp, sens_power_board->pwr_brd_servo_4_amp, sens_power_board->pwr_brd_aux_amp);
 }
 
 /**
@@ -239,35 +240,35 @@ static inline uint16_t mavlink_msg_sens_power_board_encode_chan(uint8_t system_i
 static inline void mavlink_msg_sens_power_board_send(mavlink_channel_t chan, uint64_t timestamp, uint8_t pwr_brd_status, uint8_t pwr_brd_led_status, float pwr_brd_system_volt, float pwr_brd_servo_volt, float pwr_brd_mot_l_amp, float pwr_brd_mot_r_amp, float pwr_brd_servo_1_amp, float pwr_brd_servo_2_amp, float pwr_brd_servo_3_amp, float pwr_brd_servo_4_amp, float pwr_brd_aux_amp)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN];
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, pwr_brd_system_volt);
-	_mav_put_float(buf, 12, pwr_brd_servo_volt);
-	_mav_put_float(buf, 16, pwr_brd_mot_l_amp);
-	_mav_put_float(buf, 20, pwr_brd_mot_r_amp);
-	_mav_put_float(buf, 24, pwr_brd_servo_1_amp);
-	_mav_put_float(buf, 28, pwr_brd_servo_2_amp);
-	_mav_put_float(buf, 32, pwr_brd_servo_3_amp);
-	_mav_put_float(buf, 36, pwr_brd_servo_4_amp);
-	_mav_put_float(buf, 40, pwr_brd_aux_amp);
-	_mav_put_uint8_t(buf, 44, pwr_brd_status);
-	_mav_put_uint8_t(buf, 45, pwr_brd_led_status);
+    char buf[MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN];
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, pwr_brd_system_volt);
+    _mav_put_float(buf, 12, pwr_brd_servo_volt);
+    _mav_put_float(buf, 16, pwr_brd_mot_l_amp);
+    _mav_put_float(buf, 20, pwr_brd_mot_r_amp);
+    _mav_put_float(buf, 24, pwr_brd_servo_1_amp);
+    _mav_put_float(buf, 28, pwr_brd_servo_2_amp);
+    _mav_put_float(buf, 32, pwr_brd_servo_3_amp);
+    _mav_put_float(buf, 36, pwr_brd_servo_4_amp);
+    _mav_put_float(buf, 40, pwr_brd_aux_amp);
+    _mav_put_uint8_t(buf, 44, pwr_brd_status);
+    _mav_put_uint8_t(buf, 45, pwr_brd_led_status);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_POWER_BOARD, buf, MAVLINK_MSG_ID_SENS_POWER_BOARD_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_CRC);
 #else
-	mavlink_sens_power_board_t packet;
-	packet.timestamp = timestamp;
-	packet.pwr_brd_system_volt = pwr_brd_system_volt;
-	packet.pwr_brd_servo_volt = pwr_brd_servo_volt;
-	packet.pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
-	packet.pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
-	packet.pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
-	packet.pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
-	packet.pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
-	packet.pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
-	packet.pwr_brd_aux_amp = pwr_brd_aux_amp;
-	packet.pwr_brd_status = pwr_brd_status;
-	packet.pwr_brd_led_status = pwr_brd_led_status;
+    mavlink_sens_power_board_t packet;
+    packet.timestamp = timestamp;
+    packet.pwr_brd_system_volt = pwr_brd_system_volt;
+    packet.pwr_brd_servo_volt = pwr_brd_servo_volt;
+    packet.pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
+    packet.pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
+    packet.pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
+    packet.pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
+    packet.pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
+    packet.pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
+    packet.pwr_brd_aux_amp = pwr_brd_aux_amp;
+    packet.pwr_brd_status = pwr_brd_status;
+    packet.pwr_brd_led_status = pwr_brd_led_status;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_POWER_BOARD, (const char *)&packet, MAVLINK_MSG_ID_SENS_POWER_BOARD_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_CRC);
 #endif
@@ -298,35 +299,35 @@ static inline void mavlink_msg_sens_power_board_send_struct(mavlink_channel_t ch
 static inline void mavlink_msg_sens_power_board_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint64_t timestamp, uint8_t pwr_brd_status, uint8_t pwr_brd_led_status, float pwr_brd_system_volt, float pwr_brd_servo_volt, float pwr_brd_mot_l_amp, float pwr_brd_mot_r_amp, float pwr_brd_servo_1_amp, float pwr_brd_servo_2_amp, float pwr_brd_servo_3_amp, float pwr_brd_servo_4_amp, float pwr_brd_aux_amp)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint64_t(buf, 0, timestamp);
-	_mav_put_float(buf, 8, pwr_brd_system_volt);
-	_mav_put_float(buf, 12, pwr_brd_servo_volt);
-	_mav_put_float(buf, 16, pwr_brd_mot_l_amp);
-	_mav_put_float(buf, 20, pwr_brd_mot_r_amp);
-	_mav_put_float(buf, 24, pwr_brd_servo_1_amp);
-	_mav_put_float(buf, 28, pwr_brd_servo_2_amp);
-	_mav_put_float(buf, 32, pwr_brd_servo_3_amp);
-	_mav_put_float(buf, 36, pwr_brd_servo_4_amp);
-	_mav_put_float(buf, 40, pwr_brd_aux_amp);
-	_mav_put_uint8_t(buf, 44, pwr_brd_status);
-	_mav_put_uint8_t(buf, 45, pwr_brd_led_status);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint64_t(buf, 0, timestamp);
+    _mav_put_float(buf, 8, pwr_brd_system_volt);
+    _mav_put_float(buf, 12, pwr_brd_servo_volt);
+    _mav_put_float(buf, 16, pwr_brd_mot_l_amp);
+    _mav_put_float(buf, 20, pwr_brd_mot_r_amp);
+    _mav_put_float(buf, 24, pwr_brd_servo_1_amp);
+    _mav_put_float(buf, 28, pwr_brd_servo_2_amp);
+    _mav_put_float(buf, 32, pwr_brd_servo_3_amp);
+    _mav_put_float(buf, 36, pwr_brd_servo_4_amp);
+    _mav_put_float(buf, 40, pwr_brd_aux_amp);
+    _mav_put_uint8_t(buf, 44, pwr_brd_status);
+    _mav_put_uint8_t(buf, 45, pwr_brd_led_status);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_POWER_BOARD, buf, MAVLINK_MSG_ID_SENS_POWER_BOARD_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_CRC);
 #else
-	mavlink_sens_power_board_t *packet = (mavlink_sens_power_board_t *)msgbuf;
-	packet->timestamp = timestamp;
-	packet->pwr_brd_system_volt = pwr_brd_system_volt;
-	packet->pwr_brd_servo_volt = pwr_brd_servo_volt;
-	packet->pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
-	packet->pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
-	packet->pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
-	packet->pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
-	packet->pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
-	packet->pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
-	packet->pwr_brd_aux_amp = pwr_brd_aux_amp;
-	packet->pwr_brd_status = pwr_brd_status;
-	packet->pwr_brd_led_status = pwr_brd_led_status;
+    mavlink_sens_power_board_t *packet = (mavlink_sens_power_board_t *)msgbuf;
+    packet->timestamp = timestamp;
+    packet->pwr_brd_system_volt = pwr_brd_system_volt;
+    packet->pwr_brd_servo_volt = pwr_brd_servo_volt;
+    packet->pwr_brd_mot_l_amp = pwr_brd_mot_l_amp;
+    packet->pwr_brd_mot_r_amp = pwr_brd_mot_r_amp;
+    packet->pwr_brd_servo_1_amp = pwr_brd_servo_1_amp;
+    packet->pwr_brd_servo_2_amp = pwr_brd_servo_2_amp;
+    packet->pwr_brd_servo_3_amp = pwr_brd_servo_3_amp;
+    packet->pwr_brd_servo_4_amp = pwr_brd_servo_4_amp;
+    packet->pwr_brd_aux_amp = pwr_brd_aux_amp;
+    packet->pwr_brd_status = pwr_brd_status;
+    packet->pwr_brd_led_status = pwr_brd_led_status;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SENS_POWER_BOARD, (const char *)packet, MAVLINK_MSG_ID_SENS_POWER_BOARD_MIN_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN, MAVLINK_MSG_ID_SENS_POWER_BOARD_CRC);
 #endif
@@ -345,7 +346,7 @@ static inline void mavlink_msg_sens_power_board_send_buf(mavlink_message_t *msgb
  */
 static inline uint64_t mavlink_msg_sens_power_board_get_timestamp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint64_t(msg,  0);
+    return _MAV_RETURN_uint64_t(msg,  0);
 }
 
 /**
@@ -355,7 +356,7 @@ static inline uint64_t mavlink_msg_sens_power_board_get_timestamp(const mavlink_
  */
 static inline uint8_t mavlink_msg_sens_power_board_get_pwr_brd_status(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  44);
+    return _MAV_RETURN_uint8_t(msg,  44);
 }
 
 /**
@@ -365,7 +366,7 @@ static inline uint8_t mavlink_msg_sens_power_board_get_pwr_brd_status(const mavl
  */
 static inline uint8_t mavlink_msg_sens_power_board_get_pwr_brd_led_status(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint8_t(msg,  45);
+    return _MAV_RETURN_uint8_t(msg,  45);
 }
 
 /**
@@ -375,7 +376,7 @@ static inline uint8_t mavlink_msg_sens_power_board_get_pwr_brd_led_status(const 
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_system_volt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  8);
+    return _MAV_RETURN_float(msg,  8);
 }
 
 /**
@@ -385,7 +386,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_system_volt(const m
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_volt(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  12);
+    return _MAV_RETURN_float(msg,  12);
 }
 
 /**
@@ -395,7 +396,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_volt(const ma
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_mot_l_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  16);
+    return _MAV_RETURN_float(msg,  16);
 }
 
 /**
@@ -405,7 +406,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_mot_l_amp(const mav
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_mot_r_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  20);
+    return _MAV_RETURN_float(msg,  20);
 }
 
 /**
@@ -415,7 +416,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_mot_r_amp(const mav
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_1_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  24);
+    return _MAV_RETURN_float(msg,  24);
 }
 
 /**
@@ -425,7 +426,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_1_amp(const m
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_2_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  28);
+    return _MAV_RETURN_float(msg,  28);
 }
 
 /**
@@ -435,7 +436,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_2_amp(const m
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_3_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  32);
+    return _MAV_RETURN_float(msg,  32);
 }
 
 /**
@@ -445,7 +446,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_3_amp(const m
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_4_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  36);
+    return _MAV_RETURN_float(msg,  36);
 }
 
 /**
@@ -455,7 +456,7 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_servo_4_amp(const m
  */
 static inline float mavlink_msg_sens_power_board_get_pwr_brd_aux_amp(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_float(msg,  40);
+    return _MAV_RETURN_float(msg,  40);
 }
 
 /**
@@ -467,21 +468,21 @@ static inline float mavlink_msg_sens_power_board_get_pwr_brd_aux_amp(const mavli
 static inline void mavlink_msg_sens_power_board_decode(const mavlink_message_t* msg, mavlink_sens_power_board_t* sens_power_board)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	sens_power_board->timestamp = mavlink_msg_sens_power_board_get_timestamp(msg);
-	sens_power_board->pwr_brd_system_volt = mavlink_msg_sens_power_board_get_pwr_brd_system_volt(msg);
-	sens_power_board->pwr_brd_servo_volt = mavlink_msg_sens_power_board_get_pwr_brd_servo_volt(msg);
-	sens_power_board->pwr_brd_mot_l_amp = mavlink_msg_sens_power_board_get_pwr_brd_mot_l_amp(msg);
-	sens_power_board->pwr_brd_mot_r_amp = mavlink_msg_sens_power_board_get_pwr_brd_mot_r_amp(msg);
-	sens_power_board->pwr_brd_servo_1_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_1_amp(msg);
-	sens_power_board->pwr_brd_servo_2_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_2_amp(msg);
-	sens_power_board->pwr_brd_servo_3_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_3_amp(msg);
-	sens_power_board->pwr_brd_servo_4_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_4_amp(msg);
-	sens_power_board->pwr_brd_aux_amp = mavlink_msg_sens_power_board_get_pwr_brd_aux_amp(msg);
-	sens_power_board->pwr_brd_status = mavlink_msg_sens_power_board_get_pwr_brd_status(msg);
-	sens_power_board->pwr_brd_led_status = mavlink_msg_sens_power_board_get_pwr_brd_led_status(msg);
+    sens_power_board->timestamp = mavlink_msg_sens_power_board_get_timestamp(msg);
+    sens_power_board->pwr_brd_system_volt = mavlink_msg_sens_power_board_get_pwr_brd_system_volt(msg);
+    sens_power_board->pwr_brd_servo_volt = mavlink_msg_sens_power_board_get_pwr_brd_servo_volt(msg);
+    sens_power_board->pwr_brd_mot_l_amp = mavlink_msg_sens_power_board_get_pwr_brd_mot_l_amp(msg);
+    sens_power_board->pwr_brd_mot_r_amp = mavlink_msg_sens_power_board_get_pwr_brd_mot_r_amp(msg);
+    sens_power_board->pwr_brd_servo_1_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_1_amp(msg);
+    sens_power_board->pwr_brd_servo_2_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_2_amp(msg);
+    sens_power_board->pwr_brd_servo_3_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_3_amp(msg);
+    sens_power_board->pwr_brd_servo_4_amp = mavlink_msg_sens_power_board_get_pwr_brd_servo_4_amp(msg);
+    sens_power_board->pwr_brd_aux_amp = mavlink_msg_sens_power_board_get_pwr_brd_aux_amp(msg);
+    sens_power_board->pwr_brd_status = mavlink_msg_sens_power_board_get_pwr_brd_status(msg);
+    sens_power_board->pwr_brd_led_status = mavlink_msg_sens_power_board_get_pwr_brd_led_status(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN? msg->len : MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN;
         memset(sens_power_board, 0, MAVLINK_MSG_ID_SENS_POWER_BOARD_LEN);
-	memcpy(sens_power_board, _MAV_PAYLOAD(msg), len);
+    memcpy(sens_power_board, _MAV_PAYLOAD(msg), len);
 #endif
 }

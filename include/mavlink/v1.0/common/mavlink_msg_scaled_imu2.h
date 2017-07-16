@@ -1,3 +1,4 @@
+#pragma once
 // MESSAGE SCALED_IMU2 PACKING
 
 #define MAVLINK_MSG_ID_SCALED_IMU2 116
@@ -28,10 +29,10 @@ typedef struct __mavlink_scaled_imu2_t {
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_SCALED_IMU2 { \
-	116, \
-	"SCALED_IMU2", \
-	10, \
-	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_scaled_imu2_t, time_boot_ms) }, \
+    116, \
+    "SCALED_IMU2", \
+    10, \
+    {  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_scaled_imu2_t, time_boot_ms) }, \
          { "xacc", NULL, MAVLINK_TYPE_INT16_T, 0, 4, offsetof(mavlink_scaled_imu2_t, xacc) }, \
          { "yacc", NULL, MAVLINK_TYPE_INT16_T, 0, 6, offsetof(mavlink_scaled_imu2_t, yacc) }, \
          { "zacc", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_scaled_imu2_t, zacc) }, \
@@ -45,9 +46,9 @@ typedef struct __mavlink_scaled_imu2_t {
 }
 #else
 #define MAVLINK_MESSAGE_INFO_SCALED_IMU2 { \
-	"SCALED_IMU2", \
-	10, \
-	{  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_scaled_imu2_t, time_boot_ms) }, \
+    "SCALED_IMU2", \
+    10, \
+    {  { "time_boot_ms", NULL, MAVLINK_TYPE_UINT32_T, 0, 0, offsetof(mavlink_scaled_imu2_t, time_boot_ms) }, \
          { "xacc", NULL, MAVLINK_TYPE_INT16_T, 0, 4, offsetof(mavlink_scaled_imu2_t, xacc) }, \
          { "yacc", NULL, MAVLINK_TYPE_INT16_T, 0, 6, offsetof(mavlink_scaled_imu2_t, yacc) }, \
          { "zacc", NULL, MAVLINK_TYPE_INT16_T, 0, 8, offsetof(mavlink_scaled_imu2_t, zacc) }, \
@@ -80,39 +81,39 @@ typedef struct __mavlink_scaled_imu2_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_scaled_imu2_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-						       uint32_t time_boot_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
+                               uint32_t time_boot_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SCALED_IMU2_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int16_t(buf, 4, xacc);
-	_mav_put_int16_t(buf, 6, yacc);
-	_mav_put_int16_t(buf, 8, zacc);
-	_mav_put_int16_t(buf, 10, xgyro);
-	_mav_put_int16_t(buf, 12, ygyro);
-	_mav_put_int16_t(buf, 14, zgyro);
-	_mav_put_int16_t(buf, 16, xmag);
-	_mav_put_int16_t(buf, 18, ymag);
-	_mav_put_int16_t(buf, 20, zmag);
+    char buf[MAVLINK_MSG_ID_SCALED_IMU2_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int16_t(buf, 4, xacc);
+    _mav_put_int16_t(buf, 6, yacc);
+    _mav_put_int16_t(buf, 8, zacc);
+    _mav_put_int16_t(buf, 10, xgyro);
+    _mav_put_int16_t(buf, 12, ygyro);
+    _mav_put_int16_t(buf, 14, zgyro);
+    _mav_put_int16_t(buf, 16, xmag);
+    _mav_put_int16_t(buf, 18, ymag);
+    _mav_put_int16_t(buf, 20, zmag);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SCALED_IMU2_LEN);
 #else
-	mavlink_scaled_imu2_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
-	packet.xgyro = xgyro;
-	packet.ygyro = ygyro;
-	packet.zgyro = zgyro;
-	packet.xmag = xmag;
-	packet.ymag = ymag;
-	packet.zmag = zmag;
+    mavlink_scaled_imu2_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
+    packet.xgyro = xgyro;
+    packet.ygyro = ygyro;
+    packet.zgyro = zgyro;
+    packet.xmag = xmag;
+    packet.ymag = ymag;
+    packet.zmag = zmag;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SCALED_IMU2_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SCALED_IMU2;
+    msg->msgid = MAVLINK_MSG_ID_SCALED_IMU2;
     return mavlink_finalize_message(msg, system_id, component_id, MAVLINK_MSG_ID_SCALED_IMU2_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU2_LEN, MAVLINK_MSG_ID_SCALED_IMU2_CRC);
 }
 
@@ -135,40 +136,40 @@ static inline uint16_t mavlink_msg_scaled_imu2_pack(uint8_t system_id, uint8_t c
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_scaled_imu2_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
-							   mavlink_message_t* msg,
-						           uint32_t time_boot_ms,int16_t xacc,int16_t yacc,int16_t zacc,int16_t xgyro,int16_t ygyro,int16_t zgyro,int16_t xmag,int16_t ymag,int16_t zmag)
+                               mavlink_message_t* msg,
+                                   uint32_t time_boot_ms,int16_t xacc,int16_t yacc,int16_t zacc,int16_t xgyro,int16_t ygyro,int16_t zgyro,int16_t xmag,int16_t ymag,int16_t zmag)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SCALED_IMU2_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int16_t(buf, 4, xacc);
-	_mav_put_int16_t(buf, 6, yacc);
-	_mav_put_int16_t(buf, 8, zacc);
-	_mav_put_int16_t(buf, 10, xgyro);
-	_mav_put_int16_t(buf, 12, ygyro);
-	_mav_put_int16_t(buf, 14, zgyro);
-	_mav_put_int16_t(buf, 16, xmag);
-	_mav_put_int16_t(buf, 18, ymag);
-	_mav_put_int16_t(buf, 20, zmag);
+    char buf[MAVLINK_MSG_ID_SCALED_IMU2_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int16_t(buf, 4, xacc);
+    _mav_put_int16_t(buf, 6, yacc);
+    _mav_put_int16_t(buf, 8, zacc);
+    _mav_put_int16_t(buf, 10, xgyro);
+    _mav_put_int16_t(buf, 12, ygyro);
+    _mav_put_int16_t(buf, 14, zgyro);
+    _mav_put_int16_t(buf, 16, xmag);
+    _mav_put_int16_t(buf, 18, ymag);
+    _mav_put_int16_t(buf, 20, zmag);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_SCALED_IMU2_LEN);
 #else
-	mavlink_scaled_imu2_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
-	packet.xgyro = xgyro;
-	packet.ygyro = ygyro;
-	packet.zgyro = zgyro;
-	packet.xmag = xmag;
-	packet.ymag = ymag;
-	packet.zmag = zmag;
+    mavlink_scaled_imu2_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
+    packet.xgyro = xgyro;
+    packet.ygyro = ygyro;
+    packet.zgyro = zgyro;
+    packet.xmag = xmag;
+    packet.ymag = ymag;
+    packet.zmag = zmag;
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, MAVLINK_MSG_ID_SCALED_IMU2_LEN);
 #endif
 
-	msg->msgid = MAVLINK_MSG_ID_SCALED_IMU2;
+    msg->msgid = MAVLINK_MSG_ID_SCALED_IMU2;
     return mavlink_finalize_message_chan(msg, system_id, component_id, chan, MAVLINK_MSG_ID_SCALED_IMU2_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU2_LEN, MAVLINK_MSG_ID_SCALED_IMU2_CRC);
 }
 
@@ -182,7 +183,7 @@ static inline uint16_t mavlink_msg_scaled_imu2_pack_chan(uint8_t system_id, uint
  */
 static inline uint16_t mavlink_msg_scaled_imu2_encode(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg, const mavlink_scaled_imu2_t* scaled_imu2)
 {
-	return mavlink_msg_scaled_imu2_pack(system_id, component_id, msg, scaled_imu2->time_boot_ms, scaled_imu2->xacc, scaled_imu2->yacc, scaled_imu2->zacc, scaled_imu2->xgyro, scaled_imu2->ygyro, scaled_imu2->zgyro, scaled_imu2->xmag, scaled_imu2->ymag, scaled_imu2->zmag);
+    return mavlink_msg_scaled_imu2_pack(system_id, component_id, msg, scaled_imu2->time_boot_ms, scaled_imu2->xacc, scaled_imu2->yacc, scaled_imu2->zacc, scaled_imu2->xgyro, scaled_imu2->ygyro, scaled_imu2->zgyro, scaled_imu2->xmag, scaled_imu2->ymag, scaled_imu2->zmag);
 }
 
 /**
@@ -196,7 +197,7 @@ static inline uint16_t mavlink_msg_scaled_imu2_encode(uint8_t system_id, uint8_t
  */
 static inline uint16_t mavlink_msg_scaled_imu2_encode_chan(uint8_t system_id, uint8_t component_id, uint8_t chan, mavlink_message_t* msg, const mavlink_scaled_imu2_t* scaled_imu2)
 {
-	return mavlink_msg_scaled_imu2_pack_chan(system_id, component_id, chan, msg, scaled_imu2->time_boot_ms, scaled_imu2->xacc, scaled_imu2->yacc, scaled_imu2->zacc, scaled_imu2->xgyro, scaled_imu2->ygyro, scaled_imu2->zgyro, scaled_imu2->xmag, scaled_imu2->ymag, scaled_imu2->zmag);
+    return mavlink_msg_scaled_imu2_pack_chan(system_id, component_id, chan, msg, scaled_imu2->time_boot_ms, scaled_imu2->xacc, scaled_imu2->yacc, scaled_imu2->zacc, scaled_imu2->xgyro, scaled_imu2->ygyro, scaled_imu2->zgyro, scaled_imu2->xmag, scaled_imu2->ymag, scaled_imu2->zmag);
 }
 
 /**
@@ -219,31 +220,31 @@ static inline uint16_t mavlink_msg_scaled_imu2_encode_chan(uint8_t system_id, ui
 static inline void mavlink_msg_scaled_imu2_send(mavlink_channel_t chan, uint32_t time_boot_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char buf[MAVLINK_MSG_ID_SCALED_IMU2_LEN];
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int16_t(buf, 4, xacc);
-	_mav_put_int16_t(buf, 6, yacc);
-	_mav_put_int16_t(buf, 8, zacc);
-	_mav_put_int16_t(buf, 10, xgyro);
-	_mav_put_int16_t(buf, 12, ygyro);
-	_mav_put_int16_t(buf, 14, zgyro);
-	_mav_put_int16_t(buf, 16, xmag);
-	_mav_put_int16_t(buf, 18, ymag);
-	_mav_put_int16_t(buf, 20, zmag);
+    char buf[MAVLINK_MSG_ID_SCALED_IMU2_LEN];
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int16_t(buf, 4, xacc);
+    _mav_put_int16_t(buf, 6, yacc);
+    _mav_put_int16_t(buf, 8, zacc);
+    _mav_put_int16_t(buf, 10, xgyro);
+    _mav_put_int16_t(buf, 12, ygyro);
+    _mav_put_int16_t(buf, 14, zgyro);
+    _mav_put_int16_t(buf, 16, xmag);
+    _mav_put_int16_t(buf, 18, ymag);
+    _mav_put_int16_t(buf, 20, zmag);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU2, buf, MAVLINK_MSG_ID_SCALED_IMU2_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU2_LEN, MAVLINK_MSG_ID_SCALED_IMU2_CRC);
 #else
-	mavlink_scaled_imu2_t packet;
-	packet.time_boot_ms = time_boot_ms;
-	packet.xacc = xacc;
-	packet.yacc = yacc;
-	packet.zacc = zacc;
-	packet.xgyro = xgyro;
-	packet.ygyro = ygyro;
-	packet.zgyro = zgyro;
-	packet.xmag = xmag;
-	packet.ymag = ymag;
-	packet.zmag = zmag;
+    mavlink_scaled_imu2_t packet;
+    packet.time_boot_ms = time_boot_ms;
+    packet.xacc = xacc;
+    packet.yacc = yacc;
+    packet.zacc = zacc;
+    packet.xgyro = xgyro;
+    packet.ygyro = ygyro;
+    packet.zgyro = zgyro;
+    packet.xmag = xmag;
+    packet.ymag = ymag;
+    packet.zmag = zmag;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU2, (const char *)&packet, MAVLINK_MSG_ID_SCALED_IMU2_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU2_LEN, MAVLINK_MSG_ID_SCALED_IMU2_CRC);
 #endif
@@ -274,31 +275,31 @@ static inline void mavlink_msg_scaled_imu2_send_struct(mavlink_channel_t chan, c
 static inline void mavlink_msg_scaled_imu2_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  uint32_t time_boot_ms, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	char *buf = (char *)msgbuf;
-	_mav_put_uint32_t(buf, 0, time_boot_ms);
-	_mav_put_int16_t(buf, 4, xacc);
-	_mav_put_int16_t(buf, 6, yacc);
-	_mav_put_int16_t(buf, 8, zacc);
-	_mav_put_int16_t(buf, 10, xgyro);
-	_mav_put_int16_t(buf, 12, ygyro);
-	_mav_put_int16_t(buf, 14, zgyro);
-	_mav_put_int16_t(buf, 16, xmag);
-	_mav_put_int16_t(buf, 18, ymag);
-	_mav_put_int16_t(buf, 20, zmag);
+    char *buf = (char *)msgbuf;
+    _mav_put_uint32_t(buf, 0, time_boot_ms);
+    _mav_put_int16_t(buf, 4, xacc);
+    _mav_put_int16_t(buf, 6, yacc);
+    _mav_put_int16_t(buf, 8, zacc);
+    _mav_put_int16_t(buf, 10, xgyro);
+    _mav_put_int16_t(buf, 12, ygyro);
+    _mav_put_int16_t(buf, 14, zgyro);
+    _mav_put_int16_t(buf, 16, xmag);
+    _mav_put_int16_t(buf, 18, ymag);
+    _mav_put_int16_t(buf, 20, zmag);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU2, buf, MAVLINK_MSG_ID_SCALED_IMU2_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU2_LEN, MAVLINK_MSG_ID_SCALED_IMU2_CRC);
 #else
-	mavlink_scaled_imu2_t *packet = (mavlink_scaled_imu2_t *)msgbuf;
-	packet->time_boot_ms = time_boot_ms;
-	packet->xacc = xacc;
-	packet->yacc = yacc;
-	packet->zacc = zacc;
-	packet->xgyro = xgyro;
-	packet->ygyro = ygyro;
-	packet->zgyro = zgyro;
-	packet->xmag = xmag;
-	packet->ymag = ymag;
-	packet->zmag = zmag;
+    mavlink_scaled_imu2_t *packet = (mavlink_scaled_imu2_t *)msgbuf;
+    packet->time_boot_ms = time_boot_ms;
+    packet->xacc = xacc;
+    packet->yacc = yacc;
+    packet->zacc = zacc;
+    packet->xgyro = xgyro;
+    packet->ygyro = ygyro;
+    packet->zgyro = zgyro;
+    packet->xmag = xmag;
+    packet->ymag = ymag;
+    packet->zmag = zmag;
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_SCALED_IMU2, (const char *)packet, MAVLINK_MSG_ID_SCALED_IMU2_MIN_LEN, MAVLINK_MSG_ID_SCALED_IMU2_LEN, MAVLINK_MSG_ID_SCALED_IMU2_CRC);
 #endif
@@ -317,7 +318,7 @@ static inline void mavlink_msg_scaled_imu2_send_buf(mavlink_message_t *msgbuf, m
  */
 static inline uint32_t mavlink_msg_scaled_imu2_get_time_boot_ms(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_uint32_t(msg,  0);
+    return _MAV_RETURN_uint32_t(msg,  0);
 }
 
 /**
@@ -327,7 +328,7 @@ static inline uint32_t mavlink_msg_scaled_imu2_get_time_boot_ms(const mavlink_me
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_xacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  4);
+    return _MAV_RETURN_int16_t(msg,  4);
 }
 
 /**
@@ -337,7 +338,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_xacc(const mavlink_message_t* 
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_yacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  6);
+    return _MAV_RETURN_int16_t(msg,  6);
 }
 
 /**
@@ -347,7 +348,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_yacc(const mavlink_message_t* 
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_zacc(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  8);
+    return _MAV_RETURN_int16_t(msg,  8);
 }
 
 /**
@@ -357,7 +358,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_zacc(const mavlink_message_t* 
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_xgyro(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  10);
+    return _MAV_RETURN_int16_t(msg,  10);
 }
 
 /**
@@ -367,7 +368,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_xgyro(const mavlink_message_t*
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_ygyro(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  12);
+    return _MAV_RETURN_int16_t(msg,  12);
 }
 
 /**
@@ -377,7 +378,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_ygyro(const mavlink_message_t*
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_zgyro(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  14);
+    return _MAV_RETURN_int16_t(msg,  14);
 }
 
 /**
@@ -387,7 +388,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_zgyro(const mavlink_message_t*
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_xmag(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  16);
+    return _MAV_RETURN_int16_t(msg,  16);
 }
 
 /**
@@ -397,7 +398,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_xmag(const mavlink_message_t* 
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_ymag(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  18);
+    return _MAV_RETURN_int16_t(msg,  18);
 }
 
 /**
@@ -407,7 +408,7 @@ static inline int16_t mavlink_msg_scaled_imu2_get_ymag(const mavlink_message_t* 
  */
 static inline int16_t mavlink_msg_scaled_imu2_get_zmag(const mavlink_message_t* msg)
 {
-	return _MAV_RETURN_int16_t(msg,  20);
+    return _MAV_RETURN_int16_t(msg,  20);
 }
 
 /**
@@ -419,19 +420,19 @@ static inline int16_t mavlink_msg_scaled_imu2_get_zmag(const mavlink_message_t* 
 static inline void mavlink_msg_scaled_imu2_decode(const mavlink_message_t* msg, mavlink_scaled_imu2_t* scaled_imu2)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
-	scaled_imu2->time_boot_ms = mavlink_msg_scaled_imu2_get_time_boot_ms(msg);
-	scaled_imu2->xacc = mavlink_msg_scaled_imu2_get_xacc(msg);
-	scaled_imu2->yacc = mavlink_msg_scaled_imu2_get_yacc(msg);
-	scaled_imu2->zacc = mavlink_msg_scaled_imu2_get_zacc(msg);
-	scaled_imu2->xgyro = mavlink_msg_scaled_imu2_get_xgyro(msg);
-	scaled_imu2->ygyro = mavlink_msg_scaled_imu2_get_ygyro(msg);
-	scaled_imu2->zgyro = mavlink_msg_scaled_imu2_get_zgyro(msg);
-	scaled_imu2->xmag = mavlink_msg_scaled_imu2_get_xmag(msg);
-	scaled_imu2->ymag = mavlink_msg_scaled_imu2_get_ymag(msg);
-	scaled_imu2->zmag = mavlink_msg_scaled_imu2_get_zmag(msg);
+    scaled_imu2->time_boot_ms = mavlink_msg_scaled_imu2_get_time_boot_ms(msg);
+    scaled_imu2->xacc = mavlink_msg_scaled_imu2_get_xacc(msg);
+    scaled_imu2->yacc = mavlink_msg_scaled_imu2_get_yacc(msg);
+    scaled_imu2->zacc = mavlink_msg_scaled_imu2_get_zacc(msg);
+    scaled_imu2->xgyro = mavlink_msg_scaled_imu2_get_xgyro(msg);
+    scaled_imu2->ygyro = mavlink_msg_scaled_imu2_get_ygyro(msg);
+    scaled_imu2->zgyro = mavlink_msg_scaled_imu2_get_zgyro(msg);
+    scaled_imu2->xmag = mavlink_msg_scaled_imu2_get_xmag(msg);
+    scaled_imu2->ymag = mavlink_msg_scaled_imu2_get_ymag(msg);
+    scaled_imu2->zmag = mavlink_msg_scaled_imu2_get_zmag(msg);
 #else
         uint8_t len = msg->len < MAVLINK_MSG_ID_SCALED_IMU2_LEN? msg->len : MAVLINK_MSG_ID_SCALED_IMU2_LEN;
         memset(scaled_imu2, 0, MAVLINK_MSG_ID_SCALED_IMU2_LEN);
-	memcpy(scaled_imu2, _MAV_PAYLOAD(msg), len);
+    memcpy(scaled_imu2, _MAV_PAYLOAD(msg), len);
 #endif
 }
