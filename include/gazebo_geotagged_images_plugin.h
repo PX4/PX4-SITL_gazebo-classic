@@ -29,6 +29,8 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/rendering.hh>
 
+#include "mavlink/v2.0/common/mavlink.h"
+
 namespace gazebo
 {
 /**
@@ -42,13 +44,22 @@ class GAZEBO_VISIBLE GeotaggedImagesPlugin : public SensorPlugin
   public: virtual ~GeotaggedImagesPlugin();
 
   public: virtual void Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf);
+  public: void OnUpdate(const common::UpdateInfo& /*_info*/);
+  void send_mavlink_message(const mavlink_message_t *message, const int destination_port=0);
+  void handle_message(mavlink_message_t *msg);
+  void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
   public: void OnNewFrame(const unsigned char *image);
   public: void OnNewGpsPosition(ConstVector3dPtr& v);
+  public: void TakePicture();
 
   protected: float storeIntervalSec_;
   private: int imageCounter_;
-  common::Time lastImageTime_;
+  common::Time lastImageTime_{};
+  common::Time last_time_{};
+
+  /// \brief Pointer to the update event connection.
+  event::ConnectionPtr updateConnection_;
 
   protected: sensors::CameraSensorPtr parentSensor_;
   protected: rendering::CameraPtr camera_;
@@ -64,6 +75,16 @@ class GAZEBO_VISIBLE GeotaggedImagesPlugin : public SensorPlugin
   protected: unsigned int width_, height_, depth_;
   protected: unsigned int destWidth_, destHeight_; ///< output size
   protected: std::string format_;
+  protected: bool capture_;
+
+  private: int _fd;
+  private: struct sockaddr_in _myaddr;    ///< The locally bound address
+  private: struct sockaddr_in _srcaddr;   ///< SITL instance
+  private: socklen_t _addrlen;
+  private: unsigned char _buf[65535];
+  private: struct pollfd fds[1];
+  private: in_addr_t mavlink_addr_;
+  private: int mavlink_udp_port_ = 14558;
 };
 
 } /* namespace gazebo */

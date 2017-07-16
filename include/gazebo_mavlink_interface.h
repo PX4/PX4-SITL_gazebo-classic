@@ -44,14 +44,11 @@
 #include <random>
 #include <sdf/sdf.hh>
 
-#include "mavlink/v1.0/common/mavlink.h"
+#include "mavlink/v2.0/common/mavlink.h"
 
 #include "gazebo/math/Vector3.hh"
 #include <sys/socket.h>
 #include <netinet/in.h>
-
-static const uint8_t mavlink_message_lengths[256] = MAVLINK_MESSAGE_LENGTHS;
-static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 
@@ -157,7 +154,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void LidarCallback(LidarPtr& lidar_msg);
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
-  void send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID);
+  void send_mavlink_message(const mavlink_message_t *message, const int destination_port=0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
