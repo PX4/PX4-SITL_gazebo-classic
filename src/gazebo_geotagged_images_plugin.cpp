@@ -182,7 +182,7 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   fds[0].events = POLLIN;
 
   mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
-  chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
+  chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
 }
 
 // This gets called by the world update start event.
@@ -275,7 +275,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
   // Send indication to GCS
   mavlink_message_t msg;
   mavlink_msg_camera_image_captured_pack_chan(1,
-                                   1 /*MAV_COMP_ID_CAMERA*/,
+                                   MAV_COMP_ID_CAMERA,
                                    MAVLINK_COMM_1,
                                    &msg,
                                    currentTime.Double() * 1e3, // time boot ms
