@@ -206,6 +206,11 @@ typedef enum MAV_COMPONENT
    MAV_COMP_ID_ALL=0, /*  | */
    MAV_COMP_ID_AUTOPILOT1=1, /*  | */
    MAV_COMP_ID_CAMERA=100, /*  | */
+   MAV_COMP_ID_CAMERA2=101, /*  | */
+   MAV_COMP_ID_CAMERA3=102, /*  | */
+   MAV_COMP_ID_CAMERA4=103, /*  | */
+   MAV_COMP_ID_CAMERA5=104, /*  | */
+   MAV_COMP_ID_CAMERA6=105, /*  | */
    MAV_COMP_ID_SERVO1=140, /*  | */
    MAV_COMP_ID_SERVO2=141, /*  | */
    MAV_COMP_ID_SERVO3=142, /*  | */
@@ -353,6 +358,33 @@ typedef enum MAV_MOUNT_MODE
 } MAV_MOUNT_MODE;
 #endif
 
+/** @brief Generalized UAVCAN node health */
+#ifndef HAVE_ENUM_UAVCAN_NODE_HEALTH
+#define HAVE_ENUM_UAVCAN_NODE_HEALTH
+typedef enum UAVCAN_NODE_HEALTH
+{
+   UAVCAN_NODE_HEALTH_OK=0, /* The node is functioning properly. | */
+   UAVCAN_NODE_HEALTH_WARNING=1, /* A critical parameter went out of range or the node has encountered a minor failure. | */
+   UAVCAN_NODE_HEALTH_ERROR=2, /* The node has encountered a major failure. | */
+   UAVCAN_NODE_HEALTH_CRITICAL=3, /* The node has suffered a fatal malfunction. | */
+   UAVCAN_NODE_HEALTH_ENUM_END=4, /*  | */
+} UAVCAN_NODE_HEALTH;
+#endif
+
+/** @brief Generalized UAVCAN node mode */
+#ifndef HAVE_ENUM_UAVCAN_NODE_MODE
+#define HAVE_ENUM_UAVCAN_NODE_MODE
+typedef enum UAVCAN_NODE_MODE
+{
+   UAVCAN_NODE_MODE_OPERATIONAL=0, /* The node is performing its primary functions. | */
+   UAVCAN_NODE_MODE_INITIALIZATION=1, /* The node is initializing; this mode is entered immediately after startup. | */
+   UAVCAN_NODE_MODE_MAINTENANCE=2, /* The node is under maintenance. | */
+   UAVCAN_NODE_MODE_SOFTWARE_UPDATE=3, /* The node is in the process of updating its software. | */
+   UAVCAN_NODE_MODE_OFFLINE=7, /* The node is no longer available online. | */
+   UAVCAN_NODE_MODE_ENUM_END=8, /*  | */
+} UAVCAN_NODE_MODE;
+#endif
+
 /** @brief Commands to be executed by the MAV. They can be executed on user request, or as part of a mission script. If the action is used in a mission, the parameter mapping to the waypoint/mission message is as follows: Param 1, Param 2, Param 3, Param 4, X: Param 5, Y:Param 6, Z:Param 7. This command list is similar what ARINC 424 is for commercial aircraft: A data format how to interpret waypoint/mission data. */
 #ifndef HAVE_ENUM_MAV_CMD
 #define HAVE_ENUM_MAV_CMD
@@ -409,7 +441,7 @@ typedef enum MAV_CMD
    MAV_CMD_DO_DIGICAM_CONTROL=203, /* Mission command to control an on-board camera controller system. |Session control e.g. show/hide lens| Zoom's absolute position| Zooming step value to offset zoom from the current position| Focus Locking, Unlocking or Re-locking| Shooting Command| Command Identity| Test shot identifier. If set to 1, image will only be captured, but not counted towards internal frame count.|  */
    MAV_CMD_DO_MOUNT_CONFIGURE=204, /* Mission command to configure a camera or antenna mount |Mount operation mode (see MAV_MOUNT_MODE enum)| stabilize roll? (1 = yes, 0 = no)| stabilize pitch? (1 = yes, 0 = no)| stabilize yaw? (1 = yes, 0 = no)| Empty| Empty| Empty|  */
    MAV_CMD_DO_MOUNT_CONTROL=205, /* Mission command to control a camera or antenna mount |pitch (WIP: DEPRECATED: or lat in degrees) depending on mount mode.| roll (WIP: DEPRECATED: or lon in degrees) depending on mount mode.| yaw (WIP: DEPRECATED: or alt in meters) depending on mount mode.| WIP: alt in meters depending on mount mode.| WIP: latitude in degrees * 1E7, set if appropriate mount mode.| WIP: longitude in degrees * 1E7, set if appropriate mount mode.| MAV_MOUNT_MODE enum value|  */
-   MAV_CMD_DO_SET_CAM_TRIGG_DIST=206, /* Mission command to set camera trigger distance for this flight. The camera is trigerred each time this distance is exceeded. This command can also be used to set the shutter integration time for the camera. |Camera trigger distance (meters). -1 or 0 to ignore| Camera shutter integration time (milliseconds). -1 or 0 to ignore| Empty| Empty| Empty| Empty| Empty|  */
+   MAV_CMD_DO_SET_CAM_TRIGG_DIST=206, /* Mission command to set camera trigger distance for this flight. The camera is trigerred each time this distance is exceeded. This command can also be used to set the shutter integration time for the camera. |Camera trigger distance (meters). 0 to stop triggering.| Camera shutter integration time (milliseconds). -1 or 0 to ignore| Trigger camera once immediately. (0 = no trigger, 1 = trigger)| Empty| Empty| Empty| Empty|  */
    MAV_CMD_DO_FENCE_ENABLE=207, /* Mission command to enable the geofence |enable? (0=disable, 1=enable, 2=disable_floor_only)| Empty| Empty| Empty| Empty| Empty| Empty|  */
    MAV_CMD_DO_PARACHUTE=208, /* Mission command to trigger a parachute |action (0=disable, 1=enable, 2=release, for some systems see PARACHUTE_ACTION enum, not in general message set.)| Empty| Empty| Empty| Empty| Empty| Empty|  */
    MAV_CMD_DO_MOTOR_TEST=209, /* Mission command to perform motor test |motor sequence number (a number from 1 to max number of motors on the vehicle)| throttle type (0=throttle percentage, 1=PWM, 2=pilot throttle channel pass-through. See MOTOR_TEST_THROTTLE_TYPE enum)| throttle| timeout (in seconds)| Empty| Empty| Empty|  */
@@ -433,22 +465,25 @@ typedef enum MAV_CMD
    MAV_CMD_START_RX_PAIR=500, /* Starts receiver pairing |0:Spektrum| 0:Spektrum DSM2, 1:Spektrum DSMX|  */
    MAV_CMD_GET_MESSAGE_INTERVAL=510, /* Request the interval between messages for a particular MAVLink message ID |The MAVLink message ID|  */
    MAV_CMD_SET_MESSAGE_INTERVAL=511, /* Request the interval between messages for a particular MAVLink message ID. This interface replaces REQUEST_DATA_STREAM |The MAVLink message ID| The interval between two messages, in microseconds. Set to -1 to disable and 0 to request default rate.|  */
+   MAV_CMD_REQUEST_PROTOCOL_VERSION=519, /* Request MAVLink protocol version compatibility |1: Request supported protocol versions by all nodes on the network| Reserved (all remaining params)|  */
    MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES=520, /* Request autopilot capabilities |1: Request autopilot version| Reserved (all remaining params)|  */
-   MAV_CMD_REQUEST_CAMERA_INFORMATION=521, /* WIP: Request camera information (CAMERA_INFORMATION) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| 0: No action 1: Request camera capabilities| Reserved (all remaining params)|  */
-   MAV_CMD_REQUEST_CAMERA_SETTINGS=522, /* WIP: Request camera settings (CAMERA_SETTINGS) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| 0: No Action 1: Request camera settings| Reserved (all remaining params)|  */
-   MAV_CMD_SET_CAMERA_SETTINGS_1=523, /* WIP: Set the camera settings part 1 (CAMERA_SETTINGS). Use NAN for values you don't want to change. |Camera ID (1 for first, 2 for second, etc.)| Aperture (1/value)| Shutter speed in seconds| ISO sensitivity| AE mode (Auto Exposure) (0: full auto 1: full manual 2: aperture priority 3: shutter priority)| EV value (when in auto exposure)| White balance (color temperature in K) (0: Auto WB)|  */
-   MAV_CMD_SET_CAMERA_SETTINGS_2=524, /* WIP: Set the camera settings part 2 (CAMERA_SETTINGS). Use NAN for values you don't want to change. |Camera ID (1 for first, 2 for second, etc.)| Camera mode (0: photo, 1: video)| Audio recording enabled (0: off 1: on)| Reserved for metering mode ID (Average, Center, Spot, etc.)| Reserved for image format ID (Jpeg/Raw/Jpeg+Raw)| Reserved for image quality ID (Compression)| Reserved for color mode ID (Neutral, Vivid, etc.)|  */
-   MAV_CMD_REQUEST_STORAGE_INFORMATION=525, /* WIP: Request storage information (STORAGE_INFORMATION) |Storage ID (0 for all, 1 for first, 2 for second, etc.)| 0: No Action 1: Request storage information| Reserved (all remaining params)|  */
-   MAV_CMD_STORAGE_FORMAT=526, /* WIP: Format a storage medium |Storage ID (1 for first, 2 for second, etc.)| 0: No action 1: Format storage| Reserved (all remaining params)|  */
-   MAV_CMD_REQUEST_CAMERA_CAPTURE_STATUS=527, /* WIP: Request camera capture status (CAMERA_CAPTURE_STATUS) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| 0: No Action 1: Request camera capture status| Reserved (all remaining params)|  */
+   MAV_CMD_REQUEST_CAMERA_INFORMATION=521, /* WIP: Request camera information (CAMERA_INFORMATION). |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| 0: No action 1: Request camera capabilities| Reserved (all remaining params)|  */
+   MAV_CMD_REQUEST_CAMERA_SETTINGS=522, /* WIP: Request camera settings (CAMERA_SETTINGS). |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| 0: No Action 1: Request camera settings| Reserved (all remaining params)|  */
+   MAV_CMD_SET_CAMERA_SETTINGS_1=523, /* WIP: Set the camera settings part 1 (CAMERA_SETTINGS). Use NAN for reserved values and values you don't want to change. (EXPERIMENTAL: IT WILL BE REMOVED) |Camera ID (1 for first, 2 for second, etc.)| Aperture (1/value)| Shutter speed in seconds| ISO sensitivity| AE mode (Auto Exposure) (0: full auto 1: full manual 2: aperture priority 3: shutter priority)| EV value (when in auto exposure)| White balance (color temperature in K) (0: Auto WB, -1: Lock at current auto value)|  */
+   MAV_CMD_SET_CAMERA_SETTINGS_2=524, /* WIP: Set the camera settings part 2 (CAMERA_SETTINGS). Use NAN for reserved values and values you don't want to change. (EXPERIMENTAL: IT WILL BE REMOVED) |Camera ID (1 for first, 2 for second, etc.)| Reserved for Flicker mode (0 for Auto)| Reserved for metering mode ID (Average, Center, Spot, etc.)| Reserved for image format ID (Jpeg/Raw/Jpeg+Raw)| Reserved for image quality ID (Compression)| Reserved for color mode ID (Neutral, Vivid, etc.)| Reserved|  */
+   MAV_CMD_REQUEST_STORAGE_INFORMATION=525, /* WIP: Request storage information (STORAGE_INFORMATION). Use the command's target_component to target a specific component's storage. |Storage ID (0 for all, 1 for first, 2 for second, etc.)| 0: No Action 1: Request storage information| Reserved (all remaining params)|  */
+   MAV_CMD_STORAGE_FORMAT=526, /* WIP: Format a storage medium. Once format is complete, a STORAGE_INFORMATION message is sent. Use the command's target_component to target a specific component's storage. |Storage ID (1 for first, 2 for second, etc.)| 0: No action 1: Format storage| Reserved (all remaining params)|  */
+   MAV_CMD_REQUEST_CAMERA_CAPTURE_STATUS=527, /* WIP: Request camera capture status (CAMERA_CAPTURE_STATUS) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| 0: No Action 1: Request camera capture status| Reserved (all remaining params)|  */
    MAV_CMD_REQUEST_FLIGHT_INFORMATION=528, /* WIP: Request flight information (FLIGHT_INFORMATION) |1: Request flight information| Reserved (all remaining params)|  */
-   MAV_CMD_RESET_CAMERA_SETTINGS=529, /* WIP: Reset all camera settings to Factory Default (CAMERA_SETTINGS) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| 0: No Action 1: Reset all settings| Reserved (all remaining params)|  */
-   MAV_CMD_IMAGE_START_CAPTURE=2000, /* WIP: Start image capture sequence. Sends CAMERA_IMAGE_CAPTURED after each capture. |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Duration between two consecutive pictures (in seconds)| Number of images to capture total - 0 for unlimited capture| Resolution horizontal in pixels (set to -1 for highest resolution possible)| Resolution vertical in pixels (set to -1 for highest resolution possible)|  */
-   MAV_CMD_IMAGE_STOP_CAPTURE=2001, /* WIP: Stop image capture sequence |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Reserved|  */
-   MAV_CMD_REQUEST_CAMERA_IMAGE_CAPTURE=2002, /* WIP: Re-request a CAMERA_IMAGE_CAPTURE packet |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Sequence number for missing CAMERA_IMAGE_CAPTURE packet| Reserved (all remaining params)|  */
+   MAV_CMD_RESET_CAMERA_SETTINGS=529, /* WIP: Reset all camera settings to Factory Default (CAMERA_SETTINGS) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| 0: No Action 1: Reset all settings| Reserved (all remaining params)|  */
+   MAV_CMD_SET_CAMERA_MODE=530, /* WIP: Set camera running mode. Use NAN for reserved values and values you don't want to change. |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| Camera mode (0: photo/image mode, 1: video mode)| Reserved (all remaining params)|  */
+   MAV_CMD_SET_CAMERA_SETTINGS_3=531, /* WIP: Set the camera settings part 3 (CAMERA_SETTINGS). Use NAN for reserved values and values you don't want to change. (EXPERIMENTAL: IT WILL BE REMOVED) |Camera ID (1 for first, 2 for second, etc.)| Photo resolution ID (4000x3000, 2560x1920, etc., -1 for maximum possible)| Video resolution and rate ID (4K 60 Hz, 4K 30 Hz, HD 60 Hz, HD 30 Hz, etc., -1 for maximum possible)| Reserved (all remaining params)|  */
+   MAV_CMD_IMAGE_START_CAPTURE=2000, /* WIP: Start image capture sequence. Sends CAMERA_IMAGE_CAPTURED after each capture. Use NAN for reserved values. |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| Duration between two consecutive pictures (in seconds)| Number of images to capture total - 0 for unlimited capture| Reserved|  */
+   MAV_CMD_IMAGE_STOP_CAPTURE=2001, /* WIP: Stop image capture sequence |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| Reserved|  */
+   MAV_CMD_REQUEST_CAMERA_IMAGE_CAPTURE=2002, /* WIP: Re-request a CAMERA_IMAGE_CAPTURE packet. Use NAN for reserved values. |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| Sequence number for missing CAMERA_IMAGE_CAPTURE packet| Reserved (all remaining params)|  */
    MAV_CMD_DO_TRIGGER_CONTROL=2003, /* Enable or disable on-board camera triggering system. |Trigger enable/disable (0 for disable, 1 for start), -1 to ignore| 1 to reset the trigger sequence, -1 or 0 to ignore| 1 to pause triggering, but without switching the camera off or retracting it. -1 to ignore|  */
-   MAV_CMD_VIDEO_START_CAPTURE=2500, /* WIP: Starts video capture (recording) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Frames per second, set to -1 for highest framerate possible.| Resolution horizontal in pixels (set to -1 for highest resolution possible)| Resolution vertical in pixels (set to -1 for highest resolution possible)| Frequency CAMERA_CAPTURE_STATUS messages should be sent while recording (0 for no messages, otherwise time in Hz)|  */
-   MAV_CMD_VIDEO_STOP_CAPTURE=2501, /* WIP: Stop the current video capture (recording) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Reserved|  */
+   MAV_CMD_VIDEO_START_CAPTURE=2500, /* WIP: Starts video capture (recording). Use NAN for reserved values. |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| Frequency CAMERA_CAPTURE_STATUS messages should be sent while recording (0 for no messages, otherwise frequency in Hz)| Reserved|  */
+   MAV_CMD_VIDEO_STOP_CAPTURE=2501, /* WIP: Stop the current video capture (recording). Use NAN for reserved values. |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.) (EXPERIMENTAL: IT WILL BE REMOVED)| Reserved|  */
    MAV_CMD_VIDEO_START_STREAMING=2502, /* WIP: Start video streaming |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Reserved|  */
    MAV_CMD_VIDEO_STOP_STREAMING=2503, /* WIP: Stop the current video streaming |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| Reserved|  */
    MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION=2504, /* WIP: Request video stream information (VIDEO_STREAM_INFORMATION) |Camera ID (0 for all cameras, 1 for first, 2 for second, etc.)| 0: No Action 1: Request video stream information| Reserved (all remaining params)|  */
@@ -463,12 +498,17 @@ typedef enum MAV_CMD
                    |Radius of desired circle in CIRCLE_MODE| User defined| User defined| User defined| Unscaled target latitude of center of circle in CIRCLE_MODE| Unscaled target longitude of center of circle in CIRCLE_MODE|  */
    MAV_CMD_NAV_FENCE_RETURN_POINT=5000, /* Fence return point. There can only be one fence return point.
          |Reserved| Reserved| Reserved| Reserved| Latitude| Longitude| Altitude|  */
-   MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION=5001, /* Fence vertex for an inclusion polygon. The vehicle must stay within this area. Minimum of 3 vertices required.
+   MAV_CMD_NAV_FENCE_POLYGON_VERTEX_INCLUSION=5001, /* Fence vertex for an inclusion polygon (the polygon must not be self-intersecting). The vehicle must stay within this area. Minimum of 3 vertices required.
          |Polygon vertex count| Reserved| Reserved| Reserved| Latitude| Longitude| Reserved|  */
-   MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION=5002, /* Fence vertex for an exclusion polygon. The vehicle must stay outside this area. Minimum of 3 vertices required.
+   MAV_CMD_NAV_FENCE_POLYGON_VERTEX_EXCLUSION=5002, /* Fence vertex for an exclusion polygon (the polygon must not be self-intersecting). The vehicle must stay outside this area. Minimum of 3 vertices required.
          |Polygon vertex count| Reserved| Reserved| Reserved| Latitude| Longitude| Reserved|  */
+   MAV_CMD_NAV_FENCE_CIRCLE_INCLUSION=5003, /* Circular fence area. The vehicle must stay inside this area.
+         |radius in meters| Reserved| Reserved| Reserved| Latitude| Longitude| Reserved|  */
+   MAV_CMD_NAV_FENCE_CIRCLE_EXCLUSION=5004, /* Circular fence area. The vehicle must stay outside this area.
+         |radius in meters| Reserved| Reserved| Reserved| Latitude| Longitude| Reserved|  */
    MAV_CMD_NAV_RALLY_POINT=5100, /* Rally point. You can have multiple rally points defined.
          |Reserved| Reserved| Reserved| Reserved| Latitude| Longitude| Altitude|  */
+   MAV_CMD_UAVCAN_GET_NODE_INFO=5200, /* Commands the vehicle to respond with a sequence of messages UAVCAN_NODE_INFO, one message per every UAVCAN node that is online. Note that some of the response messages can be lost, which the receiver can detect easily by checking whether every received UAVCAN_NODE_STATUS has a matching message UAVCAN_NODE_INFO received earlier; if not, this command should be sent again in order to request re-transmission of the node information messages. |Reserved (set to 0)| Reserved (set to 0)| Reserved (set to 0)| Reserved (set to 0)| Reserved (set to 0)| Reserved (set to 0)| Reserved (set to 0)|  */
    MAV_CMD_PAYLOAD_PREPARE_DEPLOY=30001, /* Deploy payload on a Lat / Lon / Alt position. This includes the navigation to reach the required release position and velocity. |Operation mode. 0: prepare single payload deploy (overwriting previous requests), but do not execute it. 1: execute payload deploy immediately (rejecting further deploy commands during execution, but allowing abort). 2: add payload deploy to existing deployment list.| Desired approach vector in degrees compass heading (0..360). A negative value indicates the system can define the approach vector at will.| Desired ground speed at release time. This can be overriden by the airframe in case it needs to meet minimum airspeed. A negative value indicates the system can define the ground speed at will.| Minimum altitude clearance to the release position in meters. A negative value indicates the system can define the clearance at will.| Latitude unscaled for MISSION_ITEM or in 1e7 degrees for MISSION_ITEM_INT| Longitude unscaled for MISSION_ITEM or in 1e7 degrees for MISSION_ITEM_INT| Altitude, in meters AMSL|  */
    MAV_CMD_PAYLOAD_CONTROL_DEPLOY=30002, /* Control the payload deployment. |Operation mode. 0: Abort deployment, continue normal mission. 1: switch to payload deploment mode. 100: delete first payload deployment request. 101: delete all payload deployment requests.| Reserved| Reserved| Reserved| Reserved| Reserved| Reserved|  */
    MAV_CMD_WAYPOINT_USER_1=31000, /* User defined waypoint item. Ground Station will show the Vehicle as flying through this item. |User defined| User defined| User defined| User defined| Latitude unscaled| Longitude unscaled| Altitude, in meters AMSL|  */
@@ -670,7 +710,9 @@ typedef enum MAV_DISTANCE_SENSOR
    MAV_DISTANCE_SENSOR_LASER=0, /* Laser rangefinder, e.g. LightWare SF02/F or PulsedLight units | */
    MAV_DISTANCE_SENSOR_ULTRASOUND=1, /* Ultrasound rangefinder, e.g. MaxBotix units | */
    MAV_DISTANCE_SENSOR_INFRARED=2, /* Infrared rangefinder, e.g. Sharp units | */
-   MAV_DISTANCE_SENSOR_ENUM_END=3, /*  | */
+   MAV_DISTANCE_SENSOR_RADAR=3, /* Radar type, e.g. uLanding units | */
+   MAV_DISTANCE_SENSOR_UNKNOWN=4, /* Broken or unknown type, e.g. analog units | */
+   MAV_DISTANCE_SENSOR_ENUM_END=5, /*  | */
 } MAV_DISTANCE_SENSOR;
 #endif
 
@@ -998,8 +1040,49 @@ typedef enum GPS_FIX_TYPE
    GPS_FIX_TYPE_RTK_FLOAT=5, /* RTK float, 3D position | */
    GPS_FIX_TYPE_RTK_FIXED=6, /* RTK Fixed, 3D position | */
    GPS_FIX_TYPE_STATIC=7, /* Static fixed, typically used for base stations | */
-   GPS_FIX_TYPE_ENUM_END=8, /*  | */
+   GPS_FIX_TYPE_PPP=8, /* PPP, 3D position. | */
+   GPS_FIX_TYPE_ENUM_END=9, /*  | */
 } GPS_FIX_TYPE;
+#endif
+
+/** @brief Type of landing target */
+#ifndef HAVE_ENUM_LANDING_TARGET_TYPE
+#define HAVE_ENUM_LANDING_TARGET_TYPE
+typedef enum LANDING_TARGET_TYPE
+{
+   LANDING_TARGET_TYPE_LIGHT_BEACON=0, /* Landing target signaled by light beacon (ex: IR-LOCK) | */
+   LANDING_TARGET_TYPE_RADIO_BEACON=1, /* Landing target signaled by radio beacon (ex: ILS, NDB) | */
+   LANDING_TARGET_TYPE_VISION_FIDUCIAL=2, /* Landing target represented by a fiducial marker (ex: ARTag) | */
+   LANDING_TARGET_TYPE_VISION_OTHER=3, /* Landing target represented by a pre-defined visual shape/feature (ex: X-marker, H-marker, square) | */
+   LANDING_TARGET_TYPE_ENUM_END=4, /*  | */
+} LANDING_TARGET_TYPE;
+#endif
+
+/** @brief Camera capability flags (Bitmap). */
+#ifndef HAVE_ENUM_CAMERA_CAP_FLAGS
+#define HAVE_ENUM_CAMERA_CAP_FLAGS
+typedef enum CAMERA_CAP_FLAGS
+{
+   CAMERA_CAP_FLAGS_CAPTURE_VIDEO=1, /* Camera is able to record video. | */
+   CAMERA_CAP_FLAGS_CAPTURE_IMAGE=2, /* Camera is able to capture images. | */
+   CAMERA_CAP_FLAGS_HAS_MODES=4, /* Camera has separate Video and Image/Photo modes (MAV_CMD_SET_CAMERA_MODE) | */
+   CAMERA_CAP_FLAGS_CAN_CAPTURE_IMAGE_IN_VIDEO_MODE=8, /* Camera can capture images while in video mode | */
+   CAMERA_CAP_FLAGS_CAN_CAPTURE_VIDEO_IN_IMAGE_MODE=16, /* Camera can capture videos while in Photo/Image mode | */
+   CAMERA_CAP_FLAGS_ENUM_END=17, /*  | */
+} CAMERA_CAP_FLAGS;
+#endif
+
+/** @brief Result from a PARAM_EXT_SET message. */
+#ifndef HAVE_ENUM_PARAM_ACK
+#define HAVE_ENUM_PARAM_ACK
+typedef enum PARAM_ACK
+{
+   PARAM_ACK_ACCEPTED=0, /* Parameter value ACCEPTED and SET | */
+   PARAM_ACK_VALUE_UNSUPPORTED=1, /* Parameter value UNKNOWN/UNSUPPORTED | */
+   PARAM_ACK_FAILED=2, /* Parameter failed to set | */
+   PARAM_ACK_IN_PROGRESS=3, /* Parameter value received but not yet validated or set. A subsequent PARAM_EXT_ACK will follow once operation is completed with the actual result. These are for parameters that may take longer to set. Instead of waiting for an ACK and potentially timing out, you will immediately receive this response to let you know it was received. | */
+   PARAM_ACK_ENUM_END=4, /*  | */
+} PARAM_ACK;
 #endif
 
 // MAVLINK VERSION
