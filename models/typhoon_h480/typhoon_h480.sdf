@@ -423,13 +423,13 @@
             <robotNamespace></robotNamespace>
             <udpPort>5600</udpPort>
         </plugin>
+        -->
         <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
             <robotNamespace></robotNamespace>
             <interval>1</interval>
             <width>3840</width>
             <height>2160</height>
         </plugin>
-        -->
       </sensor>
     </link>
     <joint name='cgo3_camera_joint' type='revolute'>
