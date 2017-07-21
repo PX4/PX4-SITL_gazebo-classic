@@ -44,6 +44,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>gazebo_ros</buildtool_depend>
 
+  <build_depend>gazebo_ros</build_depend>
   <run_depend>gazebo_ros</run_depend>
 
 
