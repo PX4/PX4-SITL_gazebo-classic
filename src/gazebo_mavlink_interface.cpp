@@ -437,6 +437,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   last_time_ = world_->GetSimTime();
   last_gps_time_ = world_->GetSimTime();
   gps_update_interval_ = 0.2;  // in seconds for 5Hz
+  ev_update_interval_ = 0.05; // in seconds for 20Hz
 
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
@@ -585,6 +586,38 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     gps_pub_->Publish(gps_msg);
 
     last_gps_time_ = current_time;
+  }
+
+  // vision position estimate
+  double dt_ev = current_time.Double() - last_ev_time_.Double();
+  if (dt_ev > ev_update_interval_) {
+    //update noise paramters
+    double noise_ev_x = ev_noise_density*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    double noise_ev_y = ev_noise_density*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    double noise_ev_z = ev_noise_density*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    double random_walk_ev_x = ev_random_walk*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    double random_walk_ev_y = ev_random_walk*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    double random_walk_ev_z = ev_random_walk*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    // bias integration
+    ev_bias_x_ += random_walk_ev_x*dt - ev_bias_x_/ev_corellation_time;
+    ev_bias_y_ += random_walk_ev_y*dt - ev_bias_y_/ev_corellation_time;
+    ev_bias_z_ += random_walk_ev_z*dt - ev_bias_z_/ev_corellation_time;
+
+    mavlink_vision_position_estimate_t vp_msg;
+
+    vp_msg.usec = current_time.nsec*1000;;
+    vp_msg.x = pos_W_I.x + noise_ev_x + ev_bias_x_;
+    vp_msg.y = -pos_W_I.y + noise_ev_y + ev_bias_y_;
+    vp_msg.z = -pos_W_I.z + noise_ev_z + ev_bias_z_;
+    vp_msg.roll = T_W_I.rot.GetRoll();
+    vp_msg.pitch = -T_W_I.rot.GetPitch();
+    vp_msg.yaw = -T_W_I.rot.GetYaw();
+
+    mavlink_message_t msg_;
+    mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg_, &vp_msg);
+    send_mavlink_message(&msg_);
+
+    last_ev_time_ = current_time;
   }
 }
 

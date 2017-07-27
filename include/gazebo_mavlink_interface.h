@@ -160,6 +160,11 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   static const unsigned n_out_max = 16;
 
+  // vision position estimate noise parameters
+  static constexpr double ev_corellation_time = 60.0; // s
+  static constexpr double ev_random_walk = 2.0; // (m/s) / sqrt(hz)
+  static constexpr double ev_noise_density = 2e-4; // (m) / sqrt(hz)
+
   unsigned _rotor_count;
 
   double input_offset_[n_out_max];
@@ -180,13 +185,20 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
   std::string sonar_sub_topic_;
-  
+
   common::Time last_time_;
   common::Time last_gps_time_;
+  common::Time last_ev_time_;
   common::Time last_actuator_time_;
+
   double gps_update_interval_;
   double lat_rad;
   double lon_rad;
+  double ev_update_interval_;
+  double ev_bias_x_;
+  double ev_bias_y_;
+  double ev_bias_z_;
+
   void handle_control(double _dt);
 
   math::Vector3 gravity_W_;
