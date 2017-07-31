@@ -558,7 +558,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
     // Raw UDP mavlink
     mavlink_hil_gps_t hil_gps_msg;
-    hil_gps_msg.time_usec = current_time.nsec*1000;
+    hil_gps_msg.time_usec = current_time.Double() * 1e6;
     hil_gps_msg.fix_type = 3;
     hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
     hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
@@ -605,7 +605,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
 
     mavlink_vision_position_estimate_t vp_msg;
 
-    vp_msg.usec = current_time.nsec*1000;
+    vp_msg.usec = current_time.Double() * 1e6;
     vp_msg.y = pos_W_I.x + noise_ev_x + ev_bias_x_;
     vp_msg.x = pos_W_I.y + noise_ev_y + ev_bias_y_;
     vp_msg.z = -pos_W_I.z + noise_ev_z + ev_bias_z_;
@@ -713,7 +713,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
   mavlink_hil_sensor_t sensor_msg;
-  sensor_msg.time_usec = world_->GetSimTime().nsec*1000;
+  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
   sensor_msg.xacc = accel_b.x;
   sensor_msg.yacc = accel_b.y;
   sensor_msg.zacc = accel_b.z;
@@ -756,7 +756,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   // send ground truth
   mavlink_hil_state_quaternion_t hil_state_quat;
-  hil_state_quat.time_usec = world_->GetSimTime().nsec*1000;
+  hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
   hil_state_quat.attitude_quaternion[0] = q_nb.w;
   hil_state_quat.attitude_quaternion[1] = q_nb.x;
   hil_state_quat.attitude_quaternion[2] = q_nb.y;
@@ -809,7 +809,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
   mavlink_hil_optical_flow_t sensor_msg;
-  sensor_msg.time_usec = opticalFlow_message->time_usec();
+  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
   sensor_msg.sensor_id = opticalFlow_message->sensor_id();
   sensor_msg.integration_time_us = opticalFlow_message->integration_time_us();
   sensor_msg.integrated_x = opticalFlow_message->integrated_x();
@@ -829,7 +829,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
 
 void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
   mavlink_distance_sensor_t sensor_msg;
-  sensor_msg.time_boot_ms = sonar_message->time_msec();
+  sensor_msg.time_boot_ms = world_->GetSimTime().Double() * 1e3;
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
