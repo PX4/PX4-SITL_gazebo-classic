@@ -335,16 +335,17 @@ void GeotaggedImagesPlugin::handle_message(mavlink_message_t *msg)
     mavlink_msg_command_long_decode(msg, &cmd);
     mavlink_command_long_t digicam_ctrl_cmd;
     if (cmd.target_component == MAV_COMP_ID_CAMERA
-        && cmd.command == MAV_CMD_DO_DIGICAM_CONTROL
-        && cmd.param5 == 1) {
+        && cmd.command == MAV_CMD_IMAGE_START_CAPTURE) {
       // Take one picture
-      TakePicture();
+      if (cmd.param3 == 1) {
+        TakePicture();
+      }
       mavlink_message_t msg;
       mavlink_msg_command_ack_pack_chan(1,
                                        MAV_COMP_ID_CAMERA,
                                        MAVLINK_COMM_1,
                                        &msg,
-                                       MAV_CMD_DO_DIGICAM_CONTROL,
+                                       MAV_CMD_IMAGE_START_CAPTURE,
                                        MAV_RESULT_ACCEPTED,
                                        100);
       send_mavlink_message(&msg);
