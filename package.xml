@@ -28,7 +28,7 @@
   <!-- Example: -->
   <author email="lorenz@px4.io">Lorenz Meier</author>
   <author email="james.goppert@gmail.com">James Goppert</author> 
-
+  <author email="develop707@gmail.com">William Peale</author>
 
   <!-- The *_depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->

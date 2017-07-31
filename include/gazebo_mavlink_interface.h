@@ -38,6 +38,7 @@
 #include "sonarSens.pb.h"
 #include <boost/bind.hpp>
 
+#include <ignition/math.hh>
 #include <iostream>
 #include <math.h>
 #include <deque>
@@ -46,7 +47,7 @@
 
 #include "mavlink/v2.0/common/mavlink.h"
 
-#include "gazebo/math/Vector3.hh"
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -201,9 +202,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   void handle_control(double _dt);
 
-  math::Vector3 gravity_W_;
-  math::Vector3 velocity_prev_W_;
-  math::Vector3 mag_d_;
+  ignition::math::Vector3d gravity_W_;
+  ignition::math::Vector3d velocity_prev_W_;
+  ignition::math::Vector3d mag_d_;
 
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
