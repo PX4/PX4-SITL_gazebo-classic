@@ -437,6 +437,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   last_time_ = world_->GetSimTime();
   last_gps_time_ = world_->GetSimTime();
   gps_update_interval_ = 0.2;  // in seconds for 5Hz
+  gps_delay_ = 0.12; // in seconds
   ev_update_interval_ = 0.05; // in seconds for 20Hz
 
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
@@ -555,34 +556,36 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     lon_rad = lon_home;
   }
 
-  if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
+  if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_ - gps_delay_) {  // 120 ms delay
     // Raw UDP mavlink
-    mavlink_hil_gps_t hil_gps_msg;
-    hil_gps_msg.time_usec = current_time.Double() * 1e6;
-    hil_gps_msg.fix_type = 3;
-    hil_gps_msg.lat = lat_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.lon = lon_rad * 180 / M_PI * 1e7;
-    hil_gps_msg.alt = (pos_W_I.z + alt_home) * 1000;
-    hil_gps_msg.eph = 100;
-    hil_gps_msg.epv = 100;
-    hil_gps_msg.vel = velocity_current_W_xy.GetLength() * 100;
-    hil_gps_msg.vn = velocity_current_W.y * 100;
-    hil_gps_msg.ve = velocity_current_W.x * 100;
-    hil_gps_msg.vd = -velocity_current_W.z * 100;
+    hil_gps_msg_.time_usec = current_time.Double() * 1e6;
+    hil_gps_msg_.fix_type = 3;
+    hil_gps_msg_.lat = lat_rad * 180 / M_PI * 1e7;
+    hil_gps_msg_.lon = lon_rad * 180 / M_PI * 1e7;
+    hil_gps_msg_.alt = (pos_W_I.z + alt_home) * 1000;
+    hil_gps_msg_.eph = 100;
+    hil_gps_msg_.epv = 100;
+    hil_gps_msg_.vel = velocity_current_W_xy.GetLength() * 100;
+    hil_gps_msg_.vn = velocity_current_W.y * 100;
+    hil_gps_msg_.ve = velocity_current_W.x * 100;
+    hil_gps_msg_.vd = -velocity_current_W.z * 100;
+
     // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
     math::Angle cog(atan2(velocity_current_W.x, velocity_current_W.y));
     cog.Normalize();
-    hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
-    hil_gps_msg.satellites_visible = 10;
+    hil_gps_msg_.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
+    hil_gps_msg_.satellites_visible = 10;
+  }
 
+  if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_) {  // 5Hz
     mavlink_message_t msg;
-    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
+    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg_);
     send_mavlink_message(&msg);
 
     msgs::Vector3d gps_msg;
     gps_msg.set_x(lat_rad * 180. / M_PI);
     gps_msg.set_y(lon_rad * 180. / M_PI);
-    gps_msg.set_z(hil_gps_msg.alt / 1000.f);
+    gps_msg.set_z(hil_gps_msg_.alt / 1000.f);
     gps_pub_->Publish(gps_msg);
 
     last_gps_time_ = current_time;
