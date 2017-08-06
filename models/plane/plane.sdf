@@ -87,6 +87,48 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+    <link name="camera_link">
+      <inertial>
+        <!-- place holder -->
+        <pose frame=''>-0.041 0 -0.162 0 -0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <sensor name="camera_imu" type="imu">
+        <always_on>1</always_on>
+      </sensor>
+      <sensor name="camera" type="camera">
+        <pose frame=''>-0.051 0 -0.162 0 0 3.14159</pose>
+        <camera>
+          <horizontal_fov>1.0</horizontal_fov>
+          <image>
+            <format>R8G8B8</format>
+            <width>640</width>
+            <height>360</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>15000</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>5</update_rate>
+        <visualize>false</visualize>
+        <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
+            <robotNamespace></robotNamespace>
+            <interval>1</interval>
+            <width>3840</width>
+            <height>2160</height>
+        </plugin>
+      </sensor>
+    </link>
     <link name='rotor_puller'>
       <pose>0.3 0 0.0 0 1.57 0</pose>
       <inertial>
