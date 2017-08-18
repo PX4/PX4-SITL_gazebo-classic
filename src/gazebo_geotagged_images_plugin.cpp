@@ -347,7 +347,10 @@ void GeotaggedImagesPlugin::handle_message(mavlink_message_t *msg)
                                        &msg,
                                        MAV_CMD_IMAGE_START_CAPTURE,
                                        MAV_RESULT_ACCEPTED,
-                                       100);
+                                       100,
+                                       0,
+                                       msg.sysid,
+                                       msg.compid);
       send_mavlink_message(&msg);
     }
     break;
