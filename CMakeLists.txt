@@ -128,7 +128,7 @@ include_directories(
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
   ${GSTREAMER_INCLUDE_DIRS}
-  ../../mavlink/include
+  ../../../mavlink/include
   )
 
 link_libraries(
