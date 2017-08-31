@@ -29,8 +29,11 @@
 #include <thread>
 #include <time.h>
 
+#include <opencv2/opencv.hpp>
+
 using namespace std;
 using namespace gazebo;
+using namespace cv;
 
 GZ_REGISTER_SENSOR_PLUGIN(GstCameraPlugin)
 
@@ -108,7 +111,7 @@ void GstCameraPlugin::startGstThread() {
   // Config src
   g_object_set(G_OBJECT(dataSrc), "caps",
       gst_caps_new_simple ("video/x-raw",
-      "format", G_TYPE_STRING, "RGB",
+      "format", G_TYPE_STRING, "I420",
       "width", G_TYPE_INT, this->width,
       "height", G_TYPE_INT, this->height,
       "framerate", GST_TYPE_FRACTION, (unsigned int)this->rate, 1,
@@ -278,12 +281,19 @@ void GstCameraPlugin::OnNewFrame(const unsigned char * image,
   }
 
   // Alloc buffer
-  guint size = width * height * 3;
+  guint size = width * height * 1.5;
   frameBuffer = gst_buffer_new_allocate(NULL, size, NULL);
 
   GstMapInfo mapInfo;
   if (gst_buffer_map(frameBuffer, &mapInfo, GST_MAP_WRITE)) {
-    memcpy(mapInfo.data, image, size);
+
+    // Color Conversion from RGB to YUV
+    Mat frame = Mat(height, width, CV_8UC3);
+    Mat frameYUV = Mat(height, width, CV_8UC3);
+    frame.data = (uchar*)image;
+    cvtColor(frame, frameYUV, COLOR_RGB2YUV_I420);
+
+    memcpy(mapInfo.data, frameYUV.data, size);
     gst_buffer_unmap(frameBuffer, &mapInfo);
   } else {
 	  gzerr << "gst_buffer_map failed"<<endl;
