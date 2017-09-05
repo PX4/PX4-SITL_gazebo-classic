@@ -209,7 +209,6 @@ target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
-add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(rotors_gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 add_library(rotors_gazebo_motor_rotation SHARED src/gazebo_motor_rotation.cpp)
@@ -223,9 +222,14 @@ set(plugins
   gazebo_lidar_plugin
   rotors_gazebo_mavlink_interface
   #rotors_gazebo_wind_plugin
-  gazebo_geotagged_images_plugin
   gazebo_sonar_plugin
   )
+
+# ROS mavlink version not compatible with geotagged images plugin
+if (NOT roscpp_FOUND)
+  add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
+  list(APPEND plugins gazebo_geotagged_images_plugin)
+endif()
 
 if (GSTREAMER_FOUND)
   add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
