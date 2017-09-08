@@ -12,9 +12,12 @@
     <include>
       <uri>model://typhoon_h480</uri>
     </include>
+    <!--
+	 Commented out for now because tarmac.png can't be found.
     <include>
       <uri>model://asphalt_plane</uri>
     </include>
+    -->
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
