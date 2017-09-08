@@ -399,7 +399,7 @@
         </camera>
         <always_on>1</always_on>
         <update_rate>10</update_rate>
-        <visualize>false</visualize>
+        <visualize>true</visualize>
         <!-- how to make this work without using urdf?
         <plugin name="cgo3_camera_controller" filename="libgazebo_ros_camera.so">
           <alwaysOn>true</alwaysOn>
@@ -1155,7 +1155,7 @@
         </limit>
       </axis>
     </joint>
-  
+
 
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
