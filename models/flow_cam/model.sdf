@@ -47,6 +47,7 @@
         </camera>
         <plugin name="opticalflow_plugin" filename="libgazebo_opticalFlow_plugin.so">
             <robotNamespace></robotNamespace>
+            <outputRate>20</outputRate>
         </plugin>
       </sensor>
     </link>

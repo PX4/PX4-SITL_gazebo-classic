@@ -37,6 +37,8 @@
 #include "flow_opencv.hpp"
 #include "flow_px4.hpp"
 
+#define DEFAULT_RATE 20
+
 using namespace cv;
 using namespace std;
 
@@ -60,24 +62,20 @@ namespace gazebo
 
     private:
       event::ConnectionPtr newFrameConnection;
-      Mat old_gray;
-      Mat frame_gray;
       transport::PublisherPtr opticalFlow_pub_;
       transport::NodePtr node_handle_;
       opticalFlow_msgs::msgs::opticalFlow opticalFlow_message;
       std::string namespace_;
       boost::timer::cpu_timer timer_;
-      OpticalFlowOpenCV *_optical_flow;
-      // OpticalFlowPX4 *_optical_flow;
+      OpticalFlowOpenCV *optical_flow_;
+      // OpticalFlowPX4 *optical_flow_;
 
-      float hfov;
-      float rate;
-      int dt_us;
-      float focal_length;
-      double first_frame_time;
-      double frame_time;
-      double old_frame_time;
-      uint32_t frame_time_us;
+      float hfov_;
+      int dt_us_;
+      int output_rate_;
+      float focal_length_;
+      double first_frame_time_;
+      uint32_t frame_time_us_;
   };
 }
 #endif
