@@ -219,9 +219,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
-  double optflow_xgyro;
-  double optflow_ygyro;
-  double optflow_zgyro;
+  math::Vector3 optflow_gyro{};
   double optflow_distance;
   double sonar_distance;
 
