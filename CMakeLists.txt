@@ -210,8 +210,7 @@ add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
-add_library(rotors_gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
-add_library(rotors_gazebo_motor_rotation SHARED src/gazebo_motor_rotation.cpp)
+add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -223,6 +222,7 @@ set(plugins
   rotors_gazebo_mavlink_interface
   #rotors_gazebo_wind_plugin
   gazebo_sonar_plugin
+  gazebo_uuv_plugin
   )
 
 # ROS mavlink version not compatible with geotagged images plugin
