@@ -183,6 +183,7 @@ set (msgs
   msgs/MotorSpeed.proto
   #msgs/Wind.proto
   msgs/sonarSens.proto
+  msgs/irlock.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -207,6 +208,7 @@ add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
 target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
+add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
@@ -219,6 +221,7 @@ set(plugins
   rotors_gazebo_imu_plugin
   gazebo_opticalFlow_plugin
   gazebo_lidar_plugin
+  gazebo_irlock_plugin
   rotors_gazebo_mavlink_interface
   #rotors_gazebo_wind_plugin
   gazebo_sonar_plugin
