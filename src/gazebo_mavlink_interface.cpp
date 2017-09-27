@@ -43,7 +43,7 @@ static double alt_home = 488.0; // meters
 // static const double lat_home = 47.592182 * M_PI / 180;  // rad
 // static const double lon_home = -122.316031 * M_PI / 180;  // rad
 // static const double alt_home = 86.0; // meters
-static const float earth_radius = 6353000;  // m
+static const double earth_radius = 6353000;  // m
 
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
@@ -558,15 +558,32 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     lon_rad = lon_home;
   }
 
+  double dt_gps = current_time.Double() - last_gps_time_.Double();
   if (current_time.Double() - last_gps_time_.Double() > gps_update_interval_ - gps_delay_) {  // 120 ms delay
+    //update noise paramters
+    double noise_gps_x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    double noise_gps_y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    double noise_gps_z = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    double random_walk_gps_x = gps_random_walk*standard_normal_distribution_(random_generator_);
+    double random_walk_gps_y = gps_random_walk*standard_normal_distribution_(random_generator_);
+    double random_walk_gps_z = gps_random_walk*standard_normal_distribution_(random_generator_);
+    // bias integration
+    gps_bias_x_ += random_walk_gps_x - gps_bias_x_/gps_corellation_time;
+    gps_bias_y_ += random_walk_gps_y - gps_bias_y_/gps_corellation_time;
+    gps_bias_z_ += random_walk_gps_z - gps_bias_z_/gps_corellation_time;
+
+    // standard deviation of random walk
+    double std_xy = gps_random_walk*gps_corellation_time/sqrtf(2*gps_corellation_time-1);
+    double std_z = std_xy;
+
     // Raw UDP mavlink
     hil_gps_msg_.time_usec = current_time.Double() * 1e6;
     hil_gps_msg_.fix_type = 3;
-    hil_gps_msg_.lat = lat_rad * 180 / M_PI * 1e7;
-    hil_gps_msg_.lon = lon_rad * 180 / M_PI * 1e7;
-    hil_gps_msg_.alt = (pos_W_I.z + alt_home) * 1000;
-    hil_gps_msg_.eph = 100;
-    hil_gps_msg_.epv = 100;
+    hil_gps_msg_.lat = (lat_rad * 180 / M_PI + (noise_gps_x + gps_bias_x_)*1e-5) * 1e7; // at the standard home coords, 1m is about 1e-5 deg
+    hil_gps_msg_.lon = (lon_rad * 180 / M_PI + (noise_gps_y + gps_bias_y_)*1e-5) * 1e7; // at the standard home coords, 1m is about 1e-5 deg
+    hil_gps_msg_.alt = (pos_W_I.z + alt_home) * 1000 + noise_gps_z + gps_bias_z_;
+    hil_gps_msg_.eph = 100*(std_xy + gps_noise_density*gps_noise_density);
+    hil_gps_msg_.epv = 100*(std_z  + gps_noise_density*gps_noise_density);
     hil_gps_msg_.vel = velocity_current_W_xy.GetLength() * 100;
     hil_gps_msg_.vn = velocity_current_W.y * 100;
     hil_gps_msg_.ve = velocity_current_W.x * 100;
