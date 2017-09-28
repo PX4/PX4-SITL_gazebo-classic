@@ -1,0 +1,26 @@
+<?xml version='1.0'?>
+<sdf version='1.5'>
+  <model name='iris_fpv_cam'>
+
+    <include>
+      <uri>model://red_iris</uri>
+    </include>
+
+    <include>
+      <uri>model://fpv_cam</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <joint name="fpv_cam_joint" type="fixed">
+      <child>fpv_cam::link</child>
+      <parent>iris::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
+  </model>
+</sdf>
