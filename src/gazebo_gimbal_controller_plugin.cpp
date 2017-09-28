@@ -308,8 +308,13 @@ void GimbalControllerPlugin::OnUpdate()
     /// and gimbal is constructed using yaw-roll-pitch-variable-axis
     ignition::math::Vector3d currentAngleYPRVariable(
       this->imuSensor->Orientation().Euler());
+#if GAZEBO_MAJOR_VERSION >= 8
+    ignition::math::Vector3d currentAnglePRYVariable(
+      this->QtoZXY(ignition::math::Quaterniond(currentAngleYPRVariable)));
+#else
     ignition::math::Vector3d currentAnglePRYVariable(
       this->QtoZXY(currentAngleYPRVariable));
+#endif
 
     /// get joint limits (in sensor frame)
     /// TODO: move to Load() if limits do not change

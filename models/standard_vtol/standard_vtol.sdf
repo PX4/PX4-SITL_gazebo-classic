@@ -767,7 +767,7 @@
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -784,7 +784,7 @@
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -801,7 +801,7 @@
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -818,7 +818,7 @@
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='puller' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -835,7 +835,7 @@
       <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
@@ -850,6 +850,7 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+    <!--
     <plugin name='wind_plugin' filename='librotors_gazebo_wind_plugin.so'>
       <frameId>base_link</frameId>
       <linkName>base_link</linkName>
@@ -862,6 +863,7 @@
       <windGustStart>0</windGustStart>
       <windGustForceMean>0</windGustForceMean>
     </plugin>
+    -->
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>

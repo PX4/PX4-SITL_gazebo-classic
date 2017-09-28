@@ -274,7 +274,7 @@ void GstCameraPlugin::OnNewFrame(const unsigned char * image,
   std::lock_guard<std::mutex> guard(frameBufferMutex);
 
   if (frameBuffer) {
-	gst_buffer_unref(frameBuffer);
+    gst_buffer_unref(frameBuffer);
   }
 
   // Alloc buffer

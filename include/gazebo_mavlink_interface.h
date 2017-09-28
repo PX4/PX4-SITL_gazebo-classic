@@ -44,14 +44,11 @@
 #include <random>
 #include <sdf/sdf.hh>
 
-#include "mavlink/v1.0/common/mavlink.h"
+#include "mavlink/v2.0/common/mavlink.h"
 
 #include "gazebo/math/Vector3.hh"
 #include <sys/socket.h>
 #include <netinet/in.h>
-
-static const uint8_t mavlink_message_lengths[256] = MAVLINK_MESSAGE_LENGTHS;
-static const uint8_t mavlink_message_crcs[256] = MAVLINK_MESSAGE_CRCS;
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 
@@ -157,11 +154,16 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void LidarCallback(LidarPtr& lidar_msg);
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
-  void send_mavlink_message(const uint8_t msgid, const void *msg, uint8_t component_ID);
+  void send_mavlink_message(const mavlink_message_t *message, const int destination_port=0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
   static const unsigned n_out_max = 16;
+
+  // vision position estimate noise parameters
+  static constexpr double ev_corellation_time = 60.0; // s
+  static constexpr double ev_random_walk = 2.0; // (m/s) / sqrt(hz)
+  static constexpr double ev_noise_density = 2e-4; // (m) / sqrt(hz)
 
   unsigned _rotor_count;
 
@@ -183,13 +185,21 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
   std::string sonar_sub_topic_;
-  
+
   common::Time last_time_;
   common::Time last_gps_time_;
+  common::Time last_ev_time_;
   common::Time last_actuator_time_;
+
   double gps_update_interval_;
+  double gps_delay_;
   double lat_rad;
   double lon_rad;
+  double ev_update_interval_;
+  double ev_bias_x_;
+  double ev_bias_y_;
+  double ev_bias_z_;
+
   void handle_control(double _dt);
 
   math::Vector3 gravity_W_;
@@ -209,11 +219,11 @@ class GazeboMavlinkInterface : public ModelPlugin {
   struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
-  double optflow_xgyro;
-  double optflow_ygyro;
-  double optflow_zgyro;
+  math::Vector3 optflow_gyro{};
   double optflow_distance;
   double sonar_distance;
+
+  mavlink_hil_gps_t hil_gps_msg_;
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
