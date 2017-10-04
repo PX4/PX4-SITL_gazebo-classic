@@ -67,6 +67,8 @@ class GazeboUUVPlugin : public ModelPlugin {
     void CommandCallback(CommandMotorSpeedPtr &command);
     double command_[4];
 
+    double absolute(double x);
+
     double last_time_;
     double time_delta_;
     
