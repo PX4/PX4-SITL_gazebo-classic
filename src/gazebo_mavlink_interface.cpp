@@ -93,6 +93,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "opticalFlowSubTopic",
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
   getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
+  getSdfParam<std::string>(_sdf, "odometrySubTopic", odometry_sub_topic_, odometry_sub_topic_);
 
   // set input_reference_ from inputs.control
   input_reference_.resize(n_out_max);
@@ -429,7 +430,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
-
+  odometry_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + odometry_sub_topic_, &GazeboMavlinkInterface::OdometryCallback, this);
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
@@ -848,6 +849,66 @@ void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::OdometryCallback(OdometryPtr& odometry_message){
+
+  mavlink_local_position_ned_cov_t position_msg;
+  mavlink_attitude_quaternion_cov_t attitute_msg;
+
+  position_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  position_msg.estimator_type = MAV_ESTIMATOR_TYPE_VIO;
+  position_msg.x = odometry_message->pose().pose().position().x();
+  position_msg.y = odometry_message->pose().pose().position().y();
+  position_msg.z = odometry_message->pose().pose().position().z();
+  position_msg.vx = odometry_message->twist().twist().linear().x();
+  position_msg.vy = odometry_message->twist().twist().linear().y();
+  position_msg.vz = odometry_message->twist().twist().linear().z();
+  position_msg.ax = 0.0f;
+  position_msg.ay = 0.0f;
+  position_msg.az = 0.0f;
+  for (int i = 0; i < 45; ++i) {
+    position_msg.covariance[i] = 0.0f;
+  }
+  position_msg.covariance[0] = odometry_message->pose().covariance(0);
+  position_msg.covariance[1] = odometry_message->pose().covariance(1);
+  position_msg.covariance[2] = odometry_message->pose().covariance(2);
+  position_msg.covariance[9] = odometry_message->pose().covariance(7);
+  position_msg.covariance[10] = odometry_message->pose().covariance(8);
+  position_msg.covariance[17] = odometry_message->pose().covariance(14);
+
+  position_msg.covariance[24] = odometry_message->twist().covariance(0);
+  position_msg.covariance[25] = odometry_message->twist().covariance(1);
+  position_msg.covariance[26] = odometry_message->twist().covariance(2);
+  position_msg.covariance[30] = odometry_message->twist().covariance(7);
+  position_msg.covariance[31] = odometry_message->twist().covariance(8);
+  position_msg.covariance[35] = odometry_message->twist().covariance(14);
+
+  mavlink_message_t msg;
+  mavlink_msg_local_position_ned_cov_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &position_msg);
+  send_mavlink_message(&msg);
+
+  attitute_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  attitute_msg.q[0] = odometry_message->pose().pose().orientation().w();
+  attitute_msg.q[1] = odometry_message->pose().pose().orientation().x();
+  attitute_msg.q[2] = odometry_message->pose().pose().orientation().y();
+  attitute_msg.q[3] = odometry_message->pose().pose().orientation().z();
+  attitute_msg.rollspeed = 0.0f;
+  attitute_msg.pitchspeed = 0.0f;
+  attitute_msg.yawspeed = 0.0f;
+
+  attitute_msg.covariance[0] = odometry_message->pose().covariance(21);
+  attitute_msg.covariance[1] = odometry_message->pose().covariance(22);
+  attitute_msg.covariance[2] = odometry_message->pose().covariance(23);
+  attitute_msg.covariance[3] = odometry_message->pose().covariance(27);
+  attitute_msg.covariance[4] = odometry_message->pose().covariance(28);
+  attitute_msg.covariance[5] = odometry_message->pose().covariance(29);
+  attitute_msg.covariance[6] = odometry_message->pose().covariance(33);
+  attitute_msg.covariance[7] = odometry_message->pose().covariance(34);
+  attitute_msg.covariance[8] = odometry_message->pose().covariance(35);
+
+  mavlink_msg_attitude_quaternion_cov_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &attitute_msg);
   send_mavlink_message(&msg);
 }
 
