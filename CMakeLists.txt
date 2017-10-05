@@ -183,7 +183,20 @@ set (msgs
   msgs/MotorSpeed.proto
   #msgs/Wind.proto
   msgs/sonarSens.proto
+  msgs/Header.proto
+  msgs/PoseStamped.proto
+  msgs/Twist.proto
+  msgs/TwistWithCovariance.proto
+  msgs/Odometry.proto
+  msgs/Transform.proto
+  msgs/TransformStamped.proto
+  msgs/TransformStampedWithFrameIds.proto
+  msgs/Vector3dStamped.proto
+  msgs/PoseWithCovarianceStamped.proto
+  msgs/PoseWithCovariance.proto
+  
 )
+
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
 
@@ -211,6 +224,7 @@ add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
+add_library(rotors_gazebo_odometry_plugin SHARED src/gazebo_odometry_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -223,6 +237,7 @@ set(plugins
   #rotors_gazebo_wind_plugin
   gazebo_sonar_plugin
   gazebo_uuv_plugin
+  rotors_gazebo_odometry_plugin
   )
 
 # ROS mavlink version not compatible with geotagged images plugin
