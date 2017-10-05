@@ -26,6 +26,13 @@
 
 namespace gazebo {
 
+// The following boolean constants enable/disable debug printing when certain plugin methods are called.
+// Suitable for debugging purposes. Left on permanently can swamp std::out and can crash Gazebo.
+
+static const bool kPrintOnPluginLoad    = false;
+static const bool kPrintOnUpdates       = false;
+static const bool kPrintOnMsgCallback   = false;
+
 /**
  * \brief Obtains a parameter from sdf.
  * \param[in] sdf Pointer to the sdf object.
