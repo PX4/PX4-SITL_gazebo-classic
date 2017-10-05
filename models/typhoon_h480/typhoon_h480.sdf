@@ -1544,5 +1544,27 @@
       <joint_pitch>typhoon_h480::cgo3_camera_joint</joint_pitch>
       <imu>camera_imu</imu>
     </plugin>
+   <plugin name='odometry_sensor_plugin' filename='librotors_gazebo_odometry_plugin.so'>
+        <linkName>typhoon_h480::base_link</linkName>
+        <robotNamespace>typhoon_h480</robotNamespace>
+        <poseTopic>pose</poseTopic>
+        <poseWithCovarianceTopic>pose_with_covariance</poseWithCovarianceTopic>
+        <positionTopic>position</positionTopic>
+        <transformTopic>transform</transformTopic>
+        <odometryTopic>odometry</odometryTopic>
+        <parentFrameId>world</parentFrameId> <!-- Use the scoped link name here. e.g. Model::link. -->
+        <childFrameId>base_link</childFrameId>
+        <measurementDivisor>1</measurementDivisor> <!-- only every (seq % measurementDivisor) == 0 measurement is published [int] -->
+        <measurementDelay>0</measurementDelay> <!-- time that measurement gets held back before it's published in [simulation cycles (int)] -->
+        <unknownDelay>0.0</unknownDelay> <!-- additional delay, that just gets added to the timestamp [s] -->
+        <noiseNormalPosition>0.1 0.1 0.1</noiseNormalPosition> <!-- standard deviation of additive white gaussian noise [m] -->
+        <noiseNormalQuaternion>0 0 0</noiseNormalQuaternion> <!-- standard deviation white gaussian noise [rad]: q_m = q*quaternionFromSmallAngleApproximation(noiseNormalQ) -->
+        <noiseNormalLinearVelocity>0 0 0</noiseNormalLinearVelocity> <!-- standard deviation of additive white gaussian noise [m/s] -->
+        <noiseNormalAngularVelocity>0 0 0</noiseNormalAngularVelocity> <!-- standard deviation of additive white gaussian noise [rad/s] -->
+        <noiseUniformPosition>0 0 0</noiseUniformPosition> <!-- symmetric bounds of uniform noise [m] -->
+        <noiseUniformQuaternion>0 0 0</noiseUniformQuaternion> <!-- symmetric bounds of uniform noise [rad], computation see above -->
+        <noiseUniformLinearVelocity>0 0 0</noiseUniformLinearVelocity> <!-- symmetric bounds of uniform noise [m/s] -->
+        <noiseUniformAngularVelocity>0 0 0</noiseUniformAngularVelocity> <!-- symmetric bounds of uniform noise [rad/s] -->
+      </plugin>
   </model>
 </sdf>
