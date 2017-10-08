@@ -21,6 +21,7 @@ list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
+option(BUILD_HIL_INTERFACE "build the HIL interface" "OFF")
 
 ## System dependencies are found with CMake's conventions
 find_package(PkgConfig REQUIRED)
@@ -30,6 +31,14 @@ find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread timer)
 if (BUILD_GSTREAMER_PLUGIN)
   find_package(GStreamer)
+endif()
+if (BUILD_HIL_INTERFACE)
+  find_package(roscpp REQUIRED)
+  find_package(mavros REQUIRED)
+  find_package(mavros_msgs REQUIRED)
+  find_package(geometry_msgs REQUIRED)
+  find_package(sensor_msgs REQUIRED)
+  find_package(mav_msgs REQUIRED)
 endif()
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
@@ -229,6 +238,22 @@ set(plugins
 if (NOT roscpp_FOUND)
   add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
   list(APPEND plugins gazebo_geotagged_images_plugin)
+endif()
+
+# If BUILD_HIL_INTERFACE set to ON, build gazebo_hil_interface
+if (BUILD_HIL_INTERFACE)
+  include_directories(
+    include
+    ${mavros_msgs_INCLUDE_DIRS}
+    ${geometry_msgs_INCLUDE_DIRS}
+    ${sensor_msgs_INCLUDE_DIRS}
+    ${mav_msgs_INCLUDE_DIRS}
+    )
+  add_library(gazebo_hil_interface SHARED src/gazebo_hil_interface.cpp)
+  list(APPEND plugins gazebo_hil_interface)
+  target_link_libraries(gazebo_hil_interface ${catkin_LIBRARIES} ${mavros_LIBRARIES})
+  add_dependencies(gazebo_hil_interface ${catkin_EXPORTED_TARGETS} ${mavros_EXPORTED_TARGETS} ${mavros_msgs_EXPORTED_TARGETS})
+  message(STATUS "adding gazebo_hil_interface to build")
 endif()
 
 if (GSTREAMER_FOUND)
