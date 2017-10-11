@@ -166,9 +166,9 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
     //prepare optical flow message
     opticalFlow_message.set_time_usec(0);//will be filled in simulator_mavlink.cpp
     opticalFlow_message.set_sensor_id(2.0);
-    opticalFlow_message.set_integration_time_us(dt_us_);
-    opticalFlow_message.set_integrated_x(flow_x_ang);
-    opticalFlow_message.set_integrated_y(flow_y_ang);
+    opticalFlow_message.set_integration_time_us(quality ? dt_us_ : 0);
+    opticalFlow_message.set_integrated_x(quality ? flow_x_ang : 0.0f);
+    opticalFlow_message.set_integrated_y(quality ? flow_y_ang : 0.0f);
     opticalFlow_message.set_integrated_xgyro(0.0f); //get real values in gazebo_mavlink_interface.cpp
     opticalFlow_message.set_integrated_ygyro(0.0f); //get real values in gazebo_mavlink_interface.cpp
     opticalFlow_message.set_integrated_zgyro(0.0f); //get real values in gazebo_mavlink_interface.cpp
