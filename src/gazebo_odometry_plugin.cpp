@@ -56,7 +56,7 @@ void GazeboOdometryPlugin::Load(physics::ModelPtr _model,
   if (kPrintOnPluginLoad) {
     gzdbg << __FUNCTION__ << "() called." << std::endl;
   }
-  printf("LOAD ODOMETRY PLUGIN \n\n");
+
   // Store the pointer to the model
   model_ = _model;
   world_ = model_->GetWorld();
@@ -148,8 +148,6 @@ void GazeboOdometryPlugin::Load(physics::ModelPtr _model,
   getSdfParam<double>(_sdf, "unknownDelay", unknown_delay_, unknown_delay_);
   getSdfParam<double>(_sdf, "covarianceImageScale", covariance_image_scale_,
                       covariance_image_scale_);
-
-  printf("param from sdf %f %f %f \n", noise_uniform_position.X(), noise_uniform_position.Y(), noise_uniform_position.Z());
 
   parent_link_ = world_->GetEntity(parent_frame_id_);
   if (parent_link_ == NULL && parent_frame_id_ != kDefaultParentFrameId) {
@@ -293,7 +291,6 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
   // First, determine whether we should publish a odometry.
   if (covariance_image_.data != NULL) {
     // We have an image.
-    printf("covariance image different null \n");
     // Image is always centered around the origin:
     int width = covariance_image_.cols;
     int height = covariance_image_.rows;
@@ -374,7 +371,7 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
         position_n_[2](random_generator_) + position_u_[2](random_generator_);
 
     gazebo::msgs::Vector3d* p =
-        odometry_msg.mutable_pose()->mutable_pose()->mutable_position(); printf("before %f \n", p->x());
+        odometry_msg.mutable_pose()->mutable_pose()->mutable_position();
     p->set_x(p->x() + pos_n[0]);
     p->set_y(p->y() + pos_n[1]);
     p->set_z(p->z() + pos_n[2]);
@@ -470,7 +467,6 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
     }
 
     if (transform_stamped_pub_->HasConnections()) {
-      printf("has connection \n");
       gz_geometry_msgs::TransformStamped transform_stamped_msg;
 
       transform_stamped_msg.mutable_header()->CopyFrom(odometry_msg.header());
@@ -489,7 +485,6 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
    // if (odometry_pub_->HasConnections()) {
       // DEBUG
       odometry_pub_->Publish(odometry_msg);
-      printf("odometry published \n");
  //   }
 
     //==============================================//
