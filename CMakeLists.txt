@@ -194,6 +194,8 @@ set (msgs
   msgs/Vector3dStamped.proto
   msgs/PoseWithCovarianceStamped.proto
   msgs/PoseWithCovariance.proto
+  msgs/ConnectGazeboToRosTopic.proto
+  msgs/ConnectRosToGazeboTopic.proto
   
 )
 
