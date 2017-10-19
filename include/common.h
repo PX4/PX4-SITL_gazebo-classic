@@ -33,6 +33,10 @@ static const bool kPrintOnPluginLoad    = false;
 static const bool kPrintOnUpdates       = false;
 static const bool kPrintOnMsgCallback   = false;
 
+// These should perhaps be defined in an .sdf/.xacro file instead?
+static const std::string kConnectGazeboToRosSubtopic = "connect_gazebo_to_ros_subtopic";
+static const std::string kConnectRosToGazeboSubtopic = "connect_ros_to_gazebo_subtopic";
+
 /**
  * \brief Obtains a parameter from sdf.
  * \param[in] sdf Pointer to the sdf object.
