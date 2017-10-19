@@ -37,8 +37,8 @@
 #include <gazebo/physics/physics.hh>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
-// #include "ConnectGazeboToRosTopic.pb.h"
-// #include "ConnectRosToGazeboTopic.pb.h"
+#include "ConnectGazeboToRosTopic.pb.h"
+#include "ConnectRosToGazeboTopic.pb.h"
 #include "PoseStamped.pb.h"
 #include "PoseWithCovarianceStamped.pb.h"
 #include "TransformStamped.pb.h"
@@ -520,11 +520,12 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
 void GazeboOdometryPlugin::CreatePubsAndSubs() {
   // Create temporary "ConnectGazeboToRosTopic" publisher and message
-  // gazebo::transport::PublisherPtr connect_gazebo_to_ros_topic_pub =
-  //     node_handle_->Advertise<gz_std_msgs::ConnectGazeboToRosTopic>(
-  //         "~/" + kConnectGazeboToRosSubtopic, 1);
+  gzerr << "ros -> gazebo odometry";
+  gazebo::transport::PublisherPtr connect_gazebo_to_ros_topic_pub =
+      node_handle_->Advertise<gz_std_msgs::ConnectGazeboToRosTopic>(
+          "~/" + kConnectGazeboToRosSubtopic, 1);
 
-  // gz_std_msgs::ConnectGazeboToRosTopic connect_gazebo_to_ros_topic_msg;
+  gz_std_msgs::ConnectGazeboToRosTopic connect_gazebo_to_ros_topic_msg;
 
   // ============================================ //
   // =============== POSE MSG SETUP ============= //
@@ -533,14 +534,14 @@ void GazeboOdometryPlugin::CreatePubsAndSubs() {
   pose_pub_ = node_handle_->Advertise<gazebo::msgs::Pose>(
       "~/" + namespace_ + "/" + pose_pub_topic_, 1);
 
-  // connect_gazebo_to_ros_topic_msg.set_gazebo_topic("~/" + namespace_ + "/" +
-  //                                                  pose_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
-  //                                               pose_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_msgtype(
-  //     gz_std_msgs::ConnectGazeboToRosTopic::POSE);
-  // connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
-  //                                          true);
+  connect_gazebo_to_ros_topic_msg.set_gazebo_topic("~/" + namespace_ + "/" +
+                                                   pose_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
+                                                pose_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_msgtype(
+      gz_std_msgs::ConnectGazeboToRosTopic::POSE);
+  connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
+                                           true);
 
   // ============================================ //
   // == POSE WITH COVARIANCE STAMPED MSG SETUP == //
@@ -550,14 +551,14 @@ void GazeboOdometryPlugin::CreatePubsAndSubs() {
       node_handle_->Advertise<gz_geometry_msgs::PoseWithCovarianceStamped>(
           "~/" + namespace_ + "/" + pose_with_covariance_stamped_pub_topic_, 1);
 
-  // connect_gazebo_to_ros_topic_msg.set_gazebo_topic(
-  //     "~/" + namespace_ + "/" + pose_with_covariance_stamped_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_ros_topic(
-  //     namespace_ + "/" + pose_with_covariance_stamped_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_msgtype(
-  //     gz_std_msgs::ConnectGazeboToRosTopic::POSE_WITH_COVARIANCE_STAMPED);
-  // connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
-  //                                          true);
+  connect_gazebo_to_ros_topic_msg.set_gazebo_topic(
+      "~/" + namespace_ + "/" + pose_with_covariance_stamped_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_ros_topic(
+      namespace_ + "/" + pose_with_covariance_stamped_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_msgtype(
+      gz_std_msgs::ConnectGazeboToRosTopic::POSE_WITH_COVARIANCE_STAMPED);
+  connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
+                                           true);
 
   // ============================================ //
   // ========= POSITION STAMPED MSG SETUP ======= //
@@ -567,14 +568,14 @@ void GazeboOdometryPlugin::CreatePubsAndSubs() {
       node_handle_->Advertise<gz_geometry_msgs::Vector3dStamped>(
           "~/" + namespace_ + "/" + position_stamped_pub_topic_, 1);
 
-  // connect_gazebo_to_ros_topic_msg.set_gazebo_topic("~/" + namespace_ + "/" +
-  //                                                  position_stamped_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
-  //                                               position_stamped_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_msgtype(
-  //     gz_std_msgs::ConnectGazeboToRosTopic::VECTOR_3D_STAMPED);
-  // connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
-  //                                          true);
+  connect_gazebo_to_ros_topic_msg.set_gazebo_topic("~/" + namespace_ + "/" +
+                                                   position_stamped_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
+                                                position_stamped_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_msgtype(
+      gz_std_msgs::ConnectGazeboToRosTopic::VECTOR_3D_STAMPED);
+  connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
+                                           true);
 
   // ============================================ //
   // ============= ODOMETRY MSG SETUP =========== //
@@ -583,14 +584,14 @@ void GazeboOdometryPlugin::CreatePubsAndSubs() {
   odometry_pub_ = node_handle_->Advertise<gz_geometry_msgs::Odometry>(
       "~/" + namespace_ + "/" + odometry_pub_topic_, 1);
 
-  // connect_gazebo_to_ros_topic_msg.set_gazebo_topic("~/" + namespace_ + "/" +
-  //                                                  odometry_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
-  //                                               odometry_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_msgtype(
-  //     gz_std_msgs::ConnectGazeboToRosTopic::ODOMETRY);
-  // connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
-  //                                          true);
+  connect_gazebo_to_ros_topic_msg.set_gazebo_topic("~/" + namespace_ + "/" +
+                                                   odometry_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
+                                                odometry_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_msgtype(
+      gz_std_msgs::ConnectGazeboToRosTopic::ODOMETRY);
+  connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
+                                           true);
 
   // ============================================ //
   // ======== TRANSFORM STAMPED MSG SETUP ======= //
@@ -600,14 +601,14 @@ void GazeboOdometryPlugin::CreatePubsAndSubs() {
       node_handle_->Advertise<gz_geometry_msgs::TransformStamped>(
           "~/" + namespace_ + "/" + transform_stamped_pub_topic_, 1);
 
-  // connect_gazebo_to_ros_topic_msg.set_gazebo_topic(
-  //     "~/" + namespace_ + "/" + transform_stamped_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
-  //                                               transform_stamped_pub_topic_);
-  // connect_gazebo_to_ros_topic_msg.set_msgtype(
-  //     gz_std_msgs::ConnectGazeboToRosTopic::TRANSFORM_STAMPED);
-  // connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
-  //                                          true);
+  connect_gazebo_to_ros_topic_msg.set_gazebo_topic(
+      "~/" + namespace_ + "/" + transform_stamped_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_ros_topic(namespace_ + "/" +
+                                                transform_stamped_pub_topic_);
+  connect_gazebo_to_ros_topic_msg.set_msgtype(
+      gz_std_msgs::ConnectGazeboToRosTopic::TRANSFORM_STAMPED);
+  connect_gazebo_to_ros_topic_pub->Publish(connect_gazebo_to_ros_topic_msg,
+                                           true);
 
   // ============================================ //
   // ===== "BROADCAST TRANSFORM" MSG SETUP =====  //
