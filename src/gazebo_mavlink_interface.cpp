@@ -872,17 +872,19 @@ void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
 
 void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 
-  mavlink_irlock_report_t sensor_msg;
+  mavlink_landing_target_t sensor_msg;
 
   sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
-  sensor_msg.signature = irlock_message->signature();
-  sensor_msg.pos_x = irlock_message->pos_x();
-  sensor_msg.pos_y = irlock_message->pos_y();
+  sensor_msg.target_num = irlock_message->signature();
+  sensor_msg.angle_x = irlock_message->pos_x();
+  sensor_msg.angle_y = irlock_message->pos_y();
   sensor_msg.size_x = irlock_message->size_x();
   sensor_msg.size_y = irlock_message->size_y();
+  sensor_msg.position_valid = false;
+  sensor_msg.type = LANDING_TARGET_TYPE_LIGHT_BEACON;
 
   mavlink_message_t msg;
-  mavlink_msg_irlock_report_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
   send_mavlink_message(&msg);
 }
 
