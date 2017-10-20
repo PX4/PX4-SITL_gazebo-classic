@@ -14,6 +14,7 @@
     </include>
     <include>
       <uri>model://iris_irlock</uri>
+      <pose>0 0 0.3 0 0 1.5708</pose>
     </include>
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
@@ -38,7 +39,7 @@
     </physics>
     
     <model name="irlock_beacon">
-      <pose>0.3 0.0 0.06 0 0 0</pose>
+      <pose>0.5 1.5 0.06 0 0 0</pose>
       <link name="link">
          <inertial>
           <pose>0 0 0 0 0 0</pose>
