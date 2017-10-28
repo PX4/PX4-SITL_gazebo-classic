@@ -4,7 +4,7 @@
   <version>1.0.0</version>
   <description>The mavlink_sitl_gazebo package</description>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="lorenz@px4.io">Lorenz Meier</maintainer>
@@ -27,7 +27,7 @@
   <!-- Authors do not have to be maintianers, but could be -->
   <!-- Example: -->
   <author email="lorenz@px4.io">Lorenz Meier</author>
-  <author email="james.goppert@gmail.com">James Goppert</author> 
+  <author email="james.goppert@gmail.com">James Goppert</author>
 
 
   <!-- The *_depend tags are used to specify dependencies -->
@@ -45,8 +45,20 @@
   <buildtool_depend>gazebo_ros</buildtool_depend>
 
   <build_depend>gazebo_ros</build_depend>
-  <run_depend>gazebo_ros</run_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>mav_msgs</build_depend>
+  <build_depend>mavros</build_depend>
+  <build_depend>mavros_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
 
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>mav_msgs</run_depend>
+  <run_depend>mavros</run_depend>
+  <run_depend>mavros_msgs</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
