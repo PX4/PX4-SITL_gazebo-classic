@@ -34,6 +34,12 @@ endif()
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
+# for ROS subscriber
+find_package(roscpp REQUIRED)
+find_package(std_msgs REQUIRED)
+include_directories(${roscpp_INCLUDE_DIRS})
+include_directories(${std_msgs_INCLUDE_DIRS})
+
 # find ROS include directories for building against ROS mavlink version
 find_package(roscpp)
 if (roscpp_FOUND)
@@ -45,7 +51,8 @@ if (CATKIN_DEVEL_PREFIX)
   message(STATUS "catkin ENABLED")
   find_package(catkin REQUIRED)
   if (catkin_FOUND)
-    catkin_package()
+    catkin_package(  DEPENDS 
+    roscpp)
   else()
     message(FATAL_ERROR "catkin not found")
   endif()
@@ -183,7 +190,6 @@ set (msgs
   msgs/MotorSpeed.proto
   #msgs/Wind.proto
   msgs/sonarSens.proto
-  msgs/irlock.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -203,12 +209,12 @@ target_link_libraries(rotors_gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} 
 
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
+target_link_libraries(rotors_gazebo_motor_model ${GAZEBO_libraries} ${roscpp_LIBRARIES})
 add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
 target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
-add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
@@ -221,7 +227,6 @@ set(plugins
   rotors_gazebo_imu_plugin
   gazebo_opticalFlow_plugin
   gazebo_lidar_plugin
-  gazebo_irlock_plugin
   rotors_gazebo_mavlink_interface
   #rotors_gazebo_wind_plugin
   gazebo_sonar_plugin
