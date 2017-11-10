@@ -209,6 +209,7 @@ target_link_libraries(rotors_gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} 
 
 add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
+target_link_libraries(rotors_gazebo_motor_model ${GAZEBO_libraries} ${roscpp_LIBRARIES})
 add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
