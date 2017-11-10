@@ -167,7 +167,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   ros::Subscriber rosSub;
   ros::CallbackQueue rosQueue;
   std::thread rosQueueThread;
-
+  
   int screen_msg_flag = 1;
 /*
   // Protobuf test
