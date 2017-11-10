@@ -34,6 +34,12 @@ endif()
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
+# for ROS subscriber
+find_package(roscpp REQUIRED)
+find_package(std_msgs REQUIRED)
+include_directories(${roscpp_INCLUDE_DIRS})
+include_directories(${std_msgs_INCLUDE_DIRS})
+
 # find ROS include directories for building against ROS mavlink version
 find_package(roscpp)
 if (roscpp_FOUND)
