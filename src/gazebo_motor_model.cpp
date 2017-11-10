@@ -139,15 +139,42 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 #if GAZEBO_MAJOR_VERSION < 5
   joint_->SetMaxForce(0, max_force_);
 #endif
-  // Listen to the update event. This event is broadcast every
-  // simulation iteration.
-  updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
   motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>("~/" + model_->GetName() + motor_speed_pub_topic_, 1);
 
   // Create the first order filter.
   rotor_velocity_filter_.reset(new FirstOrderFilter<double>(time_constant_up_, time_constant_down_, ref_motor_rot_vel_));
+  
+  // ROS Topic subscriber
+  // Initialize ros, if it has not already bee initialized.
+  if (!ros::isInitialized())  {
+      /*{
+      ROS_FATAL_STREAM("A ROS node for Gazebo has not been initialized, unable to load plugin. "
+        << "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
+      return;
+      }
+
+    ROS_INFO("Hello World!");*/
+
+    int argc = 0;
+    char **argv = NULL;
+    ros::init(argc, argv, "gazebo_ros_sub", ros::init_options::NoSigintHandler);
+    gzwarn << "[gazebo_motor_model]: Subscribe to /gazebo/motor_failure \n" ;
+  }
+
+  // Create our ROS node. This acts in a similar manner to the Gazebo node
+  this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
+
+  // Create a named topic, and subscribe to it.
+  ros::SubscribeOptions so = ros::SubscribeOptions::create<std_msgs::Int32>("/gazebo/motor_failure/motor_number", 1, boost::bind(&GazeboMotorModel::motorFailNumCallBack, this, _1), ros::VoidPtr(), &this->rosQueue);
+  this->rosSub = this->rosNode->subscribe(so);
+  
+  this->rosQueueThread = std::thread(std::bind(&GazeboMotorModel::QueueThread, this));
+
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 }
 
 // Protobuf test
@@ -167,6 +194,7 @@ void GazeboMotorModel::OnUpdate(const common::UpdateInfo& _info) {
   sampling_time_ = _info.simTime.Double() - prev_sim_time_;
   prev_sim_time_ = _info.simTime.Double();
   UpdateForcesAndMoments();
+  UpdateMotorFail();
   Publish();
 }
 
@@ -246,6 +274,26 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #else
   joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif /* if 0 */
+}
+  
+void GazeboMotorModel::UpdateMotorFail() {
+  if (motor_number_ == motor_Failure_Number_ - 1){
+    motor_constant_ = 0.0;
+    if (screen_msg_flag){
+      std::cout << "Motor number [" << motor_Failure_Number_ <<"] failed! [Motor constant = " << motor_constant_ << "]" << std::endl;
+      tmp_motor_num = motor_Failure_Number_;
+      
+      screen_msg_flag = 0;
+    }
+  }else if (motor_Failure_Number_ == 0 && motor_number_ ==  tmp_motor_num - 1){
+     if (!screen_msg_flag){
+       motor_constant_ = kDefaultMotorConstant;
+       std::cout << "Motor number [" << tmp_motor_num <<"] failed! [Motor constant = " << motor_constant_ << " (default)]" << std::endl;
+       screen_msg_flag = 1;
+     }
+  }else{
+     motor_constant_ = kDefaultMotorConstant;
+  }
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);
