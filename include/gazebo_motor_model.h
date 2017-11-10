@@ -38,6 +38,13 @@
 
 #include "common.h"
 
+// ROS Topic subscriber
+#include <thread>
+#include "ros/ros.h"
+#include "ros/callback_queue.h"
+#include "ros/subscribe_options.h"
+#include "std_msgs/Bool.h"
+#include <std_msgs/Int32.h>
 
 namespace turning_direction {
 const static int CCW = 1;
@@ -71,6 +78,12 @@ static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
 
 class GazeboMotorModel : public MotorModel, public ModelPlugin {
  public:
+ 
+  int motor_Failure_Number_, tmp_motor_num;
+  void motorFailNumCallBack(const std_msgs::Int32ConstPtr& _msg1){
+    this->motor_Failure_Number_ = _msg1->data;
+  }
+
   GazeboMotorModel()
       : ModelPlugin(),
         MotorModel(),
@@ -98,6 +111,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   //void testProto(MotorSpeedPtr &msg);
  protected:
   virtual void UpdateForcesAndMoments();
+  virtual void UpdateMotorFail();
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 
@@ -135,10 +149,26 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   event::ConnectionPtr updateConnection_;
 
   boost::thread callback_queue_thread_;
-  void QueueThread();
+  //void QueueThread();
   std_msgs::msgs::Float turning_velocity_msg_;
   void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
   std::unique_ptr<FirstOrderFilter<double>>  rotor_velocity_filter_;
+ 
+  void QueueThread(){
+    static const double timeout = 0.01;
+    while (this->rosNode->ok())
+    {
+      this->rosQueue.callAvailable(ros::WallDuration(timeout));
+    }
+  }
+
+  // ROS communication
+  std::unique_ptr<ros::NodeHandle> rosNode;
+  ros::Subscriber rosSub;
+  ros::CallbackQueue rosQueue;
+  std::thread rosQueueThread;
+
+  int screen_msg_flag = 1;
 /*
   // Protobuf test
   std::string motor_test_sub_topic_;
