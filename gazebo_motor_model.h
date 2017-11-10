@@ -38,7 +38,6 @@
 
 #include "common.h"
 
-
 // ROS Topic subscriber
 #include <thread>
 #include "ros/ros.h"
@@ -150,7 +149,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   event::ConnectionPtr updateConnection_;
 
   boost::thread callback_queue_thread_;
-  //void QueueThread();
+  void QueueThread();
   std_msgs::msgs::Float turning_velocity_msg_;
   void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
   std::unique_ptr<FirstOrderFilter<double>>  rotor_velocity_filter_;
