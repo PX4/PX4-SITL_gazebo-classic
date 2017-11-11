@@ -21,6 +21,7 @@ list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
+option(BUILD_ROS_INTERFACE "enable ROS subscriber for motor model plugin" "OFF")
 
 ## System dependencies are found with CMake's conventions
 find_package(PkgConfig REQUIRED)
@@ -34,6 +35,14 @@ endif()
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
+# for ROS subscriber
+if (BUILD_ROS_INTERFACE)
+  find_package(roscpp REQUIRED)
+  find_package(std_msgs REQUIRED)
+  include_directories(${roscpp_INCLUDE_DIRS})
+  include_directories(${std_msgs_INCLUDE_DIRS})
+endif()
+
 # find ROS include directories for building against ROS mavlink version
 find_package(roscpp)
 if (roscpp_FOUND)
@@ -45,7 +54,8 @@ if (CATKIN_DEVEL_PREFIX)
   message(STATUS "catkin ENABLED")
   find_package(catkin REQUIRED)
   if (catkin_FOUND)
-    catkin_package()
+    catkin_package(  DEPENDS 
+    roscpp)
   else()
     message(FATAL_ERROR "catkin not found")
   endif()
@@ -183,7 +193,6 @@ set (msgs
   msgs/MotorSpeed.proto
   #msgs/Wind.proto
   msgs/sonarSens.proto
-  msgs/irlock.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -208,7 +217,6 @@ add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
 target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
-add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
@@ -221,7 +229,6 @@ set(plugins
   rotors_gazebo_imu_plugin
   gazebo_opticalFlow_plugin
   gazebo_lidar_plugin
-  gazebo_irlock_plugin
   rotors_gazebo_mavlink_interface
   #rotors_gazebo_wind_plugin
   gazebo_sonar_plugin
@@ -232,6 +239,13 @@ set(plugins
 if (NOT roscpp_FOUND)
   add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
   list(APPEND plugins gazebo_geotagged_images_plugin)
+endif()
+
+if (BUILD_ROS_INTERFACE)
+  add_library(rotors_gazebo_motor_failure_model SHARED src/gazebo_motor_failure_model.cpp)
+  target_link_libraries(rotors_gazebo_motor_failure_model ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+  list(APPEND plugins rotors_gazebo_motor_failure_model)
+  message(STATUS "adding gazebo_ros_interface to build")
 endif()
 
 if (GSTREAMER_FOUND)
