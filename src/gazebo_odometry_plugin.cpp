@@ -519,8 +519,8 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
 }
 
 void GazeboOdometryPlugin::CreatePubsAndSubs() {
-  // Create temporary "ConnectGazeboToRosTopic" publisher and message
-  gzerr << "ros -> gazebo odometry";
+  //Create temporary "ConnectGazeboToRosTopic" publisher and message
+
   gazebo::transport::PublisherPtr connect_gazebo_to_ros_topic_pub =
       node_handle_->Advertise<gz_std_msgs::ConnectGazeboToRosTopic>(
           "~/" + kConnectGazeboToRosSubtopic, 1);
