@@ -23,7 +23,6 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "common.h"
-//#include "int.pb.h"
 
 // ROS Topic subscriber
 #include <thread>
@@ -45,8 +44,7 @@ class GazeboMotorFailure : public ModelPlugin {
 
   void motorFailNumCallBack(const std_msgs::Int32ConstPtr& _msg) {
     this->motor_Failure_Number_ = _msg->data;
-    //std::cout << "[gazebo_motor_failure_plugin]: Subscribe to /motor_failure/motor_number " << std::endl;
-    //std::cout << "[gazebo_motor_failure_plugin] Current motor num : " << motor_Failure_Number_ << std::endl;
+    //std::cout << "[gazebo_motor_failure_plugin]: Subscribe to " << ROS_motor_num_sub_topic_ << std::endl;
   }
 
   GazeboMotorFailure()
@@ -58,18 +56,20 @@ class GazeboMotorFailure : public ModelPlugin {
 
   virtual ~GazeboMotorFailure();
   virtual void Publish();
-
-  //void MainTask();
- 
+	
  protected:
 
+  /// \brief Create subscription to ROS topic that triggers the motor failure
+  /// \details Inits a rosnode in case there's not one and subscribes to ROS_motor_num_sub_topic_
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+	
+  /// \brief Updates and publishes the motor_Failure_Number_ to motor_failure_num_pub_topic_
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 
  private:
 
-  int motor_Failure_Number_;
-  int tmp_motor_num;
+  int motor_Failure_Number_; /*!< motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly */
+  int tmp_motor_num; // A temporary variable used to print msg
 
   physics::ModelPtr model_;
 
@@ -78,7 +78,7 @@ class GazeboMotorFailure : public ModelPlugin {
   std::string namespace_;
 
   transport::NodePtr node_handle_;
-  transport::PublisherPtr motor_failure_pub_;
+  transport::PublisherPtr motor_failure_pub_; /*!< Publish the motor_Failure_num to gazebo topic motor_failure_num_pub_topic_ */
 
   /// \brief Pointer to the update event connection.
   event::ConnectionPtr updateConnection_;

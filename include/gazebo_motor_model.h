@@ -101,6 +101,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   //void testProto(MotorSpeedPtr &msg);
  protected:
   virtual void UpdateForcesAndMoments();
+  /// \brief A function to check the motor_Failure_Number_ and stimulate motor fail
+  /// \details Doing joint_->SetVelocity(0,0) for the flagged motor to fail
   virtual void UpdateMotorFail();
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
@@ -116,7 +118,6 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   int motor_number_;
   int turning_direction_;
 
-  // motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly
   int motor_Failure_Number_;
   int tmp_motor_num;
 
@@ -136,7 +137,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_pub_;
   transport::SubscriberPtr command_sub_;
-  transport::SubscriberPtr motor_failure_sub_;
+  transport::SubscriberPtr motor_failure_sub_; /*!< Subscribing to motor_failure_sub_topic_; receiving motor number to fail, as an integer */
 
   physics::ModelPtr model_;
   physics::JointPtr joint_;
@@ -150,7 +151,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   void QueueThread();
   std_msgs::msgs::Float turning_velocity_msg_;
   void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
-  void MotorFailureCallback(const boost::shared_ptr<const msgs::Int> &fail_msg);
+  void MotorFailureCallback(const boost::shared_ptr<const msgs::Int> &fail_msg);  /*!< Callback for the motor_failure_sub_ subscriber */
   std::unique_ptr<FirstOrderFilter<double>>  rotor_velocity_filter_;
 /*
   // Protobuf test

@@ -31,8 +31,6 @@ void GazeboMotorFailure::Publish() {
 
 void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
-  model_ = _model;
-
   namespace_.clear();
 
   node_handle_ = transport::NodePtr(new transport::Node());
@@ -45,7 +43,7 @@ void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 
   // ROS Topic subscriber
-  // Initialize ros, if it has not already bee initialized.
+  // Initialize ROS, if it has not already bee initialized.
   if (!ros::isInitialized())  {
     int argc = 0;
     char **argv = NULL;
@@ -61,13 +59,14 @@ void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   
   this->rosQueueThread = std::thread(std::bind(&GazeboMotorFailure::QueueThread, this));
 
-  std::cout << "[gazebo_motor_failure_plugin]: Subscribe to ROS topic /motor_failure/motor_number" << std::endl;
+  std::cout << "[gazebo_motor_failure_plugin]: Subscribe to ROS topic: "<< ROS_motor_num_sub_topic_ << std::endl;
 
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorFailure::OnUpdate, this, _1));
 }
 
 void GazeboMotorFailure::OnUpdate(const common::UpdateInfo& _info) {
-  //UpdateMotorFail();
   Publish();
 }
 

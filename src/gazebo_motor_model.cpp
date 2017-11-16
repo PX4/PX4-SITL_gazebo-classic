@@ -144,7 +144,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
-  //std::cout << "[gazebo_motor_model]: Subscribe to gz topic /gazebo/motor_failure_num" << std::endl;
+  //std::cout << "[gazebo_motor_model]: Subscribe to gz topic: "<< motor_failure_sub_topic_ << std::endl;
   motor_failure_sub_ = node_handle_->Subscribe<msgs::Int>(motor_failure_sub_topic_, &GazeboMotorModel::MotorFailureCallback, this);
   motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>("~/" + model_->GetName() + motor_speed_pub_topic_, 1);
 
@@ -257,21 +257,20 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 
 void GazeboMotorModel::UpdateMotorFail() {
   if (motor_number_ == motor_Failure_Number_ - 1){
-    motor_constant_ = 0.0;
+    // motor_constant_ = 0.0;
+    joint_->SetVelocity(0,0);
     if (screen_msg_flag){
-      std::cout << "Motor number [" << motor_Failure_Number_ <<"] failed! [Motor constant = " << motor_constant_ << "]" << std::endl;
+      std::cout << "Motor number [" << motor_Failure_Number_ <<"] failed!  [Motor thrust = 0]" << std::endl;
       tmp_motor_num = motor_Failure_Number_;
       
       screen_msg_flag = 0;
     }
   }else if (motor_Failure_Number_ == 0 && motor_number_ ==  tmp_motor_num - 1){
      if (!screen_msg_flag){
-       motor_constant_ = kDefaultMotorConstant;
-       std::cout << "Motor number [" << tmp_motor_num <<"] running! [Motor constant = " << motor_constant_ << " (default)]" << std::endl;
+       //motor_constant_ = kDefaultMotorConstant;
+       std::cout << "Motor number [" << tmp_motor_num <<"] running! [Motor thrust = (default)]" << std::endl;
        screen_msg_flag = 1;
      }
-  }else{
-     motor_constant_ = kDefaultMotorConstant;
   }
 }
 
