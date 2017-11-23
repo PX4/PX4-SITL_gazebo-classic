@@ -151,7 +151,7 @@ link_directories(
 #--------------------------#
 
 set(enable_mavlink_interface "true")
-set(enable_ground_truth "false")
+set(enable_ground_truth "true")
 set(enable_logging "false")
 set(enable_camera "false")
 set(enable_wind "false")
