@@ -320,6 +320,9 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
         (world_->GetSimTime()).nsec + static_cast<int32_t>(unknown_delay_));
     odometry.set_child_frame_id(child_frame_id_);
 
+    gazebo_pose.Set(gazebo_pose.pos.y, gazebo_pose.pos.x, -gazebo_pose.pos.z, gazebo_pose.rot.GetRoll(),
+      -gazebo_pose.rot.GetPitch(), -gazebo_pose.rot.GetYaw() + (M_PI / 2.0));
+
     odometry.mutable_pose()->mutable_pose()->mutable_position()->set_x(
         gazebo_pose.pos.x);
     odometry.mutable_pose()->mutable_pose()->mutable_position()->set_y(
@@ -336,6 +339,7 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
     odometry.mutable_pose()->mutable_pose()->mutable_orientation()->set_w(
         gazebo_pose.rot.w);
 
+    gazebo_linear_velocity.Set(gazebo_linear_velocity.y, gazebo_linear_velocity.x, -gazebo_linear_velocity.z);
     odometry.mutable_twist()->mutable_twist()->mutable_linear()->set_x(
         gazebo_linear_velocity.x);
     odometry.mutable_twist()->mutable_twist()->mutable_linear()->set_y(
