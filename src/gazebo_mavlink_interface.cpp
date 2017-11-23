@@ -617,9 +617,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
     vp_msg.pitch = -T_W_I.rot.GetPitch();
     vp_msg.yaw = -T_W_I.rot.GetYaw() + M_PI/2.0;
 
-    mavlink_message_t msg_;
-    mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg_, &vp_msg);
-    send_mavlink_message(&msg_);
+    // mavlink_message_t msg_;
+    // mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg_, &vp_msg);
+    // send_mavlink_message(&msg_);
 
     last_ev_time_ = current_time;
   }
