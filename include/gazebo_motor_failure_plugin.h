@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <gazebo_motor_model.h>
+
 #include <stdio.h>
 #include <boost/bind.hpp>
 #include <gazebo/gazebo.hh>
@@ -67,9 +69,6 @@ class GazeboMotorFailure : public ModelPlugin {
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 
  private:
-
-  int motor_Failure_Number_; /*!< motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly */
-  int tmp_motor_num; // A temporary variable used to print msg
 
   physics::ModelPtr model_;
 
