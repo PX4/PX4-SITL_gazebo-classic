@@ -118,8 +118,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   int motor_number_;
   int turning_direction_;
 
-  int motor_Failure_Number_;
-  int tmp_motor_num;
+  int motor_Failure_Number_; /*!< motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly */
+  int tmp_motor_num; // A temporary variable used to print msg
 
   int screen_msg_flag = 1;
 
