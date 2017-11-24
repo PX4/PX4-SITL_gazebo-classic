@@ -21,6 +21,7 @@ list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
+option(BUILD_ROS_INTERFACE "enable ROS subscriber for motor failure plugin" "OFF")
 
 ## System dependencies are found with CMake's conventions
 find_package(PkgConfig REQUIRED)
@@ -34,10 +35,17 @@ endif()
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
+# for ROS subscriber
+if (BUILD_ROS_INTERFACE)
+  find_package(roscpp REQUIRED)
+  find_package(std_msgs REQUIRED)
+endif()
+
 # find ROS include directories for building against ROS mavlink version
 find_package(roscpp)
 if (roscpp_FOUND)
    include_directories(${roscpp_INCLUDE_DIRS})
+   include_directories(${std_msgs_INCLUDE_DIRS})
 endif()
 
 # see if catkin was invoked to build this
@@ -232,6 +240,13 @@ set(plugins
 if (NOT roscpp_FOUND)
   add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
   list(APPEND plugins gazebo_geotagged_images_plugin)
+endif()
+
+if (BUILD_ROS_INTERFACE)
+  add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
+  target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+  list(APPEND plugins gazebo_motor_failure_plugin)
+  message(STATUS "adding gazebo_motor_failure_plugin to build")
 endif()
 
 if (GSTREAMER_FOUND)
