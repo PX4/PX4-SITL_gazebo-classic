@@ -2,6 +2,9 @@
 <sdf version="1.5">
   <world name="default">
     <!-- A global light source -->
+    <gui>
+      <plugin name="video_widget" filename="libgazebo_video_stream_widget.so"/>
+    </gui>
     <include>
       <uri>model://sun</uri>
     </include>
