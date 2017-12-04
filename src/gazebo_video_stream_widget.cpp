@@ -16,6 +16,7 @@
 */
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
+#include <std_msgs/Int32.h>
 #include "gazebo_video_stream_widget.h"
 
 using namespace gazebo;
@@ -66,6 +67,12 @@ VideoStreamWidget::VideoStreamWidget()
   this->move(10, 10);
   this->resize(100, 30);
 
+  // Create a node for transportation
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->videoPub = this->node->Advertise<msgs::Int>("~/video_stream");
+  videoPub->WaitForConnection();
+
   if(mVideoON)
     enable();
   else
@@ -94,6 +101,11 @@ void VideoStreamWidget::OnButton()
 void VideoStreamWidget::enable()
 {
   gzwarn << "Enable Video Streaming \n";
+
+  msgs::Int request;
+  request.set_data(1);
+  videoPub->Publish(request);
+
   mButton->setText("Video: ON");
   mButton->setStyleSheet(QString("QPushButton {"
                                   "background-color: green; font-weight: bold"
@@ -105,6 +117,11 @@ void VideoStreamWidget::enable()
 void VideoStreamWidget::disable()
 {
   gzwarn << "Disable Video Streaming \n";
+
+  msgs::Int request;
+  request.set_data(0);
+  videoPub->Publish(request);
+
   mButton->setText("Video: OFF");
   mButton->setStyleSheet(QString("QPushButton {"
                                   "background-color: red; font-weight: bold"
