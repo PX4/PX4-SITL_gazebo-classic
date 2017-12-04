@@ -43,8 +43,13 @@ namespace gazebo
       /// \brief Counter used to create unique model names
       private: unsigned int counter;
 
-      QPushButton *mButton;
+      /// \brief Node used to establish communication with gzserver.
+      private: transport::NodePtr node;
 
+      /// \brief Publisher of video streaming control messages.
+      private: transport::PublisherPtr videoPub;
+
+      private: QPushButton *mButton;
       private: bool mVideoON;
       private: void enable();
       private: void disable();

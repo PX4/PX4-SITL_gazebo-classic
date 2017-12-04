@@ -28,6 +28,7 @@
 #include <iostream>
 #include <thread>
 #include <time.h>
+#include <std_msgs/Int32.h>
 
 #include <opencv2/opencv.hpp>
 
@@ -76,6 +77,7 @@ static void* start_thread(void* param) {
   return nullptr;
 }
 
+/////////////////////////////////////////////////
 void GstCameraPlugin::startGstThread() {
 
   gst_init(0, 0);
@@ -161,9 +163,17 @@ void GstCameraPlugin::startGstThread() {
 }
 
 /////////////////////////////////////////////////
+void GstCameraPlugin::stopGstThread()
+{
+  if(mainLoop)
+    g_main_loop_quit(mainLoop);
+
+}
+
+/////////////////////////////////////////////////
 GstCameraPlugin::GstCameraPlugin()
 : SensorPlugin(), width(0), height(0), depth(0), frameBuffer(nullptr), mainLoop(nullptr),
-  gstTimestamp(0)
+  gstTimestamp(0), mIsActive(false)
 {
 }
 
@@ -249,15 +259,52 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
+  // Listen to Gazebo topic
+  mVideoSub = node_handle_->Subscribe<msgs::Int>(mTopicName, &GstCameraPlugin::cbVideoStream, this);
 
-  this->newFrameConnection = this->camera->ConnectNewImageFrame(
-      boost::bind(&GstCameraPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
+}
 
-  this->parentSensor->SetActive(true);
+/////////////////////////////////////////////////
+void GstCameraPlugin::cbVideoStream(const boost::shared_ptr<const msgs::Int> &_msg)
+{
+  gzwarn << "Video Streaming callback: " << _msg->data() << "\n";
+  int enable = _msg->data();
+  if(enable)
+    startStreaming();
+  else
+    stopStreaming();
+}
 
-  /* start the gstreamer event loop */
-  pthread_t threadId;
-  pthread_create(&threadId, NULL, start_thread, this);
+/////////////////////////////////////////////////
+void GstCameraPlugin::startStreaming()
+{
+  if(!mIsActive) {
+    this->newFrameConnection = this->camera->ConnectNewImageFrame(
+        boost::bind(&GstCameraPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
+
+    this->parentSensor->SetActive(true);
+
+    /* start the gstreamer event loop */
+    pthread_create(&mThreadId, NULL, start_thread, this);
+    mIsActive = true;
+  }
+
+}
+
+/////////////////////////////////////////////////
+void GstCameraPlugin::stopStreaming()
+{
+  if(mIsActive) {
+    stopGstThread();
+
+    pthread_join(mThreadId, NULL);
+
+    this->parentSensor->SetActive(false);
+
+    this->newFrameConnection->~Connection();
+    mIsActive = false;
+  }
+
 }
 
 /////////////////////////////////////////////////
