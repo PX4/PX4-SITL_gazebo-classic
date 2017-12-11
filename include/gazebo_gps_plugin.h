@@ -72,21 +72,15 @@ namespace gazebo
 
             double gps_update_interval_;
             double gps_delay_;
-            double gps_bias_x_;
-            double gps_bias_y_;
-            double gps_bias_z_;
-            double noise_gps_x;
-            double noise_gps_y;
-            double noise_gps_z;
-            double random_walk_gps_x;
-            double random_walk_gps_y;
-            double random_walk_gps_z;
             double std_xy;
             double std_z;
             double lat_rad;
             double lon_rad;
             double dt_gps;
             
+            math::Vector3 gps_bias_;
+            math::Vector3 noise_gps;
+            math::Vector3 random_walk_gps;
             math::Vector3 gravity_W_;
             math::Vector3 velocity_prev_W_;
             
