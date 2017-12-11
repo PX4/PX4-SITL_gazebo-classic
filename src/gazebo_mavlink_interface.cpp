@@ -541,23 +541,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
   math::Vector3 pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
 
-//   // reproject local position to gps coordinates
-//   double x_rad = pos_W_I.y / earth_radius; // north
-//   double y_rad = pos_W_I.x / earth_radius; // east
-//   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
-//   double sin_c = sin(c);
-//   double cos_c = cos(c);
-//   
-//   if (c != 0.0) {
-//     lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
-//     lon_rad = (lon_home + atan2(y_rad * sin_c, c * cos(lat_home) * cos_c - x_rad * sin(lat_home) * sin_c));
-//   } else {
-//     lat_rad = lat_home;
-//     lon_rad = lon_home;
-//   }
-
-
-
   // vision position estimate
   double dt_ev = current_time.Double() - last_ev_time_.Double();
   if (dt_ev > ev_update_interval_) {
