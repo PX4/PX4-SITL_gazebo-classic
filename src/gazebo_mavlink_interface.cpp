@@ -486,7 +486,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   memset((char *)&_myaddr, 0, sizeof(_myaddr));
   _myaddr.sin_family = AF_INET;
-  _myaddr.sin_addr.s_addr = inet_addr(htonl(INADDR_ANY));
+  _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   // Let the OS pick the port
   _myaddr.sin_port = htons(0);
 
@@ -541,20 +541,20 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo& /*_info*/) {
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
   math::Vector3 pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
 
-  // reproject local position to gps coordinates
-  double x_rad = pos_W_I.y / earth_radius; // north
-  double y_rad = pos_W_I.x / earth_radius; // east
-  double c = sqrt(x_rad * x_rad + y_rad * y_rad);
-  double sin_c = sin(c);
-  double cos_c = cos(c);
-  
-  if (c != 0.0) {
-    lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
-    lon_rad = (lon_home + atan2(y_rad * sin_c, c * cos(lat_home) * cos_c - x_rad * sin(lat_home) * sin_c));
-  } else {
-    lat_rad = lat_home;
-    lon_rad = lon_home;
-  }
+//   // reproject local position to gps coordinates
+//   double x_rad = pos_W_I.y / earth_radius; // north
+//   double y_rad = pos_W_I.x / earth_radius; // east
+//   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
+//   double sin_c = sin(c);
+//   double cos_c = cos(c);
+//   
+//   if (c != 0.0) {
+//     lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
+//     lon_rad = (lon_home + atan2(y_rad * sin_c, c * cos(lat_home) * cos_c - x_rad * sin(lat_home) * sin_c));
+//   } else {
+//     lat_rad = lat_home;
+//     lon_rad = lon_home;
+//   }
 
 
 
@@ -762,6 +762,10 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
+    // update lat_rad and lon_rad
+    lat_rad = gps_msg->lat_rad();
+    lon_rad = gps_msg->lon_rad();
+    
     //send gps
     // Raw UDP mavlink
     hil_gps_msg_.time_usec = gps_msg->time() * 1e6;
