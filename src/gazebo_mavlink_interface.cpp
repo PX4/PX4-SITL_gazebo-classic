@@ -486,9 +486,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   memset((char *)&_myaddr, 0, sizeof(_myaddr));
   _myaddr.sin_family = AF_INET;
-  _myaddr.sin_addr.s_addr = inet_addr(_sdf->GetElement("mavlink_addr")->Get<std::string>().c_str());
+  _myaddr.sin_addr.s_addr = inet_addr(htonl(INADDR_ANY));
   // Let the OS pick the port
-  _myaddr.sin_port = htons(mavlink_udp_port_);
+  _myaddr.sin_port = htons(0);
 
   if (bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
     printf("bind failed\n");
@@ -603,7 +603,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     dest_addr.sin_port = htons(destination_port);
   }
 
-  ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+  ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
 
   if (len <= 0) {
     printf("Failed sending mavlink message\n");
@@ -611,16 +611,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
-    
-  // Only set a fixed rate if imu_rate is set on sdf config
-  if (set_imu_rate_) {
-    common::Time current_time = world_->GetSimTime();
-    double dt = (current_time - last_imu_time_).Double();
 
-    if (imu_rate_ > 0 && dt*imu_rate_ < 1.0)
-      return;
-    last_imu_time_ = current_time;
-  }
 
   // frames
   // g - gazebo (ENU), east, north, up

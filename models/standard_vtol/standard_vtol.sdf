@@ -767,7 +767,7 @@
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
     <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -872,9 +872,6 @@
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps<gpsSubTopic>
-      <imu_rate>250</imu_rate>
-      <mavlink_addr>127.0.0.1</mavlink_addr>
-      <mavlink_udp_port>14560</mavlink_udp_port>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name="rotor0">
