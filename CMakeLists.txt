@@ -46,12 +46,8 @@ if (BUILD_ROS_INTERFACE)
   find_package(mav_msgs REQUIRED)
 endif()
 
-# find ROS include directories for building against ROS mavlink version
-find_package(roscpp)
-if (roscpp_FOUND)
-   include_directories(${roscpp_INCLUDE_DIRS})
-   include_directories(${std_msgs_INCLUDE_DIRS})
-endif()
+# find MAVLink
+find_package(MAVLink)
 
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)
@@ -141,7 +137,7 @@ include_directories(
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
   ${GSTREAMER_INCLUDE_DIRS}
-  ../../mavlink/include
+  ${MAVLINK_INCLUDE_DIRS}
   )
 
 link_libraries(
@@ -256,7 +252,7 @@ if (BUILD_ROS_INTERFACE)
   target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
   list(APPEND plugins gazebo_motor_failure_plugin)
   message(STATUS "adding gazebo_motor_failure_plugin to build")
- 
+
   include_directories(
     include
     ${mavros_msgs_INCLUDE_DIRS}
@@ -267,7 +263,7 @@ if (BUILD_ROS_INTERFACE)
   add_executable(gazebo_hil_interface
     src/gazebo_hil_interface.cpp
   )
-  
+
   add_dependencies(gazebo_hil_interface
     ${catkin_EXPORTED_TARGETS}
     ${mavros_EXPORTED_TARGETS}
