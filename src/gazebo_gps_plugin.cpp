@@ -134,38 +134,38 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 
   dt_gps = current_time.Double() - last_gps_time_.Double();
       
-  noise_gps_x = 0;
-  noise_gps_y = 0;
-  noise_gps_z = 0;
+  noise_gps.x = 0;
+  noise_gps.y = 0;
+  noise_gps.z = 0;
 
-  random_walk_gps_x = 0;
-  random_walk_gps_y = 0;
-  random_walk_gps_z = 0;
+  random_walk_gps.x = 0;
+  random_walk_gps.y = 0;
+  random_walk_gps.z = 0;
     
   if(gps_noise_){
     //update noise paramters
-    noise_gps_x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-    noise_gps_y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-    noise_gps_z = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    noise_gps.x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    noise_gps.y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    noise_gps.z = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
         
-    random_walk_gps_x = gps_random_walk*standard_normal_distribution_(random_generator_);
-    random_walk_gps_y = gps_random_walk*standard_normal_distribution_(random_generator_);
-    random_walk_gps_z = gps_random_walk*standard_normal_distribution_(random_generator_);
+    random_walk_gps.x = gps_random_walk*standard_normal_distribution_(random_generator_);
+    random_walk_gps.y = gps_random_walk*standard_normal_distribution_(random_generator_);
+    random_walk_gps.z = gps_random_walk*standard_normal_distribution_(random_generator_);
   }
     
   // bias integration
-  gps_bias_x_ += random_walk_gps_x - gps_bias_x_/gps_corellation_time;
-  gps_bias_y_ += random_walk_gps_y - gps_bias_y_/gps_corellation_time;
-  gps_bias_z_ += random_walk_gps_z - gps_bias_z_/gps_corellation_time;
+  gps_bias_.x += random_walk_gps.x - gps_bias_.x/gps_corellation_time;
+  gps_bias_.y += random_walk_gps.y - gps_bias_.y/gps_corellation_time;
+  gps_bias_.z += random_walk_gps.z - gps_bias_.z/gps_corellation_time;
 
   // standard deviation of random walk
   std_xy = gps_random_walk*gps_corellation_time/sqrtf(2*gps_corellation_time-1);
   std_z = std_xy;
 
   gps_msg.set_time(current_time.Double());
-  gps_msg.set_latitude_deg((lat_rad * 180 / M_PI + (noise_gps_x + gps_bias_x_)*1e-5) * 1e7);
-  gps_msg.set_longitude_deg((lon_rad * 180 / M_PI + (noise_gps_y + gps_bias_y_)*1e-5) * 1e7);
-  gps_msg.set_altitude(((pos_W_I.z + alt_home) * 1000 + noise_gps_z + gps_bias_z_) / 1000.f);
+  gps_msg.set_latitude_deg((lat_rad * 180 / M_PI + (noise_gps.x + gps_bias_.x)*1e-5) * 1e7);
+  gps_msg.set_longitude_deg((lon_rad * 180 / M_PI + (noise_gps.y + gps_bias_.y)*1e-5) * 1e7);
+  gps_msg.set_altitude(((pos_W_I.z + alt_home) * 1000 + noise_gps.z + gps_bias_.z) / 1000.f);
   gps_msg.set_eph(100*(std_xy + gps_noise_density*gps_noise_density));
   gps_msg.set_epv(100*(std_z  + gps_noise_density*gps_noise_density));
   gps_msg.set_velocity(velocity_current_W_xy.GetLength() * 100);
