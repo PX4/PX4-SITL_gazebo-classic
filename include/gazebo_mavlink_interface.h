@@ -36,6 +36,7 @@
 #include "opticalFlow.pb.h"
 #include "lidar.pb.h"
 #include "sonarSens.pb.h"
+#include "Gps.pb.h"
 #include <irlock.pb.h>
 #include <boost/bind.hpp>
 
@@ -54,13 +55,13 @@
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 
 namespace gazebo {
-
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
 typedef const boost::shared_ptr<const sonarSens_msgs::msgs::sonarSens> SonarSensPtr;
 typedef const boost::shared_ptr<const irlock_msgs::msgs::irlock> IRLockPtr;
+typedef const boost::shared_ptr<const gps_msgs::msgs::Gps> GpsPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -155,6 +156,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   boost::thread callback_queue_thread_;
   void QueueThread();
   void ImuCallback(ImuPtr& imu_msg);
+  void GpsCallback(GpsPtr& gps_msg);
   void LidarCallback(LidarPtr& lidar_msg);
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
@@ -169,9 +171,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   static constexpr double ev_corellation_time = 60.0; // s
   static constexpr double ev_random_walk = 2.0; // (m/s) / sqrt(hz)
   static constexpr double ev_noise_density = 2e-4; // (m) / sqrt(hz)
-  static constexpr double gps_corellation_time = 30.0; // s
-  static constexpr double gps_random_walk = 1.0; // (m/s) / sqrt(hz)
-  static constexpr double gps_noise_density = 2e-4; // (m) / sqrt(hz)
 
   unsigned _rotor_count;
 
@@ -189,29 +188,31 @@ class GazeboMavlinkInterface : public ModelPlugin {
   transport::SubscriberPtr sonar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
+  transport::SubscriberPtr gps_sub_;
   transport::PublisherPtr gps_pub_;
+  
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
   std::string sonar_sub_topic_;
   std::string irlock_sub_topic_;
+  std::string gps_sub_topic_;
 
   common::Time last_time_;
   common::Time last_gps_time_;
+  common::Time last_imu_time_;
   common::Time last_ev_time_;
   common::Time last_actuator_time_;
 
-  double gps_update_interval_;
-  double gps_delay_;
+  double imu_rate_;
   double lat_rad;
   double lon_rad;
   double ev_update_interval_;
   double ev_bias_x_;
   double ev_bias_y_;
   double ev_bias_z_;
-  double gps_bias_x_;
-  double gps_bias_y_;
-  double gps_bias_z_;
+
+  bool set_imu_rate_;
 
   void handle_control(double _dt);
 

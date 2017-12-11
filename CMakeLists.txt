@@ -32,13 +32,18 @@ find_package(Boost REQUIRED COMPONENTS system thread timer)
 if (BUILD_GSTREAMER_PLUGIN)
   find_package(GStreamer)
 endif()
+
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
-# for ROS subscriber
+# for ROS subscribers and publishers
 if (BUILD_ROS_INTERFACE)
   find_package(roscpp REQUIRED)
-  find_package(std_msgs REQUIRED)
+  find_package(mavros REQUIRED)
+  find_package(mavros_msgs REQUIRED)
+  find_package(geometry_msgs REQUIRED)
+  find_package(sensor_msgs REQUIRED)
+  find_package(mav_msgs REQUIRED)
 endif()
 
 # find ROS include directories for building against ROS mavlink version
@@ -192,6 +197,7 @@ set (msgs
   #msgs/Wind.proto
   msgs/sonarSens.proto
   msgs/irlock.proto
+  msgs/Gps.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -221,6 +227,7 @@ add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.
 #add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
+add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -234,6 +241,7 @@ set(plugins
   #rotors_gazebo_wind_plugin
   gazebo_sonar_plugin
   gazebo_uuv_plugin
+  gazebo_gps_plugin
   )
 
 # ROS mavlink version not compatible with geotagged images plugin
@@ -242,11 +250,35 @@ if (NOT roscpp_FOUND)
   list(APPEND plugins gazebo_geotagged_images_plugin)
 endif()
 
+#If BUILD_ROS_INTERFACE set to ON, build gazebo_hil_interface and gazebo_motor_failure_plugin
 if (BUILD_ROS_INTERFACE)
   add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
   target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
   list(APPEND plugins gazebo_motor_failure_plugin)
   message(STATUS "adding gazebo_motor_failure_plugin to build")
+ 
+  include_directories(
+    include
+    ${mavros_msgs_INCLUDE_DIRS}
+    ${geometry_msgs_INCLUDE_DIRS}
+    ${sensor_msgs_INCLUDE_DIRS}
+    ${mav_msgs_INCLUDE_DIRS}
+    )
+  add_executable(gazebo_hil_interface
+    src/gazebo_hil_interface.cpp
+  )
+  
+  add_dependencies(gazebo_hil_interface
+    ${catkin_EXPORTED_TARGETS}
+    ${mavros_EXPORTED_TARGETS}
+    ${mavros_msgs_EXPORTED_TARGETS}
+  )
+
+  target_link_libraries(gazebo_hil_interface
+    ${catkin_LIBRARIES}
+    ${mavros_LIBRARIES}
+  )
+  message(STATUS "adding gazebo_hil_interface to build")
 endif()
 
 if (GSTREAMER_FOUND)
