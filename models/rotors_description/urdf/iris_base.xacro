@@ -34,11 +34,20 @@
         />
   </xacro:if>
 
+  
+    <!-- Instantiate gps plugin. -->
+  <xacro:gps_plugin_macro
+    namespace="${namespace}"
+    gps_noise="true"
+    >
+  </xacro:gps_plugin_macro>
+  
   <xacro:if value="$(arg enable_mavlink_interface)">
   <!-- Instantiate mavlink telemetry interface. -->
   <xacro:mavlink_interface_macro
     namespace="${namespace}"
     imu_sub_topic="/imu"
+    gps_sub_topic="/gps"
     mavlink_addr="$(arg mavlink_addr)"
     mavlink_udp_port="$(arg mavlink_udp_port)"
     >
