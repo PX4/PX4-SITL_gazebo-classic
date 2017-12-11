@@ -936,8 +936,6 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       if (armed) {
         input_reference_[i] = (controls.controls[input_index_[i]] + input_offset_[i])
           * input_scaling_[i] + zero_position_armed_[i];
-        // if (joints_[i])
-//            gzerr << i << " : " << input_index_[i] << " : " << controls.controls[input_index_[i]] << " : " << input_reference_[i] << "\n";
       } else {
         input_reference_[i] = zero_position_disarmed_[i];
       }
@@ -952,7 +950,6 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 {
     // set joint positions
     for (int i = 0; i < input_reference_.size(); i++) {
-//         gzdbg << "joints_[i]: " << joints_[i] << " \n";
       if (joints_[i]) {
         double target = input_reference_[i];
         if (joint_control_type_[i] == "velocity")
@@ -961,19 +958,13 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           double err = current - target;
           double force = pids_[i].Update(err, _dt);
           joints_[i]->SetForce(0, force);
-//           gzdbg << "chan[" << i << "] curr[" << current
-//                 << "] cmd[" << target << "] f[" << force
-//                 << "] scale[" << input_scaling_[i] << "]\n";
         }
         else if (joint_control_type_[i] == "position")
         {
           double current = joints_[i]->GetAngle(0).Radian();
           double err = current - target;
           double force = pids_[i].Update(err, _dt);
-          joints_[i]->SetForce(0, force);/*
-          gzerr << "chan[" << i << "] curr[" << current
-                << "] cmd[" << target << "] f[" << force
-                << "] scale[" << input_scaling_[i] << "]\n";*/
+          joints_[i]->SetForce(0, force);
         }
         else if (joint_control_type_[i] == "position_gztopic")
         {
