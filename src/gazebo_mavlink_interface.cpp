@@ -56,8 +56,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   model_ = _model;
 
   world_ = model_->GetWorld();
-  
-  
 
   // Use environment variables if set for home position.
   const char *env_lat = std::getenv("PX4_HOME_LAT");
