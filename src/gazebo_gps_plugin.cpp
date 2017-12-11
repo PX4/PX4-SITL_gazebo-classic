@@ -172,6 +172,8 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_msg.set_velocity_east(velocity_current_W.x * 100);
   gps_msg.set_velocity_north(velocity_current_W.y * 100);
   gps_msg.set_velocity_down(-velocity_current_W.z * 100);
+  gps_msg.set_lat_rad(lat_rad);
+  gps_msg.set_lon_rad(lon_rad);
   gps_pub_->Publish(gps_msg);
 
   last_gps_time_ = current_time;
