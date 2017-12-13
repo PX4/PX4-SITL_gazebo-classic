@@ -35,6 +35,7 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
   this->yawCommand = 0;
+  this->lastImuYaw = 0;
 }
 
 /////////////////////////////////////////////////
@@ -110,24 +111,24 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
   }
 
 
-  // get imu sensor
-  std::string imuSensorName = "camera_imu";
+  // get imu sensors
+  std::string cameraImuSensorName = "camera_imu";
   if (this->sdf->HasElement("imu"))
   {
     // Add names to map
-    imuSensorName = sdf->Get<std::string>("imu");
+    cameraImuSensorName = sdf->Get<std::string>("imu");
   }
 #if GAZEBO_MAJOR_VERSION >= 7
-  this->imuSensor = std::static_pointer_cast<sensors::ImuSensor>(
-    sensors::SensorManager::Instance()->GetSensor(imuSensorName));
+  this->cameraImuSensor = std::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(cameraImuSensorName));
 #elif GAZEBO_MAJOR_VERSION >= 6
-  this->imuSensor = boost::static_pointer_cast<sensors::ImuSensor>(
-    sensors::SensorManager::Instance()->GetSensor(imuSensorName));
+  this->cameraImuSensor = boost::static_pointer_cast<sensors::ImuSensor>(
+    sensors::SensorManager::Instance()->GetSensor(cameraImuSensorName));
 #endif
-  if (!this->imuSensor)
+  if (!this->cameraImuSensor)
   {
     gzerr << "GimbalControllerPlugin::Load ERROR! Can't get imu sensor '"
-          << imuSensorName << "' " << endl;
+          << cameraImuSensorName << "' " << endl;
   }
 }
 
@@ -189,7 +190,17 @@ void GimbalControllerPlugin::Init()
   this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
 #endif
 
+  imuSub = node->Subscribe("~/" + model->GetName() + "/imu", &GimbalControllerPlugin::ImuCallback, this);
+
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
+}
+
+void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
+{
+  this->lastImuYaw = ignition::math::Quaterniond(imu_message->orientation().w(),
+						 imu_message->orientation().x(),
+						 imu_message->orientation().y(),
+						 imu_message->orientation().z()).Euler()[2];
 }
 
 #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
@@ -287,6 +298,9 @@ void GimbalControllerPlugin::OnUpdate()
     const double pDir = -1;
     const double yDir = 1;
 
+    // We want yaw to control in body frame, not in global.
+    this->yawCommand += this->lastImuYaw;
+
     // truncate command inside joint angle limits
     double rollLimited = ignition::math::clamp(this->rollCommand,
       rDir*this->rollJoint->GetUpperLimit(0).Radian(),
@@ -298,16 +312,11 @@ void GimbalControllerPlugin::OnUpdate()
       yDir*this->yawJoint->GetLowerLimit(0).Radian(),
 	  yDir*this->yawJoint->GetUpperLimit(0).Radian());
 
-    ignition::math::Quaterniond commandRPY(
-      rollLimited, pitchLimited, yawLimited);
-
-
-    /// Get current joint angles (in sensor frame):
-
     /// currentAngleYPRVariable is defined in roll-pitch-yaw-fixed-axis
     /// and gimbal is constructed using yaw-roll-pitch-variable-axis
     ignition::math::Vector3d currentAngleYPRVariable(
-      this->imuSensor->Orientation().Euler());
+      this->cameraImuSensor->Orientation().Euler());
+
 #if GAZEBO_MAJOR_VERSION >= 8
     ignition::math::Vector3d currentAnglePRYVariable(
       this->QtoZXY(ignition::math::Quaterniond(currentAngleYPRVariable)));
