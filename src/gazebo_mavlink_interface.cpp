@@ -675,23 +675,48 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   sensor_msg.xmag = mag_b.x;
   sensor_msg.ymag = mag_b.y;
   sensor_msg.zmag = mag_b.z;
-  sensor_msg.abs_pressure = 0.0;
-  float rho = 1.2754f; // density of air, TODO why is this not 1.225 as given by std. atmos.
-  sensor_msg.diff_pressure = 0.5f*rho*vel_b.x*vel_b.x / 100;
 
-  float p1, p2;
+  // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
+  const float lapse_rate = 0.0065f; // reduction in temperature with altitude (Kelvin/m)
+  const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
+  float alt_msl = (float)alt_home - pos_n.z;
+  float temperature_local = temperature_msl - lapse_rate * alt_msl;
+  float pressure_ratio = powf((temperature_msl/temperature_local) , 5.256f);
+  const float pressure_msl = 101325.0f; // pressure at MSL
+  sensor_msg.abs_pressure = pressure_msl / pressure_ratio;
 
-  // need to add noise to pressure alt
+  // generate Gaussian noise sequence using polar form of Box-Muller transformation
+  // http://www.design.caltech.edu/erik/Misc/Gaussian.html
+  double x1, x2, w, y1, y2;
   do {
-      p1 = rand() * (1.0 / RAND_MAX);
-      p2 = rand() * (1.0 / RAND_MAX);
-  } while (p1 <= FLT_EPSILON);
+	  x1 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
+	  x2 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
+	  w = x1 * x1 + x2 * x2;
+  } while ( w >= 1.0 );
+  w = sqrt( (-2.0 * log( w ) ) / w );
+  y1 = x1 * w;
+  y2 = x2 * w;
 
-  float n = sqrtf(-2.0 * logf(p1)) * cosf(2.0f * M_PI * p2);
-  float alt_n = -pos_n.z + n * sqrtf(0.006f);
+  // Apply 1 Pa RMS noise
+  float abs_pressure_noise = 1.0f * (float)w;
+  sensor_msg.abs_pressure += abs_pressure_noise;
 
-  sensor_msg.pressure_alt = (std::isfinite(alt_n)) ? alt_n : -pos_n.z;
-  sensor_msg.temperature = 0.0;
+  // convert to hPa
+  sensor_msg.abs_pressure *= 0.01f;
+
+  // calculate density using an ISA model for the tropsphere (valid up to 11km above MSL)
+  const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
+  float rho = 1.225f / density_ratio;
+
+  // calculate pressure altitude including effect of pressure noise
+  sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.GetLength() * rho);
+
+  // calculate differential pressure in hPa
+  sensor_msg.diff_pressure = 0.005f*rho*vel_b.x*vel_b.x;
+
+  // calculate temperature in Celsius
+  sensor_msg.temperature = temperature_local - 273.0f;
+
   sensor_msg.fields_updated = 4095;
 
   //accumulate gyro measurements that are needed for the optical flow message
