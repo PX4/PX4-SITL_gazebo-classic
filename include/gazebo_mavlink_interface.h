@@ -37,7 +37,6 @@
 #include <boost/system/system_error.hpp>
 
 #include <iostream>
-#include <deque>
 #include <random>
 #include <stdio.h>
 #include <math.h>
@@ -45,7 +44,6 @@
 #include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <boost/bind.hpp>
 #include <Eigen/Eigen>
 
 #include <gazebo/gazebo.hh>
