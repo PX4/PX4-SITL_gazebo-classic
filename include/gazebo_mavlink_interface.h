@@ -35,7 +35,6 @@
 #include <boost/shared_array.hpp>
 #include <boost/system/system_error.hpp>
 
-#include <boost/bind.hpp>
 #include <Eigen/Eigen>
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
