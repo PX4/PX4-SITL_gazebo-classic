@@ -156,7 +156,7 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
-    hil_state_level_(true)
+    hil_state_level_(false)
   {}
 
   ~GazeboMavlinkInterface();
