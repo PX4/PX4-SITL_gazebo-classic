@@ -75,7 +75,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_gps_plugin] Please specify a robotNamespace.\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
@@ -85,7 +85,6 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GpsPlugin::OnUpdate, this, _1));
 
-  last_gps_time_ = world_->GetSimTime();
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   gps_pub_ = node_handle_->Advertise<gps_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
