@@ -98,7 +98,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_gps_plugin] Please specify a robotNamespace.\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
@@ -121,62 +121,65 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
     
   common::Time current_time = world_->GetSimTime();
   double dt = (current_time - last_gps_time_).Double();
-    
-  math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
-  math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
   
-  reproject(pos_W_I, lat_rad, lon_rad);
+  if(dt > gps_update_interval_){
+    
+    math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
+    math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
+  
+    reproject(pos_W_I, lat_rad, lon_rad);
 
-  math::Vector3 velocity_current_W = model_->GetWorldLinearVel();  // Use the models' world position for GPS velocity.
+    math::Vector3 velocity_current_W = model_->GetWorldLinearVel();  // Use the models' world position for GPS velocity.
 
-  math::Vector3 velocity_current_W_xy = velocity_current_W;
-  velocity_current_W_xy.z = 0;
+    math::Vector3 velocity_current_W_xy = velocity_current_W;
+    velocity_current_W_xy.z = 0;
 
-  dt_gps = current_time.Double() - last_gps_time_.Double();
+    dt_gps = current_time.Double() - last_gps_time_.Double();
       
-  noise_gps.x = 0;
-  noise_gps.y = 0;
-  noise_gps.z = 0;
+    noise_gps.x = 0;
+    noise_gps.y = 0;
+    noise_gps.z = 0;
 
-  random_walk_gps.x = 0;
-  random_walk_gps.y = 0;
-  random_walk_gps.z = 0;
+    random_walk_gps.x = 0;
+    random_walk_gps.y = 0;
+    random_walk_gps.z = 0;
     
-  if(gps_noise_){
-    //update noise paramters
-    noise_gps.x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-    noise_gps.y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-    noise_gps.z = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+    if(gps_noise_){
+      //update noise paramters
+      noise_gps.x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+      noise_gps.y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
+      noise_gps.z = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
         
-    random_walk_gps.x = gps_random_walk*standard_normal_distribution_(random_generator_);
-    random_walk_gps.y = gps_random_walk*standard_normal_distribution_(random_generator_);
-    random_walk_gps.z = gps_random_walk*standard_normal_distribution_(random_generator_);
-  }
+      random_walk_gps.x = gps_random_walk*standard_normal_distribution_(random_generator_);
+      random_walk_gps.y = gps_random_walk*standard_normal_distribution_(random_generator_);
+      random_walk_gps.z = gps_random_walk*standard_normal_distribution_(random_generator_);
+    }
     
-  // bias integration
-  gps_bias_.x += random_walk_gps.x - gps_bias_.x/gps_corellation_time;
-  gps_bias_.y += random_walk_gps.y - gps_bias_.y/gps_corellation_time;
-  gps_bias_.z += random_walk_gps.z - gps_bias_.z/gps_corellation_time;
+    // bias integration
+    gps_bias_.x += random_walk_gps.x - gps_bias_.x/gps_corellation_time;
+    gps_bias_.y += random_walk_gps.y - gps_bias_.y/gps_corellation_time;
+    gps_bias_.z += random_walk_gps.z - gps_bias_.z/gps_corellation_time;
 
-  // standard deviation of random walk
-  std_xy = gps_random_walk*gps_corellation_time/sqrtf(2*gps_corellation_time-1);
-  std_z = std_xy;
+    // standard deviation of random walk
+    std_xy = gps_random_walk*gps_corellation_time/sqrtf(2*gps_corellation_time-1);
+    std_z = std_xy;
 
-  gps_msg.set_time(current_time.Double());
-  gps_msg.set_latitude_deg((lat_rad * 180 / M_PI + (noise_gps.x + gps_bias_.x)*1e-5) * 1e7);
-  gps_msg.set_longitude_deg((lon_rad * 180 / M_PI + (noise_gps.y + gps_bias_.y)*1e-5) * 1e7);
-  gps_msg.set_altitude(((pos_W_I.z + alt_home) * 1000 + noise_gps.z + gps_bias_.z) / 1000.f);
-  gps_msg.set_eph(100*(std_xy + gps_noise_density*gps_noise_density));
-  gps_msg.set_epv(100*(std_z  + gps_noise_density*gps_noise_density));
-  gps_msg.set_velocity(velocity_current_W_xy.GetLength() * 100);
-  gps_msg.set_velocity_east(velocity_current_W.x * 100);
-  gps_msg.set_velocity_north(velocity_current_W.y * 100);
-  gps_msg.set_velocity_down(-velocity_current_W.z * 100);
-  gps_msg.set_lat_rad(lat_rad);
-  gps_msg.set_lon_rad(lon_rad);
-  gps_pub_->Publish(gps_msg);
+    gps_msg.set_time(current_time.Double());
+    gps_msg.set_latitude_deg((lat_rad * 180 / M_PI + (noise_gps.x + gps_bias_.x)*1e-5) * 1e7);
+    gps_msg.set_longitude_deg((lon_rad * 180 / M_PI + (noise_gps.y + gps_bias_.y)*1e-5) * 1e7);
+    gps_msg.set_altitude(((pos_W_I.z + alt_home) * 1000 + noise_gps.z + gps_bias_.z) / 1000.f);
+    gps_msg.set_eph(100*(std_xy + gps_noise_density*gps_noise_density));
+    gps_msg.set_epv(100*(std_z  + gps_noise_density*gps_noise_density));
+    gps_msg.set_velocity(velocity_current_W_xy.GetLength() * 100);
+    gps_msg.set_velocity_east(velocity_current_W.x * 100);
+    gps_msg.set_velocity_north(velocity_current_W.y * 100);
+    gps_msg.set_velocity_down(-velocity_current_W.z * 100);
+    gps_msg.set_lat_rad(lat_rad);
+    gps_msg.set_lon_rad(lon_rad);
+    gps_pub_->Publish(gps_msg);
 
-  last_gps_time_ = current_time;
+    last_gps_time_ = current_time;
+  }
 }
 
 void GpsPlugin::reproject(math::Vector3& pos, double& lat_rad, double& lon_rad)
