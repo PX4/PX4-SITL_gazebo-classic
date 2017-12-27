@@ -156,12 +156,8 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
-<<<<<<< 1971c3a6e2073b07e32eb67566d817faf90f2411
     hil_state_level_(false)
-=======
-    hil_state_level_(true)
->>>>>>> Fixed conflicts
-  {}
+    {}
   ~GazeboMavlinkInterface();
 
   void Publish();
