@@ -261,6 +261,13 @@
       <imuSubTopic>/imu</imuSubTopic>
       <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>
       <mavlink_udp_port>$(arg mavlink_udp_port)</mavlink_udp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <!-- no elevator
       <left_elevon_joint>
