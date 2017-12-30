@@ -32,13 +32,16 @@ find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread timer)
 if (BUILD_GSTREAMER_PLUGIN)
   find_package(GStreamer)
-  if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-    find_package (Qt4)
-    include (${QT_USE_FILE})
+  if (GSTREAMER_FOUND)
+    if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+      find_package (Qt4)
+      include (${QT_USE_FILE})
+    endif()
   endif()
-  include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
-  link_directories(${GAZEBO_LIBRARY_DIRS})
 endif()
+
+include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
@@ -143,9 +146,14 @@ include_directories(
   # Workaround for OGRE include dirs on Mac OS
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
-  ${GSTREAMER_INCLUDE_DIRS}
   ${MAVLINK_INCLUDE_DIRS}
   )
+
+if (GSTREAMER_FOUND)
+  include_directories(
+    ${GSTREAMER_INCLUDE_DIRS}
+  )
+endif()
 
 link_libraries(
   ${PROTOBUF_LIBRARY}
@@ -154,8 +162,13 @@ link_libraries(
   ${Boost_SYSTEM_LIBRARY_RELEASE}
   ${Boost_THREAD_LIBRARY_RELEASE}
   ${Boost_TIMER_LIBRARY_RELEASE}
-  ${GSTREAMER_LIBRARIES}
   )
+
+if (GSTREAMER_FOUND)
+  link_libraries(
+    ${GSTREAMER_LIBRARIES}
+  )
+endif()
 
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
