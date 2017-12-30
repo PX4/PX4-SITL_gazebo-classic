@@ -20,8 +20,8 @@ set(_MAVLINK_EXTRA_SEARCH_PATHS
     ../../devel/include/
     ../../build/mavlink/include/
     ../../mavlink/include/
-    /usr/
-    /usr/local/
+    /usr/include/
+    /usr/local/include/
     /opt/ros/${ROS_DISTRO}/include/
     )
 
