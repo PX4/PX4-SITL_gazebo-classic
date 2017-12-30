@@ -54,7 +54,12 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
 		unsigned int depth, const std::string &format);
 
   public: void startGstThread();
+  public: void stopGstThread();
   public: void gstCallback(GstElement *appsrc);
+
+  public: void cbVideoStream(const boost::shared_ptr<const msgs::Int> &_msg);
+  private: void startStreaming();
+  private: void stopStreaming();
 
   protected: unsigned int width, height, depth;
   float rate;
@@ -69,7 +74,11 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
 
   private: transport::NodePtr node_handle_;
   private: std::string namespace_;
-  private: const std::string topicName = "gst_video";
+
+  private: transport::SubscriberPtr mVideoSub;
+  private: pthread_t mThreadId;
+  private: const std::string mTopicName = "~/video_stream";
+  private: bool mIsActive;
 
   GstBuffer *frameBuffer;
   std::mutex frameBufferMutex;

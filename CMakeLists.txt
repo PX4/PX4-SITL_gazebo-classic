@@ -20,7 +20,8 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
+option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "ON")
+
 option(BUILD_ROS_INTERFACE "enable ROS subscriber for motor failure plugin" "OFF")
 
 ## System dependencies are found with CMake's conventions
@@ -31,6 +32,10 @@ find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system thread timer)
 if (BUILD_GSTREAMER_PLUGIN)
   find_package(GStreamer)
+  find_package (Qt4)
+  include (${QT_USE_FILE})
+  include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
+  link_directories(${GAZEBO_LIBRARY_DIRS})
 endif()
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
@@ -279,11 +284,19 @@ endif()
 
 if (GSTREAMER_FOUND)
   add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
+  QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
+  add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
+  target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
   set(plugins
     ${plugins}
     gazebo_gst_camera_plugin
   )
+  set(plugins
+    ${plugins}
+    gazebo_video_stream_widget
+  )
   message(STATUS "Found GStreamer: adding gst_camera_plugin")
+  message(STATUS "Found GStreamer: adding gst_video_stream_widget")
 endif()
 
 # Linux is not consistent with plugin availability, even on Gazebo 7
