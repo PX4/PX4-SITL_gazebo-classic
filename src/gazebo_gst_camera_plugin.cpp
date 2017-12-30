@@ -28,7 +28,7 @@
 #include <iostream>
 #include <thread>
 #include <time.h>
-#include <std_msgs/Int32.h>
+#include "Int32.pb.h"
 
 #include <opencv2/opencv.hpp>
 
@@ -261,6 +261,9 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 
   // Listen to Gazebo topic
   mVideoSub = node_handle_->Subscribe<msgs::Int>(mTopicName, &GstCameraPlugin::cbVideoStream, this);
+
+  // And start by default
+  startStreaming();
 
 }
 

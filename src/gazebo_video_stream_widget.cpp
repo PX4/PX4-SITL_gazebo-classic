@@ -16,7 +16,7 @@
 */
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
-#include <std_msgs/Int32.h>
+#include "Int32.pb.h"
 #include "gazebo_video_stream_widget.h"
 
 using namespace gazebo;
@@ -27,7 +27,7 @@ GZ_REGISTER_GUI_PLUGIN(VideoStreamWidget)
 /////////////////////////////////////////////////
 VideoStreamWidget::VideoStreamWidget()
   : GUIPlugin()
-  , mVideoON(false)
+  , mVideoON(true)
 {
   this->counter = 0;
 
