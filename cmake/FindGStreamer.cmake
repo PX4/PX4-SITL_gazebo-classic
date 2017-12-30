@@ -48,7 +48,21 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if (APPLE)
+    find_library(GSTREAMER NAMES GStreamer)
+    if (NOT GSTREAMER)
+        message(FATAL_ERROR "GStreamer not found")
+    else()
+        message(STATUS "GStreamer found")
+    endif()
+
+    SET(GSTREAMER_INCLUDE_DIRS ${GSTREAMER}/Headers)
+    SET(GSTREAMER_LIBRARIES "-framework GStreamer")
+    SET(GSTREAMER_FOUND true)
+
+else()
 find_package(PkgConfig)
+
 
 # Helper macro to find a GStreamer plugin (or GStreamer itself)
 #   _component_prefix is prepended to the _INCLUDE_DIRS and _LIBRARIES variables (eg. "GSTREAMER_AUDIO")
@@ -129,3 +143,5 @@ mark_as_advanced(
     GSTREAMER_VIDEO_INCLUDE_DIRS
     GSTREAMER_VIDEO_LIBRARIES
 )
+
+endif()

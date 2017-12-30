@@ -399,7 +399,7 @@
         </camera>
         <always_on>1</always_on>
         <update_rate>10</update_rate>
-        <visualize>false</visualize>
+        <visualize>true</visualize>
         <!-- how to make this work without using urdf?
         <plugin name="cgo3_camera_controller" filename="libgazebo_ros_camera.so">
           <alwaysOn>true</alwaysOn>
@@ -417,8 +417,7 @@
         </plugin>
         -->
         <!-- GStreamer camera plugin (needs a lot of CPU! Consider lowering the
-             camera image size when enabling) -->
-        <!--
+             camera image size) -->
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
             <udpPort>5600</udpPort>
@@ -429,7 +428,6 @@
             <width>3840</width>
             <height>2160</height>
         </plugin>
-        -->
       </sensor>
     </link>
     <joint name='cgo3_camera_joint' type='revolute'>
@@ -439,8 +437,8 @@
       <axis>
         <xyz>0 -1 0</xyz>
         <limit>
-          <lower>-0.0872665</lower>
-          <upper>1.5708</upper>
+          <lower>-1.05</lower>
+          <upper>2.09</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
         </limit>
@@ -1141,6 +1139,22 @@
       </physics>
     </joint>
 
+    <include>
+      <uri>model://sonar</uri>
+    </include>
+    <joint name="sonar_joint" type="revolute">
+      <child>sonar_model::link</child>
+      <parent>typhoon_h480::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+  
+
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>base_link</linkName>
@@ -1314,9 +1328,14 @@
       </joint_control_pid>
       -->
     </plugin>
+    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+        <robotNamespace></robotNamespace>
+        <gpsNoise>true</gpsNoise>
+    </plugin>
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
+      <gpsSubTopic>/gps</gpsSubTopic>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
 
       <control_channels>
@@ -1462,7 +1481,7 @@
         </channel>
         <channel name="gimbal_yaw">
           <input_index>8</input_index>
-          <input_offset>-0.5</input_offset>
+          <input_offset>0</input_offset>
           <input_scaling>-3.1415</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
@@ -1478,13 +1497,13 @@
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_control_pid>
-            <p>50.0</p>
-            <i>0</i>
+            <p>3.5</p>
+            <i>0.5</i>
             <d>0</d>
-            <iMax>0</iMax>
-            <iMin>0</iMin>
-            <cmdMax>10</cmdMax>
-            <cmdMin>-10</cmdMin>
+            <iMax>4</iMax>
+            <iMin>-4</iMin>
+            <cmdMax>6</cmdMax>
+            <cmdMin>-6</cmdMin>
           </joint_control_pid>
           <joint_name>left_leg_joint</joint_name>
         </channel>
@@ -1496,13 +1515,13 @@
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_control_pid>
-            <p>50.0</p>
-            <i>0</i>
+            <p>3.5</p>
+            <i>0.5</i>
             <d>0</d>
-            <iMax>0</iMax>
-            <iMin>0</iMin>
-            <cmdMax>10</cmdMax>
-            <cmdMin>-10</cmdMin>
+            <iMax>4</iMax>
+            <iMin>-4</iMin>
+            <cmdMax>6</cmdMax>
+            <cmdMin>-6</cmdMin>
           </joint_control_pid>
           <joint_name>right_leg_joint</joint_name>
         </channel>

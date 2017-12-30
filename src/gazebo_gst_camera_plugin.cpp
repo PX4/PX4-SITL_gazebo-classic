@@ -28,9 +28,13 @@
 #include <iostream>
 #include <thread>
 #include <time.h>
+#include "Int32.pb.h"
+
+#include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace gazebo;
+using namespace cv;
 
 GZ_REGISTER_SENSOR_PLUGIN(GstCameraPlugin)
 
@@ -73,6 +77,7 @@ static void* start_thread(void* param) {
   return nullptr;
 }
 
+/////////////////////////////////////////////////
 void GstCameraPlugin::startGstThread() {
 
   gst_init(0, 0);
@@ -108,7 +113,7 @@ void GstCameraPlugin::startGstThread() {
   // Config src
   g_object_set(G_OBJECT(dataSrc), "caps",
       gst_caps_new_simple ("video/x-raw",
-      "format", G_TYPE_STRING, "RGB",
+      "format", G_TYPE_STRING, "I420",
       "width", G_TYPE_INT, this->width,
       "height", G_TYPE_INT, this->height,
       "framerate", GST_TYPE_FRACTION, (unsigned int)this->rate, 1,
@@ -158,9 +163,17 @@ void GstCameraPlugin::startGstThread() {
 }
 
 /////////////////////////////////////////////////
+void GstCameraPlugin::stopGstThread()
+{
+  if(mainLoop)
+    g_main_loop_quit(mainLoop);
+
+}
+
+/////////////////////////////////////////////////
 GstCameraPlugin::GstCameraPlugin()
 : SensorPlugin(), width(0), height(0), depth(0), frameBuffer(nullptr), mainLoop(nullptr),
-  gstTimestamp(0)
+  gstTimestamp(0), mIsActive(false)
 {
 }
 
@@ -246,15 +259,55 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
+  // Listen to Gazebo topic
+  mVideoSub = node_handle_->Subscribe<msgs::Int>(mTopicName, &GstCameraPlugin::cbVideoStream, this);
 
-  this->newFrameConnection = this->camera->ConnectNewImageFrame(
-      boost::bind(&GstCameraPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
+  // And start by default
+  startStreaming();
 
-  this->parentSensor->SetActive(true);
+}
 
-  /* start the gstreamer event loop */
-  pthread_t threadId;
-  pthread_create(&threadId, NULL, start_thread, this);
+/////////////////////////////////////////////////
+void GstCameraPlugin::cbVideoStream(const boost::shared_ptr<const msgs::Int> &_msg)
+{
+  gzwarn << "Video Streaming callback: " << _msg->data() << "\n";
+  int enable = _msg->data();
+  if(enable)
+    startStreaming();
+  else
+    stopStreaming();
+}
+
+/////////////////////////////////////////////////
+void GstCameraPlugin::startStreaming()
+{
+  if(!mIsActive) {
+    this->newFrameConnection = this->camera->ConnectNewImageFrame(
+        boost::bind(&GstCameraPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));
+
+    this->parentSensor->SetActive(true);
+
+    /* start the gstreamer event loop */
+    pthread_create(&mThreadId, NULL, start_thread, this);
+    mIsActive = true;
+  }
+
+}
+
+/////////////////////////////////////////////////
+void GstCameraPlugin::stopStreaming()
+{
+  if(mIsActive) {
+    stopGstThread();
+
+    pthread_join(mThreadId, NULL);
+
+    this->parentSensor->SetActive(false);
+
+    this->newFrameConnection->~Connection();
+    mIsActive = false;
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -274,16 +327,23 @@ void GstCameraPlugin::OnNewFrame(const unsigned char * image,
   std::lock_guard<std::mutex> guard(frameBufferMutex);
 
   if (frameBuffer) {
-	gst_buffer_unref(frameBuffer);
+    gst_buffer_unref(frameBuffer);
   }
 
   // Alloc buffer
-  guint size = width * height * 3;
+  guint size = width * height * 1.5;
   frameBuffer = gst_buffer_new_allocate(NULL, size, NULL);
 
   GstMapInfo mapInfo;
   if (gst_buffer_map(frameBuffer, &mapInfo, GST_MAP_WRITE)) {
-    memcpy(mapInfo.data, image, size);
+
+    // Color Conversion from RGB to YUV
+    Mat frame = Mat(height, width, CV_8UC3);
+    Mat frameYUV = Mat(height, width, CV_8UC3);
+    frame.data = (uchar*)image;
+    cvtColor(frame, frameYUV, COLOR_RGB2YUV_I420);
+
+    memcpy(mapInfo.data, frameYUV.data, size);
     gst_buffer_unmap(frameBuffer, &mapInfo);
   } else {
 	  gzerr << "gst_buffer_map failed"<<endl;

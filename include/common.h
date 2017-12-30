@@ -1,3 +1,5 @@
+#ifndef SITL_GAZEBO_COMMON_H_
+#define SITL_GAZEBO_COMMON_H_
 /*
  * Copyright 2015 Fadri Furrer, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Michael Burri, ASL, ETH Zurich, Switzerland
@@ -47,9 +49,18 @@ bool getSdfParam(sdf::ElementPtr sdf, const std::string& name, T& param, const T
   return false;
 }
 
+/**
+ * \brief Get a math::Angle as an angle from [0, 360)
+ */
+double GetDegrees360(const math::Angle& angle) {
+  double degrees = angle.Degree();
+  while (degrees < 0.) degrees += 360.0;
+  while (degrees >= 360.0) degrees -= 360.0;
+  return degrees;
 }
 
 
+}  // namespace gazebo
 
 template <typename T>
 class FirstOrderFilter {
@@ -126,3 +137,5 @@ void copyPosition(const In& in, Out* out) {
   out->y = in.y;
   out->z = in.z;
 }
+
+#endif  // SITL_GAZEBO_COMMON_H_
