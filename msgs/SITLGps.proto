@@ -2,7 +2,7 @@ syntax = "proto2";
 package gps_msgs.msgs;
 
 
-message Gps
+message SITLGps
 {
   required double time                  = 1;
   required double latitude_deg          = 2;

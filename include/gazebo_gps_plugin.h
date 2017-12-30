@@ -25,6 +25,8 @@
 #ifndef _GAZEBO_GPS_PLUGIN_HH_
 #define _GAZEBO_GPS_PLUGIN_HH_
 
+#include "SITLGps.pb.h"
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/common/common.hh"
@@ -34,11 +36,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/math/gzmath.hh"
 
-#include "Gps.pb.h"
-
 #include "common.h"
-#include <sdf/sdf.hh>
-#include <stdio.h>
 
 namespace gazebo
 {
@@ -66,7 +64,7 @@ namespace gazebo
             event::ConnectionPtr updateConnection_;
             transport::PublisherPtr gps_pub_;
             transport::NodePtr node_handle_;
-            gps_msgs::msgs::Gps gps_msg;
+            gps_msgs::msgs::SITLGps gps_msg;
             
             common::Time last_gps_time_;
 
@@ -88,7 +86,10 @@ namespace gazebo
 
             // gps noise parameters
             static constexpr double gps_corellation_time = 30.0; // s
-            static constexpr double gps_random_walk = 1.0; // (m/s) / sqrt(hz)
+
+            // Assuming 0.1 Hz and 1 m error
+
+            static constexpr double gps_random_walk = 0.01; // (m/s) / sqrt(hz)
             static constexpr double gps_noise_density = 2e-4; // (m) / sqrt(hz)
     };
 }

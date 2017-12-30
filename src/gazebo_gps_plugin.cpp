@@ -24,6 +24,8 @@
 
 #include "gazebo_gps_plugin.h"
 #include <math.h>
+#include <sdf/sdf.hh>
+#include <cstdio>
 #include "common.h"
 #include <cstdlib>
 
@@ -72,13 +74,10 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   const char *env_alt = std::getenv("PX4_HOME_ALT");
   
   // Get noise param
-  if(_sdf->HasElement("gpsNoise"))
-  {
+  if(_sdf->HasElement("gpsNoise")) {
     getSdfParam<bool>(_sdf, "gpsNoise", gps_noise_, gps_noise_);
-  }
-  
-  else {
-    gps_noise_ = true;    
+  } else {
+    gps_noise_ = false;
   }
 
   if (env_lat) {
@@ -114,7 +113,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   gps_delay_ = 0.12; // in seconds
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
     
-  gps_pub_ = node_handle_->Advertise<gps_msgs::msgs::Gps>("~/" + model_->GetName() + "/gps", 10);
+  gps_pub_ = node_handle_->Advertise<gps_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
@@ -142,7 +141,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   random_walk_gps.y = 0;
   random_walk_gps.z = 0;
     
-  if(gps_noise_){
+  if (gps_noise_) {
     //update noise paramters
     noise_gps.x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
     noise_gps.y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);

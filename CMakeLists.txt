@@ -193,7 +193,7 @@ set (msgs
   #msgs/Wind.proto
   msgs/sonarSens.proto
   msgs/irlock.proto
-  msgs/Gps.proto
+  msgs/SITLGps.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})

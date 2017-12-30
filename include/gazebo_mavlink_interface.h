@@ -36,7 +36,7 @@
 #include "opticalFlow.pb.h"
 #include "lidar.pb.h"
 #include "sonarSens.pb.h"
-#include "Gps.pb.h"
+#include "SITLGps.pb.h"
 #include <irlock.pb.h>
 #include <boost/bind.hpp>
 
@@ -61,7 +61,7 @@ typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
 typedef const boost::shared_ptr<const sonarSens_msgs::msgs::sonarSens> SonarSensPtr;
 typedef const boost::shared_ptr<const irlock_msgs::msgs::irlock> IRLockPtr;
-typedef const boost::shared_ptr<const gps_msgs::msgs::Gps> GpsPtr;
+typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
