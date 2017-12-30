@@ -20,7 +20,7 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "ON")
+option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
 
 option(BUILD_ROS_INTERFACE "enable ROS subscriber for motor failure plugin" "OFF")
 
