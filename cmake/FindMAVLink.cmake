@@ -8,13 +8,21 @@
 # macros
 include(FindPackageHandleStandardArgs)
 
+# Check for ROS_DISTRO
+find_program(ROSVERSION rosversion)
+execute_process(COMMAND ${ROSVERSION} -d
+    OUTPUT_VARIABLE ROS_DISTRO
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 set(_MAVLINK_EXTRA_SEARCH_PATHS
+    ../mavlink/include/
+    ../../devel/include/
+    ../../build/mavlink/include/
+    ../../mavlink/include/
     /usr/
     /usr/local/
-    /opt/local/
-    mavlink/
-    ../mavlink/
-    ../../mavlink/
+    /opt/ros/${ROS_DISTRO}/include/
     )
 
 # find the include directory
@@ -31,7 +39,7 @@ if (EXISTS ${_MAVLINK_INCLUDE_DIR}/mavlink/config.h)
         _MAVLINK_VERSION_MATCH "${MAVLINK_CONFIG_FILE}")
     set(MAVLINK_VERSION "${CMAKE_MATCH_1}")
 else()
-    set(MAVLINK_VERSION "")
+    set(MAVLINK_VERSION "2.0")
 endif()
 
 # handle arguments

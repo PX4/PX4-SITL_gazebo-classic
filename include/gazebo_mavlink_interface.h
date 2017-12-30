@@ -46,7 +46,7 @@
 #include <random>
 #include <sdf/sdf.hh>
 
-#include "mavlink/v2.0/common/mavlink.h"
+#include <mavlink/v2.0/common/mavlink.h>
 
 #include "gazebo/math/Vector3.hh"
 #include <sys/socket.h>
