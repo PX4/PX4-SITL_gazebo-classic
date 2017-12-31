@@ -698,7 +698,7 @@
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <gpsSubTopic>/gps<gpsSubTopic>
+      <gpsSubTopic>/gps</gpsSubTopic>
       
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
 
