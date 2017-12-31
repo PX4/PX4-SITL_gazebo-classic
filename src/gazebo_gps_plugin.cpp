@@ -46,6 +46,8 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   model_ = _model;
 
   world_ = model_->GetWorld();
+  last_time_ = world_->GetSimTime();
+  last_gps_time_ = world_->GetSimTime();
 
   // Use environment variables if set for home position.
   const char *env_lat = std::getenv("PX4_HOME_LAT");
@@ -95,7 +97,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   common::Time current_time = world_->GetSimTime();
-  double dt = (current_time - last_gps_time_).Double();
+  double dt = (current_time - last_time_).Double();
 
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
   math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
@@ -136,21 +138,21 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_bias.y += random_walk_gps.y * dt - gps_bias.y / gps_corellation_time;
   gps_bias.z += random_walk_gps.z * dt - gps_bias.z / gps_corellation_time;
 
-  // standard deviation of random walk
-  std_xy = random_walk_gps.x * gps_corellation_time / sqrtf(2*gps_corellation_time-1);
-  std_z = random_walk_gps.z * gps_corellation_time / sqrtf(2*gps_corellation_time-1);
+  // standard deviation TODO: add a way of computing this
+  std_xy = 1.0;
+  std_z = 1.0;
 
   // fill SITLGps msg
   gps_msg.set_time(current_time.Double());
-  gps_msg.set_latitude_deg(lat_rad * 180.0 / M_PI * 1e7);
-  gps_msg.set_longitude_deg(lon_rad * 180.0 / M_PI * 1e7);
-  gps_msg.set_altitude(((pos_W_I.z + alt_home) * 1000.0 + noise_gps_pos.z + gps_bias.z) / 1000.0);
-  gps_msg.set_eph(100.0 * (std_xy + gps_xy_noise_density * gps_xy_noise_density));
-  gps_msg.set_epv(100.0 * (std_z  + gps_z_noise_density * gps_z_noise_density));
-  gps_msg.set_velocity(velocity_current_W_xy.GetLength() * 100.0);
-  gps_msg.set_velocity_east((velocity_current_W.y + noise_gps_vel.x) * 100.0);
-  gps_msg.set_velocity_north((velocity_current_W.x + random_walk_gps.y) * 100.0);
-  gps_msg.set_velocity_down(-(velocity_current_W.z + random_walk_gps.z) * 100.0);
+  gps_msg.set_latitude_deg(lat_rad * 180.0 / M_PI);
+  gps_msg.set_longitude_deg(lon_rad * 180.0 / M_PI);
+  gps_msg.set_altitude(pos_W_I.z + alt_home + noise_gps_pos.z + gps_bias.z);
+  gps_msg.set_eph(std_xy);
+  gps_msg.set_epv(std_z);
+  gps_msg.set_velocity(velocity_current_W_xy.GetLength());
+  gps_msg.set_velocity_east(velocity_current_W.x + noise_gps_vel.y);
+  gps_msg.set_velocity_north(velocity_current_W.y + noise_gps_vel.x);
+  gps_msg.set_velocity_up(velocity_current_W.z + noise_gps_vel.z);
   gps_msg.set_lat_rad(lat_rad);
   gps_msg.set_lon_rad(lon_rad);
 
@@ -158,12 +160,12 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_delay_buffer.push(gps_msg);
 
   // apply GPS delay
-  if (dt > gps_update_interval_) {
+  if ((current_time - last_gps_time_).Double() > gps_update_interval_) {
     last_gps_time_ = current_time;
 
     while (true) {
       gps_msg = gps_delay_buffer.front();
-      gps_current_delay = (current_time.Double() - gps_delay_buffer.front().time());
+      double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time();
       if (gps_delay_buffer.empty()) {
 	// abort if buffer is empty already
 	break;
@@ -179,10 +181,10 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 	break;
       }
     }
+    // publish SITLGps msg
+    gps_pub_->Publish(gps_msg);
   }
-
-  // publish SITLGps msg
-  gps_pub_->Publish(gps_msg);
+  last_time_ = current_time;
 }
 
 void GpsPlugin::reproject(math::Vector3& pos, double& lat_rad, double& lon_rad)

@@ -402,7 +402,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   _rotor_count = 5;
   last_time_ = world_->GetSimTime();
-  last_gps_time_ = world_->GetSimTime();
   last_imu_time_ = world_->GetSimTime();
   ev_update_interval_ = 0.05; // in seconds for 20Hz
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
@@ -727,8 +726,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
-  common::Time current_time = world_->GetSimTime();
-
   // update lat_rad and lon_rad
   lat_rad = gps_msg->lat_rad();
   lon_rad = gps_msg->lon_rad();
@@ -737,16 +734,15 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   mavlink_hil_gps_t hil_gps_msg;
   hil_gps_msg.time_usec = gps_msg->time() * 1e6;
   hil_gps_msg.fix_type = 3;
-  hil_gps_msg.lat = gps_msg->latitude_deg();
-  hil_gps_msg.lon = gps_msg->longitude_deg();
-  hil_gps_msg.alt = gps_msg->altitude();
-  hil_gps_msg.eph = gps_msg->eph();
-  hil_gps_msg.epv = gps_msg->epv();
-  hil_gps_msg.vel = gps_msg->velocity();
-  hil_gps_msg.vn = gps_msg->velocity_north();
-  hil_gps_msg.ve = gps_msg->velocity_east();
-  hil_gps_msg.vd = gps_msg->velocity_down();
-
+  hil_gps_msg.lat = gps_msg->latitude_deg() * 1e7;
+  hil_gps_msg.lon = gps_msg->longitude_deg() * 1e7;
+  hil_gps_msg.alt = gps_msg->altitude() * 1000.0;
+  hil_gps_msg.eph = gps_msg->eph() * 100.0;
+  hil_gps_msg.epv = gps_msg->epv() * 100.0;
+  hil_gps_msg.vel = gps_msg->velocity() * 100.0;
+  hil_gps_msg.vn = gps_msg->velocity_north() * 100.0;
+  hil_gps_msg.ve = gps_msg->velocity_east() * 100.0;
+  hil_gps_msg.vd = - gps_msg->velocity_up() * 100.0;
   // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
   math::Angle cog(atan2(gps_msg->velocity_east(), gps_msg->velocity_north()));
   cog.Normalize();

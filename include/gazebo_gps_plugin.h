@@ -67,7 +67,8 @@ namespace gazebo
             transport::NodePtr node_handle_;
             gps_msgs::msgs::SITLGps gps_msg;
 
-            common::Time last_gps_time_;
+	    common::Time last_gps_time_;
+	    common::Time last_time_;
 
 	    // Set global reference point
 	    // Zurich Irchel Park: 47.397742, 8.545594, 488m
@@ -88,19 +89,17 @@ namespace gazebo
 	    static constexpr const double earth_radius = 6353000.0;  // m
 
 	    // gps delay related
-	    static constexpr double gps_update_interval_ = 0.2;  // in seconds (5hz)
-	    static constexpr double gps_delay = 0.12; // seconds
-	    std::queue<gps_msgs::msgs::SITLGps> gps_delay_buffer;
+	    static constexpr double gps_update_interval_ = 0.2;  // seconds (5hz)
+	    static constexpr double gps_delay = 0.3; // seconds
 	    static constexpr int gps_buffer_size_max = 1000;
-	    double gps_current_delay;
-	    double gps_last_time_;
+	    std::queue<gps_msgs::msgs::SITLGps> gps_delay_buffer;
 
             double lat_rad;
             double lon_rad;
 
             math::Vector3 gps_bias;
             math::Vector3 noise_gps_pos;
-	    math::Vector3 noise_gps_vel;
+            math::Vector3 noise_gps_vel;
             math::Vector3 random_walk_gps;
             math::Vector3 gravity_W_;
             math::Vector3 velocity_prev_W_;

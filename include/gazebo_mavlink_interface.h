@@ -205,7 +205,6 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string gps_sub_topic_;
 
   common::Time last_time_;
-  common::Time last_gps_time_;
   common::Time last_imu_time_;
   common::Time last_ev_time_;
   common::Time last_actuator_time_;
@@ -246,5 +245,3 @@ class GazeboMavlinkInterface : public ModelPlugin {
   int mavlink_udp_port_;
   };
 }
-
-/* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */
