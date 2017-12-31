@@ -642,7 +642,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   float declination = get_mag_declination(lat_rad, lon_rad);
 
   math::Quaternion q_dn(0.0, 0.0, declination);
-  math::Vector3 mag_n = q_dn.RotateVectorReverse(mag_d_);
+  math::Vector3 mag_n = q_dn.RotateVector(mag_d_);
 
   math::Vector3 vel_b = q_br.RotateVector(model_->GetRelativeLinearVel());
   math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
