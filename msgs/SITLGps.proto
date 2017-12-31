@@ -13,7 +13,7 @@ message SITLGps
   optional double velocity              = 7;
   optional double velocity_east         = 8;
   optional double velocity_north        = 9;
-  optional double velocity_down         = 10;
+  optional double velocity_up           = 10;
   optional double lat_rad               = 11;
   optional double lon_rad               = 12;
 }
