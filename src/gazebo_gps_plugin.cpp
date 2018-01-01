@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2012-2017 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
+ * Copyright (C) 2017-2018 PX4 Pro Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /**
  * @brief GPS Plugin
  *
@@ -72,7 +73,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   const char *env_alt = std::getenv("PX4_HOME_ALT");
 
   // Get noise param
-  if(_sdf->HasElement("gpsNoise")) {
+  if (_sdf->HasElement("gpsNoise")) {
     getSdfParam<bool>(_sdf, "gpsNoise", gps_noise_, gps_noise_);
   } else {
     gps_noise_ = false;
@@ -119,13 +120,13 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   common::Time current_time = world_->GetSimTime();
   double dt = (current_time - last_time_).Double();
 
-  math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
-  math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and groundtruth
+  math::Pose T_W_I = model_->GetWorldPose();    // TODO(burrimi): Check tf
+  math::Vector3& pos_W_I = T_W_I.pos;           // Use the models' world position for GPS and groundtruth
 
   // reproject position without noise into geographic coordinates
   auto latlon_gt = reproject(pos_W_I);
 
-  math::Vector3 velocity_current_W = model_->GetWorldLinearVel();  // Use the models' world position for GPS velocity.
+  math::Vector3 velocity_current_W = model_->GetWorldLinearVel();    // Use the models' world position for GPS velocity.
 
   math::Vector3 velocity_current_W_xy = velocity_current_W;
   velocity_current_W_xy.z = 0;
@@ -186,18 +187,18 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
       gps_msg = gps_delay_buffer.front();
       double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time();
       if (gps_delay_buffer.empty()) {
-	// abort if buffer is empty already
-	break;
+        // abort if buffer is empty already
+        break;
       }
       // remove data that is too old or if buffer size is too large
       if (gps_current_delay > gps_delay) {
-	gps_delay_buffer.pop();
-	// remove data if buffer too large
+        gps_delay_buffer.pop();
+        // remove data if buffer too large
       } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
-	gps_delay_buffer.pop();
+        gps_delay_buffer.pop();
       } else {
-	// if we get here, we have good data, stop
-	break;
+        // if we get here, we have good data, stop
+        break;
       }
     }
     // publish SITLGps msg at 5hz
@@ -222,8 +223,8 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 std::pair<double, double> GpsPlugin::reproject(math::Vector3& pos)
 {
   // reproject local position to gps coordinates
-  double x_rad = pos.y / earth_radius; // north
-  double y_rad = pos.x / earth_radius; // east
+  double x_rad = pos.y / earth_radius;    // north
+  double y_rad = pos.x / earth_radius;    // east
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);
@@ -239,5 +240,4 @@ std::pair<double, double> GpsPlugin::reproject(math::Vector3& pos)
 
   return std::make_pair (lat_rad, lon_rad);
 }
-
 }
