@@ -43,7 +43,6 @@
         <projection_type>perspective</projection_type>
         <track_visual>
           <name>rover</name>
-          <use_model_frame>1</use_model_frame>
         </track_visual>
       </camera>
     </gui>
