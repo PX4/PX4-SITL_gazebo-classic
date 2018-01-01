@@ -126,7 +126,8 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
   math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
 
-  reproject(pos_W_I, lat_rad, lon_rad);
+  // reproject position without noise into geographic coordinates
+  auto latlon_gt = reproject(pos_W_I);
 
   math::Vector3 velocity_current_W = model_->GetWorldLinearVel();  // Use the models' world position for GPS velocity.
 
@@ -159,13 +160,17 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_bias_.y += random_walk_gps.y - gps_bias_.y/gps_corellation_time;
   gps_bias_.z += random_walk_gps.z - gps_bias_.z/gps_corellation_time;
 
+  // reproject position with noise into geographic coordinates
+  auto pos_with_noise = pos_W_I + noise_gps_pos + gps_bias;
+  auto latlon = reproject(pos_with_noise);
+
   // standard deviation TODO: add a way of computing this
   std_xy = 1.0;
   std_z = 1.0;
 
   gps_msg.set_time(current_time.Double());
-  gps_msg.set_latitude_deg(lat_rad * 180.0 / M_PI);
-  gps_msg.set_longitude_deg(lon_rad * 180.0 / M_PI);
+  gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
+  gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
   gps_msg.set_altitude(pos_W_I.z + alt_home + noise_gps_pos.z + gps_bias.z);
   gps_msg.set_eph(std_xy);
   gps_msg.set_epv(std_z);
@@ -173,8 +178,9 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_msg.set_velocity_east(velocity_current_W.x + noise_gps_vel.y);
   gps_msg.set_velocity_north(velocity_current_W.y + noise_gps_vel.x);
   gps_msg.set_velocity_up(velocity_current_W.z + noise_gps_vel.z);
-  gps_msg.set_lat_rad(lat_rad);
-  gps_msg.set_lon_rad(lon_rad);
+  // fill groundtruth data
+  gps_msg.set_groundtruth_lat_rad(latlon_gt.first);
+  gps_msg.set_groundtruth_lon_rad(latlon_gt.second);
 
   // add msg to buffer
   gps_delay_buffer.push(gps_msg);
@@ -207,7 +213,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   last_time_ = current_time;
 }
 
-void GpsPlugin::reproject(math::Vector3& pos, double& lat_rad, double& lon_rad)
+std::pair<double, double> GpsPlugin::reproject(math::Vector3& pos)
 {
   // reproject local position to gps coordinates
   double x_rad = pos.y / earth_radius; // north
@@ -215,6 +221,7 @@ void GpsPlugin::reproject(math::Vector3& pos, double& lat_rad, double& lon_rad)
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);
+  double lat_rad, lon_rad;
 
   if (c != 0.0) {
     lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
@@ -223,6 +230,8 @@ void GpsPlugin::reproject(math::Vector3& pos, double& lat_rad, double& lon_rad)
     lat_rad = lat_home;
     lon_rad = lon_home;
   }
+
+  return std::make_pair (lat_rad, lon_rad);
 }
 
 }
