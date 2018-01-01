@@ -17,17 +17,22 @@
 /**
  * @brief GPS Plugin
  *
- * This plugin publishes GPS data to be used and propagated
+ * This plugin publishes GPS and Groundtruth data to be used and propagated
  *
  * @author Amy Wagoner <arwagoner@gmail.com>
+ * @author Nuno Marques <nuno.marques@dronesolutions.io>
  */
 
 #ifndef _GAZEBO_GPS_PLUGIN_HH_
 #define _GAZEBO_GPS_PLUGIN_HH_
 
+#include <math.h>
+#include <cstdio>
+#include <cstdlib>
 #include <queue>
 #include <random>
 
+#include <sdf/sdf.hh>
 #include <common.h>
 
 #include <gazebo/common/Plugin.hh>
@@ -39,6 +44,7 @@
 #include <gazebo/math/gzmath.hh>
 
 #include <SITLGps.pb.h>
+#include <Groundtruth.pb.h>
 
 namespace gazebo
 {
@@ -58,14 +64,19 @@ namespace gazebo
             std::string namespace_;
             std::default_random_engine random_generator_;
             std::normal_distribution<float> standard_normal_distribution_;
+
             bool gps_noise_;
 
             physics::ModelPtr model_;
             physics::WorldPtr world_;
             event::ConnectionPtr updateConnection_;
-            transport::PublisherPtr gps_pub_;
+
             transport::NodePtr node_handle_;
+            transport::PublisherPtr gt_pub_;
+            transport::PublisherPtr gps_pub_;
+
             gps_msgs::msgs::SITLGps gps_msg;
+            gps_msgs::msgs::Groundtruth groundtruth_msg;
 
 	    common::Time last_gps_time_;
 	    common::Time last_time_;

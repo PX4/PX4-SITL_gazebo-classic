@@ -48,6 +48,7 @@
 #include <sonarSens.pb.h>
 #include <SITLGps.pb.h>
 #include <irlock.pb.h>
+#include <Groundtruth.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 
@@ -63,6 +64,7 @@ typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> Optic
 typedef const boost::shared_ptr<const sonarSens_msgs::msgs::sonarSens> SonarSensPtr;
 typedef const boost::shared_ptr<const irlock_msgs::msgs::irlock> IRLockPtr;
 typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
+typedef const boost::shared_ptr<const gps_msgs::msgs::Groundtruth> GtPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -104,8 +106,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
         zero_position_disarmed_{},
         zero_position_armed_{},
         input_index_{},
-        lat_rad(0.0),
-        lon_rad(0.0),
+        groundtruth_lat_rad(0.0),
+        groundtruth_lon_rad(0.0),
+        groundtruth_altitude(0.0),
         mavlink_udp_port_(kDefaultMavlinkUdpPort)
         {}
   ~GazeboMavlinkInterface();
@@ -158,6 +161,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void QueueThread();
   void ImuCallback(ImuPtr& imu_msg);
   void GpsCallback(GpsPtr& gps_msg);
+  void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg);
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
@@ -195,7 +199,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
   transport::SubscriberPtr gps_sub_;
-  transport::PublisherPtr gps_pub_;
+  transport::SubscriberPtr groundtruth_sub_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -203,6 +207,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::string sonar_sub_topic_;
   std::string irlock_sub_topic_;
   std::string gps_sub_topic_;
+  std::string groundtruth_sub_topic_;
 
   common::Time last_time_;
   common::Time last_imu_time_;
@@ -212,8 +217,9 @@ class GazeboMavlinkInterface : public ModelPlugin {
   bool set_imu_rate_;
   double imu_rate_;
 
-  double lat_rad;
-  double lon_rad;
+  double groundtruth_lat_rad;
+  double groundtruth_lon_rad;
+  double groundtruth_altitude;
 
   double ev_update_interval_;
   double gps_update_interval_;
