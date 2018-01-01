@@ -19,33 +19,9 @@
  * limitations under the License.
  */
 
-#include "common.h"
-#include "gazebo_mavlink_interface.h"
-#include "geo_mag_declination.h"
-#include <cstdlib>
-#include <string>
+#include <gazebo_mavlink_interface.h>
 
 namespace gazebo {
-
-// Set global reference point
-// Zurich Irchel Park: 47.397742, 8.545594, 488m
-// Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
-// Moscow downtown: 55.753395, 37.625427, 155m
-
-// The home position can be specified using the environment variables:
-// PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
-
-// Zurich Irchel Park
-static double lat_home = 47.397742 * M_PI / 180;  // rad
-static double lon_home = 8.545594 * M_PI / 180;  // rad
-static double alt_home = 488.0; // meters
-// Seattle downtown (15 deg declination): 47.592182, -122.316031
-// static const double lat_home = 47.592182 * M_PI / 180;  // rad
-// static const double lon_home = -122.316031 * M_PI / 180;  // rad
-// static const double alt_home = 86.0; // meters
-static const double earth_radius = 6353000;  // m
-
-
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
@@ -58,19 +34,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   world_ = model_->GetWorld();
 
-  // Use environment variables if set for home position.
-  const char *env_lat = std::getenv("PX4_HOME_LAT");
-  const char *env_lon = std::getenv("PX4_HOME_LON");
   const char *env_alt = std::getenv("PX4_HOME_ALT");
-
-  if (env_lat) {
-    gzmsg << "Home latitude is set to " << env_lat << ".\n";
-    lat_home = std::stod(env_lat) * M_PI / 180.0;
-  }
-  if (env_lon) {
-    gzmsg << "Home longitude is set to " << env_lon << ".\n";
-    lon_home = std::stod(env_lon) * M_PI / 180.0;
-  }
   if (env_alt) {
     gzmsg << "Home altitude is set to " << env_alt << ".\n";
     alt_home = std::stod(env_alt);
@@ -517,7 +481,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   handle_control(dt);
 
   if (received_first_referenc_) {
-
     mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
     for (int i = 0; i < input_reference_.size(); i++) {
@@ -531,7 +494,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
     // turning_velocities_msg->header.stamp.sec = current_time.sec;
     // turning_velocities_msg->header.stamp.nsec = current_time.nsec;
 
-
     motor_velocity_reference_pub_->Publish(turning_velocities_msg);
   }
 
@@ -539,36 +501,39 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for vision estimate
 
   // vision position estimate
-  double dt_ev = current_time.Double() - last_ev_time_.Double();
+  double dt_ev = (current_time - last_ev_time_).Double();
   if (dt_ev > ev_update_interval_) {
-    //update noise paramters
-    double noise_ev_x = ev_noise_density*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
-    double noise_ev_y = ev_noise_density*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
-    double noise_ev_z = ev_noise_density*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
-    double random_walk_ev_x = ev_random_walk*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
-    double random_walk_ev_y = ev_random_walk*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
-    double random_walk_ev_z = ev_random_walk*sqrt(dt_ev)*standard_normal_distribution_(random_generator_);
+    // update noise parameters
+    noise_ev.x = ev_noise_density * sqrt(dt_ev) * randn_(rand_);
+    noise_ev.y = ev_noise_density * sqrt(dt_ev) * randn_(rand_);
+    noise_ev.z = ev_noise_density * sqrt(dt_ev) * randn_(rand_);
+    random_walk_ev.x = ev_random_walk * sqrt(dt_ev) * randn_(rand_);
+    random_walk_ev.y = ev_random_walk * sqrt(dt_ev) * randn_(rand_);
+    random_walk_ev.z = ev_random_walk * sqrt(dt_ev) * randn_(rand_);
+
     // bias integration
-    ev_bias_x_ += random_walk_ev_x*dt - ev_bias_x_/ev_corellation_time;
-    ev_bias_y_ += random_walk_ev_y*dt - ev_bias_y_/ev_corellation_time;
-    ev_bias_z_ += random_walk_ev_z*dt - ev_bias_z_/ev_corellation_time;
+    ev_bias.x += random_walk_ev.x * dt_ev - ev_bias.x / ev_corellation_time;
+    ev_bias.y += random_walk_ev.y * dt_ev - ev_bias.y / ev_corellation_time;
+    ev_bias.z += random_walk_ev.z * dt_ev - ev_bias.z / ev_corellation_time;
 
+    // Fill VISION_POSITION_ESTIMATE Mavlink msg
     mavlink_vision_position_estimate_t vp_msg;
-
     vp_msg.usec = current_time.Double() * 1e6;
-    vp_msg.y = pos_W_I.x + noise_ev_x + ev_bias_x_;
-    vp_msg.x = pos_W_I.y + noise_ev_y + ev_bias_y_;
-    vp_msg.z = -pos_W_I.z + noise_ev_z + ev_bias_z_;
+    vp_msg.y = pos_W_I.x + noise_ev.x + ev_bias.x;
+    vp_msg.x = pos_W_I.y + noise_ev.y + ev_bias.y;
+    vp_msg.z = -pos_W_I.z + noise_ev.z + ev_bias.z;
     vp_msg.roll = T_W_I.rot.GetRoll();
     vp_msg.pitch = -T_W_I.rot.GetPitch();
-    vp_msg.yaw = -T_W_I.rot.GetYaw() + M_PI/2.0;
+    vp_msg.yaw = -T_W_I.rot.GetYaw() + M_PI / 2.0;
 
+    // send VISION_POSITION_ESTIMATE Mavlink msg
     mavlink_message_t msg_;
     mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg_, &vp_msg);
     send_mavlink_message(&msg_);
 
     last_ev_time_ = current_time;
   }
+  last_time_ = current_time;
 }
 
 void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message, const int destination_port)
@@ -601,7 +566,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
       imu_message->orientation().x(),
       imu_message->orientation().y(),
       imu_message->orientation().z());
-
 
   // q_br
   /*
@@ -731,7 +695,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
 
   // send ground truth
-
   mavlink_hil_state_quaternion_t hil_state_quat;
   hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
   hil_state_quat.attitude_quaternion[0] = q_nb.w;
@@ -1007,4 +970,3 @@ void GazeboMavlinkInterface::handle_control(double _dt)
   }
 }
 }
-/* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */
