@@ -4,6 +4,7 @@
  * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+ * Copyright 2015-2017 PX4 Pro Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,46 +84,45 @@ static const double gps_vz_noise_density = 4e-1; // (m/s) / sqrt(hz)
 
 
 class GazeboMavlinkInterface : public ModelPlugin {
- public:
-  GazeboMavlinkInterface()
-      : ModelPlugin(),
+public:
+  GazeboMavlinkInterface() : ModelPlugin(),
+    received_first_referenc_(false),
+    namespace_(kDefaultNamespace),
+    motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
+    imu_sub_topic_(kDefaultImuTopic),
+    opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
+    lidar_sub_topic_(kDefaultLidarTopic),
+    sonar_sub_topic_(kDefaultSonarTopic),
+    irlock_sub_topic_(kDefaultIRLockTopic),
+    model_ {},
+    world_(nullptr),
+    left_elevon_joint_(nullptr),
+    right_elevon_joint_(nullptr),
+    elevator_joint_(nullptr),
+    propeller_joint_(nullptr),
+    gimbal_yaw_joint_(nullptr),
+    gimbal_pitch_joint_(nullptr),
+    gimbal_roll_joint_(nullptr),
+    input_offset_ {},
+    input_scaling_ {},
+    zero_position_disarmed_ {},
+    zero_position_armed_ {},
+    input_index_ {},
+    groundtruth_lat_rad(0.0),
+    groundtruth_lon_rad(0.0),
+    groundtruth_altitude(0.0),
+    mavlink_udp_port_(kDefaultMavlinkUdpPort)
+  {}
 
-        received_first_referenc_(false),
-        namespace_(kDefaultNamespace),
-        motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
-        imu_sub_topic_(kDefaultImuTopic),
-        opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
-        lidar_sub_topic_(kDefaultLidarTopic),
-        sonar_sub_topic_(kDefaultSonarTopic),
-        irlock_sub_topic_(kDefaultIRLockTopic),
-        model_{},
-        world_(nullptr),
-        left_elevon_joint_(nullptr),
-        right_elevon_joint_(nullptr),
-        elevator_joint_(nullptr),
-        propeller_joint_(nullptr),
-        gimbal_yaw_joint_(nullptr),
-        gimbal_pitch_joint_(nullptr),
-        gimbal_roll_joint_(nullptr),
-        input_offset_{},
-        input_scaling_{},
-        zero_position_disarmed_{},
-        zero_position_armed_{},
-        input_index_{},
-        groundtruth_lat_rad(0.0),
-        groundtruth_lon_rad(0.0),
-        groundtruth_altitude(0.0),
-        mavlink_udp_port_(kDefaultMavlinkUdpPort)
-        {}
   ~GazeboMavlinkInterface();
 
   void Publish();
 
- protected:
+protected:
   void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-  void OnUpdate(const common::UpdateInfo& /*_info*/);
+  void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
- private:
+private:
 
   bool received_first_referenc_;
   Eigen::VectorXd input_reference_;
@@ -169,16 +169,22 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
-  void send_mavlink_message(const mavlink_message_t *message, const int destination_port=0);
+  void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
   static const unsigned n_out_max = 16;
 
+  double alt_home = 488.0;   // meters
+
+  math::Vector3 ev_bias;
+  math::Vector3 noise_ev;
+  math::Vector3 random_walk_ev;
+
   // vision position estimate noise parameters
-  static constexpr double ev_corellation_time = 60.0; // s
-  static constexpr double ev_random_walk = 2.0; // (m/s) / sqrt(hz)
-  static constexpr double ev_noise_density = 2e-4; // (m) / sqrt(hz)
+  static constexpr double ev_corellation_time = 60.0;  // s
+  static constexpr double ev_random_walk = 2.0;        // (m/s) / sqrt(hz)
+  static constexpr double ev_noise_density = 2e-4;     // (m) / sqrt(hz)
 
   unsigned _rotor_count;
 
@@ -235,8 +241,8 @@ class GazeboMavlinkInterface : public ModelPlugin {
   std::normal_distribution<float> randn_;
 
   int _fd;
-  struct sockaddr_in _myaddr;  ///< The locally bound address
-  struct sockaddr_in _srcaddr;  ///< SITL instance
+  struct sockaddr_in _myaddr;     ///< The locally bound address
+  struct sockaddr_in _srcaddr;    ///< SITL instance
   socklen_t _addrlen;
   unsigned char _buf[65535];
   struct pollfd fds[1];
@@ -244,7 +250,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
-  math::Vector3 optflow_gyro{};
+  math::Vector3 optflow_gyro {};
   double optflow_distance;
   double sonar_distance;
 
@@ -252,11 +258,5 @@ class GazeboMavlinkInterface : public ModelPlugin {
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
-
-  };
-
-  std::queue<mavlink_hil_gps_t> gps_delay_buffer;
-  double gps_bias_x_;
-  double gps_bias_y_;
-  double gps_bias_z_;
+};
 }
