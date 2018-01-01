@@ -7,9 +7,9 @@
   -->
   <model name='hippocampus'>
     <link name='base_link'>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <!--
           These values are a compromise between the dry mass and added mass
           values used to correct for hydrodynamic effects.
@@ -205,7 +205,7 @@
       <velocity_decay/>
       <gravity>0</gravity>
       <visual name='rotor_0_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -231,7 +231,7 @@
       <collision name='rotor_0_collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 0 0.02 0 -0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -284,7 +284,7 @@
       <velocity_decay/>
       <gravity>0</gravity>
       <visual name='rotor_1_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -310,7 +310,7 @@
       <collision name='rotor_1_collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 0 0.02 0 -0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -363,7 +363,7 @@
       <velocity_decay/>
       <gravity>0</gravity>
       <visual name='rotor_2_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -389,7 +389,7 @@
       <collision name='rotor_2_collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 0 0.02 0 -0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -442,7 +442,7 @@
       <velocity_decay/>
       <gravity>0</gravity>
       <visual name='rotor_3_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -468,7 +468,7 @@
       <collision name='rotor_3_collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 0 0.02 0 -0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>

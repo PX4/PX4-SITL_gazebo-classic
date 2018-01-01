@@ -43,7 +43,7 @@
     <include>
       <name>shelves 2</name>
       <uri>model://shelves_high2</uri>
-      <pose>-4.13394 3.4 0 0 -0 0</pose>
+      <pose>-4.13394 3.4 0 0 0 0</pose>
     </include>
     
     <!-- SHELVES -->
@@ -55,7 +55,7 @@
     <include>
       <name>shelves 4</name>
       <uri>model://shelves_high2</uri>
-      <pose>-4.13394 4.7 0 0 -0 0</pose>
+      <pose>-4.13394 4.7 0 0 0 0</pose>
     </include>
     
     <!-- SHELVES -->
@@ -67,7 +67,7 @@
     <include>
       <name>shelves 6</name>
       <uri>model://shelves_high2_no_collision</uri>
-      <pose>-4.13394 -1.5 0 0 -0 0</pose>
+      <pose>-4.13394 -1.5 0 0 0 0</pose>
     </include>
     
     <!-- SHELVES -->
@@ -79,7 +79,7 @@
     <include>
       <name>shelves 8</name>
       <uri>model://shelves_high2_no_collision</uri>
-      <pose>-4.13394 -2.8 0 0 -0 0</pose>
+      <pose>-4.13394 -2.8 0 0 0 0</pose>
     </include>
     
     <!-- SHELVES -->
@@ -91,7 +91,7 @@
     <include>
       <name>shelves 10</name>
       <uri>model://shelves_high2_no_collision</uri>
-      <pose>-4.13394 -7.8 0 0 -0 0</pose>
+      <pose>-4.13394 -7.8 0 0 0 0</pose>
     </include>
     
     <!-- SHELVES -->
@@ -103,7 +103,7 @@
     <include>
       <name>shelves 12</name>
       <uri>model://shelves_high2_no_collision</uri>
-      <pose>-4.13394 -9.1 0 0 -0 0</pose>
+      <pose>-4.13394 -9.1 0 0 0 0</pose>
     </include>
     
     <!-- =================================
@@ -155,7 +155,7 @@
     <include>
       <name>pallet 10 support</name>
       <uri>model://europallet</uri>
-      <pose>-3.41303 3.343739 0.0635 0 -0 1.56536</pose>
+      <pose>-3.41303 3.343739 0.0635 0 0 1.56536</pose>
     </include>
     
     <!-- PALLET 11 -->
@@ -179,19 +179,19 @@
     <include>
       <name>pallet 12 support</name>
       <uri>model://europallet</uri>
-      <pose>-5.91303 3.343739 0.0635 0 -0 1.56536</pose>
+      <pose>-5.91303 3.343739 0.0635 0 0 1.56536</pose>
     </include>
     
     <!-- EMPTY PALLET 18 -->
     <include>
       <name>pallet 18 support</name>
       <uri>model://europallet</uri>
-      <pose>0.234986 3.337637 0.0635 0 -0 1.56536</pose>
+      <pose>0.234986 3.337637 0.0635 0 0 1.56536</pose>
     </include>
     <include>
       <name>pallet 18b support</name>
       <uri>model://europallet</uri>
-      <pose>0.134986 3.337637 0.2102 0 -0 1.2</pose>
+      <pose>0.134986 3.337637 0.2102 0 0 1.2</pose>
     </include>
       
     <!-- =================================
@@ -207,7 +207,7 @@
     <include>
       <name>pallet 2 support</name>
       <uri>model://europallet</uri>
-      <pose>-3.21303 3.343739 1.6373 0 -0 1.56536</pose>
+      <pose>-3.21303 3.343739 1.6373 0 0 1.56536</pose>
     </include>
     
     
@@ -248,7 +248,7 @@
     <include>
       <name>pallet 9 support</name>
       <uri>model://europallet</uri>
-      <pose>-2.28744 2.915349 1.64676 0 -0 1.5541</pose>
+      <pose>-2.28744 2.915349 1.64676 0 0 1.5541</pose>
     </include>
     
     <!-- PALLET 13 -->
@@ -272,7 +272,7 @@
     <include>
       <name>pallet 14 support</name>
       <uri>model://europallet</uri>
-      <pose>-5.91303 3.343739 1.64676 0 -0 1.56536</pose>
+      <pose>-5.91303 3.343739 1.64676 0 0 1.56536</pose>
     </include>
     
     <!-- PALLET 19 -->
@@ -284,7 +284,7 @@
     <include>
       <name>pallet 19 support</name>
       <uri>model://europallet</uri>
-      <pose>-0.8 3.337637 1.6373 0 -0 1.56536</pose>
+      <pose>-0.8 3.337637 1.6373 0 0 1.56536</pose>
     </include>
     
     
@@ -326,7 +326,7 @@
     <include>
       <name>pallet 20 support</name>
       <uri>model://europallet</uri>
-      <pose>-3.21303 3.343739 3.27046 0 -0 1.56536</pose>
+      <pose>-3.21303 3.343739 3.27046 0 0 1.56536</pose>
     </include>
     
     <!-- PALLET 21 -->
@@ -350,7 +350,7 @@
     <include>
       <name>pallet 22 support</name>
       <uri>model://europallet</uri>
-      <pose>-0.8 3.337637 3.27046 0 -0 1.56536</pose>
+      <pose>-0.8 3.337637 3.27046 0 0 1.56536</pose>
     </include>
     
     
@@ -451,7 +451,7 @@
     <include>
       <name>first_2015_trash_can</name>
       <uri>model://first_2015_trash_can</uri>
-      <pose>3.8239 3.403029 0 0 -0 0</pose>
+      <pose>3.8239 3.403029 0 0 0 0</pose>
     </include>
     
     

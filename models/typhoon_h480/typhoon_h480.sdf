@@ -3,11 +3,11 @@
     <!-- Typhoon H body -->
     <pose>0 0 0.26 0 0 3.1415927</pose>
     <link name='base_link'>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <!-- rear reference point X: -100.044mm, CAD offset: 1001.049mm -->
         <!-- top reference point Z: 33.8663mm, CAD offset: 42.8698mm -->
-        <pose>0.001005 0 -0.0090035 0 -0 0</pose>
+        <pose>0.001005 0 -0.0090035 0 0 0</pose>
         <mass>2.02</mass>
         <inertia>
           <ixx>0.011</ixx>
@@ -38,7 +38,7 @@
         </surface>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -152,7 +152,7 @@
     <link name="cgo3_mount_link">
       <inertial>
         <!-- place holder -->
-        <pose>-0.041 0 -0.162 0 -0 0</pose>
+        <pose>-0.041 0 -0.162 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -164,7 +164,7 @@
         </inertia>
       </inertial>
       <visual name='cgo3_mount_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -206,7 +206,7 @@
     <link name="cgo3_vertical_arm_link">
       <inertial>
         <!-- place holder -->
-        <pose>-0.041 0 -0.162 0 -0 0</pose>
+        <pose>-0.041 0 -0.162 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -218,7 +218,7 @@
         </inertia>
       </inertial>
       <visual name='cgo3_vertical_arm_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -268,7 +268,7 @@
     <link name="cgo3_horizontal_arm_link">
       <inertial>
         <!-- place holder -->
-        <pose>-0.041 0 -0.081 0 -0 0</pose>
+        <pose>-0.041 0 -0.081 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -280,7 +280,7 @@
         </inertia>
       </inertial>
       <visual name='cgo3_horizontal_arm_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -330,7 +330,7 @@
     <link name="cgo3_camera_link">
       <inertial>
         <!-- place holder -->
-        <pose>-0.041 0 -0.162 0 -0 0</pose>
+        <pose>-0.041 0 -0.162 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -342,7 +342,7 @@
         </inertia>
       </inertial>
       <collision name='cgo3_camera_collision'>
-        <pose>-0.041 0 -0.162 0 -0 0</pose>
+        <pose>-0.041 0 -0.162 0 0 0</pose>
         <geometry>
           <sphere>
             <radius>0.035</radius>
@@ -366,7 +366,7 @@
         </surface>
       </collision>
       <visual name='cgo3_camera_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -462,7 +462,7 @@
     <link name="left_leg">
       <inertial>
         <!-- place holder -->
-        <pose>0 -0.14314 -0.207252 0 -0 0</pose>
+        <pose>0 -0.14314 -0.207252 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
@@ -524,7 +524,7 @@
         </surface>
       </collision>
       <visual name='base_link_left_leg'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -566,7 +566,7 @@
     </joint>
 
     <link name="right_leg">
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <!-- place holder -->
         <pose>0 0.14314 -0.207252 0 0 0</pose>
@@ -631,7 +631,7 @@
         </surface>
       </collision>
       <visual name='base_link_right_leg'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -675,7 +675,7 @@
     <link name='typhoon_h480/imu_link'>
       <pose>0 0 0 0 0 3.1415927</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.015</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -708,7 +708,7 @@
     <link name='rotor_3'>
       <pose>0.211396 0.119762 0.082219 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -720,7 +720,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_3_collision'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -780,7 +780,7 @@
     <link name='rotor_0'>
       <pose>-0.209396 0.122762 0.082219 0 0 2.09439510239</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -792,7 +792,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_0_collision'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -852,7 +852,7 @@
     <link name='rotor_4'>
       <pose>-0.00187896 0.242705 0.0822169 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -864,7 +864,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_4_collision'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -924,7 +924,7 @@
     <link name='rotor_1'>
       <pose>0.211396 -0.119762 0.082219 0 0 -2.09439510239</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -936,7 +936,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_1_collision'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -997,7 +997,7 @@
     <link name='rotor_5'>
       <pose>-0.00187896 -0.242705 0.0822169 0 0 -2.09439510239</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -1009,7 +1009,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_5_collision'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
@@ -1069,7 +1069,7 @@
     <link name='rotor_2'>
       <pose>-0.209396 -0.122762 0.082219 0 0 2.09439510239</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -1081,7 +1081,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_2_collision'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.005</length>
