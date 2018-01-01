@@ -19,7 +19,9 @@
           <cylinder><radius>0.006</radius><length>0.05</length></cylinder>
         </geometry>
         <material>
-          <script>Gazebo/Black</script>
+          <script>
+	    <name>Gazebo/Black</name>
+	  </script>
         </material>
       </visual>
       <sensor name="laser" type="ray">
@@ -45,7 +47,6 @@
           </noise>
         </ray>
 	<plugin name="LaserPlugin" filename="libgazebo_lidar_plugin.so"/>
-		<robotNamespace></robotNamespace>
         <always_on>1</always_on>
         <update_rate>20</update_rate>
         <visualize>true</visualize>
