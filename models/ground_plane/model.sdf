@@ -12,7 +12,7 @@
         </geometry>
         <surface>
           <contact>
-             <collide_bitmask>0xffff</collide_bitmask>
+             <collide_bitmask>65535</collide_bitmask>
           </contact>
           <friction>
             <ode>
