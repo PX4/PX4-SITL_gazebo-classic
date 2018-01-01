@@ -17,17 +17,13 @@
 /**
  * @brief GPS Plugin
  *
- * This plugin publishes GPS data to be used and propagated
+ * This plugin publishes GPS and Groundtruth data to be used and propagated
  *
  * @author Amy Wagoner <arwagoner@gmail.com>
+ * @author Nuno Marques <nuno.marques@dronesolutions.io>
  */
 
-#include "gazebo_gps_plugin.h"
-#include <math.h>
-#include <sdf/sdf.hh>
-#include <cstdio>
-#include "common.h"
-#include <cstdlib>
+#include <gazebo_gps_plugin.h>
 
 namespace gazebo {
 
@@ -105,8 +101,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-   // Listen to the update event. This event is broadcast every
-  // simulation iteration.
+  // Listen to the update event. This event is broadcast every simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GpsPlugin::OnUpdate, this, _1));
 
@@ -116,6 +111,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   gps_pub_ = node_handle_->Advertise<gps_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
+  gt_pub_ = node_handle_->Advertise<gps_msgs::msgs::Groundtruth>("~/" + model_->GetName() + "/groundtruth", 10);
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
@@ -124,7 +120,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   double dt = (current_time - last_time_).Double();
 
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
-  math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
+  math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and groundtruth
 
   // reproject position without noise into geographic coordinates
   auto latlon_gt = reproject(pos_W_I);
@@ -178,9 +174,6 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_msg.set_velocity_east(velocity_current_W.x + noise_gps_vel.y);
   gps_msg.set_velocity_north(velocity_current_W.y + noise_gps_vel.x);
   gps_msg.set_velocity_up(velocity_current_W.z + noise_gps_vel.z);
-  // fill groundtruth data
-  gps_msg.set_groundtruth_lat_rad(latlon_gt.first);
-  gps_msg.set_groundtruth_lon_rad(latlon_gt.second);
 
   // add msg to buffer
   gps_delay_buffer.push(gps_msg);
@@ -207,9 +200,22 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 	break;
       }
     }
-    // publish SITLGps msg
+    // publish SITLGps msg at 5hz
     gps_pub_->Publish(gps_msg);
   }
+
+  // fill Groundtruth msg
+  groundtruth_msg.set_time(current_time.Double());
+  groundtruth_msg.set_latitude_rad(latlon_gt.first);
+  groundtruth_msg.set_longitude_rad(latlon_gt.second);
+  groundtruth_msg.set_altitude(-pos_W_I.z + alt_home);
+  groundtruth_msg.set_velocity_east(velocity_current_W.x);
+  groundtruth_msg.set_velocity_north(velocity_current_W.y);
+  groundtruth_msg.set_velocity_up(velocity_current_W.z);
+
+  // publish Groundtruth msg at full rate
+  gt_pub_->Publish(groundtruth_msg);
+
   last_time_ = current_time;
 }
 
