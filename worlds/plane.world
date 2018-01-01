@@ -36,7 +36,7 @@
     <!--
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>5.4634 -5.46339 2.17586 0 0.275643 2.35619</pose>
+        <pose>5.4634 -5.46339 2.17586 0 0.275643 2.35619</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
         <track_visual>
