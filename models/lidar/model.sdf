@@ -3,7 +3,7 @@
   <model name="lidar">
     <link name="link">
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.01</mass>
         <inertia>
           <ixx>2.1733e-6</ixx>

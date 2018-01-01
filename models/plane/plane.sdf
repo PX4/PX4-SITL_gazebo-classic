@@ -90,7 +90,7 @@
     <link name="camera_link">
       <inertial>
         <!-- place holder -->
-        <pose>-0.041 0 -0.162 0 -0 0</pose>
+        <pose>-0.041 0 -0.162 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
           <ixx>0.001</ixx>
