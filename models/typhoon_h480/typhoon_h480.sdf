@@ -1153,7 +1153,7 @@
         </limit>
       </axis>
     </joint>
-  
+
 
     <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
@@ -1545,7 +1545,7 @@
       <joint_yaw>typhoon_h480::cgo3_vertical_arm_joint</joint_yaw>
       <joint_roll>typhoon_h480::cgo3_horizontal_arm_joint</joint_roll>
       <joint_pitch>typhoon_h480::cgo3_camera_joint</joint_pitch>
-      <imu>camera_imu</imu>
+      <gimbal_imu>camera_imu</gimbal_imu>
     </plugin>
   </model>
 </sdf>
