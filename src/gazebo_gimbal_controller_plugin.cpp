@@ -113,10 +113,10 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
 
   // get imu sensors
   std::string cameraImuSensorName = "camera_imu";
-  if (this->sdf->HasElement("imu"))
+  if (this->sdf->HasElement("gimbal_imu"))
   {
     // Add names to map
-    cameraImuSensorName = sdf->Get<std::string>("imu");
+    cameraImuSensorName = sdf->Get<std::string>("gimbal_imu");
   }
 #if GAZEBO_MAJOR_VERSION >= 7
   this->cameraImuSensor = std::static_pointer_cast<sensors::ImuSensor>(
