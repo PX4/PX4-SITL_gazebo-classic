@@ -51,8 +51,7 @@ namespace gazebo
             virtual void OnUpdate(const common::UpdateInfo&);
 
         private:
-
-            void reproject(math::Vector3& pos, double& lat_rad, double& lon_rad);
+            std::pair<double, double> reproject(math::Vector3& pos);
 
             std::string namespace_;
             std::default_random_engine random_generator_;
@@ -92,9 +91,6 @@ namespace gazebo
 	    static constexpr double gps_delay = 0.12; // 120 ms
 	    static constexpr int gps_buffer_size_max = 1000;
 	    std::queue<gps_msgs::msgs::SITLGps> gps_delay_buffer;
-
-            double lat_rad;
-            double lon_rad;
 
             math::Vector3 gps_bias;
             math::Vector3 noise_gps_pos;

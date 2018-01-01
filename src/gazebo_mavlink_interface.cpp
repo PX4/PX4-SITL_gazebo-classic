@@ -766,9 +766,9 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
-  // update lat_rad and lon_rad
-  lat_rad = gps_msg->lat_rad();
-  lon_rad = gps_msg->lon_rad();
+  // update groundtruth lat_rad and lon_rad
+  lat_rad = gps_msg->groundtruth_lat_rad();
+  lon_rad = gps_msg->groundtruth_lon_rad();
 
   // fill HIL GPS Mavlink msg
   mavlink_hil_gps_t hil_gps_msg;
