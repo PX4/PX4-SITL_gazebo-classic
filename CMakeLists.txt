@@ -215,6 +215,7 @@ set (msgs
   msgs/sonarSens.proto
   msgs/irlock.proto
   msgs/SITLGps.proto
+  msgs/Groundtruth.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -313,7 +314,7 @@ if (GSTREAMER_FOUND)
       ${plugins}
       gazebo_video_stream_widget
     )
-    
+
     message(STATUS "Found GStreamer: adding gst_video_stream_widget")
   endif()
 endif()

@@ -94,6 +94,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
   getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
+  groundtruth_sub_topic_ = "/groundtruth";
 
   // set input_reference_ from inputs.control
   input_reference_.resize(n_out_max);
@@ -432,6 +433,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
   gps_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gps_sub_topic_, &GazeboMavlinkInterface::GpsCallback, this);
+  groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
@@ -591,8 +593,6 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
-
-
   // frames
   // g - gazebo (ENU), east, north, up
   // r - rotors imu frame (FLU), forward, left, up
@@ -638,7 +638,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
   //gzerr << "got imu: " << C_W_I << "\n";
   //gzerr << "got pose: " << T_W_I.rot << "\n";
-  float declination = get_mag_declination(lat_rad, lon_rad);
+  float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
 
   math::Quaternion q_dn(0.0, 0.0, declination);
   math::Vector3 mag_n = q_dn.RotateVector(mag_d_);
@@ -745,9 +745,9 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   hil_state_quat.pitchspeed = omega_nb_b.y;
   hil_state_quat.yawspeed = omega_nb_b.z;
 
-  hil_state_quat.lat = lat_rad * 180 / M_PI * 1e7;
-  hil_state_quat.lon = lon_rad * 180 / M_PI * 1e7;
-  hil_state_quat.alt = (-pos_n.z + alt_home) * 1000;
+  hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
+  hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
+  hil_state_quat.alt = groundtruth_altitude * 1000;
 
   hil_state_quat.vx = vel_n.x * 100;
   hil_state_quat.vy = vel_n.y * 100;
@@ -766,10 +766,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
-  // update groundtruth lat_rad and lon_rad
-  lat_rad = gps_msg->groundtruth_lat_rad();
-  lon_rad = gps_msg->groundtruth_lon_rad();
-
   // fill HIL GPS Mavlink msg
   mavlink_hil_gps_t hil_gps_msg;
   hil_gps_msg.time_usec = gps_msg->time() * 1e6;
@@ -793,6 +789,15 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   mavlink_message_t msg;
   mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
   send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg){
+  // update groundtruth lat_rad, lon_rad and altitude
+  groundtruth_lat_rad = groundtruth_msg->latitude_rad();
+  groundtruth_lon_rad = groundtruth_msg->longitude_rad();
+  groundtruth_altitude = groundtruth_msg->altitude();
+  // the rest of the data is obtained directly on this interface and sent to
+  // the FCU
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
