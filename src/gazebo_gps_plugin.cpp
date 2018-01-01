@@ -27,31 +27,10 @@
 #include <gazebo_gps_plugin.h>
 
 namespace gazebo {
-
 GZ_REGISTER_MODEL_PLUGIN(GpsPlugin)
 
-// Set global reference point
-// Zurich Irchel Park: 47.397742, 8.545594, 488m
-// Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
-// Moscow downtown: 55.753395, 37.625427, 155m
-
-// The home position can be specified using the environment variables:
-// PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
-
-// Zurich Irchel Park
-static double lat_home = 47.397742 * M_PI / 180;  // rad
-static double lon_home = 8.545594 * M_PI / 180;  // rad
-static double alt_home = 488.0; // meters
-// Seattle downtown (15 deg declination): 47.592182, -122.316031
-// static const double lat_home = 47.592182 * M_PI / 180;  // rad
-// static const double lon_home = -122.316031 * M_PI / 180;  // rad
-// static const double alt_home = 86.0; // meters
-static const double earth_radius = 6353000;  // m
-
 GpsPlugin::GpsPlugin() : ModelPlugin()
-{
-
-}
+{ }
 
 GpsPlugin::~GpsPlugin()
 {
@@ -107,8 +86,6 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       boost::bind(&GpsPlugin::OnUpdate, this, _1));
 
   last_gps_time_ = world_->GetSimTime();
-  gps_update_interval_ = 0.2;  // in seconds for 5Hz
-  gps_delay_ = 0.12; // in seconds
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   gps_pub_ = node_handle_->Advertise<gps_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
@@ -116,7 +93,6 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
-
   common::Time current_time = world_->GetSimTime();
   double dt = (current_time - last_time_).Double();
 
@@ -131,31 +107,34 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   math::Vector3 velocity_current_W_xy = velocity_current_W;
   velocity_current_W_xy.z = 0;
 
-  dt_gps = current_time.Double() - last_gps_time_.Double();
-
-  noise_gps.x = 0;
-  noise_gps.y = 0;
-  noise_gps.z = 0;
-
-  random_walk_gps.x = 0;
-  random_walk_gps.y = 0;
-  random_walk_gps.z = 0;
-
+  // update noise parameters if gps_noise_ is set
   if (gps_noise_) {
-    //update noise paramters
-    noise_gps.x = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-    noise_gps.y = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-    noise_gps.z = gps_noise_density*sqrt(dt_gps)*standard_normal_distribution_(random_generator_);
-
-    random_walk_gps.x = gps_random_walk*standard_normal_distribution_(random_generator_);
-    random_walk_gps.y = gps_random_walk*standard_normal_distribution_(random_generator_);
-    random_walk_gps.z = gps_random_walk*standard_normal_distribution_(random_generator_);
+    noise_gps_pos.x = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.y = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.z = gps_z_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.x = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.y = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.z = gps_vz_noise_density * sqrt(dt) * randn_(rand_);
+    random_walk_gps.x = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
+    random_walk_gps.y = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
+    random_walk_gps.z = gps_z_random_walk * sqrt(dt) * randn_(rand_);
+  }
+  else {
+    noise_gps_pos.x = 0.0;
+    noise_gps_pos.y = 0.0;
+    noise_gps_pos.z = 0.0;
+    noise_gps_vel.x = 0.0;
+    noise_gps_vel.y = 0.0;
+    noise_gps_vel.z = 0.0;
+    random_walk_gps.x = 0.0;
+    random_walk_gps.y = 0.0;
+    random_walk_gps.z = 0.0;
   }
 
-  // bias integration
-  gps_bias_.x += random_walk_gps.x - gps_bias_.x/gps_corellation_time;
-  gps_bias_.y += random_walk_gps.y - gps_bias_.y/gps_corellation_time;
-  gps_bias_.z += random_walk_gps.z - gps_bias_.z/gps_corellation_time;
+  // gps bias integration
+  gps_bias.x += random_walk_gps.x * dt - gps_bias.x / gps_corellation_time;
+  gps_bias.y += random_walk_gps.y * dt - gps_bias.y / gps_corellation_time;
+  gps_bias.z += random_walk_gps.z * dt - gps_bias.z / gps_corellation_time;
 
   // reproject position with noise into geographic coordinates
   auto pos_with_noise = pos_W_I + noise_gps_pos + gps_bias;
@@ -165,6 +144,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   std_xy = 1.0;
   std_z = 1.0;
 
+  // fill SITLGps msg
   gps_msg.set_time(current_time.Double());
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);

@@ -49,7 +49,8 @@
 
 namespace gazebo
 {
-class GAZEBO_VISIBLE GpsPlugin : public ModelPlugin {
+class GAZEBO_VISIBLE GpsPlugin : public ModelPlugin
+{
 public:
   GpsPlugin();
   virtual ~GpsPlugin();

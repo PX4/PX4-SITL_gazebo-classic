@@ -19,34 +19,41 @@
  * limitations under the License.
  */
 
+#include <iostream>
+#include <deque>
+#include <random>
+#include <stdio.h>
+#include <math.h>
+#include <cstdlib>
+#include <string>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <boost/bind.hpp>
 #include <Eigen/Eigen>
+
+#include <gazebo/gazebo.hh>
+#include <gazebo/math/Vector3.hh>
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-#include "CommandMotorSpeed.pb.h"
-#include "MotorSpeed.pb.h"
-#include "gazebo/transport/transport.hh"
-#include "gazebo/msgs/msgs.hh"
-#include <stdio.h>
-#include <queue>
+#include <gazebo/transport/transport.hh>
+#include <gazebo/msgs/msgs.hh>
 
-#include "common.h"
-
-#include "SensorImu.pb.h"
-#include "opticalFlow.pb.h"
-#include "lidar.pb.h"
-#include "sonarSens.pb.h"
-#include "SITLGps.pb.h"
+#include <sdf/sdf.hh>
+#include <common.h>
+#include <CommandMotorSpeed.pb.h>
+#include <MotorSpeed.pb.h>
+#include <SensorImu.pb.h>
+#include <opticalFlow.pb.h>
+#include <lidar.pb.h>
+#include <sonarSens.pb.h>
+#include <SITLGps.pb.h>
 #include <irlock.pb.h>
 #include <Groundtruth.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 
-#include "gazebo/math/Vector3.hh"
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <geo_mag_declination.h>
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 
@@ -72,16 +79,6 @@ static const std::string kDefaultLidarTopic = "/lidar/link/lidar";
 static const std::string kDefaultOpticalFlowTopic = "/camera/link/opticalFlow";
 static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
-
-// gps noise params
-static const double gps_corellation_time = 60.0; // s
-static const double gps_xy_random_walk = 2.0; // (m/s) / sqrt(hz)
-static const double gps_z_random_walk = 4.0; // (m/s) / sqrt(hz)
-static const double gps_xy_noise_density = 2e-4; // (m) / sqrt(hz)
-static const double gps_z_noise_density = 4e-4; // (m) / sqrt(hz)
-static const double gps_vxy_noise_density = 2e-1; // (m/s) / sqrt(hz)
-static const double gps_vz_noise_density = 4e-1; // (m/s) / sqrt(hz)
-
 
 class GazeboMavlinkInterface : public ModelPlugin {
 public:
@@ -174,7 +171,6 @@ private:
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
   static const unsigned n_out_max = 16;
-
   double alt_home = 488.0;   // meters
 
   math::Vector3 ev_bias;
@@ -218,6 +214,7 @@ private:
   common::Time last_ev_time_;
   common::Time last_actuator_time_;
 
+  bool set_imu_rate_;
   double imu_rate_;
 
   double groundtruth_lat_rad;
@@ -225,11 +222,7 @@ private:
   double groundtruth_altitude;
 
   double ev_update_interval_;
-  double ev_bias_x_;
-  double ev_bias_y_;
-  double ev_bias_z_;
-
-  bool set_imu_rate_;
+  double gps_update_interval_;
 
   void handle_control(double _dt);
 
@@ -253,8 +246,6 @@ private:
   math::Vector3 optflow_gyro {};
   double optflow_distance;
   double sonar_distance;
-
-  mavlink_hil_gps_t hil_gps_msg_;
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
