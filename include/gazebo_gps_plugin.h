@@ -88,8 +88,8 @@ namespace gazebo
 	    static constexpr const double earth_radius = 6353000.0;  // m
 
 	    // gps delay related
-	    static constexpr double gps_update_interval_ = 0.2;  // seconds (5hz)
-	    static constexpr double gps_delay = 0.3; // seconds
+	    static constexpr double gps_update_interval_ = 0.2;  // 5hz
+	    static constexpr double gps_delay = 0.12; // 120 ms
 	    static constexpr int gps_buffer_size_max = 1000;
 	    std::queue<gps_msgs::msgs::SITLGps> gps_delay_buffer;
 
