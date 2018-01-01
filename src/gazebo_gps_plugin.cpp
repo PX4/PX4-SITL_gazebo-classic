@@ -120,6 +120,10 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
     
   common::Time current_time = world_->GetSimTime();
   double dt = (current_time - last_gps_time_).Double();
+
+  if (dt < gps_update_interval_) {
+    return;
+  }
     
   math::Pose T_W_I = model_->GetWorldPose(); //TODO(burrimi): Check tf.
   math::Vector3& pos_W_I = T_W_I.pos;  // Use the models' world position for GPS and pressure alt.
