@@ -18,9 +18,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <vector>
+#include <thread>
+#include <mutex>
+#include <deque>
+#include <atomic>
+#include <chrono>
+#include <thread>
+#include <memory>
+#include <sstream>
+#include <cassert>
+#include <stdexcept>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/utility.hpp>
+#include <boost/function.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/system/system_error.hpp>
 
 #include <iostream>
-#include <deque>
 #include <random>
 #include <stdio.h>
 #include <math.h>
@@ -28,7 +44,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <boost/bind.hpp>
+
 #include <Eigen/Eigen>
 
 #include <gazebo/gazebo.hh>
@@ -51,11 +67,22 @@
 #include <irlock.pb.h>
 #include <Groundtruth.pb.h>
 
+
 #include <mavlink/v2.0/common/mavlink.h>
+#include "msgbuffer.h"
 
 #include <geo_mag_declination.h>
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
+static const uint32_t kDefaultQGCUdpPort = 14550;
+
+using lock_guard = std::lock_guard<std::recursive_mutex>;
+static constexpr auto kDefaultDevice = "/dev/ttyACM0";
+static constexpr auto kDefaultBaudRate = 921600;
+
+//! Maximum buffer size with padding for CRC bytes (280 + padding)
+static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
+static constexpr size_t MAX_TXQ_SIZE = 1000;
 
 namespace gazebo {
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
@@ -79,6 +106,15 @@ static const std::string kDefaultLidarTopic = "/lidar/link/lidar";
 static const std::string kDefaultOpticalFlowTopic = "/camera/link/opticalFlow";
 static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
+static const std::string kDefaultGPSTopic = "/gps";
+
+//! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
+enum class Framing : uint8_t {
+	incomplete = MAVLINK_FRAMING_INCOMPLETE,
+	ok = MAVLINK_FRAMING_OK,
+	bad_crc = MAVLINK_FRAMING_BAD_CRC,
+	bad_signature = MAVLINK_FRAMING_BAD_SIGNATURE,
+};
 
 class GazeboMavlinkInterface : public ModelPlugin {
 public:
@@ -87,10 +123,12 @@ public:
     namespace_(kDefaultNamespace),
     motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
     imu_sub_topic_(kDefaultImuTopic),
+    imu_rate_(170),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
     lidar_sub_topic_(kDefaultLidarTopic),
     sonar_sub_topic_(kDefaultSonarTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
+    gps_sub_topic_(kDefaultGPSTopic),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -108,9 +146,21 @@ public:
     groundtruth_lat_rad(0.0),
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
-    mavlink_udp_port_(kDefaultMavlinkUdpPort)
-  {}
-
+    mavlink_udp_port_(kDefaultMavlinkUdpPort),
+    qgc_udp_port_(kDefaultMavlinkUdpPort),
+    serial_enabled_(false),
+    tx_q {},
+    rx_buf {},
+    m_status {},
+    m_buffer {},
+    io_service(),
+    serial_dev(io_service),
+    device_(kDefaultDevice),
+    baudrate_(kDefaultBaudRate),
+    hil_mode_(false),
+    hil_state_level_(false)
+    {}
+  
   ~GazeboMavlinkInterface();
 
   void Publish();
@@ -120,7 +170,6 @@ protected:
   void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
 private:
-
   bool received_first_referenc_;
   Eigen::VectorXd input_reference_;
 
@@ -169,6 +218,16 @@ private:
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
+  
+  // Serial interface
+  void open();
+  void close();
+  void do_read();
+  void parse_buffer(const boost::system::error_code& err, std::size_t bytes_t);
+  void do_write(bool check_tx_state);
+  inline bool is_open(){
+    return serial_dev.is_open();
+  }
 
   static const unsigned n_out_max = 16;
   double alt_home = 488.0;   // meters
@@ -249,5 +308,26 @@ private:
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
-};
+  
+  in_addr_t qgc_addr_;
+  int qgc_udp_port_;
+  
+  // Serial interface 
+  mavlink_status_t m_status;
+  mavlink_message_t m_buffer;
+  bool serial_enabled_;
+  std::thread io_thread;
+  std::string device_;
+  std::array<uint8_t, MAX_SIZE> rx_buf;
+  std::recursive_mutex mutex;
+  unsigned int baudrate_;
+  std::atomic<bool> tx_in_progress;
+  std::deque<MsgBuffer> tx_q;
+  boost::asio::io_service io_service;
+  boost::asio::serial_port serial_dev;
+  
+  bool hil_mode_;
+  bool hil_state_level_;
+
+  };
 }
