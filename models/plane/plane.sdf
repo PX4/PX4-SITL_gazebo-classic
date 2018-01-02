@@ -461,6 +461,15 @@
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps</gpsSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name="rotor4">

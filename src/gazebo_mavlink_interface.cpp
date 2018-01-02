@@ -60,6 +60,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
   groundtruth_sub_topic_ = "/groundtruth";
+  getSdfParam<std::string>(_sdf, "gpsSubTopic", gps_sub_topic_, gps_sub_topic_);
 
   // set input_reference_ from inputs.control
   input_reference_.resize(n_out_max);
@@ -410,9 +411,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
 
   if (_sdf->HasElement("imu_rate")) {
-    imu_rate_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
-    set_imu_rate_ = true;
+    imu_rate_ = _sdf->GetElement("imu_rate")->Get<int>();
   }
+  imu_rate_ = 1/imu_rate_;
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E D) n-frame )
   // mag_n_ = {0.21523, 0.00771, -0.42741};
@@ -425,6 +426,41 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   mag_d_.y = 0;
   mag_d_.z = -0.42741;
 
+  if(_sdf->HasElement("hil_state_level"))
+  {
+    hil_mode_ = _sdf->GetElement("hil_mode")->Get<bool>();
+  }
+  
+  if(_sdf->HasElement("hil_state_level"))
+  {
+    hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
+  }
+  
+  // Get serial params 
+  if(_sdf->HasElement("serialEnabled"))
+  {
+    serial_enabled_ = _sdf->GetElement("serialEnabled")->Get<bool>();
+  }
+  
+  if(serial_enabled_) {
+    // Set up serial interface  
+    if(_sdf->HasElement("serialDevice"))
+    {
+      device_ = _sdf->GetElement("serialDevice")->Get<std::string>();
+    }
+  
+    if (_sdf->HasElement("baudRate")) {
+      baudrate_ = _sdf->GetElement("baudRate")->Get<int>();
+    }
+    io_service.post(std::bind(&GazeboMavlinkInterface::do_read, this));
+
+    // run io_service for async io
+    io_thread = std::thread([this] () {
+    io_service.run();
+  });
+    open();  
+  }
+  
   //Create socket
   // udp socket data
   mavlink_addr_ = htonl(INADDR_ANY);
@@ -437,12 +473,27 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         return;
       }
     }
-  }
+  } 
   if (_sdf->HasElement("mavlink_udp_port")) {
     mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
   }
+    
+  qgc_addr_ = htonl(INADDR_ANY);
+  if (_sdf->HasElement("qgc_addr")) {
+    std::string qgc_addr = _sdf->GetElement("qgc_addr")->Get<std::string>();
+    if (qgc_addr != "INADDR_ANY") {
+      qgc_addr_ = inet_addr(qgc_addr.c_str());
+      if (qgc_addr_ == INADDR_NONE) {
+        fprintf(stderr, "invalid qgc_addr \"%s\"\n", qgc_addr.c_str());
+        return;
+      }
+    }
+  } 
+  if (_sdf->HasElement("qgc_udp_port")) {
+    qgc_udp_port_ = _sdf->GetElement("qgc_udp_port")->Get<int>();
+  }
 
-  // try to setup udp socket for communcation with simulator
+  // try to setup udp socket for communcation
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     printf("create socket failed\n");
     return;
@@ -450,19 +501,30 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   memset((char *)&_myaddr, 0, sizeof(_myaddr));
   _myaddr.sin_family = AF_INET;
-  _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  // Let the OS pick the port
-  _myaddr.sin_port = htons(0);
+  _srcaddr.sin_family = AF_INET;
+    
+  if (serial_enabled_) {
+    // gcs link
+    _myaddr.sin_addr.s_addr = mavlink_addr_;
+    _myaddr.sin_port = htons(mavlink_udp_port_);
+    _srcaddr.sin_addr.s_addr = qgc_addr_;
+    _srcaddr.sin_port = htons(qgc_udp_port_);
+  }
+    
+  else {
+    _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    // Let the OS pick the port
+    _myaddr.sin_port = htons(0);
+    _srcaddr.sin_addr.s_addr = mavlink_addr_;
+    _srcaddr.sin_port = htons(mavlink_udp_port_);
+  }
+    
+  _addrlen = sizeof(_srcaddr);
 
   if (bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
     printf("bind failed\n");
     return;
   }
-
-  _srcaddr.sin_family = AF_INET;
-  _srcaddr.sin_addr.s_addr = mavlink_addr_;
-  _srcaddr.sin_port = htons(mavlink_udp_port_);
-  _addrlen = sizeof(_srcaddr);
 
   fds[0].fd = _fd;
   fds[0].events = POLLIN;
@@ -538,192 +600,238 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
 void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message, const int destination_port)
 {
-  uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-  int packetlen = mavlink_msg_to_send_buffer(buffer, message);
-
-  struct sockaddr_in dest_addr;
-  memcpy(&dest_addr, &_srcaddr, sizeof(_srcaddr));
-
-  if (destination_port != 0) {
-    dest_addr.sin_port = htons(destination_port);
+    
+  if(serial_enabled_ && destination_port == 0) {
+    assert(message != nullptr);
+    if (!is_open()) {
+      gzerr << "Serial port closed! \n";
+      return;
+    }
+    
+    {
+      lock_guard lock(mutex);
+      
+      if (tx_q.size() >= MAX_TXQ_SIZE) {
+//         gzwarn << "TX queue overflow. \n";  
+      }
+      tx_q.emplace_back(message);
+    }
+    io_service.post(std::bind(&GazeboMavlinkInterface::do_write, this, true));
   }
+  
+  else {
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
-  ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
+    struct sockaddr_in dest_addr;
+    memcpy(&dest_addr, &_srcaddr, sizeof(_srcaddr));
 
-  if (len <= 0) {
-    printf("Failed sending mavlink message\n");
+    if (destination_port != 0) {
+      dest_addr.sin_port = htons(destination_port);
+    }
+ 
+    ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
+
+    if (len <= 0) {
+      printf("Failed sending mavlink message\n");
+    }
   }
+  
 }
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
-  // frames
-  // g - gazebo (ENU), east, north, up
-  // r - rotors imu frame (FLU), forward, left, up
-  // b - px4 (FRD) forward, right down
-  // n - px4 (NED) north, east, down
-  math::Quaternion q_gr = math::Quaternion(
+  common::Time current_time = world_->GetSimTime();  
+  double dt = (current_time - last_imu_time_).Double();
+  if (dt >= imu_rate_)
+  {
+    // frames
+    // g - gazebo (ENU), east, north, up
+    // r - rotors imu frame (FLU), forward, left, up
+    // b - px4 (FRD) forward, right down
+    // n - px4 (NED) north, east, down
+    math::Quaternion q_gr = math::Quaternion(
       imu_message->orientation().w(),
       imu_message->orientation().x(),
       imu_message->orientation().y(),
       imu_message->orientation().z());
 
-  // q_br
-  /*
-     tf.euler2quat(*tf.mat2euler([
-   #        F  L  U
-          [1, 0, 0],  # F
-          [0, -1, 0], # R
-          [0, 0, -1]  # D
-      ]
-     )).round(5)
-   */
-  math::Quaternion q_br(0, 1, 0, 0);
+    // q_br
+    /*
+    tf.euler2quat(*tf.mat2euler([
+    #        F  L  U
+            [1, 0, 0],  # F
+            [0, -1, 0], # R
+            [0, 0, -1]  # D
+        ]
+    )).round(5)
+    */
+    math::Quaternion q_br(0, 1, 0, 0);
 
 
-  // q_ng
-  /*
-     tf.euler2quat(*tf.mat2euler([
-   #        N  E  D
-          [0, 1, 0],  # E
-          [1, 0, 0],  # N
-          [0, 0, -1]  # U
-      ]
-     )).round(5)
-   */
-  math::Quaternion q_ng(0, 0.70711, 0.70711, 0);
+    // q_ng
+    /*
+    tf.euler2quat(*tf.mat2euler([
+    #        N  E  D
+            [0, 1, 0],  # E
+            [1, 0, 0],  # N
+            [0, 0, -1]  # U
+        ]
+    )).round(5)
+    */
+    math::Quaternion q_ng(0, 0.70711, 0.70711, 0);
 
-  math::Quaternion q_gb = q_gr * q_br.GetInverse();
-  math::Quaternion q_nb = q_ng * q_gb;
+    math::Quaternion q_gb = q_gr*q_br.GetInverse();
+    math::Quaternion q_nb = q_ng*q_gb;
 
-  math::Vector3 pos_g = model_->GetWorldPose().pos;
-  math::Vector3 pos_n = q_ng.RotateVector(pos_g);
+    math::Vector3 pos_g = model_->GetWorldPose().pos;
+    math::Vector3 pos_n = q_ng.RotateVector(pos_g);
 
-  //gzerr << "got imu: " << C_W_I << "\n";
-  //gzerr << "got pose: " << T_W_I.rot << "\n";
-  float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
+    //gzerr << "got imu: " << C_W_I << "\n";
+    //gzerr << "got pose: " << T_W_I.rot << "\n";
+    float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
 
-  math::Quaternion q_dn(0.0, 0.0, declination);
-  math::Vector3 mag_n = q_dn.RotateVector(mag_d_);
+    math::Quaternion q_dn(0.0, 0.0, declination);
+    math::Vector3 mag_n = q_dn.RotateVectorReverse(mag_d_);
 
-  math::Vector3 vel_b = q_br.RotateVector(model_->GetRelativeLinearVel());
-  math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
-  math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
+    math::Vector3 vel_b = q_br.RotateVector(model_->GetRelativeLinearVel());
+    math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
+    math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
 
-  math::Vector3 mag_noise_b(
+    math::Vector3 mag_noise_b(
       0.01 * randn_(rand_),
       0.01 * randn_(rand_),
       0.01 * randn_(rand_));
 
-  math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
-        imu_message->linear_acceleration().x(),
-        imu_message->linear_acceleration().y(),
-        imu_message->linear_acceleration().z()));
-  math::Vector3 gyro_b = q_br.RotateVector(math::Vector3(
-        imu_message->angular_velocity().x(),
-        imu_message->angular_velocity().y(),
-        imu_message->angular_velocity().z()));
-  math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
+    math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
+      imu_message->linear_acceleration().x(),
+      imu_message->linear_acceleration().y(),
+      imu_message->linear_acceleration().z()));
+    math::Vector3 gyro_b = q_br.RotateVector(math::Vector3(
+      imu_message->angular_velocity().x(),
+      imu_message->angular_velocity().y(),
+      imu_message->angular_velocity().z()));
+    math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
-  mavlink_hil_sensor_t sensor_msg;
-  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
-  sensor_msg.xacc = accel_b.x;
-  sensor_msg.yacc = accel_b.y;
-  sensor_msg.zacc = accel_b.z;
-  sensor_msg.xgyro = gyro_b.x;
-  sensor_msg.ygyro = gyro_b.y;
-  sensor_msg.zgyro = gyro_b.z;
-  sensor_msg.xmag = mag_b.x;
-  sensor_msg.ymag = mag_b.y;
-  sensor_msg.zmag = mag_b.z;
+    mavlink_hil_sensor_t sensor_msg;
+    sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+    sensor_msg.xacc = accel_b.x;
+    sensor_msg.yacc = accel_b.y;
+    sensor_msg.zacc = accel_b.z;
+    sensor_msg.xgyro = gyro_b.x;
+    sensor_msg.ygyro = gyro_b.y;
+    sensor_msg.zgyro = gyro_b.z;
+    sensor_msg.xmag = mag_b.x;
+    sensor_msg.ymag = mag_b.y;
+    sensor_msg.zmag = mag_b.z;
 
-  // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
-  const float lapse_rate = 0.0065f;  // reduction in temperature with altitude (Kelvin/m)
-  const float temperature_msl = 288.0f;  // temperature at MSL (Kelvin)
-  float alt_msl = (float)alt_home - pos_n.z;
-  float temperature_local = temperature_msl - lapse_rate * alt_msl;
-  float pressure_ratio = powf((temperature_msl / temperature_local), 5.256f);
-  const float pressure_msl = 101325.0f;  // pressure at MSL
-  sensor_msg.abs_pressure = pressure_msl / pressure_ratio;
+    // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
+    const float lapse_rate = 0.0065f; // reduction in temperature with altitude (Kelvin/m)
+    const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
+    float alt_msl = (float)alt_home - pos_n.z;
+    float temperature_local = temperature_msl - lapse_rate * alt_msl;
+    float pressure_ratio = powf((temperature_msl/temperature_local) , 5.256f);
+    const float pressure_msl = 101325.0f; // pressure at MSL
+    sensor_msg.abs_pressure = pressure_msl / pressure_ratio;
 
-  // generate Gaussian noise sequence using polar form of Box-Muller transformation
-  // http://www.design.caltech.edu/erik/Misc/Gaussian.html
-  double x1, x2, w, y1, y2;
-  do {
-    x1 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
-    x2 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
-    w = x1 * x1 + x2 * x2;
-  } while ( w >= 1.0 );
-  w = sqrt( (-2.0 * log( w ) ) / w );
-  y1 = x1 * w;
-  y2 = x2 * w;
+    // generate Gaussian noise sequence using polar form of Box-Muller transformation
+    // http://www.design.caltech.edu/erik/Misc/Gaussian.html
+    double x1, x2, w, y1, y2;
+    do {
+     x1 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
+     x2 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
+     w = x1 * x1 + x2 * x2;
+    } while ( w >= 1.0 );
+    w = sqrt( (-2.0 * log( w ) ) / w );
+    y1 = x1 * w;
+    y2 = x2 * w;
 
-  // Apply 1 Pa RMS noise
-  float abs_pressure_noise = 1.0f * (float)w;
-  sensor_msg.abs_pressure += abs_pressure_noise;
+    // Apply 1 Pa RMS noise
+    float abs_pressure_noise = 1.0f * (float)w;
+    sensor_msg.abs_pressure += abs_pressure_noise;
 
-  // convert to hPa
-  sensor_msg.abs_pressure *= 0.01f;
+    // convert to hPa
+    sensor_msg.abs_pressure *= 0.01f;
 
-  // calculate density using an ISA model for the tropsphere (valid up to 11km above MSL)
-  const float density_ratio = powf((temperature_msl / temperature_local), 4.256f);
-  float rho = 1.225f / density_ratio;
+    // calculate density using an ISA model for the tropsphere (valid up to 11km above MSL)
+    const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
+    float rho = 1.225f / density_ratio;
 
-  // calculate pressure altitude including effect of pressure noise
-  sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.GetLength() * rho);
+    // calculate pressure altitude including effect of pressure noise
+    sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.GetLength() * rho);
 
-  // calculate differential pressure in hPa
-  sensor_msg.diff_pressure = 0.005f * rho * vel_b.x * vel_b.x;
+    // calculate differential pressure in hPa
+    sensor_msg.diff_pressure = 0.005f*rho*vel_b.x*vel_b.x;
 
-  // calculate temperature in Celsius
-  sensor_msg.temperature = temperature_local - 273.0f;
+    // calculate temperature in Celsius
+    sensor_msg.temperature = temperature_local - 273.0f;
 
-  sensor_msg.fields_updated = 4095;
+    sensor_msg.fields_updated = 4095;
 
-  //accumulate gyro measurements that are needed for the optical flow message
-  static uint32_t last_dt_us = sensor_msg.time_usec;
-  uint32_t dt_us = sensor_msg.time_usec - last_dt_us;
-  if (dt_us > 1000) {
-    optflow_gyro += gyro_b * (dt_us / 1000000.0f);
-    last_dt_us = sensor_msg.time_usec;
-  }
+    //accumulate gyro measurements that are needed for the optical flow message
+    static uint32_t last_dt_us = sensor_msg.time_usec;
+    uint32_t dt_us = sensor_msg.time_usec - last_dt_us;
+    if (dt_us > 1000) {
+      optflow_gyro += gyro_b * (dt_us / 1000000.0f);
+      last_dt_us = sensor_msg.time_usec;
+    }
 
-  mavlink_message_t msg;
-  mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+    mavlink_message_t msg;
+    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+    if (hil_mode_) {
+      if (!hil_state_level_){
+        send_mavlink_message(&msg);  
+      }
+    }
+    
+    else {
+      send_mavlink_message(&msg);
+    }
 
-  // ground truth
-  math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
+    // ground truth
+    math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
 
-  // send ground truth
-  mavlink_hil_state_quaternion_t hil_state_quat;
-  hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
-  hil_state_quat.attitude_quaternion[0] = q_nb.w;
-  hil_state_quat.attitude_quaternion[1] = q_nb.x;
-  hil_state_quat.attitude_quaternion[2] = q_nb.y;
-  hil_state_quat.attitude_quaternion[3] = q_nb.z;
+    // send ground truth
 
-  hil_state_quat.rollspeed = omega_nb_b.x;
-  hil_state_quat.pitchspeed = omega_nb_b.y;
-  hil_state_quat.yawspeed = omega_nb_b.z;
+    mavlink_hil_state_quaternion_t hil_state_quat;
+    hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
+    hil_state_quat.attitude_quaternion[0] = q_nb.w;
+    hil_state_quat.attitude_quaternion[1] = q_nb.x;
+    hil_state_quat.attitude_quaternion[2] = q_nb.y;
+    hil_state_quat.attitude_quaternion[3] = q_nb.z;
 
-  hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
-  hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
-  hil_state_quat.alt = groundtruth_altitude * 1000;
+    hil_state_quat.rollspeed = omega_nb_b.x;
+    hil_state_quat.pitchspeed = omega_nb_b.y;
+    hil_state_quat.yawspeed = omega_nb_b.z;
 
-  hil_state_quat.vx = vel_n.x * 100;
-  hil_state_quat.vy = vel_n.y * 100;
-  hil_state_quat.vz = vel_n.z * 100;
+    hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
+    hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
+    hil_state_quat.alt = groundtruth_altitude * 1000;
+    
+    hil_state_quat.vx = vel_n.x * 100;
+    hil_state_quat.vy = vel_n.y * 100;
+    hil_state_quat.vz = vel_n.z * 100;
 
-  // assumed indicated airspeed due to flow aligned with pitot (body x)
-  hil_state_quat.ind_airspeed = vel_b.x;
-  hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
+    // assumed indicated airspeed due to flow aligned with pitot (body x)
+    hil_state_quat.ind_airspeed = vel_b.x;
+    hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
 
-  hil_state_quat.xacc = accel_true_b.x * 1000;
-  hil_state_quat.yacc = accel_true_b.y * 1000;
-  hil_state_quat.zacc = accel_true_b.z * 1000;
+    hil_state_quat.xacc = accel_true_b.x * 1000;
+    hil_state_quat.yacc = accel_true_b.y * 1000;
+    hil_state_quat.zacc = accel_true_b.z * 1000;
 
-  mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
-  send_mavlink_message(&msg);
+    mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
+    if (hil_mode_) {
+      if (hil_state_level_){
+        send_mavlink_message(&msg); 
+      }
+    }
+    
+    else {
+      send_mavlink_message(&msg);
+    }
+  
+    last_imu_time_ = current_time;
+    }
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
@@ -749,7 +857,15 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   // send HIL_GPS Mavlink msg
   mavlink_message_t msg;
   mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
-  send_mavlink_message(&msg);
+  if (hil_mode_) {
+    if (!hil_state_level_){
+      send_mavlink_message(&msg);  
+    }
+  }
+    
+  else {
+    send_mavlink_message(&msg);
+  }
 }
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg){
@@ -874,6 +990,10 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages(double _dt, uint32_t _timeou
       {
         if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
         {
+          if (serial_enabled_) {
+            // forward message from qgc to serial  
+            send_mavlink_message(&msg);  
+          }
           // have a message, handle it
           handle_message(&msg);
         }
@@ -969,4 +1089,115 @@ void GazeboMavlinkInterface::handle_control(double _dt)
     }
   }
 }
+
+void GazeboMavlinkInterface::open() {
+  try{
+    serial_dev.open(device_);
+    serial_dev.set_option(boost::asio::serial_port_base::baud_rate(baudrate_));
+    serial_dev.set_option(boost::asio::serial_port_base::character_size(8));
+    serial_dev.set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
+    serial_dev.set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
+    serial_dev.set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+    gzdbg << "Opened serial device " << device_ << "\n";
+  }
+  catch (boost::system::system_error &err) {
+    gzerr <<"Error opening serial device: " << err.what() << "\n";
+  }
+}
+
+void GazeboMavlinkInterface::close()
+{
+  lock_guard lock(mutex);
+  if (!is_open())
+    return;
+
+  io_service.stop();
+  serial_dev.close();
+
+  if (io_thread.joinable())
+    io_thread.join();
+}
+
+void GazeboMavlinkInterface::do_read(void)
+{
+  serial_dev.async_read_some(boost::asio::buffer(rx_buf), boost::bind(
+      &GazeboMavlinkInterface::parse_buffer, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred
+      )
+  );
+}
+
+// Based on MAVConnInterface::parse_buffer in MAVROS
+void GazeboMavlinkInterface::parse_buffer(const boost::system::error_code& err, std::size_t bytes_t){
+  mavlink_status_t status;
+  mavlink_message_t message;
+  uint8_t *buf = this->rx_buf.data();
+  
+  assert(rx_buf.size() >= bytes_t);
+  
+  for(; bytes_t > 0; bytes_t--)
+  {
+    auto c = *buf++;
+    
+    auto msg_received = static_cast<Framing>(mavlink_frame_char_buffer(&m_buffer, &m_status, c, &message, &status));
+    if (msg_received == Framing::bad_crc || msg_received == Framing::bad_signature) {
+      _mav_parse_error(&m_status);
+      m_status.msg_received = MAVLINK_FRAMING_INCOMPLETE;
+      m_status.parse_state = MAVLINK_PARSE_STATE_IDLE;
+      if (c == MAVLINK_STX) {
+        m_status.parse_state = MAVLINK_PARSE_STATE_GOT_STX;
+        m_buffer.len = 0;
+        mavlink_start_checksum(&m_buffer);
+      }
+    }
+    
+    if(msg_received != Framing::incomplete){
+      // send to gcs
+      send_mavlink_message(&message, qgc_udp_port_);  
+      handle_message(&message);
+    }
+  }
+  do_read();
+}
+
+void GazeboMavlinkInterface::do_write(bool check_tx_state){
+  if (check_tx_state && tx_in_progress)
+    return;
+
+  lock_guard lock(mutex);
+  if (tx_q.empty())
+    return;
+
+  tx_in_progress = true;
+  auto &buf_ref = tx_q.front();
+  
+  serial_dev.async_write_some(
+    boost::asio::buffer(buf_ref.dpos(), buf_ref.nbytes()), [this, &buf_ref] (boost::system::error_code error,   size_t bytes_transferred) 
+    {
+      assert(bytes_transferred <= buf_ref.len);
+      if(error) {
+        gzerr << "Serial error: " << error.message() << "\n";
+      return;
+      }
+  
+    lock_guard lock(mutex);
+  
+    if (tx_q.empty()) {
+      tx_in_progress = false;
+      return;    
+    }
+
+    buf_ref.pos += bytes_transferred;
+    if (buf_ref.nbytes() == 0) {
+      tx_q.pop_front();   
+    }
+  
+    if (!tx_q.empty()) {
+      do_write(false);   
+    }
+    else {
+      tx_in_progress = false;   
+    }
+  });
+}
+
 }
