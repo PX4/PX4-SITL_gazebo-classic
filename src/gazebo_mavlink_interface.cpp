@@ -412,8 +412,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   if (_sdf->HasElement("imu_rate")) {
     imu_rate_ = _sdf->GetElement("imu_rate")->Get<int>();
+    imu_rate_ = 1/imu_rate_;
   }
-  imu_rate_ = 1/imu_rate_;
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E D) n-frame )
   // mag_n_ = {0.21523, 0.00771, -0.42741};
@@ -642,8 +642,10 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   common::Time current_time = world_->GetSimTime();  
   double dt = (current_time - last_imu_time_).Double();
-  if (dt >= imu_rate_)
+  if (imu_rate_!=0 && dt < imu_rate_)
   {
+    return;
+  }
     // frames
     // g - gazebo (ENU), east, north, up
     // r - rotors imu frame (FLU), forward, left, up
@@ -831,7 +833,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     }
   
     last_imu_time_ = current_time;
-    }
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
