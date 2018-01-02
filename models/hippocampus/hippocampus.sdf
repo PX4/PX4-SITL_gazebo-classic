@@ -686,7 +686,6 @@
     -->
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
-    
     <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
         <robotNamespace></robotNamespace>
         <gpsNoise>true</gpsNoise>
@@ -699,7 +698,6 @@
       <robotNamespace>hippocampus</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps</gpsSubTopic>
-      
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
 
       <!-- control channels, this way for every channel different settings can be realized -->
