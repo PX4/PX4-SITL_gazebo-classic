@@ -7,6 +7,13 @@
   <xacro:arg name='name' default='iris' />
   <xacro:arg name='mavlink_addr' default='INADDR_ANY' />
   <xacro:arg name='mavlink_udp_port' default='14560' />
+  <xacro:arg name='serial_enabled' default='false' />
+  <xacro:arg name='serial_device' default='/dev/ttyACM0' />
+  <xacro:arg name='baudrate' default='921600' />
+  <xacro:arg name='qgc_addr' default='INADDR_ANY' />
+  <xacro:arg name='qgc_udp_port' default='14550' />
+  <xacro:arg name='hil_mode' default='false' />
+  <xacro:arg name='hil_state_level' default='false' />
   <xacro:arg name='visual_material' default='DarkGrey' />
   <xacro:arg name='enable_mavlink_interface' default='true' />
   <xacro:arg name='enable_wind' default='false' />
@@ -50,6 +57,13 @@
     gps_sub_topic="/gps"
     mavlink_addr="$(arg mavlink_addr)"
     mavlink_udp_port="$(arg mavlink_udp_port)"
+    serial_enabled="$(arg serial_enabled)"
+    serial_device="$(arg serial_device)"
+    baudrate="$(arg baudrate)"
+    qgc_addr="$(arg qgc_addr)"
+    qgc_udp_port="$(arg qgc_udp_port)"
+    hil_mode="$(arg hil_mode)"
+    hil_state_level="$(arg hil_state_level)"
     >
   </xacro:mavlink_interface_macro>
   </xacro:if>
