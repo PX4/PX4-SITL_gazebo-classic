@@ -135,7 +135,7 @@
   </xacro:macro>
         
   <!-- Macro to add the mavlink interface. -->
-  <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mavlink_addr mavlink_udp_port">
+  <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mavlink_addr mavlink_udp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port hil_mode hil_state_level">
     <gazebo>
       <plugin name="mavlink_interface" filename="librotors_gazebo_mavlink_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
@@ -143,6 +143,13 @@
         <gpsSubTopic>${gps_sub_topic}</gpsSubTopic>
         <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>
         <mavlink_udp_port>$(arg mavlink_udp_port)</mavlink_udp_port>
+        <serialEnabled>$(arg serial_enabled)</serialEnabled>
+        <serialDevice>$(arg serial_device)</serialDevice>
+        <baudRate>$(arg baudrate)</baudRate>
+        <qgc_addr>$(arg qgc_addr)</qgc_addr>
+        <qgc_udp_port>$(arg qgc_udp_port)</qgc_udp_port>
+        <hil_mode>$(arg hil_mode)</hil_mode>
+        <hil_state_level>$(arg hil_state_level)</hil_state_level>
         <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
         <control_channels>
           <channel name="rotor1">
