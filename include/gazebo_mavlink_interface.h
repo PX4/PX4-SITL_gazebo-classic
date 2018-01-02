@@ -123,7 +123,6 @@ public:
     namespace_(kDefaultNamespace),
     motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
     imu_sub_topic_(kDefaultImuTopic),
-    imu_rate_(170),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
     lidar_sub_topic_(kDefaultLidarTopic),
     sonar_sub_topic_(kDefaultSonarTopic),
