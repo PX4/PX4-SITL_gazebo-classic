@@ -641,10 +641,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   common::Time current_time = world_->GetSimTime();  
   double dt = (current_time - last_imu_time_).Double();
-  if (imu_rate_!=0 && dt < imu_rate_)
-  {
-    return;
-  }
+
     // frames
     // g - gazebo (ENU), east, north, up
     // r - rotors imu frame (FLU), forward, left, up
@@ -713,6 +710,8 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
       imu_message->angular_velocity().z()));
     math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
+  if (imu_rate_!=0 && dt >= imu_rate_)
+  {
     mavlink_hil_sensor_t sensor_msg;
     sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
     sensor_msg.xacc = accel_b.x;
@@ -787,6 +786,8 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     else {
       send_mavlink_message(&msg);
     }
+    last_imu_time_ = current_time;
+  }
 
     // ground truth
     math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
@@ -820,6 +821,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     hil_state_quat.yacc = accel_true_b.y * 1000;
     hil_state_quat.zacc = accel_true_b.z * 1000;
 
+    mavlink_message_t msg;
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
     if (hil_mode_) {
       if (hil_state_level_){
@@ -830,8 +832,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     else {
       send_mavlink_message(&msg);
     }
-  
-    last_imu_time_ = current_time;
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
