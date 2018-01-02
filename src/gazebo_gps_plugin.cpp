@@ -103,7 +103,6 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 
   math::Vector3 velocity_current_W = model_->GetWorldLinearVel();    // Use the models' world position for GPS velocity.
 
-
   math::Vector3 velocity_current_W_xy = velocity_current_W;
   velocity_current_W_xy.z = 0;
 
