@@ -31,8 +31,6 @@
 #include <stdexcept>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/utility.hpp>
-#include <boost/function.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/system/system_error.hpp>
 
