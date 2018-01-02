@@ -129,7 +129,6 @@ public:
     sonar_sub_topic_(kDefaultSonarTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
     gps_sub_topic_(kDefaultGPSTopic),
-    imu_rate_(170),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
