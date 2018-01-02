@@ -640,11 +640,6 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
-  // frames
-  // g - gazebo (ENU), east, north, up
-  // r - rotors imu frame (FLU), forward, left, up
-  // b - px4 (FRD) forward, right down
-  // n - px4 (NED) north, east, down
   common::Time current_time = world_->GetSimTime();  
   double dt = (current_time - last_imu_time_).Double();
   if (dt >= imu_rate_)
@@ -811,7 +806,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
     hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
     hil_state_quat.alt = groundtruth_altitude * 1000;
-
+    
     hil_state_quat.vx = vel_n.x * 100;
     hil_state_quat.vy = vel_n.y * 100;
     hil_state_quat.vz = vel_n.z * 100;
@@ -862,7 +857,15 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   // send HIL_GPS Mavlink msg
   mavlink_message_t msg;
   mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
-  send_mavlink_message(&msg);
+  if (hil_mode_) {
+    if (!hil_state_level_){
+      send_mavlink_message(&msg);  
+    }
+  }
+    
+  else {
+    send_mavlink_message(&msg);
+  }
 }
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg){

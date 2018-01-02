@@ -44,6 +44,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
 #include <Eigen/Eigen>
 
 #include <gazebo/gazebo.hh>
@@ -168,7 +169,6 @@ protected:
   void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
 private:
-
   bool received_first_referenc_;
   Eigen::VectorXd input_reference_;
 
