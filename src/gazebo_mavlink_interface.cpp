@@ -631,7 +631,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     }
  
     ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
-    
+
     if (len <= 0) {
       printf("Failed sending mavlink message\n");
     }
@@ -774,6 +774,79 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
       last_dt_us = sensor_msg.time_usec;
     }
 
+    math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
+      imu_message->linear_acceleration().x(),
+      imu_message->linear_acceleration().y(),
+      imu_message->linear_acceleration().z()));
+    math::Vector3 gyro_b = q_br.RotateVector(math::Vector3(
+      imu_message->angular_velocity().x(),
+      imu_message->angular_velocity().y(),
+      imu_message->angular_velocity().z()));
+    math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
+
+    mavlink_hil_sensor_t sensor_msg;
+    sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+    sensor_msg.xacc = accel_b.x;
+    sensor_msg.yacc = accel_b.y;
+    sensor_msg.zacc = accel_b.z;
+    sensor_msg.xgyro = gyro_b.x;
+    sensor_msg.ygyro = gyro_b.y;
+    sensor_msg.zgyro = gyro_b.z;
+    sensor_msg.xmag = mag_b.x;
+    sensor_msg.ymag = mag_b.y;
+    sensor_msg.zmag = mag_b.z;
+
+    // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
+    const float lapse_rate = 0.0065f; // reduction in temperature with altitude (Kelvin/m)
+    const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
+    float alt_msl = (float)alt_home - pos_n.z;
+    float temperature_local = temperature_msl - lapse_rate * alt_msl;
+    float pressure_ratio = powf((temperature_msl/temperature_local) , 5.256f);
+    const float pressure_msl = 101325.0f; // pressure at MSL
+    sensor_msg.abs_pressure = pressure_msl / pressure_ratio;
+
+    // generate Gaussian noise sequence using polar form of Box-Muller transformation
+    // http://www.design.caltech.edu/erik/Misc/Gaussian.html
+    double x1, x2, w, y1, y2;
+    do {
+     x1 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
+     x2 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
+     w = x1 * x1 + x2 * x2;
+    } while ( w >= 1.0 );
+    w = sqrt( (-2.0 * log( w ) ) / w );
+    y1 = x1 * w;
+    y2 = x2 * w;
+
+    // Apply 1 Pa RMS noise
+    float abs_pressure_noise = 1.0f * (float)w;
+    sensor_msg.abs_pressure += abs_pressure_noise;
+
+    // convert to hPa
+    sensor_msg.abs_pressure *= 0.01f;
+
+    // calculate density using an ISA model for the tropsphere (valid up to 11km above MSL)
+    const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
+    float rho = 1.225f / density_ratio;
+
+    // calculate pressure altitude including effect of pressure noise
+    sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.GetLength() * rho);
+
+    // calculate differential pressure in hPa
+    sensor_msg.diff_pressure = 0.005f*rho*vel_b.x*vel_b.x;
+
+    // calculate temperature in Celsius
+    sensor_msg.temperature = temperature_local - 273.0f;
+
+    sensor_msg.fields_updated = 4095;
+
+    //accumulate gyro measurements that are needed for the optical flow message
+    static uint32_t last_dt_us = sensor_msg.time_usec;
+    uint32_t dt_us = sensor_msg.time_usec - last_dt_us;
+    if (dt_us > 1000) {
+      optflow_gyro += gyro_b * (dt_us / 1000000.0f);
+      last_dt_us = sensor_msg.time_usec;
+    }
+
     mavlink_message_t msg;
     mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
     if (hil_mode_) {
@@ -805,14 +878,14 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
     hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
     hil_state_quat.alt = groundtruth_altitude * 1000;
-
+    
     hil_state_quat.vx = vel_n.x * 100;
     hil_state_quat.vy = vel_n.y * 100;
     hil_state_quat.vz = vel_n.z * 100;
 
     // assumed indicated airspeed due to flow aligned with pitot (body x)
     hil_state_quat.ind_airspeed = vel_b.x;
-    hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100; //no wind simulated
+    hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
 
     hil_state_quat.xacc = accel_true_b.x * 1000;
     hil_state_quat.yacc = accel_true_b.y * 1000;

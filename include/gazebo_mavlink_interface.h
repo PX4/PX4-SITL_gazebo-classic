@@ -44,6 +44,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
 #include <Eigen/Eigen>
 
 #include <gazebo/gazebo.hh>
@@ -66,6 +67,8 @@
 #include <irlock.pb.h>
 #include <Groundtruth.pb.h>
 
+
+#include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
 
 #include <geo_mag_declination.h>
@@ -158,6 +161,7 @@ public:
     hil_mode_(false),
     hil_state_level_(false)
     {}
+  
   ~GazeboMavlinkInterface();
 
   void Publish();
