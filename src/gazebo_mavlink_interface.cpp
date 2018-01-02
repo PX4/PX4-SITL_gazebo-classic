@@ -631,7 +631,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     }
  
     ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
-
+    
     if (len <= 0) {
       printf("Failed sending mavlink message\n");
     }
@@ -688,7 +688,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
     //gzerr << "got imu: " << C_W_I << "\n";
     //gzerr << "got pose: " << T_W_I.rot << "\n";
-    float declination = get_mag_declination(lat_rad, lon_rad);
+    float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
 
     math::Quaternion q_dn(0.0, 0.0, declination);
     math::Vector3 mag_n = q_dn.RotateVectorReverse(mag_d_);
@@ -697,12 +697,10 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
     math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
 
-    standard_normal_distribution_ = std::normal_distribution<float>(0, 0.01f);
     math::Vector3 mag_noise_b(
-      standard_normal_distribution_(random_generator_),
-      standard_normal_distribution_(random_generator_),
-      standard_normal_distribution_(random_generator_));
-
+      0.01 * randn_(rand_),
+      0.01 * randn_(rand_),
+      0.01 * randn_(rand_));
     math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
       imu_message->linear_acceleration().x(),
       imu_message->linear_acceleration().y(),

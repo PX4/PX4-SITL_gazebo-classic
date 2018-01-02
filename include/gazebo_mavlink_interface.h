@@ -66,7 +66,6 @@
 #include <irlock.pb.h>
 #include <Groundtruth.pb.h>
 
-#include "mavlink/v2.0/common/mavlink.h"
 #include "msgbuffer.h"
 
 #include <geo_mag_declination.h>
@@ -126,6 +125,8 @@ public:
     lidar_sub_topic_(kDefaultLidarTopic),
     sonar_sub_topic_(kDefaultSonarTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
+    gps_sub_topic_(kDefaultGPSTopic),
+    imu_rate_(170),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -155,7 +156,11 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
+<<<<<<< 1971c3a6e2073b07e32eb67566d817faf90f2411
     hil_state_level_(false)
+=======
+    hil_state_level_(true)
+>>>>>>> Fixed conflicts
   {}
   ~GazeboMavlinkInterface();
 
