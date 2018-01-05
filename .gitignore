@@ -1,6 +1,6 @@
 Build/
 build/
-scritps/schemas
+scripts/schemas
 .DS_Store
 *~
 models/iris/*.sdf
