@@ -16,20 +16,21 @@ execute_process(COMMAND ${ROSVERSION} -d
 )
 
 set(_MAVLINK_EXTRA_SEARCH_PATHS
-    ../mavlink/include/
-    ../../devel/include/
-    ../../build/mavlink/include/
-    ../../mavlink/include/
-    /usr/include/
-    /usr/local/include/
-    /opt/ros/${ROS_DISTRO}/include/
+    ${CMAKE_SOURCE_DIR}/mavlink/
+    ../../mavlink/
+    ../mavlink/
+    ${CATKIN_DEVEL_PREFIX}/
+    /usr/
+    /usr/local/
+    /opt/ros/${ROS_DISTRO}/
     )
 
 # find the include directory
 find_path(_MAVLINK_INCLUDE_DIR
     NAMES mavlink/v1.0/mavlink_types.h mavlink/v2.0/mavlink_types.h
-    PATHS ${_MAVLINK_EXTRA_SEARCH_PATHS}
+    HINTS ${_MAVLINK_EXTRA_SEARCH_PATHS}
     PATH_SUFFIXES include
+    NO_DEFAULT_PATH
     )
 
 # read the version
