@@ -51,7 +51,6 @@ if [ -d ${MODELS_DIR} ]; then
 else
 	echo "${MODELS_DIR} doesn't exist!"
 	delete_schema
-	return 1
 fi
 
 # Validate the worlds SDF schemas according to http://sdformat.org/schemas/root.xsd format
@@ -66,16 +65,15 @@ if [ -d ${WORLDS_DIR} ]; then
 else
 	echo "${WORLDS_DIR} doesn't exist!"
 	delete_schema
-	return 1
 fi
 
 # If every SDFs are validated positively, exit 0, else exit 1
 if [[ ${RET} -gt 0 ]]; then
 	echo "Validation not successful! Check in the command line log for the reason"
 	delete_schema
-	return 1
+	exit 1
 else
 	echo "All SDFs validated positively!"
 	delete_schema
-	return 0
+	exit 0
 fi
