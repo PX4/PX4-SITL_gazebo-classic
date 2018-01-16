@@ -94,6 +94,9 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
                       imu_parameters_.accelerometer_turn_on_bias_sigma,
                       imu_parameters_.accelerometer_turn_on_bias_sigma);
 
+  imu_rate_ = 0;
+  model_param(world_->GetName(), model_->GetName(), "imu_rate", imu_rate_);
+
   last_time_ = world_->GetSimTime();
 
   // Listen to the update event. This event is broadcast every
@@ -240,6 +243,10 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
 void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   common::Time current_time  = world_->GetSimTime();
   double dt = (current_time - last_time_).Double();
+
+  if (imu_rate_ > 0 && dt*imu_rate_ < 1.0)
+    return;
+
   last_time_ = current_time;
   double t = current_time.Double();
 
@@ -252,13 +259,6 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   orientation->set_y(C_W_I.y);
   orientation->set_z(C_W_I.z);
   orientation->set_w(C_W_I.w);
-
-
-
-
-
-
-
 
 #if GAZEBO_MAJOR_VERSION < 5
   math::Vector3 velocity_current_W = link_->GetWorldLinearVel();
@@ -307,7 +307,7 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   // imu_message_.orientation.x = 0;
   // imu_message_.orientation.y = 0;
   // imu_message_.orientation.z = 0;
-  
+
   imu_message_.set_allocated_orientation(orientation);
   imu_message_.set_allocated_linear_acceleration(linear_acceleration);
   imu_message_.set_allocated_angular_velocity(angular_velocity);
