@@ -448,6 +448,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   int hil_gps_port_ = mavlink_udp_port_;
   model_param(world_->GetName(), model_->GetName(), "hil_gps_port", hil_gps_port_);
 
+  hil_state_ = true;
+  model_param(world_->GetName(), model_->GetName(), "hil_state", hil_state_);
+
   // try to setup udp socket for communcation with simulator
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     printf("create socket failed\n");
@@ -695,6 +698,9 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   mavlink_message_t msg;
   mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
   send_mavlink_message(&msg);
+
+  if (!hil_state_)
+    return;
 
   // ground truth
   math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());

@@ -249,5 +249,7 @@ private:
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
+
+  bool hil_state_;
 };
 }
