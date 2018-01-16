@@ -102,7 +102,7 @@ private:
   static constexpr const double earth_radius = 6353000.0;      // meters
 
   // gps delay related
-  static constexpr double gps_update_interval_ = 0.2; // 5hz
+  double gps_update_interval_ = 0.2; // 5hz
   static constexpr double gps_delay = 0.12;           // 120 ms
   static constexpr int gps_buffer_size_max = 1000;
   std::queue<gps_msgs::msgs::SITLGps> gps_delay_buffer;

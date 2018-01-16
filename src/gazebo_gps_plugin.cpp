@@ -71,6 +71,8 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     alt_home = std::stod(env_alt);
   }
 
+  model_param(world_->GetName(), model_->GetName(), "gps_update_interval", gps_update_interval_);
+
   namespace_.clear();
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
