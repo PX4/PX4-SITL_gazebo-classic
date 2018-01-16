@@ -134,6 +134,7 @@ class GazeboImuPlugin : public ModelPlugin {
   event::ConnectionPtr updateConnection_;
 
   common::Time last_time_;
+  int imu_rate_;
 
   sensor_msgs::msgs::Imu imu_message_;
 

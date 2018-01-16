@@ -166,7 +166,7 @@ private:
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
-  void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
+  void send_mavlink_message(const mavlink_message_t *message, struct sockaddr_in *p_dest_addr = nullptr);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
@@ -222,7 +222,6 @@ private:
   double groundtruth_altitude;
 
   double ev_update_interval_;
-  double gps_update_interval_;
 
   void handle_control(double _dt);
 
@@ -236,6 +235,7 @@ private:
   int _fd;
   struct sockaddr_in _myaddr;     ///< The locally bound address
   struct sockaddr_in _srcaddr;    ///< SITL instance
+  struct sockaddr_in _hil_gps_addr;
   socklen_t _addrlen;
   unsigned char _buf[65535];
   struct pollfd fds[1];
@@ -249,5 +249,7 @@ private:
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
+
+  bool hil_state_;
 };
 }
