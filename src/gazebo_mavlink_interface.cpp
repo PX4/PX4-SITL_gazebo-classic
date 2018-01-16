@@ -445,6 +445,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   model_param(world_->GetName(), model_->GetName(), "mavlink_udp_port", mavlink_udp_port_);
 
+  int hil_gps_port_ = mavlink_udp_port_;
+  model_param(world_->GetName(), model_->GetName(), "hil_gps_port", hil_gps_port_);
+
   // try to setup udp socket for communcation with simulator
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     printf("create socket failed\n");
@@ -466,6 +469,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   _srcaddr.sin_addr.s_addr = mavlink_addr_;
   _srcaddr.sin_port = htons(mavlink_udp_port_);
   _addrlen = sizeof(_srcaddr);
+
+  memcpy(&_hil_gps_addr, &_srcaddr, sizeof(_srcaddr));
+  _hil_gps_addr.sin_port = htons(hil_gps_port_);
 
   fds[0].fd = _fd;
   fds[0].events = POLLIN;
@@ -539,19 +545,15 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   last_time_ = current_time;
 }
 
-void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message, const int destination_port)
+void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message, struct sockaddr_in *p_dest_addr)
 {
   uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
   int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
-  struct sockaddr_in dest_addr;
-  memcpy(&dest_addr, &_srcaddr, sizeof(_srcaddr));
+  if (!p_dest_addr)
+    p_dest_addr = &_srcaddr;
 
-  if (destination_port != 0) {
-    dest_addr.sin_port = htons(destination_port);
-  }
-
-  ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
+  ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)p_dest_addr, sizeof(_srcaddr));
 
   if (len <= 0) {
     printf("Failed sending mavlink message\n");
@@ -752,7 +754,7 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   // send HIL_GPS Mavlink msg
   mavlink_message_t msg;
   mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
-  send_mavlink_message(&msg);
+  send_mavlink_message(&msg, &_hil_gps_addr);
 }
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg){
