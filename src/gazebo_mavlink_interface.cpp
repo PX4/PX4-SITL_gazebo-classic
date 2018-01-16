@@ -442,6 +442,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
   }
 
+
+  model_param(world_->GetName(), model_->GetName(), "mavlink_udp_port", mavlink_udp_port_);
+
   // try to setup udp socket for communcation with simulator
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     printf("create socket failed\n");
