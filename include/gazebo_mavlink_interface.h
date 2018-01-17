@@ -24,7 +24,6 @@
 #include <deque>
 #include <atomic>
 #include <chrono>
-#include <thread>
 #include <memory>
 #include <sstream>
 #include <cassert>
@@ -155,7 +154,8 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
-    hil_state_level_(false)
+    hil_state_level_(false),
+    imu_rate_(250)
     {}
   
   ~GazeboMavlinkInterface();
