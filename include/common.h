@@ -21,6 +21,7 @@
  */
 
 
+#include <tinyxml.h>
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
 #include <ignition/math.hh>
@@ -48,6 +49,36 @@ bool getSdfParam(sdf::ElementPtr sdf, const std::string& name, T& param, const T
       gzerr << "[rotors_gazebo_plugins] Please specify a value for parameter \"" << name << "\".\n";
   }
   return false;
+}
+
+template <typename T>
+void model_param(const std::string& world_name, const std::string& model_name, const std::string& param, T& param_value)
+{
+  TiXmlDocument doc(world_name + ".xml");
+  if (doc.LoadFile())
+  {
+    TiXmlHandle hDoc(&doc);
+
+    TiXmlElement* pElem=hDoc.FirstChild( "options" ).FirstChild("model").Element();
+    for( pElem; pElem; pElem=pElem->NextSiblingElement("model"))
+    {
+      TiXmlElement* pName = pElem->FirstChildElement("name");
+      if (pName && model_name.compare(pName->GetText()) == 0)
+      {
+        TiXmlElement* pValue = pElem->FirstChildElement(param);
+
+        if (pValue)
+        {
+          std::istringstream iss(pValue->GetText());
+          iss >> param_value;
+
+          gzdbg << "get " << param << " " << param_value <<" for " << model_name << " model from " << doc.Value() << "\n";
+          break;
+        }
+      }
+    }
+  }
+
 }
 
 /**
