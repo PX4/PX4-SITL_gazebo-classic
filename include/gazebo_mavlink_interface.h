@@ -154,8 +154,7 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
-    hil_state_level_(false),
-    imu_rate_(250)
+    hil_state_level_(false)
     {}
   
   ~GazeboMavlinkInterface();
@@ -270,16 +269,13 @@ private:
   common::Time last_ev_time_;
   common::Time last_actuator_time_;
 
-  bool set_imu_rate_;
-  double imu_rate_;
-
   double groundtruth_lat_rad;
   double groundtruth_lon_rad;
   double groundtruth_altitude;
 
   double ev_update_interval_;
   double gps_update_interval_;
-  double imu_update_interval_;
+  double imu_update_interval_ = 0.004;
 
   void handle_control(double _dt);
 
