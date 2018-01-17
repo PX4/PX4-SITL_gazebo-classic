@@ -279,6 +279,7 @@ private:
 
   double ev_update_interval_;
   double gps_update_interval_;
+  double imu_update_interval_;
 
   void handle_control(double _dt);
 

@@ -412,7 +412,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   if (_sdf->HasElement("imu_rate")) {
     imu_rate_ = _sdf->GetElement("imu_rate")->Get<int>();
   }
-  imu_rate_ = 1/imu_rate_;
+  imu_update_interval_ = 1/imu_rate_;
 
   // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E D) n-frame )
   // mag_n_ = {0.21523, 0.00771, -0.42741};
@@ -710,7 +710,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
       imu_message->angular_velocity().z()));
     math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
-  if (imu_rate_!=0 && dt >= imu_rate_)
+  if (imu_update_interval_!=0 && dt >= imu_update_interval_)
   {
     mavlink_hil_sensor_t sensor_msg;
     sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
