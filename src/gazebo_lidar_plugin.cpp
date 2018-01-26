@@ -51,14 +51,14 @@ RayPlugin::RayPlugin()
 RayPlugin::~RayPlugin()
 {
 #if GAZEBO_MAJOR_VERSION >= 7
-  this->parentSensor->LaserShape()->DisconnectNewLaserScans(
+  this->parentSensor_->LaserShape()->DisconnectNewLaserScans(
 #else
-  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
+  this->parentSensor_->GetLaserShape()->DisconnectNewLaserScans(
 #endif
       this->newLaserScansConnection);
   this->newLaserScansConnection.reset();
 
-  this->parentSensor.reset();
+  this->parentSensor_.reset();
   this->world.reset();
 }
 
@@ -66,27 +66,27 @@ RayPlugin::~RayPlugin()
 void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
-  this->parentSensor =
+  this->parentSensor_ =
 #if GAZEBO_MAJOR_VERSION >= 7
     std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 #else
     boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 #endif
 
-  if (!this->parentSensor)
+  if (!this->parentSensor_)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
 #if GAZEBO_MAJOR_VERSION >= 7
-  this->world = physics::get_world(this->parentSensor->WorldName());
+  this->world = physics::get_world(this->parentSensor_->WorldName());
 #else
-  this->world = physics::get_world(this->parentSensor->GetWorldName());
+  this->world = physics::get_world(this->parentSensor_->GetWorldName());
 #endif
 
   this->newLaserScansConnection =
 #if GAZEBO_MAJOR_VERSION >= 7
-    this->parentSensor->LaserShape()->ConnectNewLaserScans(
+    this->parentSensor_->LaserShape()->ConnectNewLaserScans(
 #else
-    this->parentSensor->GetLaserShape()->ConnectNewLaserScans(
+    this->parentSensor_->GetLaserShape()->ConnectNewLaserScans(
 #endif
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 
@@ -94,6 +94,28 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
     gzwarn << "[gazebo_lidar_plugin] Please specify a robotNamespace.\n";
+
+  // get minimum distance
+  if (_sdf->HasElement("min_distance")) {
+    min_distance_ = _sdf->GetElement("min_distance")->Get<double>();
+    if (min_distance_ < SENSOR_MIN_DISTANCE) {
+      min_distance_ = SENSOR_MIN_DISTANCE;
+    }
+  } else {
+    gzwarn << "[gazebo_lidar_plugin] Using default minimum distance: 0.3\n";
+    min_distance_ = DEFAULT_MIN_DISTANCE;
+  }
+
+  // get maximum distance
+  if (_sdf->HasElement("max_distance")) {
+    max_distance_ = _sdf->GetElement("max_distance")->Get<double>();
+    if (max_distance_ > SENSOR_MAX_DISTANCE) {
+      max_distance_ = SENSOR_MAX_DISTANCE;
+    }
+  } else {
+    gzwarn << "[gazebo_lidar_plugin] Using default maximum distance: 15\n";
+    max_distance_ = DEFAULT_MAX_DISTANCE;
+  }
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
@@ -113,15 +135,25 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 void RayPlugin::OnNewLaserScans()
 {
   lidar_message.set_time_msec(0);
+  lidar_message.set_min_distance(min_distance_);
+  lidar_message.set_max_distance(max_distance_);
+
+  double current_distance;
+
 #if GAZEBO_MAJOR_VERSION >= 7
-  lidar_message.set_min_distance(parentSensor->RangeMin());
-  lidar_message.set_max_distance(parentSensor->RangeMax());
-  lidar_message.set_current_distance(parentSensor->Range(0));
+  current_distance = parentSensor_->Range(0);
 #else
-  lidar_message.set_min_distance(parentSensor->GetRangeMin());
-  lidar_message.set_max_distance(parentSensor->GetRangeMax());
-  lidar_message.set_current_distance(parentSensor->GetRange(0));
+  current_distance = parentSensor_->GetRange(0);
 #endif
+
+  // set distance to min/max if actual value is smaller/bigger
+  if (current_distance < min_distance_ || isinf(current_distance)) {
+    current_distance = min_distance_;
+  } else if (current_distance > max_distance_) {
+    current_distance = max_distance_;
+  }
+
+  lidar_message.set_current_distance(current_distance);
 
   lidar_pub_->Publish(lidar_message);
 }
