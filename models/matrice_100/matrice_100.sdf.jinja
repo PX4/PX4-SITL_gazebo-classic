@@ -273,9 +273,24 @@
       <!--<sonar_topic>fuselage/mb1240-xl-ez4/link/sonar</sonar_topic>-->
     <!--</plugin>-->
 
+    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+        <robotNamespace></robotNamespace>
+        <gpsNoise>true</gpsNoise>
+    </plugin>
+
     <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
+      <gpsSubTopic>/gps</gpsSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
       <opticalFlowSubTopic>/px4flow/link/opticalFlow</opticalFlowSubTopic>
       <lidarSubTopic>/sf10a/link/lidar</lidarSubTopic>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
