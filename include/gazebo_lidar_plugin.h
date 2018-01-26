@@ -29,6 +29,11 @@
 
 #include "lidar.pb.h"
 
+#define SENSOR_MIN_DISTANCE   0.06 // values smaller than that cause issues
+#define SENSOR_MAX_DISTANCE  35.0 // values bigger than that cause issues
+#define DEFAULT_MIN_DISTANCE  0.2
+#define DEFAULT_MAX_DISTANCE 15.0
+
 namespace gazebo
 {
   /// \brief A Ray Sensor Plugin
@@ -51,15 +56,17 @@ namespace gazebo
     protected: physics::WorldPtr world;
 
     /// \brief The parent sensor
-    private: 
-      sensors::RaySensorPtr parentSensor;
+    private:
+      sensors::RaySensorPtr parentSensor_;
       transport::NodePtr node_handle_;
       transport::PublisherPtr lidar_pub_;
       std::string namespace_;
+      double min_distance_;
+      double max_distance_;
 
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
-    private: 
+    private:
       event::ConnectionPtr newLaserScansConnection;
       lidar_msgs::msgs::lidar lidar_message;
   };
