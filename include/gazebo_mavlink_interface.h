@@ -156,7 +156,7 @@ public:
     hil_mode_(false),
     hil_state_level_(false)
     {}
-  
+
   ~GazeboMavlinkInterface();
 
   void Publish();
@@ -214,7 +214,7 @@ private:
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
-  
+
   // Serial interface
   void open();
   void close();
@@ -302,11 +302,11 @@ private:
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
-  
+
   in_addr_t qgc_addr_;
   int qgc_udp_port_;
-  
-  // Serial interface 
+
+  // Serial interface
   mavlink_status_t m_status;
   mavlink_message_t m_buffer;
   bool serial_enabled_;
@@ -319,7 +319,7 @@ private:
   std::deque<MsgBuffer> tx_q;
   boost::asio::io_service io_service;
   boost::asio::serial_port serial_dev;
-  
+
   bool hil_mode_;
   bool hil_state_level_;
 
