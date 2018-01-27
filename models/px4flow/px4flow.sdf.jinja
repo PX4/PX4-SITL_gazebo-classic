@@ -58,7 +58,7 @@
       <sensor name="px4flow" type="camera">
         <always_on>true</always_on>
         <update_rate>100</update_rate>
-        <visualize>false</visualize>
+        <visualize>true</visualize>
         <topic>/px4flow</topic>
         <camera>
           <horizontal_fov>0.25</horizontal_fov>
@@ -69,6 +69,7 @@
           <image>
             <width>64</width>
             <height>64</height>
+            <format>L8</format>
           </image>
           <clip>
             <near>0.1</near>
@@ -82,6 +83,7 @@
         </camera>
         <plugin name="opticalflow_plugin" filename="libgazebo_opticalFlow_plugin.so">
             <robotNamespace></robotNamespace>
+            <outputRate>20</outputRate>
         </plugin>
         <!--<plugin name="camera_controller" filename="libgazebo_ros_camera.so">-->
             <!--<robotNamespace></robotNamespace>-->

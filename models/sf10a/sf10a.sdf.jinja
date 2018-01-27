@@ -48,7 +48,7 @@
       </collision>
 
       <sensor name="sf10a" type="ray">
-        <visualize>false</visualize>
+        <visualize>true</visualize>
         <always_on>1</always_on>
         <update_rate>20</update_rate>
         <pose>0 0 0 0 {{ 90*deg2rad }} 0</pose>
@@ -62,8 +62,8 @@
             </horizontal>
           </scan>
           <range>
-            <min>0.06</min>
-            <max>25</max>
+            <min>0.06</min> <!-- do not change: use min_distance (below) for realistic behavior (smaller values cause issues) -->
+            <max>35</max>   <!-- do not change: use min_distance (below) for realistic behavior (bigger values cause issues) -->
             <resolution>0.01</resolution>
           </range>
           <noise>
@@ -76,6 +76,8 @@
         <plugin name="LaserPlugin"
           filename="libgazebo_lidar_plugin.so">
           <robotNamespace></robotNamespace>
+          <min_distance>0.1</min_distance>
+          <max_distance>25.0</max_distance>
         </plugin>
 
       </sensor>
