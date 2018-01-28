@@ -1,5 +1,12 @@
 <sdf version='1.5'>
   <model name='iris_opt_flow'>
+    <plugin name="vision_plugin" filename="libgazebo_vision_plugin.so">
+        <robotNamespace></robotNamespace>
+        <pub_rate>30</pub_rate>
+        <random_walk>1.0</random_walk>
+        <noise_density>0.0005</noise_density>
+        <corellation_time>60.0</corellation_time>
+    </plugin>
 
     <include>
       <uri>model://iris</uri>
