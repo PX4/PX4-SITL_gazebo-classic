@@ -63,7 +63,7 @@
 #include <SITLGps.pb.h>
 #include <irlock.pb.h>
 #include <Groundtruth.pb.h>
-
+#include <odom.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
@@ -90,6 +90,7 @@ typedef const boost::shared_ptr<const sonarSens_msgs::msgs::sonarSens> SonarSens
 typedef const boost::shared_ptr<const irlock_msgs::msgs::irlock> IRLockPtr;
 typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
 typedef const boost::shared_ptr<const gps_msgs::msgs::Groundtruth> GtPtr;
+typedef const boost::shared_ptr<const odom_msgs::msgs::odom> OdomPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -104,6 +105,7 @@ static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
 static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
+static const std::string kDefaultVisionTopic = "/vision_odom";
 
 //! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
 enum class Framing : uint8_t {
@@ -125,6 +127,7 @@ public:
     sonar_sub_topic_(kDefaultSonarTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
     gps_sub_topic_(kDefaultGPSTopic),
+    vision_sub_topic_(kDefaultVisionTopic),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -211,6 +214,7 @@ private:
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
+  void VisionCallback(OdomPtr& odom_msg);
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
@@ -227,15 +231,6 @@ private:
 
   static const unsigned n_out_max = 16;
   double alt_home = 488.0;   // meters
-
-  math::Vector3 ev_bias;
-  math::Vector3 noise_ev;
-  math::Vector3 random_walk_ev;
-
-  // vision position estimate noise parameters
-  static constexpr double ev_corellation_time = 60.0;  // s
-  static constexpr double ev_random_walk = 2.0;        // (m/s) / sqrt(hz)
-  static constexpr double ev_noise_density = 2e-4;     // (m) / sqrt(hz)
 
   unsigned _rotor_count;
 
@@ -255,6 +250,7 @@ private:
   transport::SubscriberPtr irlock_sub_;
   transport::SubscriberPtr gps_sub_;
   transport::SubscriberPtr groundtruth_sub_;
+  transport::SubscriberPtr vision_sub_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -263,18 +259,16 @@ private:
   std::string irlock_sub_topic_;
   std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
+  std::string vision_sub_topic_;
 
   common::Time last_time_;
   common::Time last_imu_time_;
-  common::Time last_ev_time_;
   common::Time last_actuator_time_;
 
   double groundtruth_lat_rad;
   double groundtruth_lon_rad;
   double groundtruth_altitude;
 
-  double ev_update_interval_;
-  double gps_update_interval_;
   double imu_update_interval_ = 0.004;
 
   void handle_control(double _dt);
