@@ -916,12 +916,13 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   mavlink_vision_position_estimate_t sensor_msg;
   sensor_msg.usec = odom_message->usec();
-  sensor_msg.x = odom_message->x();
-  sensor_msg.y = odom_message->y();
-  sensor_msg.z = odom_message->z();
-  sensor_msg.roll = odom_message->roll();
-  sensor_msg.pitch = odom_message->pitch();
-  sensor_msg.yaw = odom_message->yaw();
+  // convert from ENU to NED
+  sensor_msg.x = odom_message->y();
+  sensor_msg.y = -odom_message->x();
+  sensor_msg.z = -odom_message->z();
+  sensor_msg.roll = odom_message->pitch();
+  sensor_msg.pitch = -odom_message->roll();
+  sensor_msg.yaw = -odom_message->yaw();
 
   // send VISION_POSITION_ESTIMATE Mavlink msg
   mavlink_message_t msg;
