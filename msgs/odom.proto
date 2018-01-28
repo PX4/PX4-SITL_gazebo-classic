@@ -1,0 +1,13 @@
+syntax = "proto2";
+package odom_msgs.msgs;
+
+message odom
+{
+  required int32 usec    = 1;
+  required float x       = 2;
+  required float y       = 3;
+  required float z       = 4;
+  required float roll    = 5;
+  required float pitch   = 6;
+  required float yaw     = 7;
+}

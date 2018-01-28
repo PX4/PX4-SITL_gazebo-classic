@@ -247,6 +247,7 @@ set (msgs
   msgs/irlock.proto
   msgs/SITLGps.proto
   msgs/Groundtruth.proto
+  msgs/odom.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(mav_msgs SHARED ${PROTO_SRCS})
@@ -277,6 +278,7 @@ add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
+add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
 
 set(plugins
   rotors_gazebo_controller_interface
@@ -291,6 +293,7 @@ set(plugins
   gazebo_sonar_plugin
   gazebo_uuv_plugin
   gazebo_gps_plugin
+  gazebo_vision_plugin
   )
 
 # ROS mavlink version not compatible with geotagged images plugin
