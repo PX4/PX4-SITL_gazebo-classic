@@ -8,6 +8,7 @@
     <!-- A ground plane -->
     <include>
       <uri>model://iris_opt_flow</uri>
+      <pose>1.01 0.98 0.83 0 0 1.14</pose>
     </include>
     <include>
       <uri>model://uneven_ground</uri>
