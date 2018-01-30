@@ -16,12 +16,14 @@ Install the protobuf library, which is used as interface to Gazebo.
 ### Ubuntu Linux
 
 ```bash
-sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev gazebo7 libgazebo7-dev libxml2-utils python-jinja2
+sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev \
+			gazebo7 libgazebo7-dev libxml2-utils python-rospkg python-jinja2
 ```
 
 ### Mac OS
 
 ```bash
+pip install rospkg jinja2
 brew install graphviz libxml2 sdformat3 eigen opencv
 brew install gazebo7
 ```
