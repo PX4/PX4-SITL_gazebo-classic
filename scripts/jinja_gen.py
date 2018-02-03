@@ -6,7 +6,6 @@ import argparse
 import os
 import fnmatch
 import numpy as np
-import rospkg
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -17,7 +16,13 @@ if __name__ == "__main__":
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
 
     # create dictionary with useful modules etc.
-    rospack = rospkg.RosPack()
+    try:
+        import rospkg
+        rospack = rospkg.RosPack()
+    except ImportError:
+        pass
+        rospack = None
+
     d = {'np': np, 'rospack': rospack}
     result = template.render(d)
     filename_out = args.filename.replace('.sdf.jinja','-gen.sdf')
