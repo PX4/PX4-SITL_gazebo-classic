@@ -30,9 +30,13 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/rendering.hh>
+#include <SITLGps.pb.h>
 
 namespace gazebo
 {
+
+typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
+
 /**
  * @class GeotaggedImagesPlugin
  * Gazebo plugin that saves geotagged camera images to disk.
@@ -50,7 +54,7 @@ class GAZEBO_VISIBLE GeotaggedImagesPlugin : public SensorPlugin
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
 
   public: void OnNewFrame(const unsigned char *image);
-  public: void OnNewGpsPosition(ConstVector3dPtr& v);
+  public: void OnNewGpsPosition(GpsPtr& gps_msg);
   public: void TakePicture();
 
   protected: float storeIntervalSec_;
@@ -66,7 +70,7 @@ class GAZEBO_VISIBLE GeotaggedImagesPlugin : public SensorPlugin
   protected: rendering::ScenePtr scene_;
   private: event::ConnectionPtr newFrameConnection_;
   private: std::string storageDir_;
-  private: msgs::Vector3d lastGpsPosition_;
+  private: math::Vector3 lastGpsPosition_;
 
   private: transport::NodePtr node_handle_;
   private: std::string namespace_;

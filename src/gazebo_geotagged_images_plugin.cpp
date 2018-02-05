@@ -121,14 +121,14 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
-  node_handle_->Init(namespace_);
+  node_handle_->Init();
 
   this->parentSensor_->SetActive(true);
 
   this->newFrameConnection_ = this->camera_->ConnectNewImageFrame(
     boost::bind(&GeotaggedImagesPlugin::OnNewFrame, this, _1));
 
-  gpsSub_ = node_handle_->Subscribe("~/gps_position", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
+  gpsSub_ = node_handle_->Subscribe("~/" + namespace_ + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
 
   storageDir_ = "frames";
   boost::filesystem::remove_all(storageDir_); //clear existing images
@@ -201,10 +201,11 @@ void GeotaggedImagesPlugin::OnUpdate(const common::UpdateInfo& /*_info*/) {
   last_time_ = current_time;
 }
 
-void GeotaggedImagesPlugin::OnNewGpsPosition(ConstVector3dPtr& v)
-{
-  lastGpsPosition_ = *v;
-  //gzdbg << "got gps pos: "<<lastGpsPosition_.x()<<", "<<lastGpsPosition.y()<<endl;
+void GeotaggedImagesPlugin::OnNewGpsPosition(GpsPtr& gps_msg) {
+  lastGpsPosition_.x = gps_msg->latitude_deg();
+  lastGpsPosition_.y = gps_msg->longitude_deg();
+  lastGpsPosition_.z = gps_msg->altitude();
+  //gzdbg << "got gps pos: "<<lastGpsPosition_.x<<", "<<lastGpsPosition.y<<endl;
 }
 
 void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
@@ -250,9 +251,9 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
   }
 
   char gps_tag_command[1024];
-  double lat = lastGpsPosition_.x();
+  double lat = lastGpsPosition_.x;
   char north_south = 'N', east_west = 'E';
-  double lon = lastGpsPosition_.y();
+  double lon = lastGpsPosition_.y;
   if (lat < 0.) {
     lat = -lat;
     north_south = 'S';
@@ -266,7 +267,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
 //    " -gpsdatetime=now -gpsmapdatum=WGS-84"
     " -datetimeoriginal=now -gpsdop=0.8"
     " -gpsmeasuremode=3-d -gpssatellites=13 -gpsaltitude=%.3lf -overwrite_original %s &>/dev/null",
-    north_south, east_west, lat, lon, lastGpsPosition_.z(), file_name);
+    north_south, east_west, lat, lon, lastGpsPosition_.z, file_name);
 
   system(gps_tag_command);
 
@@ -283,7 +284,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
                                    1, // camera ID
                                    lat * 1e7,
                                    lon * 1e7,
-                                   lastGpsPosition_.z(),
+                                   lastGpsPosition_.z,
                                    0, // relative alt
                                    0, // q[4]
                                    imageCounter_,

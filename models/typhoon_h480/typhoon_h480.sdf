@@ -423,7 +423,7 @@
             <udpPort>5600</udpPort>
         </plugin>
         <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
-            <robotNamespace></robotNamespace>
+            <robotNamespace>typhoon_h480</robotNamespace>
             <interval>1</interval>
             <width>3840</width>
             <height>2160</height>
