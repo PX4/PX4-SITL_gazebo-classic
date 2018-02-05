@@ -39,52 +39,58 @@ namespace gazebo
  */
 class GAZEBO_VISIBLE GeotaggedImagesPlugin : public SensorPlugin
 {
-  public: GeotaggedImagesPlugin();
+public:
+    GeotaggedImagesPlugin();
 
-  public: virtual ~GeotaggedImagesPlugin();
+    virtual ~GeotaggedImagesPlugin();
+    virtual void Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf);
 
-  public: virtual void Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf);
-  public: void OnUpdate(const common::UpdateInfo& /*_info*/);
-  void send_mavlink_message(const mavlink_message_t *message, const int destination_port=0);
-  void handle_message(mavlink_message_t *msg);
-  void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
+    void send_mavlink_message(const mavlink_message_t *message, struct sockaddr* srcaddr = NULL);
+    void handle_message(mavlink_message_t *msg, struct sockaddr* srcaddr);
 
-  public: void OnNewFrame(const unsigned char *image);
-  public: void OnNewGpsPosition(ConstVector3dPtr& v);
-  public: void TakePicture();
+    void OnNewFrame(const unsigned char *image);
+    void OnNewGpsPosition(ConstVector3dPtr& v);
+    void TakePicture();
+    void cameraThread();
 
-  protected: float storeIntervalSec_;
-  private: int imageCounter_;
-  common::Time lastImageTime_{};
-  common::Time last_time_{};
+private:
+    void _handle_camera_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_request_camera_capture_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_storage_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _send_capture_status(struct sockaddr* srcaddr);
+    void _send_cmd_ack(uint8_t target_sysid, uint8_t target_compid, uint16_t cmd, unsigned char result, struct sockaddr* srcaddr);
+    void _send_heartbeat();
+    bool _init_udp(sdf::ElementPtr sdf);
 
-  /// \brief Pointer to the update event connection.
-  event::ConnectionPtr updateConnection_;
+protected:
+    float storeIntervalSec_;
+    int imageCounter_;
+    common::Time lastImageTime_{};
+    common::Time last_time_{};
+    common::Time last_heartbeat_{};
 
-  protected: sensors::CameraSensorPtr parentSensor_;
-  protected: rendering::CameraPtr camera_;
-  protected: rendering::ScenePtr scene_;
-  private: event::ConnectionPtr newFrameConnection_;
-  private: std::string storageDir_;
-  private: msgs::Vector3d lastGpsPosition_;
+    sensors::CameraSensorPtr parentSensor_;
+    rendering::CameraPtr camera_;
+    rendering::ScenePtr scene_;
+    event::ConnectionPtr newFrameConnection_;
+    std::string storageDir_;
+    msgs::Vector3d lastGpsPosition_;
 
-  private: transport::NodePtr node_handle_;
-  private: std::string namespace_;
-  private: transport::SubscriberPtr gpsSub_;
+    transport::NodePtr node_handle_;
+    std::string namespace_;
+    transport::SubscriberPtr gpsSub_;
 
-  protected: unsigned int width_, height_, depth_;
-  protected: unsigned int destWidth_, destHeight_; ///< output size
-  protected: std::string format_;
-  protected: bool capture_;
+    unsigned int width_, height_, depth_;
+    unsigned int destWidth_, destHeight_; ///< output size
+    std::string format_;
+    bool capture_;
 
-  private: int _fd;
-  private: struct sockaddr_in _myaddr;    ///< The locally bound address
-  private: struct sockaddr_in _srcaddr;   ///< SITL instance
-  private: socklen_t _addrlen;
-  private: unsigned char _buf[65535];
-  private: struct pollfd fds[1];
-  private: in_addr_t mavlink_addr_;
-  private: int mavlink_udp_port_ = 14558;
+    int _fd;
+    struct sockaddr_in _myaddr;    ///< The locally bound address
+    struct sockaddr_in _gcsaddr;   ///< GCS port
+    socklen_t _addrlen;
+    unsigned char _buf[65535];
+    struct pollfd fds[1];
 };
 
 } /* namespace gazebo */
