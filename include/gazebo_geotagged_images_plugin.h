@@ -17,7 +17,7 @@
 #pragma once
 
 #include <string>
-
+#include <mavlink/v2.0/common/mavlink.h>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/CameraSensor.hh>
 #include <gazebo/gazebo.hh>
@@ -28,11 +28,13 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/rendering.hh>
-
-#include "mavlink/v2.0/yuneec/mavlink.h"
+#include <SITLGps.pb.h>
 
 namespace gazebo
 {
+
+typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
+
 /**
  * @class GeotaggedImagesPlugin
  * Gazebo plugin that saves geotagged camera images to disk.
@@ -46,7 +48,7 @@ public:
     virtual void Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf);
 
     void OnNewFrame(const unsigned char *image);
-    void OnNewGpsPosition(ConstVector3dPtr& v);
+    void OnNewGpsPosition(GpsPtr& gps_msg);
     void cameraThread();
 
 private:
@@ -70,7 +72,7 @@ private:
     uint32_t    height_;
     uint32_t    depth_;
     uint32_t    destWidth_;     ///< output size
-    uint32_t    destHeight_; 
+    uint32_t    destHeight_;
     bool        capture_;
     int         _fd;
 
@@ -82,7 +84,7 @@ private:
     rendering::ScenePtr scene_;
     event::ConnectionPtr newFrameConnection_;
     std::string storageDir_;
-    msgs::Vector3d lastGpsPosition_;
+    math::Vector3 lastGpsPosition_;
     transport::NodePtr node_handle_;
     std::string namespace_;
     transport::SubscriberPtr gpsSub_;
