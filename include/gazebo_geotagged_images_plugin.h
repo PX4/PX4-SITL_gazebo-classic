@@ -18,8 +18,6 @@
 
 #include <string>
 
-#include <mavlink/v2.0/common/mavlink.h>
-
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/CameraSensor.hh>
 #include <gazebo/gazebo.hh>
@@ -30,6 +28,8 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/rendering.hh>
+
+#include "mavlink/v2.0/yuneec/mavlink.h"
 
 namespace gazebo
 {
@@ -45,51 +45,50 @@ public:
     virtual ~GeotaggedImagesPlugin();
     virtual void Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf);
 
-    void send_mavlink_message(const mavlink_message_t *message, struct sockaddr* srcaddr = NULL);
-    void handle_message(mavlink_message_t *msg, struct sockaddr* srcaddr);
-
     void OnNewFrame(const unsigned char *image);
     void OnNewGpsPosition(ConstVector3dPtr& v);
-    void TakePicture();
     void cameraThread();
 
 private:
+    void _handle_message(mavlink_message_t *msg, struct sockaddr* srcaddr);
+    void _send_mavlink_message(const mavlink_message_t *message, struct sockaddr* srcaddr = NULL);
     void _handle_camera_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_request_camera_capture_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_storage_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
-    void _send_capture_status(struct sockaddr* srcaddr);
+    void _handle_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_request_camera_settings(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _send_capture_status(struct sockaddr* srcaddr = NULL);
     void _send_cmd_ack(uint8_t target_sysid, uint8_t target_compid, uint16_t cmd, unsigned char result, struct sockaddr* srcaddr);
     void _send_heartbeat();
     bool _init_udp(sdf::ElementPtr sdf);
+    void _take_picture();
 
-protected:
-    float storeIntervalSec_;
-    int imageCounter_;
+private:
+    float       storeIntervalSec_;
+    int         imageCounter_;
+    uint32_t    width_;
+    uint32_t    height_;
+    uint32_t    depth_;
+    uint32_t    destWidth_;     ///< output size
+    uint32_t    destHeight_; 
+    bool        capture_;
+    int         _fd;
+
     common::Time lastImageTime_{};
     common::Time last_time_{};
     common::Time last_heartbeat_{};
-
     sensors::CameraSensorPtr parentSensor_;
     rendering::CameraPtr camera_;
     rendering::ScenePtr scene_;
     event::ConnectionPtr newFrameConnection_;
     std::string storageDir_;
     msgs::Vector3d lastGpsPosition_;
-
     transport::NodePtr node_handle_;
     std::string namespace_;
     transport::SubscriberPtr gpsSub_;
-
-    unsigned int width_, height_, depth_;
-    unsigned int destWidth_, destHeight_; ///< output size
     std::string format_;
-    bool capture_;
-
-    int _fd;
     struct sockaddr_in _myaddr;    ///< The locally bound address
-    struct sockaddr_in _gcsaddr;   ///< GCS port
-    socklen_t _addrlen;
-    unsigned char _buf[65535];
+    struct sockaddr_in _gcsaddr;   ///< GCS target
     struct pollfd fds[1];
 };
 

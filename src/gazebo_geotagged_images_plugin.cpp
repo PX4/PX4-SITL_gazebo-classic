@@ -31,7 +31,7 @@ using namespace std;
 using namespace gazebo;
 using namespace cv;
 
-//#define DEBUG_MESSAGE_IO
+// #define DEBUG_MESSAGE_IO
 
 GZ_REGISTER_SENSOR_PLUGIN(GeotaggedImagesPlugin)
 
@@ -43,10 +43,15 @@ static void* start_thread(void* param) {
 
 GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     : SensorPlugin()
+    , storeIntervalSec_(0.0f)
+    , imageCounter_(0)
     , width_(0)
     , height_(0)
     , depth_(0)
-    , imageCounter_(0)
+    , destWidth_(0)
+    , destHeight_(0)
+    , capture_(false)
+    , _fd(-1)
 {
 }
 
@@ -220,7 +225,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
 
     system(gps_tag_command);
 
-    gzerr << "Took picture:" << file_name << endl;
+    gzmsg << "Took picture: " << file_name << endl;
 
     // Send indication to GCS
     mavlink_message_t msg;
@@ -243,24 +248,26 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
     );
 
     // Send to GCS port directly
-    send_mavlink_message(&msg);
-
+    _send_mavlink_message(&msg);
+    // Send Capture Status
+    _send_capture_status();
     ++imageCounter_;
     capture_ = false;
 }
 
-void GeotaggedImagesPlugin::TakePicture()
+void GeotaggedImagesPlugin::_take_picture()
 {
     capture_ = true;
 }
 
-void GeotaggedImagesPlugin::handle_message(mavlink_message_t *msg, struct sockaddr* srcaddr)
+void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct sockaddr* srcaddr)
 {
 #if defined(DEBUG_MESSAGE_IO)
     sockaddr_in* foo = (sockaddr_in*)srcaddr;
     if (msg->sysid == 255) {
-        printf("Message %03u %u %u from: %s:%u\n", msg->msgid, msg->sysid, msg->compid, inet_ntoa(foo->sin_addr), ntohs(foo->sin_port));
-        fflush(stdout);
+        gzdbg << "Message " << std::to_string(msg->msgid).c_str() <<
+              " " << std::to_string(msg->sysid).c_str() << " " << std::to_string(msg->compid).c_str() <<
+              " from: " << inet_ntoa(foo->sin_addr) << ":" << std::to_string(ntohs(foo->sin_port)).c_str() << endl;
     }
 #endif
     switch (msg->msgid) {
@@ -271,16 +278,7 @@ void GeotaggedImagesPlugin::handle_message(mavlink_message_t *msg, struct sockad
         if (cmd.target_component == MAV_COMP_ID_CAMERA) {
             switch (cmd.command) {
             case MAV_CMD_IMAGE_START_CAPTURE:
-                // Take one picture
-                printf("Handle Start Capture\n");
-                if (cmd.param3 == 1) {
-                    _send_cmd_ack(msg->sysid, msg->compid,
-                                  MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-                    TakePicture();
-                } else {
-                    _send_cmd_ack(msg->sysid, msg->compid,
-                                  MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_UNSUPPORTED, srcaddr);
-                }
+                _handle_take_photo(msg, srcaddr);
                 break;
             case MAV_CMD_REQUEST_CAMERA_INFORMATION:
                 _handle_camera_info(msg, srcaddr);
@@ -291,25 +289,37 @@ void GeotaggedImagesPlugin::handle_message(mavlink_message_t *msg, struct sockad
             case MAV_CMD_REQUEST_STORAGE_INFORMATION:
                 _handle_storage_info(msg, srcaddr);
                 break;
+            case MAV_CMD_REQUEST_CAMERA_SETTINGS:
+                _handle_request_camera_settings(msg, srcaddr);
+                break;
+            case MAV_CMD_RESET_CAMERA_SETTINGS:
+                // Just ACK and ignore
+                _send_cmd_ack(msg->sysid, msg->compid, MAV_CMD_RESET_CAMERA_SETTINGS, MAV_RESULT_ACCEPTED, srcaddr);
+                break;
+            case MAV_CMD_STORAGE_FORMAT:
+                // Just ACK and ignore
+                _send_cmd_ack(msg->sysid, msg->compid, MAV_CMD_STORAGE_FORMAT, MAV_RESULT_ACCEPTED, srcaddr);
+                break;
             }
         }
         break;
     }
 }
 
-void GeotaggedImagesPlugin::send_mavlink_message(const mavlink_message_t *message, struct sockaddr* srcaddr)
+void GeotaggedImagesPlugin::_send_mavlink_message(const mavlink_message_t *message, struct sockaddr* srcaddr)
 {
     struct sockaddr* target = srcaddr ? srcaddr : (struct sockaddr *)&_gcsaddr;
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
     ssize_t len = sendto(_fd, buffer, packetlen, 0, target, sizeof(_gcsaddr));
     if (len <= 0) {
-        printf("Failed sending mavlink message\n");
+        gzerr << "Failed sending mavlink message" << endl;
 #if defined(DEBUG_MESSAGE_IO)
     } else {
         sockaddr_in* foo = (sockaddr_in*)target;
-        printf("Message %03u %u %u to   %s:%u\n", message->msgid, message->sysid, message->compid, inet_ntoa(foo->sin_addr), ntohs(foo->sin_port));
-        fflush(stdout);
+        gzdbg << "Message " << std::to_string(message->msgid).c_str() <<
+              " " << std::to_string(message->sysid).c_str() << " " << std::to_string(message->compid).c_str() <<
+              " to: " << inet_ntoa(foo->sin_addr) << ":" << std::to_string(ntohs(foo->sin_port)).c_str() << endl;
 #endif
     }
 }
@@ -328,7 +338,7 @@ void GeotaggedImagesPlugin::_send_cmd_ack(uint8_t target_sysid, uint8_t target_c
         0,
         target_sysid,
         target_compid);
-    send_mavlink_message(&msg, srcaddr);
+    _send_mavlink_message(&msg, srcaddr);
 }
 
 void GeotaggedImagesPlugin::_send_heartbeat()
@@ -336,25 +346,29 @@ void GeotaggedImagesPlugin::_send_heartbeat()
     mavlink_message_t msg;
     mavlink_msg_heartbeat_pack_chan(1, MAV_COMP_ID_CAMERA, MAVLINK_COMM_1, &msg, MAV_TYPE_GENERIC, MAV_AUTOPILOT_GENERIC, 0, 0, 0);
     // Send to GCS port directly
-    send_mavlink_message(&msg);
+    _send_mavlink_message(&msg);
+    // Gazebo log output is using buffered IO for some reason
+    fflush(stdout);
+    fflush(stderr);
 }
 
 void GeotaggedImagesPlugin::cameraThread() {
     mavlink_status_t  status;
     mavlink_message_t msg;
+    unsigned char buffer[16 * 1024];
     while (true) {
         ::poll(&fds[0], (sizeof(fds[0]) / sizeof(fds[0])), 1000);
         if (fds[0].revents & POLLIN) {
             struct sockaddr srcaddr;
             socklen_t addrlen = sizeof(srcaddr);
-            int len = recvfrom(_fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&srcaddr, &addrlen);
+            int len = recvfrom(_fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&srcaddr, &addrlen);
             if (len > 0) {
                 for (unsigned i = 0; i < len; ++i)
                 {
-                    if (mavlink_parse_char(MAVLINK_COMM_1, _buf[i], &msg, &status))
+                    if (mavlink_parse_char(MAVLINK_COMM_1, buffer[i], &msg, &status))
                     {
                         // have a message, handle it
-                        handle_message(&msg, &srcaddr);
+                        _handle_message(&msg, &srcaddr);
                         memset(&status, 0, sizeof(status));
                         memset(&msg, 0, sizeof(msg));
                     }
@@ -378,7 +392,10 @@ void GeotaggedImagesPlugin::cameraThread() {
 bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     //-- Target
     uint32_t mavlink_addr = htonl(INADDR_LOOPBACK);
-    /* Need to find if it's either localhost or broadcast
+    /* TODO: We need to find if the system is setup for broadcast
+             and add the proper socket options and broadcast address
+             if that's the case. It's hardcoded to loopback for now.
+
     if (sdf->HasElement("mavlink_telem_addr")) {
         std::string mavlink_addr = sdf->GetElement("mavlink_telem_addr")->Get<std::string>();
         if (mavlink_addr != "INADDR_ANY") {
@@ -389,10 +406,11 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
             }
         }
     }
+
     */
     //Create socket
     if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        printf("create socket failed\n");
+        gzerr << "Create camera plugin UDP socket failed" << endl;
         return false;
     }
     memset((char *)&_myaddr, 0, sizeof(_myaddr));
@@ -401,18 +419,34 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     // Choose the default cam port
     _myaddr.sin_port = htons(14530);
     if (::bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
-        printf("bind failed\n");
+        gzerr << "Bind failed for camera UDP plugin" << endl;
         return false;
     }
     _gcsaddr.sin_family = AF_INET;
     _gcsaddr.sin_addr.s_addr = mavlink_addr;
     _gcsaddr.sin_port = htons(14550);
-    _addrlen = sizeof(_gcsaddr);
     fds[0].fd = _fd;
     fds[0].events = POLLIN;
     mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
     chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+    gzmsg << "Camera on udp port 14530\n";
     return true;
+}
+
+void GeotaggedImagesPlugin::_handle_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+
+    gzdbg << "Handle Start Capture" << endl;
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    if (cmd.param3 == 1) {
+        _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                      MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
+        _take_picture();
+    } else {
+        _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                      MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_UNSUPPORTED, srcaddr);
+    }
 }
 
 void GeotaggedImagesPlugin::_handle_request_camera_capture_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
@@ -422,7 +456,7 @@ void GeotaggedImagesPlugin::_handle_request_camera_capture_status(const mavlink_
     // Should we execute the command
     if (cmd.param1 != 1)
     {
-        printf("Camera capture status request ignored\n");
+        gzwarn << "Camera capture status request ignored" << endl;
         return;
     }
     // ACK command received and accepted
@@ -433,7 +467,7 @@ void GeotaggedImagesPlugin::_handle_request_camera_capture_status(const mavlink_
 
 void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
 {
-    printf("Send camera info\n");
+    gzdbg << "Send camera info" << endl;
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
     static const char* vendor = "PX4.io";
     static const char* model  = "Gazebo";
@@ -459,12 +493,36 @@ void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, s
         0,                         // Camera Definition Version
         uri                        // URI
     );
-    send_mavlink_message(&msg, srcaddr);
+    _send_mavlink_message(&msg, srcaddr);
+}
+
+void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    gzdbg << "Send camera settings" << endl;
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    //-- Should we execute the command
+    if ((int)cmd.param1 != 1)
+    {
+        gzwarn << "Request ignored" << endl;
+        return;
+    }
+    // ACK command received and accepted
+    _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_CAMERA_SETTINGS, MAV_RESULT_ACCEPTED, srcaddr);
+    mavlink_message_t msg;
+    mavlink_msg_camera_settings_pack_chan(
+        1,
+        MAV_COMP_ID_CAMERA,
+        MAVLINK_COMM_1,
+        &msg,
+        0,                      // time_boot_ms
+        CAMERA_MODE_IMAGE);     // Camera Mode
+    _send_mavlink_message(&msg, srcaddr);
 }
 
 void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
 {
-    printf("Send capture status\n");
+    gzdbg << "Send capture status" << endl;
     float available_mib = 0.0f;
     boost::filesystem::space_info si = boost::filesystem::space(".");
     available_mib = (float)((double)si.available / (1024.0 * 1024.0));
@@ -480,12 +538,12 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
         0,                                     // image interval
         0,                                     // recording_time_s
         available_mib);                        // available_capacity
-    send_mavlink_message(&msg, srcaddr);
+    _send_mavlink_message(&msg, srcaddr);
 }
 
 void GeotaggedImagesPlugin::_handle_storage_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
 {
-    printf("Send storage info\n");
+    gzdbg << "Send storage info" << endl;
     float total_mib     = 0.0f;
     float available_mib = 0.0f;
     boost::filesystem::space_info si = boost::filesystem::space(".");
@@ -508,5 +566,5 @@ void GeotaggedImagesPlugin::_handle_storage_info(const mavlink_message_t *pMsg, 
         NAN,                                // read_speed,
         NAN                                 // write_speed
     );
-    send_mavlink_message(&msg, srcaddr);
+    _send_mavlink_message(&msg, srcaddr);
 }
