@@ -44,7 +44,7 @@
             <stddev>0.001</stddev>
           </noise>
         </camera>
-        <plugin name="svo_plugin" filename="libgazebo_ros_camera.so">
+        <plugin name="vision_cam_plugin" filename="libgazebo_ros_camera.so">
 	  <alwaysOn>true</alwaysOn>
 	  <updateRate>0.0</updateRate>
 	  <cameraName>camera</cameraName>
