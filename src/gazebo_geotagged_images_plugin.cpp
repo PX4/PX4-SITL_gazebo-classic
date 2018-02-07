@@ -43,22 +43,23 @@ static void* start_thread(void* param) {
 
 GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     : SensorPlugin()
-    , storeIntervalSec_(0.0f)
-    , imageCounter_(0)
-    , width_(0)
-    , height_(0)
-    , depth_(0)
-    , destWidth_(0)
-    , destHeight_(0)
-    , capture_(false)
+    , _imageCounter(0)
+    , _width(0)
+    , _height(0)
+    , _depth(0)
+    , _destWidth(0)
+    , _destHeight(0)
+    , _captureCount(0)
+    , _captureInterval(0.0)
     , _fd(-1)
+    , _captureMode(CAPTURE_DISABLED)
 {
 }
 
 GeotaggedImagesPlugin::~GeotaggedImagesPlugin()
 {
-    this->parentSensor_.reset();
-    this->camera_.reset();
+    _parentSensor.reset();
+    _camera.reset();
 }
 
 void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
@@ -66,66 +67,61 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     if (!sensor)
         gzerr << "Invalid sensor pointer.\n";
 
-    this->parentSensor_ =
+    _parentSensor =
 #if GAZEBO_MAJOR_VERSION >= 7
         std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 #else
         boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 #endif
 
-    if (!this->parentSensor_)
+    if (!_parentSensor)
     {
         gzerr << "GeotaggedImagesPlugin requires a CameraSensor.\n";
     }
 
 #if GAZEBO_MAJOR_VERSION >= 7
-    this->camera_ = this->parentSensor_->Camera();
+    _camera = _parentSensor->Camera();
 #else
-    this->camera_ = this->parentSensor_->GetCamera();
+    _camera = _parentSensor->GetCamera();
 #endif
 
-    if (!this->parentSensor_)
+    if (!_parentSensor)
     {
         gzerr << "GeotaggedImagesPlugin not attached to a camera sensor\n";
         return;
     }
-    scene_ = camera_->GetScene();
+    _scene = _camera->GetScene();
 #if GAZEBO_MAJOR_VERSION >= 8
-    lastImageTime_ = scene_->SimTime();
+    _lastImageTime = _scene->SimTime();
 #else
-    lastImageTime_ = scene_->GetSimTime();
+    _lastImageTime = _scene->GetSimTime();
 #endif
 
 #if GAZEBO_MAJOR_VERSION >= 7
-    this->width_    = this->camera_->ImageWidth();
-    this->height_   = this->camera_->ImageHeight();
-    this->depth_    = this->camera_->ImageDepth();
-    this->format_   = this->camera_->ImageFormat();
+    _width    = _camera->ImageWidth();
+    _height   = _camera->ImageHeight();
+    _depth    = _camera->ImageDepth();
+    _format   = _camera->ImageFormat();
 #else
-    this->width_    = this->camera_->GetImageWidth();
-    this->height_   = this->camera_->GetImageHeight();
-    this->depth_    = this->camera_->GetImageDepth();
-    this->format_   = this->camera_->GetImageFormat();
+    _width    = _camera->GetImageWidth();
+    _height   = _camera->GetImageHeight();
+    _depth    = _camera->GetImageDepth();
+    _format   = _camera->GetImageFormat();
 #endif
 
     if (sdf->HasElement("robotNamespace")) {
-        namespace_ = sdf->GetElement("robotNamespace")->Get<std::string>();
+        _namespace = sdf->GetElement("robotNamespace")->Get<std::string>();
     } else {
         gzwarn << "[gazebo_geotagging_images_camera_plugin] Please specify a robotNamespace.\n";
     }
 
-    this->storeIntervalSec_ = 1;
-    if (sdf->HasElement("interval")) {
-        this->storeIntervalSec_ = sdf->GetElement("interval")->Get<float>();
-    }
-
-    destWidth_ = width_;
+    _destWidth = _width;
     if (sdf->HasElement("width")) {
-        destWidth_ = sdf->GetElement("width")->Get<int>();
+        _destWidth = sdf->GetElement("width")->Get<int>();
     }
-    destHeight_ = height_;
+    _destHeight = _height;
     if (sdf->HasElement("height")) {
-        destHeight_ = sdf->GetElement("height")->Get<int>();
+        _destHeight = sdf->GetElement("height")->Get<int>();
     }
 
     //check if exiftool exists
@@ -135,19 +131,19 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
         return;
     }
 
-    node_handle_ = transport::NodePtr(new transport::Node());
-    node_handle_->Init();
+    _node_handle = transport::NodePtr(new transport::Node());
+    _node_handle->Init();
 
-    this->parentSensor_->SetActive(true);
+    _parentSensor->SetActive(true);
 
-    this->newFrameConnection_ = this->camera_->ConnectNewImageFrame(
-                                    boost::bind(&GeotaggedImagesPlugin::OnNewFrame, this, _1));
+    _newFrameConnection = _camera->ConnectNewImageFrame(
+                              boost::bind(&GeotaggedImagesPlugin::OnNewFrame, this, _1));
 
-    gpsSub_ = node_handle_->Subscribe("~/" + namespace_ + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
+    _gpsSub = _node_handle->Subscribe("~/" + _namespace + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
 
-    storageDir_ = "frames";
-    boost::filesystem::remove_all(storageDir_); //clear existing images
-    boost::filesystem::create_directory(storageDir_);
+    _storageDir = "frames";
+    boost::filesystem::remove_all(_storageDir); //clear existing images
+    boost::filesystem::create_directory(_storageDir);
 
     if (_init_udp(sdf)) {
         // Start UDP thread
@@ -157,48 +153,53 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 }
 
 void GeotaggedImagesPlugin::OnNewGpsPosition(GpsPtr& gps_msg) {
-    lastGpsPosition_.x = gps_msg->latitude_deg();
-    lastGpsPosition_.y = gps_msg->longitude_deg();
-    lastGpsPosition_.z = gps_msg->altitude();
-    //gzdbg << "got gps pos: "<<lastGpsPosition_.x<<", "<<lastGpsPosition.y<<endl;
+    _lastGpsPosition.x = gps_msg->latitude_deg();
+    _lastGpsPosition.y = gps_msg->longitude_deg();
+    _lastGpsPosition.z = gps_msg->altitude();
+    //gzdbg << "got gps pos: "<<_lastGpsPosition.x<<", "<<lastGpsPosition.y<<endl;
 }
 
 void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
 {
-#if GAZEBO_MAJOR_VERSION >= 7
-    image = this->camera_->ImageData(0);
-#else
-    image = this->camera_->GetImageData(0);
-#endif
 
-    if (!capture_ || storeIntervalSec_ == 0) {
+    _captureMutex.lock();
+    // Are we capturing at all?
+    if (_captureMode == CAPTURE_DISABLED) {
+        _captureMutex.unlock();
         return;
     }
+    _captureMutex.unlock();
 
+    // Check for time lapse capture
 #if GAZEBO_MAJOR_VERSION >= 8
-    common::Time currentTime = scene_->SimTime();
+    common::Time currentTime = _scene->SimTime();
 #else
-    common::Time currentTime = scene_->GetSimTime();
+    common::Time currentTime = _scene->GetSimTime();
 #endif
-
-    if (currentTime.Double() - lastImageTime_.Double() < storeIntervalSec_) {
-        gzerr << "WARNING: TRIGGERED CAMERA TOO FAST!" << endl;
+    double elapsed = currentTime.Double() - _lastImageTime.Double();
+    if (_captureMode == CAPTURE_ELAPSED && (elapsed < _captureInterval)) {
         return;
     }
 
-    lastImageTime_ = currentTime;
+    _lastImageTime = currentTime;
 
-    Mat frame = Mat(height_, width_, CV_8UC3);
-    Mat frameBGR = Mat(height_, width_, CV_8UC3);
-    frame.data = (uchar*)image; //frame has not the right color format yet -> convert
+#if GAZEBO_MAJOR_VERSION >= 7
+    image = _camera->ImageData(0);
+#else
+    image = _camera->GetImageData(0);
+#endif
+
+    Mat frame    = Mat(_height, _width, CV_8UC3);
+    Mat frameBGR = Mat(_height, _width, CV_8UC3);
+    frame.data   = (uchar*)image; //frame has not the right color format yet -> convert
     cvtColor(frame, frameBGR, CV_RGB2BGR);
 
     char file_name[256];
-    snprintf(file_name, sizeof(file_name), "%s/DSC%05i.jpg", storageDir_.c_str(), imageCounter_);
+    snprintf(file_name, sizeof(file_name), "%s/DSC%05i.jpg", _storageDir.c_str(), _imageCounter);
 
-    if (destWidth_ != width_ || destHeight_ != height_) {
+    if (_destWidth != _width || _destHeight != _height) {
         Mat frameResized;
-        cv::Size size(destWidth_, destHeight_);
+        cv::Size size(_destWidth, _destHeight);
         cv::resize(frameBGR, frameResized, size);
         imwrite(file_name, frameResized);
     } else {
@@ -206,9 +207,9 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
     }
 
     char gps_tag_command[1024];
-    double lat = lastGpsPosition_.x;
+    double lat = _lastGpsPosition.x;
     char north_south = 'N', east_west = 'E';
-    double lon = lastGpsPosition_.y;
+    double lon = _lastGpsPosition.y;
     if (lat < 0.) {
         lat = -lat;
         north_south = 'S';
@@ -222,7 +223,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
 //           " -gpsdatetime=now -gpsmapdatum=WGS-84"
              " -datetimeoriginal=now -gpsdop=0.8"
              " -gpsmeasuremode=3-d -gpssatellites=13 -gpsaltitude=%.3lf -overwrite_original %s &>/dev/null",
-             north_south, east_west, lat, lon, lastGpsPosition_.z, file_name);
+             north_south, east_west, lat, lon, _lastGpsPosition.z, file_name);
 
     system(gps_tag_command);
 
@@ -240,25 +241,33 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
         1, // camera ID
         lat * 1e7,
         lon * 1e7,
-        lastGpsPosition_.z,
+        _lastGpsPosition.z,
         0, // relative alt
         0, // q[4]
-        imageCounter_,
+        _imageCounter,
         1, // result
         0 // file_url
     );
 
     // Send to GCS port directly
     _send_mavlink_message(&msg);
+    ++_imageCounter;
+    _captureMutex.lock();
+    if (_captureMode == CAPTURE_SINGLE) {
+        _captureMode  = CAPTURE_DISABLED;
+    } else {
+        // _captureCount == 0 is infinite
+        if (_captureCount && --_captureCount < 1) {
+            _captureCount = 0;
+            _captureMode  = CAPTURE_DISABLED;
+        }
+    }
+    if (_captureMode == CAPTURE_DISABLED) {
+        gzdbg << "Done with image capture\n";
+    }
+    _captureMutex.unlock();
     // Send Capture Status
     _send_capture_status();
-    ++imageCounter_;
-    capture_ = false;
-}
-
-void GeotaggedImagesPlugin::_take_picture()
-{
-    capture_ = true;
 }
 
 void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct sockaddr* srcaddr)
@@ -280,6 +289,9 @@ void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct socka
             switch (cmd.command) {
             case MAV_CMD_IMAGE_START_CAPTURE:
                 _handle_take_photo(msg, srcaddr);
+                break;
+            case MAV_CMD_IMAGE_STOP_CAPTURE:
+                _handle_stop_take_photo(msg, srcaddr);
                 break;
             case MAV_CMD_REQUEST_CAMERA_INFORMATION:
                 _handle_camera_info(msg, srcaddr);
@@ -358,8 +370,8 @@ void GeotaggedImagesPlugin::cameraThread() {
     mavlink_message_t msg;
     unsigned char buffer[16 * 1024];
     while (true) {
-        ::poll(&fds[0], (sizeof(fds[0]) / sizeof(fds[0])), 1000);
-        if (fds[0].revents & POLLIN) {
+        ::poll(&_fds[0], (sizeof(_fds[0]) / sizeof(_fds[0])), 1000);
+        if (_fds[0].revents & POLLIN) {
             struct sockaddr srcaddr;
             socklen_t addrlen = sizeof(srcaddr);
             int len = recvfrom(_fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&srcaddr, &addrlen);
@@ -378,13 +390,13 @@ void GeotaggedImagesPlugin::cameraThread() {
         }
         // Heartbeat
 #if GAZEBO_MAJOR_VERSION >= 8
-        common::Time current_time = scene_->SimTime();
+        common::Time current_time = _scene->SimTime();
 #else
-        common::Time current_time = scene_->GetSimTime();
+        common::Time current_time = _scene->GetSimTime();
 #endif
-        double elapsed = (current_time - last_heartbeat_).Double();
+        double elapsed = (current_time - _last_heartbeat).Double();
         if (elapsed > 1.0) {
-            last_heartbeat_ = current_time;
+            _last_heartbeat = current_time;
             _send_heartbeat();
         }
     }
@@ -426,8 +438,8 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     _gcsaddr.sin_family = AF_INET;
     _gcsaddr.sin_addr.s_addr = mavlink_addr;
     _gcsaddr.sin_port = htons(14550);
-    fds[0].fd = _fd;
-    fds[0].events = POLLIN;
+    _fds[0].fd = _fd;
+    _fds[0].events = POLLIN;
     mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
     chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
     gzmsg << "Camera on udp port 14530\n";
@@ -440,14 +452,43 @@ void GeotaggedImagesPlugin::_handle_take_photo(const mavlink_message_t *pMsg, st
     gzdbg << "Handle Start Capture" << endl;
     mavlink_command_long_t cmd;
     mavlink_msg_command_long_decode(pMsg, &cmd);
-    if (cmd.param3 == 1) {
+    std::lock_guard<std::mutex> guard(_captureMutex);
+    //-- We we busy?
+    if (_captureMode != CAPTURE_DISABLED) {
         _send_cmd_ack(pMsg->sysid, pMsg->compid,
-                      MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-        _take_picture();
-    } else {
-        _send_cmd_ack(pMsg->sysid, pMsg->compid,
-                      MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_UNSUPPORTED, srcaddr);
+                      MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_TEMPORARILY_REJECTED, srcaddr);
+        return;
     }
+    //-- Single capture?
+    if (cmd.param3 == 1) {
+        _captureMode = CAPTURE_SINGLE;
+        _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                      MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_ACCEPTED, srcaddr);
+        //-- Time lapse?
+    } else if (cmd.param3 >= 0 && cmd.param2 > 0.0) {
+        gzdbg << "Start time lapse of " << (int)cmd.param3 << " shots every " << cmd.param2 << " seconds.\n";
+        _captureInterval = cmd.param2;
+        _captureCount    = cmd.param3;
+        _captureMode     = CAPTURE_ELAPSED;
+        _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                      MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_ACCEPTED, srcaddr);
+    } else {
+        gzerr << "Bad Start Capture argments: " << cmd.param2 << " " << cmd.param3 << endl;
+        _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                      MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_UNSUPPORTED, srcaddr);
+    }
+}
+
+void GeotaggedImagesPlugin::_handle_stop_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+
+    gzdbg << "Handle Stop Capture" << endl;
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    std::lock_guard<std::mutex> guard(_captureMutex);
+    _captureMode = CAPTURE_DISABLED;
+    _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                  MAV_CMD_IMAGE_STOP_CAPTURE, MAV_RESULT_ACCEPTED, srcaddr);
 }
 
 void GeotaggedImagesPlugin::_handle_request_camera_capture_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
@@ -487,8 +528,8 @@ void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, s
         50.0f,                     // float focal_lenth
         35.0f,                     // float  sensor_size_h
         24.0f,                     // float  sensor_size_v
-        width_,                    // resolution_h
-        height_,                   // resolution_v
+        _width,                    // resolution_h
+        _height,                   // resolution_v
         0,                         // lens_id
         camera_capabilities,       // CAP_FLAGS
         0,                         // Camera Definition Version
@@ -523,6 +564,9 @@ void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_messag
 
 void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
 {
+    _captureMutex.lock();
+    int status = _captureMode == CAPTURE_DISABLED ? 0 : (_captureMode == CAPTURE_SINGLE ? 1 : 3);
+    _captureMutex.unlock();
     gzdbg << "Send capture status" << endl;
     float available_mib = 0.0f;
     boost::filesystem::space_info si = boost::filesystem::space(".");
@@ -534,11 +578,11 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
         MAVLINK_COMM_1,
         &msg,
         0,
-        0,                                     // image status (Idle)
-        0,                                     // video status (Idle)
-        0,                                     // image interval
-        0,                                     // recording_time_s
-        available_mib);                        // available_capacity
+        status,                                 // image status
+        0,                                      // video status (Idle)
+        _captureMode == CAPTURE_ELAPSED ? (float)_captureInterval : 0, // image interval
+        0,                                      // recording_time_s
+        available_mib);                         // available_capacity
     _send_mavlink_message(&msg, srcaddr);
 }
 

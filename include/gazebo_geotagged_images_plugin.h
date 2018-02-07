@@ -58,40 +58,50 @@ private:
     void _handle_request_camera_capture_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_storage_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_stop_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_request_camera_settings(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _send_capture_status(struct sockaddr* srcaddr = NULL);
     void _send_cmd_ack(uint8_t target_sysid, uint8_t target_compid, uint16_t cmd, unsigned char result, struct sockaddr* srcaddr);
     void _send_heartbeat();
     bool _init_udp(sdf::ElementPtr sdf);
-    void _take_picture();
 
 private:
-    float       storeIntervalSec_;
-    int         imageCounter_;
-    uint32_t    width_;
-    uint32_t    height_;
-    uint32_t    depth_;
-    uint32_t    destWidth_;     ///< output size
-    uint32_t    destHeight_;
-    bool        capture_;
+
+    int         _imageCounter;
+    uint32_t    _width;
+    uint32_t    _height;
+    uint32_t    _depth;
+    uint32_t    _destWidth;     ///< output size
+    uint32_t    _destHeight;
+    int         _captureCount;
+    double      _captureInterval;
     int         _fd;
 
-    common::Time lastImageTime_{};
-    common::Time last_time_{};
-    common::Time last_heartbeat_{};
-    sensors::CameraSensorPtr parentSensor_;
-    rendering::CameraPtr camera_;
-    rendering::ScenePtr scene_;
-    event::ConnectionPtr newFrameConnection_;
-    std::string storageDir_;
-    math::Vector3 lastGpsPosition_;
-    transport::NodePtr node_handle_;
-    std::string namespace_;
-    transport::SubscriberPtr gpsSub_;
-    std::string format_;
-    struct sockaddr_in _myaddr;    ///< The locally bound address
-    struct sockaddr_in _gcsaddr;   ///< GCS target
-    struct pollfd fds[1];
+    enum {
+        CAPTURE_DISABLED,
+        CAPTURE_SINGLE,
+        CAPTURE_ELAPSED
+    };
+
+    int         _captureMode;
+
+    common::Time                _lastImageTime{};
+    common::Time                _last_time{};
+    common::Time                _last_heartbeat{};
+    sensors::CameraSensorPtr    _parentSensor;
+    rendering::CameraPtr        _camera;
+    rendering::ScenePtr         _scene;
+    event::ConnectionPtr        _newFrameConnection;
+    std::string                 _storageDir;
+    math::Vector3               _lastGpsPosition;
+    transport::NodePtr          _node_handle;
+    std::string                 _namespace;
+    transport::SubscriberPtr    _gpsSub;
+    std::string                 _format;
+    struct sockaddr_in          _myaddr;    ///< The locally bound address
+    struct sockaddr_in          _gcsaddr;   ///< GCS target
+    struct pollfd               _fds[1];
+    std::mutex                  _captureMutex;
 };
 
 } /* namespace gazebo */
