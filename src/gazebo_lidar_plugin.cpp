@@ -125,8 +125,9 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 #else
   const string scopedName = _parent->GetParentName();
 #endif
-  string topicName = "~/" + scopedName + "/lidar";
-  boost::replace_all(topicName, "::", "/");
+  vector<string> names_splitted;
+  boost::split(names_splitted,scopedName,boost::is_any_of("::"));
+  string topicName = "~/" + names_splitted[0] + "/link/lidar";
 
   lidar_pub_ = node_handle_->Advertise<lidar_msgs::msgs::lidar>(topicName, 10);
 }
