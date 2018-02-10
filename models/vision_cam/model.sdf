@@ -45,12 +45,12 @@
           </noise>
         </camera>
         <plugin name="vision_cam_plugin" filename="libgazebo_ros_camera.so">
-	  <alwaysOn>true</alwaysOn>
-	  <updateRate>0.0</updateRate>
-	  <cameraName>camera</cameraName>
-	  <imageTopicName>image_raw</imageTopicName>
-	  <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-	  <frameName>camera_link</frameName>
+	        <alwaysOn>true</alwaysOn>
+	        <updateRate>0.0</updateRate>
+	        <cameraName>camera</cameraName>
+	        <imageTopicName>image_raw</imageTopicName>
+	        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+	        <frameName>camera_link</frameName>
         </plugin>
       </sensor>
     </link>
