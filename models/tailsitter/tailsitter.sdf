@@ -667,6 +667,7 @@
       <qgc_udp_port>14550</qgc_udp_port>
       <hil_mode>false</hil_mode>
       <hil_state_level>false</hil_state_level>
+      <vehicle_is_tailsitter>true</vehicle_is_tailsitter>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name="rotor0">
