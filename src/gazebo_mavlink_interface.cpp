@@ -497,6 +497,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     return;
   }
 
+  if(_sdf->HasElement("vehicle_is_tailsitter"))
+  {
+    vehicle_is_tailsitter_ = _sdf->GetElement("vehicle_is_tailsitter")->Get<bool>();
+  }
+
   memset((char *)&_myaddr, 0, sizeof(_myaddr));
   _myaddr.sin_family = AF_INET;
   _srcaddr.sin_family = AF_INET;
@@ -721,7 +726,12 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.GetLength() * rho);
 
     // calculate differential pressure in hPa
-    sensor_msg.diff_pressure = 0.005f*rho*vel_b.x*vel_b.x;
+    // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
+    if (vehicle_is_tailsitter_) {
+      sensor_msg.diff_pressure = 0.005f*rho*vel_b.z*vel_b.z;
+    } else {
+      sensor_msg.diff_pressure = 0.005f*rho*vel_b.x*vel_b.x;
+    }
 
     // calculate temperature in Celsius
     sensor_msg.temperature = temperature_local - 273.0f;

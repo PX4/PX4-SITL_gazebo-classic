@@ -199,6 +199,8 @@ private:
   bool use_left_elevon_pid_;
   bool use_right_elevon_pid_;
 
+  bool vehicle_is_tailsitter_;
+
   std::vector<physics::JointPtr> joints_;
   std::vector<common::PID> pids_;
 
