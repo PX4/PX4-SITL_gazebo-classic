@@ -566,6 +566,7 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
 {
     _captureMutex.lock();
     int status = _captureMode == CAPTURE_DISABLED ? 0 : (_captureMode == CAPTURE_SINGLE ? 1 : 3);
+    float interval == CAPTURE_ELAPSED ? (float)_captureInterval : 0.0f;
     _captureMutex.unlock();
     gzdbg << "Send capture status" << endl;
     float available_mib = 0.0f;
@@ -580,7 +581,7 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
         0,
         status,                                 // image status
         0,                                      // video status (Idle)
-        _captureMode == CAPTURE_ELAPSED ? (float)_captureInterval : 0, // image interval
+        interval,                               // image interval
         0,                                      // recording_time_s
         available_mib);                         // available_capacity
     _send_mavlink_message(&msg, srcaddr);
