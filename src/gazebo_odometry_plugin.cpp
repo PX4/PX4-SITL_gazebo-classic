@@ -495,27 +495,26 @@ void GazeboOdometryPlugin::OnUpdate(const common::UpdateInfo& _info) {
     //========= BROADCAST TRANSFORM MSG ============//
     //==============================================//
 
-    // gz_geometry_msgs::TransformStampedWithFrameIds
-    //     transform_stamped_with_frame_ids_msg;
-    // transform_stamped_with_frame_ids_msg.mutable_header()->CopyFrom(
-    //     odometry_msg.header());
-    // transform_stamped_with_frame_ids_msg.mutable_transform()
-    //     ->mutable_translation()
-    //     ->set_x(p->x());
-    // transform_stamped_with_frame_ids_msg.mutable_transform()
-    //     ->mutable_translation()
-    //     ->set_y(p->y());
-    // transform_stamped_with_frame_ids_msg.mutable_transform()
-    //     ->mutable_translation()
-    //     ->set_z(p->z());
-    // transform_stamped_with_frame_ids_msg.mutable_transform()
-    //     ->mutable_rotation()
-    //     ->CopyFrom(*q_W_L);
-    // transform_stamped_with_frame_ids_msg.set_parent_frame_id(parent_frame_id_);
-    // transform_stamped_with_frame_ids_msg.set_child_frame_id(child_frame_id_);
+    gz_geometry_msgs::TransformStampedWithFrameIds
+        transform_stamped_with_frame_ids_msg;
+    transform_stamped_with_frame_ids_msg.mutable_header()->CopyFrom(
+        odometry_msg.header());
+    transform_stamped_with_frame_ids_msg.mutable_transform()
+        ->mutable_translation()
+        ->set_x(p->x());
+    transform_stamped_with_frame_ids_msg.mutable_transform()
+        ->mutable_translation()
+        ->set_y(p->y());
+    transform_stamped_with_frame_ids_msg.mutable_transform()
+        ->mutable_translation()
+        ->set_z(p->z());
+    transform_stamped_with_frame_ids_msg.mutable_transform()
+        ->mutable_rotation()
+        ->CopyFrom(*q_W_L);
+    transform_stamped_with_frame_ids_msg.set_parent_frame_id(parent_frame_id_);
+    transform_stamped_with_frame_ids_msg.set_child_frame_id(child_frame_id_);
 
-    // broadcast_transform_pub_->Publish(transform_stamped_with_frame_ids_msg);
-    // printf("transfor \n");
+    broadcast_transform_pub_->Publish(transform_stamped_with_frame_ids_msg);
 
   }  // if (gazebo_sequence_ == odometry_queue_.front().first) {
 
@@ -618,9 +617,9 @@ void GazeboOdometryPlugin::CreatePubsAndSubs() {
   // ===== "BROADCAST TRANSFORM" MSG SETUP =====  //
   // ============================================ //
 
-  // broadcast_transform_pub_ =
-  //     node_handle_->Advertise<gz_geometry_msgs::TransformStampedWithFrameIds>(
-  //         "~/" + kBroadcastTransformSubtopic, 1);
+  broadcast_transform_pub_ =
+      node_handle_->Advertise<gz_geometry_msgs::TransformStampedWithFrameIds>(
+          "~/" + kBroadcastTransformSubtopic, 1);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboOdometryPlugin);
