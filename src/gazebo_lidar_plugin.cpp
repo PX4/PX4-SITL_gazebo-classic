@@ -148,7 +148,7 @@ void RayPlugin::OnNewLaserScans()
 #endif
 
   // set distance to min/max if actual value is smaller/bigger
-  if (current_distance < min_distance_ || isinf(current_distance)) {
+  if (current_distance < min_distance_ || std::isinf(current_distance)) {
     current_distance = min_distance_;
   } else if (current_distance > max_distance_) {
     current_distance = max_distance_;
