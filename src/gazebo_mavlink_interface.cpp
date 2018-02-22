@@ -431,6 +431,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
   odometry_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + odometry_sub_topic_, &GazeboMavlinkInterface::OdometryCallback, this);
+  tf_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + tf_sub_topic_, &GazeboMavlinkInterface::TfCallback, this);
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
@@ -850,6 +851,11 @@ void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
   send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::TfCallback(TransformPtr& transform_message){
+
+  std::cout << transform_message->transform().translation().x() << " " << transform_message->transform().translation().y() << " " << transform_message->transform().translation().z() << std::endl;
 }
 
 void GazeboMavlinkInterface::OdometryCallback(OdometryPtr& odometry_message){

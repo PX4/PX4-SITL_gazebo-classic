@@ -66,6 +66,7 @@ typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
 typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
 typedef const boost::shared_ptr<const sonarSens_msgs::msgs::sonarSens> SonarSensPtr;
 typedef const boost::shared_ptr<const gz_geometry_msgs::Odometry> OdometryPtr;
+typedef const boost::shared_ptr<const gz_geometry_msgs::TransformStamped> TransformPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -79,6 +80,7 @@ static const std::string kDefaultLidarTopic = "/lidar/link/lidar";
 static const std::string kDefaultOpticalFlowTopic = "/camera/link/opticalFlow";
 static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultOdometryTopic = "/odometry";
+static const std::string kDefaultTfTopic = "/transform";
 
 class GazeboMavlinkInterface : public ModelPlugin {
  public:
@@ -93,6 +95,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
         lidar_sub_topic_(kDefaultLidarTopic),
         sonar_sub_topic_(kDefaultSonarTopic),
         odometry_sub_topic_(kDefaultOdometryTopic),
+        tf_sub_topic_(kDefaultTfTopic),
         model_{},
         world_(nullptr),
         left_elevon_joint_(nullptr),
@@ -164,6 +167,7 @@ class GazeboMavlinkInterface : public ModelPlugin {
   void SonarCallback(SonarSensPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void OdometryCallback(OdometryPtr& odometry_message);
+  void TfCallback(TransformPtr& transform_message);
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port=0);
   void handle_message(mavlink_message_t *msg);
   void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
@@ -191,12 +195,14 @@ class GazeboMavlinkInterface : public ModelPlugin {
   transport::SubscriberPtr sonar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr odometry_sub_;
+  transport::SubscriberPtr tf_sub_;
   transport::PublisherPtr gps_pub_;
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
   std::string sonar_sub_topic_;
   std::string odometry_sub_topic_;
+  std::string tf_sub_topic_;
 
   common::Time last_time_;
   common::Time last_gps_time_;
