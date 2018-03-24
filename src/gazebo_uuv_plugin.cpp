@@ -23,11 +23,12 @@
 
 
 #include "gazebo_uuv_plugin.h"
+#include <ignition/math.hh>
 
 namespace gazebo {
 
 GazeboUUVPlugin::~GazeboUUVPlugin() {
-  event::Events::DisconnectWorldUpdateBegin(update_connection_);
+  update_connection_->~Connection();
 }
 
 // Load necessary data from the .sdf file
@@ -35,7 +36,7 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   namespace_.clear();
   getSdfParam<std::string>(
     _sdf, "robotNamespace", namespace_, namespace_, true);
-  
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -67,29 +68,29 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     _sdf, "motorTorqueConstant", motor_torque_constant_, motor_torque_constant_);
 
   // parameters for added mass and damping
-  math::Vector3 added_mass_linear(0,0,0);
-  getSdfParam<math::Vector3>(
+  ignition::math::Vector3d added_mass_linear(0,0,0);
+  getSdfParam<ignition::math::Vector3d>(
     _sdf, "addedMassLinear", added_mass_linear, added_mass_linear);
   X_udot_ = added_mass_linear[0];
   Y_vdot_ = added_mass_linear[1];
   Z_wdot_ = added_mass_linear[2];
 
-  math::Vector3 added_mass_angular(0,0,0);
-  getSdfParam<math::Vector3>(
+  ignition::math::Vector3d added_mass_angular(0,0,0);
+  getSdfParam<ignition::math::Vector3d>(
     _sdf, "addedMassAngular", added_mass_angular, added_mass_angular);
   K_pdot_ = added_mass_angular[0];
   M_qdot_ = added_mass_angular[1];
   N_rdot_ = added_mass_angular[2];
 
-  math::Vector3 damping_linear(0,0,0);
-  getSdfParam<math::Vector3>(
+  ignition::math::Vector3d damping_linear(0,0,0);
+  getSdfParam<ignition::math::Vector3d>(
     _sdf, "dampingLinear", damping_linear, damping_linear);
   X_u_ = damping_linear[0];
   Y_v_ = damping_linear[1];
   Z_w_ = damping_linear[2];
-  
-  math::Vector3 damping_angular(0,0,0);
-  getSdfParam<math::Vector3>(
+
+  ignition::math::Vector3d damping_angular(0,0,0);
+  getSdfParam<ignition::math::Vector3d>(
     _sdf, "dampingAngular", damping_angular, damping_angular);
   K_p_ = damping_angular[0];
   M_q_ = damping_angular[1];
@@ -123,24 +124,24 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
   time_ = time_ + time_delta_;
 
   //std::cout << "UUV Update at " << now << ", delta " << time_delta_ << "\n";
-  
+
   double forces[4];
   double torques[4];
 
   // Apply forces and torques at rotor joints
   for(int i = 0; i < 4; i++) {
-    
+
     // Currently a rotor index hack to get over IMU link being first, since rotor_links_[0] would be the IMU
-    math::Vector3 rotor_force(motor_force_constant_ * command_[i] * std::abs(command_[i]), 0, 0);
+    ignition::math::Vector3d rotor_force(motor_force_constant_ * command_[i] * std::abs(command_[i]), 0, 0);
     rotor_links_[i+1]->AddRelativeForce(rotor_force);
-    
+
     forces[i] = rotor_force[0];
     //std::cout << "Applying force " << rotor_force[2] << " to rotor " << i << "\n";
 
     // CCW 1, CW 2, CCW 3 and CW 4. Apply drag torque
     // directly to main body X axis
     int propeller_direction = ((i+1)%2==0)?1:-1;            // ternary operator:  (condition) ? (if_true) : (if_false)
-    math::Vector3 rotor_torque(
+    ignition::math::Vector3d rotor_torque(
       propeller_direction * motor_torque_constant_ * command_[i] * std::abs(command_[i]), 0, 0);
     link_->AddRelativeTorque(rotor_torque);
 
@@ -176,61 +177,61 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
   } */
 
   // Calculate and apply body Coriolis and Drag forces and torques
-  math::Vector3 linear_velocity = link_->GetRelativeLinearVel();
+  ignition::math::Vector3d linear_velocity = link_->RelativeLinearVel();
   double u = linear_velocity[0];
   double v = linear_velocity[1];
   double w = linear_velocity[2];
 
-  math::Vector3 angular_velocity = link_->GetRelativeAngularVel();
+  ignition::math::Vector3d angular_velocity = link_->RelativeAngularVel();
   double p = angular_velocity[0];
   double q = angular_velocity[1];
   double r = angular_velocity[2];
 
-  //std::cout << "Vels:" << linear_velocity << ":" << angular_velocity << "\n"; 
+  //std::cout << "Vels:" << linear_velocity << ":" << angular_velocity << "\n";
 
   // Linear Damping Matrix, with minus already multiplied
-  math::Matrix3 D_FL(
+  ignition::math::Matrix3d D_FL(
     -X_u_, 0, 0,
     0, -Y_v_, 0,
     0, 0, -Z_w_
   );
 
   // Angular Damping Matrix, with minus already multiplied
-  math::Matrix3 D_FA(
+  ignition::math::Matrix3d D_FA(
     -K_p_, 0, 0,
     0, -M_q_, 0,
     0, 0, -N_r_
   );
 
-  math::Vector3 damping_force =
+  ignition::math::Vector3d damping_force =
         D_FL*linear_velocity;
-  math::Vector3 damping_torque =
+  ignition::math::Vector3d damping_torque =
         D_FA*angular_velocity;
 
   // Corriolis Forces and Torques
   // upper right and bottom left matrix, with minus already multiplied
-  math::Matrix3 C_AD_FA(
+  ignition::math::Matrix3d C_AD_FA(
     0, Z_wdot_ * w, -Y_vdot_ * v,
     -Z_wdot_ * w, 0, X_udot_ * u,
     Y_vdot_ * v, -X_udot_ * u, 0
   );
 
   // Torques from angular velocity, with minus already multiplied
-  math::Matrix3 C_AD_TA(
+  ignition::math::Matrix3d C_AD_TA(
     0, N_rdot_ * r,  -M_qdot_ * q,
     -N_rdot_ * r, 0, K_pdot_ * p,
     M_qdot_ * q, -K_pdot_ * p, 0
   );
- 
-  math::Vector3 coriolis_force =
+
+  ignition::math::Vector3d coriolis_force =
     C_AD_FA*angular_velocity;
-  math::Vector3 coriolis_torque =
+  ignition::math::Vector3d coriolis_torque =
     (C_AD_FA*linear_velocity) + (C_AD_TA*angular_velocity);
-  
+
   //std::cout << C_AD_FA << "\n";
   //std::cout << "Linear:" << coriolis_force << "\n";
   //std::cout << "Angular:" << angular_velocity << "\n";
-  
+
   link_->AddRelativeForce(damping_force + coriolis_force);
   link_->AddRelativeTorque(damping_torque + coriolis_torque);
 }

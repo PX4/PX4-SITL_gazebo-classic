@@ -11,7 +11,6 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/math/gzmath.hh"
 
 #include "irlock.pb.h"
 

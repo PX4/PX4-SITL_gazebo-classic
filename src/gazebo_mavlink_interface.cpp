@@ -25,7 +25,7 @@ namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
-  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+    updateConnection_->~Connection();
 }
 
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -195,9 +195,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
   _rotor_count = 5;
-  last_time_ = world_->GetSimTime();
-  last_imu_time_ = world_->GetSimTime();
-  gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
+  last_time_ = world_->SimTime();
+  last_imu_time_ = world_->SimTime();
+  gravity_W_ = world_->Gravity();
 
   if (_sdf->HasElement("imu_rate")) {
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
@@ -210,9 +210,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // and so we need to start without any offsets.
   // The real value for Zurich would be 0.00771
   // frame d is the magnetic north frame
-  mag_d_.x = 0.21523;
-  mag_d_.y = 0;
-  mag_d_.z = -0.42741;
+  mag_d_.X() = 0.21523;
+  mag_d_.Y() = 0;
+  mag_d_.Z() = -0.42741;
 
   if(_sdf->HasElement("hil_state_level"))
   {
@@ -328,7 +328,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
-  common::Time current_time = world_->GetSimTime();
+  common::Time current_time = world_->SimTime();
   double dt = (current_time - last_time_).Double();
 
   pollForMAVLinkMessages(dt, 1000);
@@ -397,7 +397,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
-  common::Time current_time = world_->GetSimTime();
+  common::Time current_time = world_->SimTime();
   double dt = (current_time - last_imu_time_).Double();
 
     // frames
@@ -405,7 +405,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     // r - rotors imu frame (FLU), forward, left, up
     // b - px4 (FRD) forward, right down
     // n - px4 (NED) north, east, down
-    math::Quaternion q_gr = math::Quaternion(
+    ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
       imu_message->orientation().w(),
       imu_message->orientation().x(),
       imu_message->orientation().y(),
@@ -421,7 +421,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
         ]
     )).round(5)
     */
-    math::Quaternion q_br(0, 1, 0, 0);
+    ignition::math::Quaterniond q_br(0, 1, 0, 0);
 
 
     // q_ng
@@ -434,56 +434,56 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
         ]
     )).round(5)
     */
-    math::Quaternion q_ng(0, 0.70711, 0.70711, 0);
+    ignition::math::Quaterniond q_ng(0, 0.70711, 0.70711, 0);
 
-    math::Quaternion q_gb = q_gr*q_br.GetInverse();
-    math::Quaternion q_nb = q_ng*q_gb;
+    ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
+    ignition::math::Quaterniond q_nb = q_ng*q_gb;
 
-    math::Vector3 pos_g = model_->GetWorldPose().pos;
-    math::Vector3 pos_n = q_ng.RotateVector(pos_g);
+    ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
+    ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
 
     float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
 
-    math::Quaternion q_dn(0.0, 0.0, declination);
-    math::Vector3 mag_n = q_dn.RotateVector(mag_d_);
+    ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
+    ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
 
-    math::Vector3 vel_b = q_br.RotateVector(model_->GetRelativeLinearVel());
-    math::Vector3 vel_n = q_ng.RotateVector(model_->GetWorldLinearVel());
-    math::Vector3 omega_nb_b = q_br.RotateVector(model_->GetRelativeAngularVel());
+    ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
+    ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
+    ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
 
-    math::Vector3 mag_noise_b(
+    ignition::math::Vector3d mag_noise_b(
       0.01 * randn_(rand_),
       0.01 * randn_(rand_),
       0.01 * randn_(rand_));
 
-    math::Vector3 accel_b = q_br.RotateVector(math::Vector3(
+    ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
       imu_message->linear_acceleration().x(),
       imu_message->linear_acceleration().y(),
       imu_message->linear_acceleration().z()));
-    math::Vector3 gyro_b = q_br.RotateVector(math::Vector3(
+    ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
       imu_message->angular_velocity().x(),
       imu_message->angular_velocity().y(),
       imu_message->angular_velocity().z()));
-    math::Vector3 mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
+    ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
   if (imu_update_interval_!=0 && dt >= imu_update_interval_)
   {
     mavlink_hil_sensor_t sensor_msg;
-    sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
-    sensor_msg.xacc = accel_b.x;
-    sensor_msg.yacc = accel_b.y;
-    sensor_msg.zacc = accel_b.z;
-    sensor_msg.xgyro = gyro_b.x;
-    sensor_msg.ygyro = gyro_b.y;
-    sensor_msg.zgyro = gyro_b.z;
-    sensor_msg.xmag = mag_b.x;
-    sensor_msg.ymag = mag_b.y;
-    sensor_msg.zmag = mag_b.z;
+    sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+    sensor_msg.xacc = accel_b.X();
+    sensor_msg.yacc = accel_b.Y();
+    sensor_msg.zacc = accel_b.Z();
+    sensor_msg.xgyro = gyro_b.X();
+    sensor_msg.ygyro = gyro_b.Y();
+    sensor_msg.zgyro = gyro_b.Z();
+    sensor_msg.xmag = mag_b.X();
+    sensor_msg.ymag = mag_b.Y();
+    sensor_msg.zmag = mag_b.Z();
 
     // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
     const float lapse_rate = 0.0065f; // reduction in temperature with altitude (Kelvin/m)
     const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
-    float alt_msl = (float)alt_home - pos_n.z;
+    float alt_msl = (float)alt_home - pos_n.Z();
     float temperature_local = temperature_msl - lapse_rate * alt_msl;
     float pressure_ratio = powf((temperature_msl/temperature_local) , 5.256f);
     const float pressure_msl = 101325.0f; // pressure at MSL
@@ -513,14 +513,14 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     float rho = 1.225f / density_ratio;
 
     // calculate pressure altitude including effect of pressure noise
-    sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.GetLength() * rho);
+    sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.Length() * rho);
 
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
     if (vehicle_is_tailsitter_) {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.z*vel_b.z;
+      sensor_msg.diff_pressure = 0.005f*rho*vel_b.Z()*vel_b.Z();
     } else {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.x*vel_b.x;
+      sensor_msg.diff_pressure = 0.005f*rho*vel_b.X()*vel_b.X();
     }
 
     // calculate temperature in Celsius
@@ -551,36 +551,36 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   }
 
     // ground truth
-    math::Vector3 accel_true_b = q_br.RotateVector(model_->GetRelativeLinearAccel());
+    ignition::math::Vector3d accel_true_b = q_br.RotateVector(model_->RelativeLinearAccel());
 
     // send ground truth
 
     mavlink_hil_state_quaternion_t hil_state_quat;
-    hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
-    hil_state_quat.attitude_quaternion[0] = q_nb.w;
-    hil_state_quat.attitude_quaternion[1] = q_nb.x;
-    hil_state_quat.attitude_quaternion[2] = q_nb.y;
-    hil_state_quat.attitude_quaternion[3] = q_nb.z;
+    hil_state_quat.time_usec = world_->SimTime().Double() * 1e6;
+    hil_state_quat.attitude_quaternion[0] = q_nb.W();
+    hil_state_quat.attitude_quaternion[1] = q_nb.X();
+    hil_state_quat.attitude_quaternion[2] = q_nb.Y();
+    hil_state_quat.attitude_quaternion[3] = q_nb.Z();
 
-    hil_state_quat.rollspeed = omega_nb_b.x;
-    hil_state_quat.pitchspeed = omega_nb_b.y;
-    hil_state_quat.yawspeed = omega_nb_b.z;
+    hil_state_quat.rollspeed = omega_nb_b.X();
+    hil_state_quat.pitchspeed = omega_nb_b.Y();
+    hil_state_quat.yawspeed = omega_nb_b.Z();
 
     hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
     hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
     hil_state_quat.alt = groundtruth_altitude * 1000;
 
-    hil_state_quat.vx = vel_n.x * 100;
-    hil_state_quat.vy = vel_n.y * 100;
-    hil_state_quat.vz = vel_n.z * 100;
+    hil_state_quat.vx = vel_n.X() * 100;
+    hil_state_quat.vy = vel_n.Y() * 100;
+    hil_state_quat.vz = vel_n.Z() * 100;
 
     // assumed indicated airspeed due to flow aligned with pitot (body x)
-    hil_state_quat.ind_airspeed = vel_b.x;
-    hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
+    hil_state_quat.ind_airspeed = vel_b.X();
+    hil_state_quat.true_airspeed = model_->WorldLinearVel().Length() * 100;  //no wind simulated
 
-    hil_state_quat.xacc = accel_true_b.x * 1000;
-    hil_state_quat.yacc = accel_true_b.y * 1000;
-    hil_state_quat.zacc = accel_true_b.z * 1000;
+    hil_state_quat.xacc = accel_true_b.X() * 1000;
+    hil_state_quat.yacc = accel_true_b.Y() * 1000;
+    hil_state_quat.zacc = accel_true_b.Z() * 1000;
 
     mavlink_message_t msg;
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
@@ -610,7 +610,7 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   hil_gps_msg.ve = gps_msg->velocity_east() * 100.0;
   hil_gps_msg.vd = -gps_msg->velocity_up() * 100.0;
   // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
-  math::Angle cog(atan2(gps_msg->velocity_east(), gps_msg->velocity_north()));
+  ignition::math::Angle cog(atan2(gps_msg->velocity_east(), gps_msg->velocity_north()));
   cog.Normalize();
   hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
   hil_gps_msg.satellites_visible = 10;
@@ -659,14 +659,14 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
   mavlink_hil_optical_flow_t sensor_msg;
-  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
   sensor_msg.sensor_id = opticalFlow_message->sensor_id();
   sensor_msg.integration_time_us = opticalFlow_message->integration_time_us();
   sensor_msg.integrated_x = opticalFlow_message->integrated_x();
   sensor_msg.integrated_y = opticalFlow_message->integrated_y();
-  sensor_msg.integrated_xgyro = opticalFlow_message->quality() ? -optflow_gyro.y : 0.0f;//xy switched
-  sensor_msg.integrated_ygyro = opticalFlow_message->quality() ? optflow_gyro.x : 0.0f;  //xy switched
-  sensor_msg.integrated_zgyro = opticalFlow_message->quality() ? -optflow_gyro.z : 0.0f;//change direction
+  sensor_msg.integrated_xgyro = opticalFlow_message->quality() ? -optflow_gyro.Y() : 0.0f;//xy switched
+  sensor_msg.integrated_ygyro = opticalFlow_message->quality() ? optflow_gyro.X() : 0.0f;  //xy switched
+  sensor_msg.integrated_zgyro = opticalFlow_message->quality() ? -optflow_gyro.Z() : 0.0f;//change direction
   sensor_msg.temperature = opticalFlow_message->temperature();
   sensor_msg.quality = opticalFlow_message->quality();
   sensor_msg.time_delta_distance_us = opticalFlow_message->time_delta_distance_us();
@@ -682,7 +682,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
 
 void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
   mavlink_distance_sensor_t sensor_msg;
-  sensor_msg.time_boot_ms = world_->GetSimTime().Double() * 1e3;
+  sensor_msg.time_boot_ms = world_->SimTime().Double() * 1e3;
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
@@ -699,7 +699,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
 void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   mavlink_landing_target_t sensor_msg;
 
-  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
   sensor_msg.target_num = irlock_message->signature();
   sensor_msg.angle_x = irlock_message->pos_x();
   sensor_msg.angle_y = irlock_message->pos_y();
@@ -792,7 +792,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       armed = true;
     }
 
-    last_actuator_time_ = world_->GetSimTime();
+    last_actuator_time_ = world_->SimTime();
 
     for (unsigned i = 0; i < n_out_max; i++) {
       input_index_[i] = i;
@@ -829,7 +829,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
       }
       else if (joint_control_type_[i] == "position")
       {
-        double current = joints_[i]->GetAngle(0).Radian();
+        double current = joints_[i]->Position(0);
 
         double err = current - target;
         double force = pids_[i].Update(err, _dt);
