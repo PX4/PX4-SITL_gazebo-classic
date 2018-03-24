@@ -41,6 +41,8 @@ if (BUILD_GSTREAMER_PLUGIN)
   endif()
 endif()
 
+pkg_check_modules(OGRE OGRE)
+
 include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
@@ -144,7 +146,11 @@ include_directories(
   # Workaround for Eigen3
   ${Boost_INCLUDE_DIR}/eigen3
   ${EIGEN3_INCLUDE_DIRS}/eigen3
+  ${OGRE_INCLUDE_DIRS}
+  # workaround for: "fatal error: OgrePagedWorldSection.h: No such file or directory"
+  ${OGRE_INCLUDE_DIRS}/Paging
   # Workaround for OGRE include dirs on Mac OS
+  # TODO: remove these hardcoded includes now that we have
   /usr/local/include/OGRE
   /usr/local/include/OGRE/Paging
   ${MAVLINK_INCLUDE_DIRS}
@@ -174,6 +180,7 @@ endif()
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${OGRE_LIBRARY_DIRS}
   )
 
 #--------------------------#
