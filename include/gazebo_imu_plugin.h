@@ -26,6 +26,7 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+#include <ignition/math.hh>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 
@@ -137,8 +138,8 @@ class GazeboImuPlugin : public ModelPlugin {
 
   sensor_msgs::msgs::Imu imu_message_;
 
-  math::Vector3 gravity_W_;
-  math::Vector3 velocity_prev_W_;
+  ignition::math::Vector3d gravity_W_;
+  ignition::math::Vector3d velocity_prev_W_;
 
   Eigen::Vector3d gyroscope_bias_;
   Eigen::Vector3d accelerometer_bias_;

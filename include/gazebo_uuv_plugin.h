@@ -21,7 +21,6 @@
 #include <gazebo/physics/physics.hh>
 
 #include "common.h"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "CommandMotorSpeed.pb.h"
@@ -53,14 +52,14 @@ class GazeboUUVPlugin : public ModelPlugin {
 
   private:
     event::ConnectionPtr update_connection_;
-    
+
     std::string namespace_;
     std::string command_sub_topic_;
     std::string link_name_;
-    
+
     transport::NodePtr node_handle_;
     transport::SubscriberPtr command_sub_;
-    
+
     physics::LinkPtr link_;
     physics::Link_V rotor_links_;
 
@@ -69,7 +68,7 @@ class GazeboUUVPlugin : public ModelPlugin {
 
     double last_time_;
     double time_delta_;
-    
+
     double motor_force_constant_;
     double motor_torque_constant_;
 

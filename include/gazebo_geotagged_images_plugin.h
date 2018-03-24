@@ -29,6 +29,7 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/rendering.hh>
 #include <SITLGps.pb.h>
+#include <ignition/math.hh>
 
 namespace gazebo
 {
@@ -93,7 +94,7 @@ private:
     rendering::ScenePtr         _scene;
     event::ConnectionPtr        _newFrameConnection;
     std::string                 _storageDir;
-    math::Vector3               _lastGpsPosition;
+    ignition::math::Vector3d    _lastGpsPosition;
     transport::NodePtr          _node_handle;
     std::string                 _namespace;
     transport::SubscriberPtr    _gpsSub;

@@ -30,7 +30,6 @@
 #include <gazebo/common/Plugin.hh>
 #include <rotors_model/motor_model.hpp>
 #include "CommandMotorSpeed.pb.h"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "MotorSpeed.pb.h"
@@ -55,7 +54,7 @@ typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> Command
 
 /*
 // Protobuf test
-typedef const boost::shared_ptr<const mav_msgs::msgs::MotorSpeed> MotorSpeedPtr;  
+typedef const boost::shared_ptr<const mav_msgs::msgs::MotorSpeed> MotorSpeedPtr;
 static const std::string kDefaultMotorTestSubTopic = "motors";
 */
 

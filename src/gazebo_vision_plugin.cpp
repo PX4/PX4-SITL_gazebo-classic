@@ -49,7 +49,7 @@ VisionPlugin::VisionPlugin() : ModelPlugin()
 
 VisionPlugin::~VisionPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(_updateConnection);
+  _updateConnection->~Connection();
 }
 
 void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
@@ -98,11 +98,11 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _model = model;
 
   _world = _model->GetWorld();
-  _last_time = _world->GetSimTime();
-  _last_pub_time = _world->GetSimTime();
+  _last_time = _world->SimTime();
+  _last_pub_time = _world->SimTime();
 
   // remember start pose -> VIO should always start with zero
-  _pose_model_start = _model->GetWorldPose();
+  _pose_model_start = _model->WorldPose();
 
   _nh = transport::NodePtr(new transport::Node());
   _nh->Init(_namespace);
@@ -116,48 +116,48 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
 
 void VisionPlugin::OnUpdate(const common::UpdateInfo&)
 {
-  common::Time current_time = _world->GetSimTime();
+  common::Time current_time = _world->SimTime();
   double dt = (current_time - _last_pub_time).Double();
 
   if (dt > 1.0 / _pub_rate) {
 
     // get pose of the model that the plugin is attached to
-    math::Pose pose_model_world = _model->GetWorldPose();
-    math::Pose pose_model; // pose in local frame (relative to where it started)
+    ignition::math::Pose3d pose_model_world = _model->WorldPose();
+    ignition::math::Pose3d pose_model; // pose in local frame (relative to where it started)
     // convert to local frame (ENU)
-    pose_model.pos.x = cos(_pose_model_start.rot.GetYaw()) * (pose_model_world.pos.y - _pose_model_start.pos.y) -
-                       sin(_pose_model_start.rot.GetYaw()) * (pose_model_world.pos.x - _pose_model_start.pos.x);
-    pose_model.pos.y = cos(_pose_model_start.rot.GetYaw()) * (pose_model_world.pos.x - _pose_model_start.pos.x) +
-                       sin(_pose_model_start.rot.GetYaw()) * (pose_model_world.pos.y - _pose_model_start.pos.y);
-    pose_model.pos.z = pose_model_world.pos.z - _pose_model_start.pos.z;
-    pose_model.rot.SetFromEuler(pose_model_world.rot.GetPitch(),
-                                pose_model_world.rot.GetRoll(),
-                                pose_model_world.rot.GetYaw() - _pose_model_start.rot.GetYaw());
+    pose_model.Pos().X() = cos(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().Y() - _pose_model_start.Pos().Y()) -
+                       sin(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().X() - _pose_model_start.Pos().X());
+    pose_model.Pos().Y() = cos(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().X() - _pose_model_start.Pos().X()) +
+                       sin(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().Y() - _pose_model_start.Pos().Y());
+    pose_model.Pos().Z() = pose_model_world.Pos().Z() - _pose_model_start.Pos().Z();
+    pose_model.Rot().Euler(pose_model_world.Rot().Pitch(),
+                           pose_model_world.Rot().Roll(),
+                           pose_model_world.Rot().Yaw() - _pose_model_start.Rot().Yaw());
 
     // update noise parameters
-    math::Vector3 noise;
-    math::Vector3 random_walk;
-    noise.x = _noise_density * sqrt(dt) * _randn(_rand);
-    noise.y = _noise_density * sqrt(dt) * _randn(_rand);
-    noise.z = _noise_density * sqrt(dt) * _randn(_rand);
-    random_walk.x = _random_walk * sqrt(dt) * _randn(_rand);
-    random_walk.y = _random_walk * sqrt(dt) * _randn(_rand);
-    random_walk.z = _random_walk * sqrt(dt) * _randn(_rand);
+    ignition::math::Vector3d noise;
+    ignition::math::Vector3d random_walk;
+    noise.X() = _noise_density * sqrt(dt) * _randn(_rand);
+    noise.Y() = _noise_density * sqrt(dt) * _randn(_rand);
+    noise.Z() = _noise_density * sqrt(dt) * _randn(_rand);
+    random_walk.X() = _random_walk * sqrt(dt) * _randn(_rand);
+    random_walk.Y() = _random_walk * sqrt(dt) * _randn(_rand);
+    random_walk.X() = _random_walk * sqrt(dt) * _randn(_rand);
 
     // bias integration
-    _bias.x += random_walk.x * dt - _bias.x / _corellation_time;
-    _bias.y += random_walk.y * dt - _bias.y / _corellation_time;
-    _bias.z += random_walk.z * dt - _bias.z / _corellation_time;
+    _bias.X() += random_walk.X() * dt - _bias.X() / _corellation_time;
+    _bias.Y() += random_walk.Y() * dt - _bias.Y() / _corellation_time;
+    _bias.Z() += random_walk.Z() * dt - _bias.Z() / _corellation_time;
 
     // Fill odom msg
     odom_msgs::msgs::odom odom_msg;
     odom_msg.set_usec(current_time.Double() * 1e6);
-    odom_msg.set_x(pose_model.pos.x + noise.x + _bias.x);
-    odom_msg.set_y(pose_model.pos.y + noise.y + _bias.y);
-    odom_msg.set_z(pose_model.pos.z + noise.z + _bias.z);
-    odom_msg.set_roll(pose_model.rot.GetRoll());
-    odom_msg.set_pitch(pose_model.rot.GetPitch());
-    odom_msg.set_yaw(pose_model.rot.GetYaw());
+    odom_msg.set_x(pose_model.Pos().X() + noise.X() + _bias.X());
+    odom_msg.set_y(pose_model.Pos().Y() + noise.Y() + _bias.Y());
+    odom_msg.set_z(pose_model.Pos().Z() + noise.Z() + _bias.Y());
+    odom_msg.set_roll(pose_model.Rot().Roll());
+    odom_msg.set_pitch(pose_model.Rot().Pitch());
+    odom_msg.set_yaw(pose_model.Rot().Yaw());
 
     _last_pub_time = current_time;
 

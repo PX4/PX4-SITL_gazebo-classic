@@ -30,6 +30,7 @@
 #include <gazebo/transport/transport.hh>
 #include <gazebo/util/system.hh>
 #include <gazebo/sensors/sensors.hh>
+#include <ignition/math.hh>
 
 #include "SensorImu.pb.h"
 

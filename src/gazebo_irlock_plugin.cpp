@@ -28,6 +28,7 @@
 #include <string>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include <ignition/math.hh>
 
 using namespace cv;
 using namespace std;
@@ -92,20 +93,20 @@ void IRLockPlugin::OnUpdated()
       if (model.has_pose()) {
 
         // position of the beacon in camera frame
-        gazebo::math::Vector3 pos;
-        pos.x = model.pose().position().x();
-        pos.y = model.pose().position().y();
-        pos.z = model.pose().position().z();
+        ignition::math::Vector3d pos;
+        pos.X() = model.pose().position().x();
+        pos.Y() = model.pose().position().y();
+        pos.Z() = model.pose().position().z();
 
         // the default orientation of the IRLock sensor reports beacon in front of vehicle as -y values, beacon right of vehicle as x values
         // rotate the measurement accordingly
-        gazebo::math::Vector3 meas(-pos.y/pos.x, -pos.z/pos.x, 1.0);
+        ignition::math::Vector3d meas(-pos.Y()/pos.X(), -pos.Z()/pos.X(), 1.0);
 
         // prepare irlock message
         irlock_message.set_time_usec(0); // will be filled in simulator_mavlink.cpp
         irlock_message.set_signature(idx); // unused by beacon estimator
-        irlock_message.set_pos_x(meas.x);
-        irlock_message.set_pos_y(meas.y);
+        irlock_message.set_pos_x(meas.X());
+        irlock_message.set_pos_y(meas.Y());
         irlock_message.set_size_x(0); // unused by beacon estimator
         irlock_message.set_size_y(0); // unused by beacon estimator
 

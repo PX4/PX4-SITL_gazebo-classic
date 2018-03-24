@@ -34,7 +34,7 @@ GpsPlugin::GpsPlugin() : ModelPlugin()
 
 GpsPlugin::~GpsPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+  updateConnection_->~Connection();
 }
 
 void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
@@ -43,8 +43,8 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   model_ = _model;
 
   world_ = model_->GetWorld();
-  last_time_ = world_->GetSimTime();
-  last_gps_time_ = world_->GetSimTime();
+  last_time_ = world_->SimTime();
+  last_gps_time_ = world_->SimTime();
 
   // Use environment variables if set for home position.
   const char *env_lat = std::getenv("PX4_HOME_LAT");
@@ -85,55 +85,55 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GpsPlugin::OnUpdate, this, _1));
 
-  gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
+  gravity_W_ = world_->Gravity();
 
   gps_pub_ = node_handle_->Advertise<gps_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
   gt_pub_ = node_handle_->Advertise<gps_msgs::msgs::Groundtruth>("~/" + model_->GetName() + "/groundtruth", 10);
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
-  common::Time current_time = world_->GetSimTime();
+  common::Time current_time = world_->SimTime();
   double dt = (current_time - last_time_).Double();
 
-  math::Pose T_W_I = model_->GetWorldPose();    // TODO(burrimi): Check tf
-  math::Vector3& pos_W_I = T_W_I.pos;           // Use the models' world position for GPS and groundtruth
+  ignition::math::Pose3d T_W_I = model_->WorldPose();    // TODO(burrimi): Check tf
+  ignition::math::Vector3d& pos_W_I = T_W_I.Pos();           // Use the models' world position for GPS and groundtruth
 
   // reproject position without noise into geographic coordinates
   auto latlon_gt = reproject(pos_W_I);
 
-  math::Vector3 velocity_current_W = model_->GetWorldLinearVel();    // Use the models' world position for GPS velocity.
+  ignition::math::Vector3d velocity_current_W = model_->WorldLinearVel();    // Use the models' world position for GPS velocity.
 
-  math::Vector3 velocity_current_W_xy = velocity_current_W;
-  velocity_current_W_xy.z = 0;
+  ignition::math::Vector3d velocity_current_W_xy = velocity_current_W;
+  velocity_current_W_xy.Z() = 0;
 
   // update noise parameters if gps_noise_ is set
   if (gps_noise_) {
-    noise_gps_pos.x = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_pos.y = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_pos.z = gps_z_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.x = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.y = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.z = gps_vz_noise_density * sqrt(dt) * randn_(rand_);
-    random_walk_gps.x = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
-    random_walk_gps.y = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
-    random_walk_gps.z = gps_z_random_walk * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.X() = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.Y() = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.Z() = gps_z_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.X() = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.Y() = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.Z() = gps_vz_noise_density * sqrt(dt) * randn_(rand_);
+    random_walk_gps.X() = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
+    random_walk_gps.Y() = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
+    random_walk_gps.Z() = gps_z_random_walk * sqrt(dt) * randn_(rand_);
   }
   else {
-    noise_gps_pos.x = 0.0;
-    noise_gps_pos.y = 0.0;
-    noise_gps_pos.z = 0.0;
-    noise_gps_vel.x = 0.0;
-    noise_gps_vel.y = 0.0;
-    noise_gps_vel.z = 0.0;
-    random_walk_gps.x = 0.0;
-    random_walk_gps.y = 0.0;
-    random_walk_gps.z = 0.0;
+    noise_gps_pos.X() = 0.0;
+    noise_gps_pos.Y() = 0.0;
+    noise_gps_pos.Z() = 0.0;
+    noise_gps_vel.X() = 0.0;
+    noise_gps_vel.Y() = 0.0;
+    noise_gps_vel.Z() = 0.0;
+    random_walk_gps.X() = 0.0;
+    random_walk_gps.Y() = 0.0;
+    random_walk_gps.Z() = 0.0;
   }
 
   // gps bias integration
-  gps_bias.x += random_walk_gps.x * dt - gps_bias.x / gps_corellation_time;
-  gps_bias.y += random_walk_gps.y * dt - gps_bias.y / gps_corellation_time;
-  gps_bias.z += random_walk_gps.z * dt - gps_bias.z / gps_corellation_time;
+  gps_bias.X() += random_walk_gps.X() * dt - gps_bias.X() / gps_corellation_time;
+  gps_bias.Y() += random_walk_gps.Y() * dt - gps_bias.Y() / gps_corellation_time;
+  gps_bias.Z() += random_walk_gps.Z() * dt - gps_bias.Z() / gps_corellation_time;
 
   // reproject position with noise into geographic coordinates
   auto pos_with_noise = pos_W_I + noise_gps_pos + gps_bias;
@@ -147,13 +147,13 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_msg.set_time(current_time.Double());
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
-  gps_msg.set_altitude(pos_W_I.z + alt_home + noise_gps_pos.z + gps_bias.z);
+  gps_msg.set_altitude(pos_W_I.Z() + alt_home + noise_gps_pos.Z() + gps_bias.Z());
   gps_msg.set_eph(std_xy);
   gps_msg.set_epv(std_z);
-  gps_msg.set_velocity(velocity_current_W_xy.GetLength());
-  gps_msg.set_velocity_east(velocity_current_W.x + noise_gps_vel.y);
-  gps_msg.set_velocity_north(velocity_current_W.y + noise_gps_vel.x);
-  gps_msg.set_velocity_up(velocity_current_W.z + noise_gps_vel.z);
+  gps_msg.set_velocity(velocity_current_W_xy.Length());
+  gps_msg.set_velocity_east(velocity_current_W.X() + noise_gps_vel.Y());
+  gps_msg.set_velocity_north(velocity_current_W.Y() + noise_gps_vel.X());
+  gps_msg.set_velocity_up(velocity_current_W.Z() + noise_gps_vel.Z());
 
   // add msg to buffer
   gps_delay_buffer.push(gps_msg);
@@ -188,10 +188,10 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   groundtruth_msg.set_time(current_time.Double());
   groundtruth_msg.set_latitude_rad(latlon_gt.first);
   groundtruth_msg.set_longitude_rad(latlon_gt.second);
-  groundtruth_msg.set_altitude(-pos_W_I.z + alt_home);
-  groundtruth_msg.set_velocity_east(velocity_current_W.x);
-  groundtruth_msg.set_velocity_north(velocity_current_W.y);
-  groundtruth_msg.set_velocity_up(velocity_current_W.z);
+  groundtruth_msg.set_altitude(-pos_W_I.Z() + alt_home);
+  groundtruth_msg.set_velocity_east(velocity_current_W.X());
+  groundtruth_msg.set_velocity_north(velocity_current_W.Y());
+  groundtruth_msg.set_velocity_up(velocity_current_W.Z());
 
   // publish Groundtruth msg at full rate
   gt_pub_->Publish(groundtruth_msg);
@@ -199,11 +199,11 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   last_time_ = current_time;
 }
 
-std::pair<double, double> GpsPlugin::reproject(math::Vector3& pos)
+std::pair<double, double> GpsPlugin::reproject(ignition::math::Vector3d& pos)
 {
   // reproject local position to gps coordinates
-  double x_rad = pos.y / earth_radius;    // north
-  double y_rad = pos.x / earth_radius;    // east
+  double x_rad = pos.Y() / earth_radius;    // north
+  double y_rad = pos.X() / earth_radius;    // east
   double c = sqrt(x_rad * x_rad + y_rad * y_rad);
   double sin_c = sin(c);
   double cos_c = cos(c);

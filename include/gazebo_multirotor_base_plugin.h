@@ -28,7 +28,6 @@
 
 #include "common.h"
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "MotorSpeed.pb.h"

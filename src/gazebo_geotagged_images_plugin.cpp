@@ -153,10 +153,10 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 }
 
 void GeotaggedImagesPlugin::OnNewGpsPosition(GpsPtr& gps_msg) {
-    _lastGpsPosition.x = gps_msg->latitude_deg();
-    _lastGpsPosition.y = gps_msg->longitude_deg();
-    _lastGpsPosition.z = gps_msg->altitude();
-    //gzdbg << "got gps pos: "<<_lastGpsPosition.x<<", "<<lastGpsPosition.y<<endl;
+    _lastGpsPosition.X() = gps_msg->latitude_deg();
+    _lastGpsPosition.Y() = gps_msg->longitude_deg();
+    _lastGpsPosition.Z() = gps_msg->altitude();
+    //gzdbg << "got gps pos: "<<_lastGpsPosition.X() <<", "<<lastGpsPosition.Y() <<endl;
 }
 
 void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
@@ -207,9 +207,9 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
     }
 
     char gps_tag_command[1024];
-    double lat = _lastGpsPosition.x;
+    double lat = _lastGpsPosition.X();
     char north_south = 'N', east_west = 'E';
-    double lon = _lastGpsPosition.y;
+    double lon = _lastGpsPosition.Y();
     if (lat < 0.) {
         lat = -lat;
         north_south = 'S';
@@ -223,7 +223,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
 //           " -gpsdatetime=now -gpsmapdatum=WGS-84"
              " -datetimeoriginal=now -gpsdop=0.8"
              " -gpsmeasuremode=3-d -gpssatellites=13 -gpsaltitude=%.3lf -overwrite_original %s &>/dev/null",
-             north_south, east_west, lat, lon, _lastGpsPosition.z, file_name);
+             north_south, east_west, lat, lon, _lastGpsPosition.Z(), file_name);
 
     system(gps_tag_command);
 
@@ -241,7 +241,7 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
         1, // camera ID
         lat * 1e7,
         lon * 1e7,
-        _lastGpsPosition.z,
+        _lastGpsPosition.Z(),
         0, // relative alt
         0, // q[4]
         _imageCounter,

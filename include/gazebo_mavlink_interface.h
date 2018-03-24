@@ -45,13 +45,13 @@
 #include <Eigen/Eigen>
 
 #include <gazebo/gazebo.hh>
-#include <gazebo/math/Vector3.hh>
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 
+#include <ignition/math.hh>
 #include <sdf/sdf.hh>
 #include <common.h>
 #include <CommandMotorSpeed.pb.h>
@@ -280,9 +280,9 @@ private:
 
   void handle_control(double _dt);
 
-  math::Vector3 gravity_W_;
-  math::Vector3 velocity_prev_W_;
-  math::Vector3 mag_d_;
+  ignition::math::Vector3d gravity_W_;
+  ignition::math::Vector3d velocity_prev_W_;
+  ignition::math::Vector3d mag_d_;
 
   std::default_random_engine rand_;
   std::normal_distribution<float> randn_;
@@ -297,7 +297,7 @@ private:
   struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
-  math::Vector3 optflow_gyro {};
+  ignition::math::Vector3d optflow_gyro {};
   double optflow_distance;
   double sonar_distance;
 

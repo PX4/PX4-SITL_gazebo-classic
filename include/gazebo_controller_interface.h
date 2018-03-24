@@ -29,6 +29,7 @@
 #include "MotorSpeed.pb.h"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
+#include <ignition/math.hh>
 
 #include <stdio.h>
 
