@@ -136,9 +136,13 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
 void GimbalControllerPlugin::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
+#if GAZEBO_MAJOR_VERSION >= 9
   this->node->Init(this->model->GetWorld()->Name());
-
   this->lastUpdateTime = this->model->GetWorld()->SimTime();
+#else
+  this->node->Init(this->model->GetWorld()->GetName());
+  this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
+#endif
 
   // receive pitch command via gz transport
   std::string pitchTopic = std::string("~/") +  this->model->GetName() +
@@ -280,7 +284,11 @@ void GimbalControllerPlugin::OnUpdate()
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;
 
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time time = this->model->GetWorld()->SimTime();
+#else
+  common::Time time = this->model->GetWorld()->GetSimTime();
+#endif
   if (time < this->lastUpdateTime)
   {
     gzerr << "time reset event\n";
@@ -302,6 +310,7 @@ void GimbalControllerPlugin::OnUpdate()
     this->yawCommand += this->lastImuYaw;
 
     // truncate command inside joint angle limits
+#if GAZEBO_MAJOR_VERSION >= 9
     double rollLimited = ignition::math::clamp(this->rollCommand,
       rDir*this->rollJoint->UpperLimit(0),
 	  rDir*this->rollJoint->LowerLimit(0));
@@ -311,6 +320,17 @@ void GimbalControllerPlugin::OnUpdate()
     double yawLimited = ignition::math::clamp(this->yawCommand,
       yDir*this->yawJoint->LowerLimit(0),
 	  yDir*this->yawJoint->UpperLimit(0));
+#else
+    double rollLimited = ignition::math::clamp(this->rollCommand,
+      rDir*this->rollJoint->GetUpperLimit(0).Radian(),
+	  rDir*this->rollJoint->GetLowerLimit(0).Radian());
+    double pitchLimited = ignition::math::clamp(this->pitchCommand,
+      pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
+      pDir*this->pitchJoint->GetLowerLimit(0).Radian());
+    double yawLimited = ignition::math::clamp(this->yawCommand,
+      yDir*this->yawJoint->GetLowerLimit(0).Radian(),
+	  yDir*this->yawJoint->GetUpperLimit(0).Radian());
+#endif
 
     /// currentAngleYPRVariable is defined in roll-pitch-yaw-fixed-axis
     /// and gimbal is constructed using yaw-roll-pitch-variable-axis
@@ -327,6 +347,7 @@ void GimbalControllerPlugin::OnUpdate()
 
     /// get joint limits (in sensor frame)
     /// TODO: move to Load() if limits do not change
+#if GAZEBO_MAJOR_VERSION >= 9
     ignition::math::Vector3d lowerLimitsPRY
       (pDir*this->pitchJoint->LowerLimit(0),
        rDir*this->rollJoint->LowerLimit(0),
@@ -335,6 +356,16 @@ void GimbalControllerPlugin::OnUpdate()
       (pDir*this->pitchJoint->UpperLimit(0),
        rDir*this->rollJoint->UpperLimit(0),
        yDir*this->yawJoint->UpperLimit(0));
+#else
+    ignition::math::Vector3d lowerLimitsPRY
+      (pDir*this->pitchJoint->GetLowerLimit(0).Radian(),
+       rDir*this->rollJoint->GetLowerLimit(0).Radian(),
+       yDir*this->yawJoint->GetLowerLimit(0).Radian());
+    ignition::math::Vector3d upperLimitsPRY
+      (pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
+       rDir*this->rollJoint->GetUpperLimit(0).Radian(),
+       yDir*this->yawJoint->GetUpperLimit(0).Radian());
+#endif
 
     // normalize errors
     double pitchError = this->ShortestAngularDistance(
@@ -417,7 +448,7 @@ void GimbalControllerPlugin::OnUpdate()
   if (++i>100)
   {
     i = 0;
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+#if GAZEBO_MAJOR_VERSION >= 9
     gazebo::msgs::Any m;
     m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
 
@@ -429,19 +460,31 @@ void GimbalControllerPlugin::OnUpdate()
 
     m.set_double_value(this->yawJoint->Position(0));
     this->yawPub->Publish(m);
+#elif GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+    gazebo::msgs::Any m;
+    m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
+
+    m.set_double_value(this->pitchJoint->GetAngle(0).Radian());
+    this->pitchPub->Publish(m);
+
+    m.set_double_value(this->rollJoint->GetAngle(0).Radian());
+    this->rollPub->Publish(m);
+
+    m.set_double_value(this->yawJoint->GetAngle(0).Radian());
+    this->yawPub->Publish(m);
 #else
     std::stringstream ss;
     gazebo::msgs::GzString m;
 
-    ss << this->pitchJoint->Position(0);
+    ss << this->pitchJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
     this->pitchPub->Publish(m);
 
-    ss << this->rollJoint->Position(0);
+    ss << this->rollJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
     this->rollPub->Publish(m);
 
-    ss << this->yawJoint->Position(0);
+    ss << this->yawJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
     this->yawPub->Publish(m);
 #endif

@@ -195,7 +195,12 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 
   // scale down force linearly with forward speed
   // XXX this has to be modelled better
+  //
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
+#else
+  ignition::math::Vector3d body_velocity = ignitionFromGazeboMath(link_->GetWorldLinearVel());
+#endif
   double vel = body_velocity.Length();
   double scalar = 1 - vel / 25.0; // at 50 m/s the rotor will not produce any force anymore
   scalar = ignition::math::clamp(scalar, 0.0, 1.0);
@@ -206,7 +211,11 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // 2010 IEEE Conference on Robotics and Automation paper
   // The True Role of Accelerometer Feedback in Quadrotor Control
   // - \omega * \lambda_1 * V_A^{\perp}
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d joint_axis = joint_->GlobalAxis(0);
+#else
+  ignition::math::Vector3d joint_axis = ignitionFromGazeboMath(joint_->GetGlobalAxis(0));
+#endif
   //ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
   ignition::math::Vector3d body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
   ignition::math::Vector3d air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
@@ -216,7 +225,11 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // Getting the parent link, such that the resulting torques can be applied to it.
   physics::Link_V parent_links = link_->GetParentJointsLinks();
   // The tansformation from the parent_link to the link_.
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d pose_difference = link_->WorldCoGPose() - parent_links.at(0)->WorldCoGPose();
+#else
+  ignition::math::Pose3d pose_difference = ignitionFromGazeboMath(link_->GetWorldCoGPose() - parent_links.at(0)->GetWorldCoGPose());
+#endif
   ignition::math::Vector3d drag_torque(0, 0, -turning_direction_ * force * moment_constant_);
   // Transforming the drag torque into the parent frame to handle arbitrary rotor orientations.
   ignition::math::Vector3d drag_torque_parent_frame = pose_difference.Rot().RotateVector(drag_torque);

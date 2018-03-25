@@ -195,9 +195,15 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
   _rotor_count = 5;
+#if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
   last_imu_time_ = world_->SimTime();
   gravity_W_ = world_->Gravity();
+#else
+  last_time_ = world_->GetSimTime();
+  last_imu_time_ = world_->GetSimTime();
+  gravity_W_ = ignitionFromGazeboMath(world_->GetPhysicsEngine()->GetGravity());
+#endif
 
   if (_sdf->HasElement("imu_rate")) {
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
@@ -328,7 +334,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
+#else
+  common::Time current_time = world_->GetSimTime();
+#endif
   double dt = (current_time - last_time_).Double();
 
   pollForMAVLinkMessages(dt, 1000);
@@ -397,7 +407,11 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
+#else
+  common::Time current_time = world_->GetSimTime();
+#endif
   double dt = (current_time - last_imu_time_).Double();
 
     // frames
@@ -439,7 +453,11 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
     ignition::math::Quaterniond q_nb = q_ng*q_gb;
 
+#if GAZEBO_MAJOR_VERSION >= 9
     ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
+#else
+    ignition::math::Vector3d pos_g = ignitionFromGazeboMath(model_->GetWorldPose().pos);
+#endif
     ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
 
     float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
@@ -447,9 +465,15 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
     ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
 
+#if GAZEBO_MAJOR_VERSION >= 9
     ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
     ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
     ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
+#else
+    ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
+    ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
+    ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
+#endif
 
     ignition::math::Vector3d mag_noise_b(
       0.01 * randn_(rand_),
@@ -469,7 +493,11 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   if (imu_update_interval_!=0 && dt >= imu_update_interval_)
   {
     mavlink_hil_sensor_t sensor_msg;
+#if GAZEBO_MAJOR_VERSION >= 9
     sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+#else
+    sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+#endif
     sensor_msg.xacc = accel_b.X();
     sensor_msg.yacc = accel_b.Y();
     sensor_msg.zacc = accel_b.Z();
@@ -551,12 +579,20 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   }
 
     // ground truth
+#if GAZEBO_MAJOR_VERSION >= 9
     ignition::math::Vector3d accel_true_b = q_br.RotateVector(model_->RelativeLinearAccel());
+#else
+    ignition::math::Vector3d accel_true_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
+#endif
 
     // send ground truth
 
     mavlink_hil_state_quaternion_t hil_state_quat;
+#if GAZEBO_MAJOR_VERSION >= 9
     hil_state_quat.time_usec = world_->SimTime().Double() * 1e6;
+#else
+    hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
+#endif
     hil_state_quat.attitude_quaternion[0] = q_nb.W();
     hil_state_quat.attitude_quaternion[1] = q_nb.X();
     hil_state_quat.attitude_quaternion[2] = q_nb.Y();
@@ -576,7 +612,12 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
     // assumed indicated airspeed due to flow aligned with pitot (body x)
     hil_state_quat.ind_airspeed = vel_b.X();
+
+#if GAZEBO_MAJOR_VERSION >= 9
     hil_state_quat.true_airspeed = model_->WorldLinearVel().Length() * 100;  //no wind simulated
+#else
+    hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
+#endif
 
     hil_state_quat.xacc = accel_true_b.X() * 1000;
     hil_state_quat.yacc = accel_true_b.Y() * 1000;
@@ -659,7 +700,11 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
   mavlink_hil_optical_flow_t sensor_msg;
+#if GAZEBO_MAJOR_VERSION >= 9
   sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+#else
+  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+#endif
   sensor_msg.sensor_id = opticalFlow_message->sensor_id();
   sensor_msg.integration_time_us = opticalFlow_message->integration_time_us();
   sensor_msg.integrated_x = opticalFlow_message->integrated_x();
@@ -682,7 +727,11 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
 
 void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
   mavlink_distance_sensor_t sensor_msg;
+#if GAZEBO_MAJOR_VERSION >= 9
   sensor_msg.time_boot_ms = world_->SimTime().Double() * 1e3;
+#else
+  sensor_msg.time_boot_ms = world_->GetSimTime().Double() * 1e3;
+#endif
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
@@ -699,7 +748,11 @@ void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
 void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   mavlink_landing_target_t sensor_msg;
 
+#if GAZEBO_MAJOR_VERSION >= 9
   sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+#else
+  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+#endif
   sensor_msg.target_num = irlock_message->signature();
   sensor_msg.angle_x = irlock_message->pos_x();
   sensor_msg.angle_y = irlock_message->pos_y();
@@ -792,7 +845,11 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
       armed = true;
     }
 
+#if GAZEBO_MAJOR_VERSION >= 9
     last_actuator_time_ = world_->SimTime();
+#else
+    last_actuator_time_ = world_->GetSimTime();
+#endif
 
     for (unsigned i = 0; i < n_out_max; i++) {
       input_index_[i] = i;
@@ -829,7 +886,12 @@ void GazeboMavlinkInterface::handle_control(double _dt)
       }
       else if (joint_control_type_[i] == "position")
       {
+
+#if GAZEBO_MAJOR_VERSION >= 9
         double current = joints_[i]->Position(0);
+#else
+        double current = joints_[i]->GetAngle(0).Radian();
+#endif
 
         double err = current - target;
         double force = pids_[i].Update(err, _dt);
