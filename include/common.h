@@ -139,6 +139,7 @@ void copyPosition(const In& in, Out* out) {
   out->z = in.z;
 }
 
+#if GAZEBO_MAJOR_VERSION < 9
 inline ignition::math::Vector3d ignitionFromGazeboMath(const gazebo::math::Vector3 &vec_gz) {
   return ignition::math::Vector3d(vec_gz.x, vec_gz.y, vec_gz.z);
 }
@@ -148,5 +149,6 @@ inline ignition::math::Pose3d ignitionFromGazeboMath(const gazebo::math::Pose &p
   return ignition::math::Pose3d(pose_gz.pos.x, pose_gz.pos.y, pose_gz.pos.z,
                                 pose_gz.rot.w, pose_gz.rot.x, pose_gz.rot.y, pose_gz.rot.z);
 }
+#endif
 
 #endif  // SITL_GAZEBO_COMMON_H_
