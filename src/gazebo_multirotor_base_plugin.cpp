@@ -75,7 +75,11 @@ void GazeboMultirotorBasePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr 
 // This gets called by the world update start event.
 void GazeboMultirotorBasePlugin::OnUpdate(const common::UpdateInfo& _info) {
   // Get the current simulation time.
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time now = world_->SimTime();
+#else
+  common::Time now = world_->GetSimTime();
+#endif
   mav_msgs::msgs::MotorSpeed msg;
   MotorNumberToJointMap::iterator m;
   for (m = motor_joints_.begin(); m != motor_joints_.end(); ++m) {

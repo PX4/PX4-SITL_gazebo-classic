@@ -94,7 +94,11 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
                       imu_parameters_.accelerometer_turn_on_bias_sigma,
                       imu_parameters_.accelerometer_turn_on_bias_sigma);
 
+  #if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
+  #else
+  last_time_ = world_->GetSimTime();
+  #endif
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -238,12 +242,21 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
 
 // This gets called by the world update start event.
 void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time  = world_->SimTime();
+#else
+  common::Time current_time  = world_->GetSimTime();
+#endif
   double dt = (current_time - last_time_).Double();
   last_time_ = current_time;
   double t = current_time.Double();
 
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d T_W_I = link_->WorldPose(); //TODO(burrimi): Check tf.
+#else
+  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(link_->GetWorldPose()); //TODO(burrimi): Check tf.
+#endif
+
   ignition::math::Quaterniond C_W_I = T_W_I.Rot();
 
   // Copy ignition::math::Quaterniond to gazebo::msgs::Quaternion
@@ -270,11 +283,17 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
       C_W_I.RotateVectorReverse(acceleration - gravity_W_);
 
   velocity_prev_W_ = velocity_current_W;
-#else
+#elif GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d acceleration_I = link_->RelativeLinearAccel() - C_W_I.RotateVectorReverse(gravity_W_);
+#else
+  ignition::math::Vector3d acceleration_I = ignitionFromGazeboMath(link_->GetRelativeLinearAccel() - C_W_I.RotateVectorReverse(gravity_W_));
 #endif
 
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d angular_vel_I = link_->RelativeAngularVel();
+#else
+  ignition::math::Vector3d angular_vel_I = ignitionFromGazeboMath(link_->GetRelativeAngularVel());
+#endif
 
   Eigen::Vector3d linear_acceleration_I(acceleration_I.X(),
                                         acceleration_I.Y(),

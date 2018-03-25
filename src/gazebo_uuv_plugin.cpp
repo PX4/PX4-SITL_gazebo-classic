@@ -177,12 +177,20 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
   } */
 
   // Calculate and apply body Coriolis and Drag forces and torques
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d linear_velocity = link_->RelativeLinearVel();
+#else
+  ignition::math::Vector3d linear_velocity = ignitionFromGazeboMath(link_->GetRelativeLinearVel());
+#endif
   double u = linear_velocity[0];
   double v = linear_velocity[1];
   double w = linear_velocity[2];
 
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d angular_velocity = link_->RelativeAngularVel();
+#else
+  ignition::math::Vector3d angular_velocity = ignitionFromGazeboMath(link_->GetRelativeAngularVel());
+#endif
   double p = angular_velocity[0];
   double q = angular_velocity[1];
   double r = angular_velocity[2];

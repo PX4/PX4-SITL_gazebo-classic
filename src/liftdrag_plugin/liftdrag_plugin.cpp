@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <string>
 
+#include "common.h"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -72,7 +73,11 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   this->world = this->model->GetWorld();
   GZ_ASSERT(this->world, "LiftDragPlugin world pointer is NULL");
 
+#if GAZEBO_MAJOR_VERSION >= 9
   this->physics = this->world->Physics();
+#else
+  this->physics = this->world->GetPhysicsEngine();
+#endif
   GZ_ASSERT(this->physics, "LiftDragPlugin physics pointer is NULL");
 
   GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");
@@ -162,7 +167,11 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp);
+#else
+  ignition::math::Vector3d vel = ignitionFromGazeboMath(this->link->GetWorldLinearVel(this->cp));
+#endif
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
 
@@ -175,7 +184,11 @@ void LiftDragPlugin::OnUpdate()
     return;
 
   // pose of body
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d pose = this->link->WorldPose();
+#else
+  ignition::math::Pose3d pose = ignitionFromGazeboMath(this->link->GetWorldPose());
+#endif
 
   // rotate forward and upward vectors into inertial frame
   ignition::math::Vector3d forwardI = pose.Rot().RotateVector(this->forward);
@@ -282,7 +295,11 @@ void LiftDragPlugin::OnUpdate()
   // modify cl per control joint value
   if (this->controlJoint)
   {
+#if GAZEBO_MAJOR_VERSION >= 9
     double controlAngle = this->controlJoint->Position(0);
+#else
+    double controlAngle = this->controlJoint->GetAngle(0).Radian();
+#endif
     cl = cl + this->controlJointRadToCL * controlAngle;
     /// \TODO: also change cm and cd
   }
@@ -341,9 +358,16 @@ void LiftDragPlugin::OnUpdate()
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
 
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d cog = this->link->GetInertial()->CoG();
+#else
+  ignition::math::Vector3d cog = ignitionFromGazeboMath(this->link->GetInertial()->GetCoG());
+#endif
+
   // moment arm from cg to cp in inertial plane
   ignition::math::Vector3d momentArm = pose.Rot().RotateVector(
-    this->cp - this->link->GetInertial()->CoG());
+    this->cp - cog
+  );
   // gzerr << this->cp << " : " << this->link->GetInertial()->CoG() << "\n";
 
   // force and torque about cg in inertial frame

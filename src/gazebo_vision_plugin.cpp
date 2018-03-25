@@ -98,11 +98,18 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _model = model;
 
   _world = _model->GetWorld();
+#if GAZEBO_MAJOR_VERSION >= 9
   _last_time = _world->SimTime();
   _last_pub_time = _world->SimTime();
-
   // remember start pose -> VIO should always start with zero
   _pose_model_start = _model->WorldPose();
+#else
+  _last_time = _world->GetSimTime();
+  _last_pub_time = _world->GetSimTime();
+  // remember start pose -> VIO should always start with zero
+  _pose_model_start = ignitionFromGazeboMath(_model->GetWorldPose());
+#endif
+
 
   _nh = transport::NodePtr(new transport::Node());
   _nh->Init(_namespace);
@@ -116,13 +123,21 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
 
 void VisionPlugin::OnUpdate(const common::UpdateInfo&)
 {
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = _world->SimTime();
+#else
+  common::Time current_time = _world->GetSimTime();
+#endif
   double dt = (current_time - _last_pub_time).Double();
 
   if (dt > 1.0 / _pub_rate) {
 
     // get pose of the model that the plugin is attached to
+#if GAZEBO_MAJOR_VERSION >= 9
     ignition::math::Pose3d pose_model_world = _model->WorldPose();
+#else
+    ignition::math::Pose3d pose_model_world = ignitionFromGazeboMath(_model->GetWorldPose());
+#endif
     ignition::math::Pose3d pose_model; // pose in local frame (relative to where it started)
     // convert to local frame (ENU)
     pose_model.Pos().X() = cos(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().Y() - _pose_model_start.Pos().Y()) -

@@ -43,8 +43,13 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   model_ = _model;
 
   world_ = model_->GetWorld();
+#if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
   last_gps_time_ = world_->SimTime();
+#else
+  last_time_ = world_->GetSimTime();
+  last_gps_time_ = world_->GetSimTime();
+#endif
 
   // Use environment variables if set for home position.
   const char *env_lat = std::getenv("PX4_HOME_LAT");
@@ -92,16 +97,29 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
+#if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
+#else
+  common::Time current_time = world_->GetSimTime();
+#endif
   double dt = (current_time - last_time_).Double();
 
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d T_W_I = model_->WorldPose();    // TODO(burrimi): Check tf
+#else
+  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(model_->GetWorldPose());    // TODO(burrimi): Check tf
+#endif
   ignition::math::Vector3d& pos_W_I = T_W_I.Pos();           // Use the models' world position for GPS and groundtruth
 
   // reproject position without noise into geographic coordinates
   auto latlon_gt = reproject(pos_W_I);
 
-  ignition::math::Vector3d velocity_current_W = model_->WorldLinearVel();    // Use the models' world position for GPS velocity.
+  // Use the models' world position for GPS velocity.
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d velocity_current_W = model_->WorldLinearVel();
+#else
+  ignition::math::Vector3d velocity_current_W = ignitionFromGazeboMath(model_->GetWorldLinearVel());
+#endif
 
   ignition::math::Vector3d velocity_current_W_xy = velocity_current_W;
   velocity_current_W_xy.Z() = 0;
