@@ -27,9 +27,6 @@
             </contact>
             <bounce/>
             <friction>
-              <torsional>
-                <ode/>
-              </torsional>
               <ode/>
             </friction>
           </surface>
