@@ -371,10 +371,11 @@ foreach(plugin ${plugins})
 endforeach()
 
 # Configure the setup script
-catkin_add_env_hooks(50_sitl_gazebo_setup
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-  SHELLS sh)
-
+if (catkin_FOUND)
+  catkin_add_env_hooks(50_sitl_gazebo_setup
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    SHELLS sh)
+endif()
 
 #############
 ## Install ##
