@@ -50,7 +50,6 @@
 #include <systemlib/err.h>
 #include <systemlib/param/param.h>
 #include <systemlib/perf_counter.h>
-#include <uORB/topics/att_pos_mocap.h>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/sensor_combined.h>
 #include <uORB/topics/vehicle_attitude.h>
@@ -259,7 +258,7 @@ void AttitudeEstimatorQ::task_main()
 
 	_sensors_sub = orb_subscribe(ORB_ID(sensor_combined));
 	_vision_sub = orb_subscribe(ORB_ID(vehicle_vision_attitude));
-	_mocap_sub = orb_subscribe(ORB_ID(att_pos_mocap));
+	_mocap_sub = orb_subscribe(ORB_ID(vehicle_attitude_groundtruth));
 	_params_sub = orb_subscribe(ORB_ID(parameter_update));
 	_global_pos_sub = orb_subscribe(ORB_ID(vehicle_global_position));
 	_magnetometer_sub = orb_subscribe(ORB_ID(vehicle_magnetometer));
@@ -365,9 +364,9 @@ void AttitudeEstimatorQ::task_main()
 		orb_check(_mocap_sub, &mocap_updated);
 
 		if (mocap_updated) {
-			att_pos_mocap_s mocap;
+			vehicle_attitude_s mocap;
 
-			if (orb_copy(ORB_ID(att_pos_mocap), _mocap_sub, &mocap) == PX4_OK) {
+			if (orb_copy(ORB_ID(vehicle_attitude_groundtruth), _mocap_sub, &mocap) == PX4_OK) {
 				math::Quaternion q(mocap.q);
 				math::Matrix<3, 3> Rmoc = q.to_dcm();
 
@@ -427,16 +426,21 @@ void AttitudeEstimatorQ::task_main()
 		last_time = now;
 
 		if (update(dt)) {
-			vehicle_attitude_s att = {
-				.timestamp = sensors.timestamp,
-				.rollspeed = _rates(0),
-				.pitchspeed = _rates(1),
-				.yawspeed = _rates(2),
+			vehicle_attitude_s att = {};
 
-				.q = {_q(0), _q(1), _q(2), _q(3)},
-				.delta_q_reset = {},
-				.quat_reset_counter = 0,
-			};
+			att.timestamp = sensors.timestamp;
+
+			att.att_valid = true;
+			att.att_rate_valid = true;
+
+			att.rollspeed = _rates(0);
+			att.pitchspeed = _rates(1);
+			att.yawspeed = _rates(2);
+
+			att.q[0] = _q(0);
+			att.q[1] = _q(1);
+			att.q[2] = _q(2);
+			att.q[3] = _q(3);
 
 			/* the instance count is not used here */
 			int att_inst;
