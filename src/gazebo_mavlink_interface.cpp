@@ -298,6 +298,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     vehicle_is_tailsitter_ = _sdf->GetElement("vehicle_is_tailsitter")->Get<bool>();
   }
 
+  if(_sdf->HasElement("send_odometry"))
+  {
+    send_odometry_ = _sdf->GetElement("send_odometry")->Get<bool>();
+  }
+
   memset((char *)&_myaddr, 0, sizeof(_myaddr));
   _myaddr.sin_family = AF_INET;
   _srcaddr.sin_family = AF_INET;
@@ -767,20 +772,213 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 }
 
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
-  mavlink_vision_position_estimate_t sensor_msg;
-  sensor_msg.usec = odom_message->usec();
-  // convert from ENU to NED
-  sensor_msg.x = odom_message->y();
-  sensor_msg.y = -odom_message->x();
-  sensor_msg.z = -odom_message->z();
-  sensor_msg.roll = odom_message->pitch();
-  sensor_msg.pitch = -odom_message->roll();
-  sensor_msg.yaw = -odom_message->yaw();
-
-  // send VISION_POSITION_ESTIMATE Mavlink msg
   mavlink_message_t msg;
-  mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+
+  // Rotation quaternion between FLU and FRD body frames
+  ignition::math::Quaterniond q_br(0, 1, 0, 0);
+  // Rotation quaternion between NED and ENU local frames
+  ignition::math::Quaterniond q_ng(0, 0.70711, 0.70711, 0);
+
+  // transform position from local ENU to local NED frame
+  ignition::math::Vector3d position = q_ng.RotateVector(ignition::math::Vector3d(
+    odom_message->position().x(),
+    odom_message->position().y(),
+    odom_message->position().z()));
+
+  // transform position covariance from local ENU to local NED frame
+  ignition::math::Vector3d pos_cov = q_ng.RotateVector(ignition::math::Vector3d(
+    odom_message->pose_covariance().data()[0],
+    odom_message->pose_covariance().data()[7],
+    odom_message->pose_covariance().data()[14]));
+
+  // q_gr is the quaternion that represents a rotation from ENU earth/local
+  // frame to XYZ body FLU frame
+  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+    odom_message->orientation().w(),
+    odom_message->orientation().x(),
+    odom_message->orientation().y(),
+    odom_message->orientation().z());
+
+  // transform orientation from local ENU to body FLU frame
+  ignition::math::Quaterniond q_gb = q_gr * q_br.Inverse();
+  // transform orientation from body FLU to body FRD frame:
+  // q_nb is the quaternion that represents a rotation from NED earth/local
+  // frame to XYZ body FRD frame
+  ignition::math::Quaterniond q_nb = q_ng * q_gb;
+
+  // transform orientation covariance from local ENU<->FRD
+  // to local NED<->FRD
+  ignition::math::Vector3d orient_cov = q_nb.RotateVector(ignition::math::Vector3d(
+    odom_message->pose_covariance().data()[21],
+    odom_message->pose_covariance().data()[28],
+    odom_message->pose_covariance().data()[35]));
+
+  // transform linear velocity from local ENU to body FRD frame
+  ignition::math::Vector3d linear_velocity = q_ng.RotateVector(
+    q_br.RotateVector(ignition::math::Vector3d(
+      odom_message->linear_velocity().x(),
+      odom_message->linear_velocity().y(),
+      odom_message->linear_velocity().z())));
+
+  // transform linear velocity covariance from local ENU to body FRD frame
+  ignition::math::Vector3d lv_frd = q_ng.RotateVector(
+    q_br.RotateVector(ignition::math::Vector3d(
+      odom_message->twist_covariance().data()[0],
+      odom_message->twist_covariance().data()[7],
+      odom_message->twist_covariance().data()[14])));
+
+  // transform angular velocity from body FLU to body FRD frame
+  ignition::math::Vector3d angular_velocity = q_br.RotateVector(ignition::math::Vector3d(
+    odom_message->angular_velocity().x(),
+    odom_message->angular_velocity().y(),
+    odom_message->angular_velocity().z()));
+
+  // transform angular velocity covariance from body FLU to body FRD frame
+  ignition::math::Vector3d av_frd = q_ng.RotateVector(
+    q_br.RotateVector(ignition::math::Vector3d(
+      odom_message->twist_covariance().data()[0],
+      odom_message->twist_covariance().data()[7],
+      odom_message->twist_covariance().data()[14])));
+
+  if (send_odometry_){
+    // send ODOMETRY Mavlink msg
+    mavlink_odometry_t odom;
+
+    odom.usec = odom_message->usec();
+
+    odom.frame_id = MAV_FRAME_VISION_NED;
+    odom.child_frame_id = MAV_FRAME_BODY_FRD;
+
+    odom.x = position.X();
+    odom.y = position.Y();
+    odom.z = position.Z();
+
+    odom.q[0] = q_nb.W();
+    odom.q[1] = q_nb.X();
+    odom.q[2] = q_nb.Y();
+    odom.q[3] = q_nb.Z();
+
+    odom.vx = linear_velocity.X();
+    odom.vy = linear_velocity.Y();
+    odom.vz = linear_velocity.Z();
+
+    odom.rollrate = angular_velocity.X();
+    odom.pitchrate = angular_velocity.Y();
+    odom.yawrate = angular_velocity.Z();
+
+    // parse covariance matrices
+    int count = 0;
+    float pose_val, twist_val = 0.0;
+    for (int i=0; i<6; i++) {
+      for (int j=i; j<6; j++) {
+        if (i<2 && j<2) {
+          int swap = i;
+          i = j;
+          j = swap;
+        }
+	int index = 6*i + j;
+
+	// fill the principal diagonal of the pose and twist covariance matrices
+	// with transformed values
+	switch (index) {
+	  case 0:
+	    pose_val = pos_cov.X();
+	    twist_val = lv_frd.X();
+	    break;
+	  case 6:
+	    pose_val = pos_cov.Y();
+	    twist_val = lv_frd.Y();
+	    break;
+	  case 11:
+	    pose_val = pos_cov.Z();
+	    twist_val = lv_frd.Z();
+	    break;
+	  case 15:
+	    pose_val = orient_cov.X();
+	    twist_val = av_frd.X();
+	    break;
+	  case 18:
+	    pose_val = orient_cov.Y();
+	    twist_val = av_frd.Y();
+	    break;
+	  case 20:
+	    pose_val = orient_cov.Z();
+	    twist_val = av_frd.Z();
+	    break;
+	  default:
+	    pose_val = odom_message->pose_covariance().data()[index];
+	    twist_val = odom_message->twist_covariance().data()[index];
+        }
+
+        odom.pose_covariance[count++] = pose_val;
+        odom.twist_covariance[count++] = twist_val;
+      }
+    }
+
+    mavlink_msg_odometry_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &odom);
+    send_mavlink_message(&msg);
+  }
+  else {
+    // send VISION_POSITION_ESTIMATE Mavlink msg
+    mavlink_vision_position_estimate_t vision;
+
+    vision.usec = odom_message->usec();
+
+    // transform position from local ENU to local NED frame
+    odom.x = position.X();
+    odom.y = position.Y();
+    odom.z = position.Z();
+
+    // q_nb is the quaternion that represents a rotation from NED earth/local
+    // frame to XYZ body FRD frame
+    ignition::math::Vector3d euler = q_nb.Euler();
+
+    vision.roll = euler.X();
+    vision.pitch = euler.Y();
+    vision.yaw = euler.Z();
+
+    // parse covariance matrix
+    int count = 0;
+    float val = 0.0;
+    for (int i=0; i<6; i++) {
+      for (int j=i; j<6; j++) {
+	if (i<2 && j<2) {
+	  int swap = i;
+	  i = j;
+	  j = swap;
+	}
+	int index = 6*i + j;
+
+	switch (index) {
+	  case 0:
+	    val = pos_cov.X();
+	    break;
+	  case 6:
+	    val = pos_cov.Y();
+	    break;
+	  case 11:
+	    val = pos_cov.Z();
+	    break;
+	  case 15:
+	    val = orient_cov.X();
+	    break;
+	  case 18:
+	    val = orient_cov.Y();
+	    break;
+	  case 20:
+	    val = orient_cov.Z();
+	    break;
+	  default:
+	    val = odom_message->pose_covariance().data()[index];
+        }
+
+	odom.covariance[count++] = val;
+      }
+    }
+
+    mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &vision);
+    send_mavlink_message(&msg);
+  }
 }
 
 /*ssize_t GazeboMavlinkInterface::receive(void *_buf, const size_t _size, uint32_t _timeoutMs)
