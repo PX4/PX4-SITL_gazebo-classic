@@ -1,17 +1,15 @@
 syntax = "proto2";
 package odom_msgs.msgs;
+import "quaternion.proto";
+import "vector3d.proto";
 
 message odom
 {
-  required int32 usec     =  1;
-  required float x        =  2;
-  required float y        =  3;
-  required float z        =  4;
-  required float roll     =  8;
-  required float pitch    =  9;
-  required float yaw      = 10;
-  optional float vx       =  5;
-  optional float vy       =  6;
-  optional float vz       =  7;
-  repeated float variance = 11 [packed=true]; // same order
+  required int32 usec                            = 1;
+  required gazebo.msgs.Vector3d position         = 2;
+  required gazebo.msgs.Quaternion orientation    = 3;
+  required gazebo.msgs.Vector3d linear_velocity  = 4;
+  required gazebo.msgs.Vector3d angular_velocity = 5;
+  repeated float pose_covariance                 = 6 [packed=true]; // x.y.z.r.p.y.
+  repeated float twist_covariance                = 7 [packed=true]; // vx.vy.vz.rr.pr.yr
 }
