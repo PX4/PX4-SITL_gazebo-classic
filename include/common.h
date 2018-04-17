@@ -54,28 +54,48 @@ bool getSdfParam(sdf::ElementPtr sdf, const std::string& name, T& param, const T
 template <typename T>
 void model_param(const std::string& world_name, const std::string& model_name, const std::string& param, T& param_value)
 {
+  TiXmlElement* e_param = nullptr;
+  TiXmlElement* e_param_tmp = nullptr;
+  std::string dbg_param;
+
   TiXmlDocument doc(world_name + ".xml");
   if (doc.LoadFile())
   {
-    TiXmlHandle hDoc(&doc);
+    TiXmlHandle h_root(doc.RootElement());
 
-    TiXmlElement* pElem=hDoc.FirstChild( "options" ).FirstChild("model").Element();
-    for( pElem; pElem; pElem=pElem->NextSiblingElement("model"))
+    TiXmlElement* e_model = h_root.FirstChild("model").Element();
+
+    for( e_model; e_model; e_model=e_model->NextSiblingElement("model") )
     {
-      TiXmlElement* pName = pElem->FirstChildElement("name");
-      if (pName && model_name.compare(pName->GetText()) == 0)
+      const char* attr_name = e_model->Attribute("name");
+      if (attr_name)
       {
-        TiXmlElement* pValue = pElem->FirstChildElement(param);
-
-        if (pValue)
+        //specific
+        if (model_name.compare(attr_name) == 0)
         {
-          std::istringstream iss(pValue->GetText());
-          iss >> param_value;
-
-          gzdbg << "get " << param << " " << param_value <<" for " << model_name << " model from " << doc.Value() << "\n";
+          e_param_tmp = e_model->FirstChildElement(param);
+          if (e_param_tmp)
+          {
+            e_param = e_param_tmp;
+            dbg_param = "";
+          }
           break;
         }
       }
+      else
+      {
+        //common
+        e_param = e_model->FirstChildElement(param);
+        dbg_param = "common ";
+      }
+    }
+
+    if (e_param)
+    {
+      std::istringstream iss(e_param->GetText());
+      iss >> param_value;
+
+      gzdbg << model_name << " model: " << dbg_param << "parameter " << param << " = " << param_value << " from " << doc.Value() << "\n";
     }
   }
 
