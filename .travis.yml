@@ -9,7 +9,7 @@ cache:
 env:
   global:
     - CCACHE_DIR=$HOME/.ccache
-    - PX4_DOCKER_REPO=px4io/px4-dev-ros:2017-12-30
+    - PX4_DOCKER_REPO=px4io/px4-dev-ros:2018-03-30
 
 script:
   - docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}" --env=LOCAL_USER_ID="$(id -u)" --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw ${PX4_DOCKER_REPO} /bin/bash -e -c "mkdir Build; cd Build; cmake ..; make; source ../scripts/validate_sdf.bash"
