@@ -785,12 +785,6 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom_message->position().y(),
     odom_message->position().z()));
 
-  // transform position covariance from local ENU to local NED frame
-  ignition::math::Vector3d pos_cov = q_ng.RotateVector(ignition::math::Vector3d(
-    odom_message->pose_covariance().data()[0],
-    odom_message->pose_covariance().data()[7],
-    odom_message->pose_covariance().data()[14]));
-
   // q_gr is the quaternion that represents a rotation from ENU earth/local
   // frame to XYZ body FLU frame
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
@@ -806,13 +800,6 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   // frame to XYZ body FRD frame
   ignition::math::Quaterniond q_nb = q_ng * q_gb;
 
-  // transform orientation covariance from local ENU<->FRD
-  // to local NED<->FRD
-  ignition::math::Vector3d orient_cov = q_nb.RotateVector(ignition::math::Vector3d(
-    odom_message->pose_covariance().data()[21],
-    odom_message->pose_covariance().data()[28],
-    odom_message->pose_covariance().data()[35]));
-
   // transform linear velocity from local ENU to body FRD frame
   ignition::math::Vector3d linear_velocity = q_ng.RotateVector(
     q_br.RotateVector(ignition::math::Vector3d(
@@ -820,25 +807,11 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
       odom_message->linear_velocity().y(),
       odom_message->linear_velocity().z())));
 
-  // transform linear velocity covariance from local ENU to body FRD frame
-  ignition::math::Vector3d lv_frd = q_ng.RotateVector(
-    q_br.RotateVector(ignition::math::Vector3d(
-      odom_message->twist_covariance().data()[0],
-      odom_message->twist_covariance().data()[7],
-      odom_message->twist_covariance().data()[14])));
-
   // transform angular velocity from body FLU to body FRD frame
   ignition::math::Vector3d angular_velocity = q_br.RotateVector(ignition::math::Vector3d(
     odom_message->angular_velocity().x(),
     odom_message->angular_velocity().y(),
     odom_message->angular_velocity().z()));
-
-  // transform angular velocity covariance from body FLU to body FRD frame
-  ignition::math::Vector3d av_frd = q_ng.RotateVector(
-    q_br.RotateVector(ignition::math::Vector3d(
-      odom_message->twist_covariance().data()[0],
-      odom_message->twist_covariance().data()[7],
-      odom_message->twist_covariance().data()[14])));
 
   if (send_odometry_){
     // send ODOMETRY Mavlink msg
@@ -867,6 +840,10 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.yawspeed = angular_velocity.Z();
 
     // parse covariance matrices
+    // The main diagonal values are always positive (variance), so a transform
+    // in the covariance matrices from one frame to another would only
+    // change the values of the main diagonal. Since they are all zero,
+    // there's no need to apply the rotation
     int count = 0;
     float pose_val, twist_val = 0.0;
     for (int i=0; i<6; i++) {
@@ -877,38 +854,6 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
           j = swap;
         }
 	int index = 6*i + j;
-
-	// fill the principal diagonal of the pose and twist covariance matrices
-	// with transformed values
-	switch (index) {
-	  case 0:
-	    pose_val = pos_cov.X();
-	    twist_val = lv_frd.X();
-	    break;
-	  case 6:
-	    pose_val = pos_cov.Y();
-	    twist_val = lv_frd.Y();
-	    break;
-	  case 11:
-	    pose_val = pos_cov.Z();
-	    twist_val = lv_frd.Z();
-	    break;
-	  case 15:
-	    pose_val = orient_cov.X();
-	    twist_val = av_frd.X();
-	    break;
-	  case 18:
-	    pose_val = orient_cov.Y();
-	    twist_val = av_frd.Y();
-	    break;
-	  case 20:
-	    pose_val = orient_cov.Z();
-	    twist_val = av_frd.Z();
-	    break;
-	  default:
-	    pose_val = odom_message->pose_covariance().data()[index];
-	    twist_val = odom_message->twist_covariance().data()[index];
-        }
 
         odom.pose_covariance[count++] = pose_val;
         odom.twist_covariance[count++] = twist_val;
@@ -938,6 +883,10 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     vision.yaw = euler.Z();
 
     // parse covariance matrix
+    // The main diagonal values are always positive (variance), so a transform
+    // in the covariance matrix from one frame to another would only
+    // change the values of the main diagonal. Since they are all zero,
+    // there's no need to apply the rotation
     int count = 0;
     float val = 0.0;
     for (int i=0; i<6; i++) {
@@ -948,29 +897,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
 	  j = swap;
 	}
 	int index = 6*i + j;
-
-	switch (index) {
-	  case 0:
-	    val = pos_cov.X();
-	    break;
-	  case 6:
-	    val = pos_cov.Y();
-	    break;
-	  case 11:
-	    val = pos_cov.Z();
-	    break;
-	  case 15:
-	    val = orient_cov.X();
-	    break;
-	  case 18:
-	    val = orient_cov.Y();
-	    break;
-	  case 20:
-	    val = orient_cov.Z();
-	    break;
-	  default:
-	    val = odom_message->pose_covariance().data()[index];
-        }
+	val = odom_message->pose_covariance().data()[index];
 
 	vision.covariance[count++] = val;
       }
