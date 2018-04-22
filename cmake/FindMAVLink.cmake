@@ -15,23 +15,43 @@ execute_process(COMMAND ${ROSVERSION} -d
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-set(_MAVLINK_EXTRA_SEARCH_PATHS
+set(_MAVLINK_EXTRA_SEARCH_HINTS
     ${CMAKE_SOURCE_DIR}/mavlink/
     ../../mavlink/
     ../mavlink/
     ${CATKIN_DEVEL_PREFIX}/
-    /usr/
-    /usr/local/
-    /opt/ros/${ROS_DISTRO}/
     )
 
-# find the include directory
+set(_MAVLINK_EXTRA_SEARCH_PATHS
+    /usr/
+    /usr/local/
+    )
+
+# look for in the hints first
 find_path(_MAVLINK_INCLUDE_DIR
     NAMES mavlink/v1.0/mavlink_types.h mavlink/v2.0/mavlink_types.h
-    HINTS ${_MAVLINK_EXTRA_SEARCH_PATHS}
     PATH_SUFFIXES include
+    HINTS ${_MAVLINK_EXTRA_SEARCH_HINTS}
     NO_DEFAULT_PATH
     )
+
+# look for in the hard-coded paths
+find_path(_MAVLINK_INCLUDE_DIR
+    NAMES mavlink/v1.0/mavlink_types.h mavlink/v2.0/mavlink_types.h
+    PATH_SUFFIXES include
+    PATHS ${_MAVLINK_EXTRA_SEARCH_PATHS}
+    NO_CMAKE_PATH
+    NO_CMAKE_ENVIRONMENT_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH
+    NO_CMAKE_SYSTEM_PATH
+    )
+
+# look specifically for the ROS version if no other was found
+find_path(_MAVLINK_INCLUDE_DIR
+   NAMES mavlink/v1.0/mavlink_types.h mavlink/v2.0/mavlink_types.h
+   PATH_SUFFIXES include
+   PATHS /opt/ros/${ROS_DISTRO}/
+   )
 
 # read the version
 if (EXISTS ${_MAVLINK_INCLUDE_DIR}/mavlink/config.h)
