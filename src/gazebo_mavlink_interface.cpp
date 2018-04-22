@@ -844,7 +844,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     // send ODOMETRY Mavlink msg
     mavlink_odometry_t odom;
 
-    odom.usec = odom_message->usec();
+    odom.time_usec = odom_message->usec();
 
     odom.frame_id = MAV_FRAME_VISION_NED;
     odom.child_frame_id = MAV_FRAME_BODY_FRD;
@@ -862,9 +862,9 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.vy = linear_velocity.Y();
     odom.vz = linear_velocity.Z();
 
-    odom.rollrate = angular_velocity.X();
-    odom.pitchrate = angular_velocity.Y();
-    odom.yawrate = angular_velocity.Z();
+    odom.rollspeed= angular_velocity.X();
+    odom.pitchspeed = angular_velocity.Y();
+    odom.yawspeed = angular_velocity.Z();
 
     // parse covariance matrices
     int count = 0;
@@ -925,9 +925,9 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     vision.usec = odom_message->usec();
 
     // transform position from local ENU to local NED frame
-    odom.x = position.X();
-    odom.y = position.Y();
-    odom.z = position.Z();
+    vision.x = position.X();
+    vision.y = position.Y();
+    vision.z = position.Z();
 
     // q_nb is the quaternion that represents a rotation from NED earth/local
     // frame to XYZ body FRD frame
@@ -972,7 +972,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
 	    val = odom_message->pose_covariance().data()[index];
         }
 
-	odom.covariance[count++] = val;
+	vision.covariance[count++] = val;
       }
     }
 
