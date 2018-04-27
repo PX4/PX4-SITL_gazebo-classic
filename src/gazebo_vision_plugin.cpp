@@ -197,8 +197,8 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
     position->set_x(pose_model.Pos().X() + noise_pos.X() + _bias.X());
-    position->set_x(pose_model.Pos().Y() + noise_pos.Y() + _bias.Y());
-    position->set_x(pose_model.Pos().Z() + noise_pos.Z() + _bias.Z());
+    position->set_y(pose_model.Pos().Y() + noise_pos.Y() + _bias.Y());
+    position->set_z(pose_model.Pos().Z() + noise_pos.Z() + _bias.Z());
     odom_msg.set_allocated_position(position);
 
     ignition::math::Quaterniond pose_model_quaternion = pose_model.Rot();
