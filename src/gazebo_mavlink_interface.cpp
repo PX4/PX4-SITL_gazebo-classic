@@ -419,41 +419,11 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 #endif
   double dt = (current_time - last_imu_time_).Double();
 
-    // frames
-    // g - gazebo (ENU), east, north, up
-    // r - rotors imu frame (FLU), forward, left, up
-    // b - px4 (FRD) forward, right down
-    // n - px4 (NED) north, east, down
     ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
       imu_message->orientation().w(),
       imu_message->orientation().x(),
       imu_message->orientation().y(),
       imu_message->orientation().z());
-
-    // q_br
-    /*
-    tf.euler2quat(*tf.mat2euler([
-    #        F  L  U
-            [1, 0, 0],  # F
-            [0, -1, 0], # R
-            [0, 0, -1]  # D
-        ]
-    )).round(5)
-    */
-    ignition::math::Quaterniond q_br(0, 1, 0, 0);
-
-
-    // q_ng
-    /*
-    tf.euler2quat(*tf.mat2euler([
-    #        N  E  D
-            [0, 1, 0],  # E
-            [1, 0, 0],  # N
-            [0, 0, -1]  # U
-        ]
-    )).round(5)
-    */
-    ignition::math::Quaterniond q_ng(0, 0.70711, 0.70711, 0);
 
     ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
     ignition::math::Quaterniond q_nb = q_ng*q_gb;
@@ -773,11 +743,6 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   mavlink_message_t msg;
-
-  // Rotation quaternion between FLU and FRD body frames
-  ignition::math::Quaterniond q_br(0, 1, 0, 0);
-  // Rotation quaternion between NED and ENU local frames
-  ignition::math::Quaterniond q_ng(0, 0.70711, 0.70711, 0);
 
   // transform position from local ENU to local NED frame
   ignition::math::Vector3d position = q_ng.RotateVector(ignition::math::Vector3d(
