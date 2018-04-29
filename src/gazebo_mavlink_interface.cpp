@@ -809,19 +809,13 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     // in the covariance matrices from one frame to another would only
     // change the values of the main diagonal. Since they are all zero,
     // there's no need to apply the rotation
-    int count = 0;
-    float pose_val, twist_val = 0.0;
-    for (int i=0; i<6; i++) {
-      for (int j=i; j<6; j++) {
-        if (i<2 && j<2) {
-          int swap = i;
-          i = j;
-          j = swap;
-        }
-	int index = 6*i + j;
+    size_t count = 0;
+    for (size_t x = 0; x < 6; x++) {
+      for (size_t y = x; y < 6; y++) {
+        size_t index = 6 * x + y;
 
-        odom.pose_covariance[count++] = pose_val;
-        odom.twist_covariance[count++] = twist_val;
+        odom.pose_covariance[count++] = odom_message->pose_covariance().data()[index];
+        odom.twist_covariance[count++] = odom_message->twist_covariance().data()[index];
       }
     }
 
@@ -852,19 +846,12 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     // in the covariance matrix from one frame to another would only
     // change the values of the main diagonal. Since they are all zero,
     // there's no need to apply the rotation
-    int count = 0;
-    float val = 0.0;
-    for (int i=0; i<6; i++) {
-      for (int j=i; j<6; j++) {
-	if (i<2 && j<2) {
-	  int swap = i;
-	  i = j;
-	  j = swap;
-	}
-	int index = 6*i + j;
-	val = odom_message->pose_covariance().data()[index];
+    size_t count = 0;
+    for (size_t x = 0; x < 6; x++) {
+      for (size_t y = x; y < 6; y++) {
+        size_t index = 6 * x + y;
 
-	vision.covariance[count++] = val;
+	vision.covariance[count++] = odom_message->pose_covariance().data()[index];
       }
     }
 
