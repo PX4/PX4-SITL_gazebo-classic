@@ -54,6 +54,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       motor_velocity_reference_pub_topic_);
   getSdfParam<std::string>(_sdf, "imuSubTopic", imu_sub_topic_, imu_sub_topic_);
   getSdfParam<std::string>(_sdf, "gpsSubTopic", gps_sub_topic_, gps_sub_topic_);
+  getSdfParam<std::string>(_sdf, "visionSubTopic", vision_sub_topic_, vision_sub_topic_);
   getSdfParam<std::string>(_sdf, "lidarSubTopic", lidar_sub_topic_, lidar_sub_topic_);
   getSdfParam<std::string>(_sdf, "opticalFlowSubTopic",
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
@@ -758,12 +759,10 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom_message->orientation().y(),
     odom_message->orientation().z());
 
-  // transform orientation from local ENU to body FLU frame
-  ignition::math::Quaterniond q_gb = q_gr * q_br.Inverse();
-  // transform orientation from body FLU to body FRD frame:
+  // transform orientation from local ENU to body FRD frame
   // q_nb is the quaternion that represents a rotation from NED earth/local
   // frame to XYZ body FRD frame
-  ignition::math::Quaterniond q_nb = q_ng * q_gb;
+  ignition::math::Quaterniond q_nb = q_ng * q_gr * q_ng.Inverse();
 
   // transform linear velocity from local ENU to body FRD frame
   ignition::math::Vector3d linear_velocity = q_ng.RotateVector(
@@ -851,7 +850,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
       for (size_t y = x; y < 6; y++) {
         size_t index = 6 * x + y;
 
-	vision.covariance[count++] = odom_message->pose_covariance().data()[index];
+        vision.covariance[count++] = odom_message->pose_covariance().data()[index];
       }
     }
 
