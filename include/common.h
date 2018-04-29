@@ -168,21 +168,11 @@ inline ignition::math::Pose3d ignitionFromGazeboMath(const gazebo::math::Pose &p
 static const auto q_ng = ignition::math::Quaterniond(0, 0.70711, 0.70711, 0);
 
 /**
- * @brief Vector for rotation between ENU and NED frames
- */
-static const auto v_ng = ignition::math::Vector3d(q_ng.Euler());
-
-/**
  * @brief Quaternion for rotation between body FLU and body FRD frames
  *
  * +PI rotation around X (Forward) axis rotates from Forward, Right, Down (aircraft)
  * to Forward, Left, Up (base_link) frames and vice-versa.
  */
 static const auto q_br = ignition::math::Quaterniond(0, 1, 0, 0);
-
-/**
- * @brief Vector for rotation between body FLU and body FRD frames
- */
-static const auto v_br = ignition::math::Vector3d(q_br.Euler());
 
 #endif  // SITL_GAZEBO_COMMON_H_
