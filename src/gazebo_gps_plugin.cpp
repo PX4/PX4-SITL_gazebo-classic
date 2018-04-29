@@ -237,4 +237,4 @@ std::pair<double, double> GpsPlugin::reproject(ignition::math::Vector3d& pos)
 
   return std::make_pair (lat_rad, lon_rad);
 }
-}
+} // namespace gazebo

@@ -61,32 +61,32 @@ void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
     gzerr << "[gazebo_vision_plugin] Please specify a robotNamespace.\n";
   }
 
-  if (sdf->HasElement("pub_rate")) {
-    _pub_rate = sdf->GetElement("pub_rate")->Get<int>();
+  if (sdf->HasElement("pubRate")) {
+    _pub_rate = sdf->GetElement("pubRate")->Get<int>();
   } else {
-    _pub_rate = DEFAULT_PUB_RATE;
-    gzerr << "[gazebo_vision_plugin] Using default publication rate of " << DEFAULT_PUB_RATE << " Hz\n";
+    _pub_rate = kDefaultPubRate;
+    gzwarn << "[gazebo_vision_plugin] Using default publication rate of " << _pub_rate << " Hz\n";
   }
 
-  if (sdf->HasElement("corellation_time")) {
-    _corellation_time = sdf->GetElement("corellation_time")->Get<float>();
+  if (sdf->HasElement("corellationTime")) {
+    _corellation_time = sdf->GetElement("corellationTime")->Get<float>();
   } else {
-    _corellation_time = DEFAULT_CORRELATION_TIME;
-    gzerr << "[gazebo_vision_plugin] Using default correlation time of " << DEFAULT_CORRELATION_TIME << " s\n";
+    _corellation_time = kDefaultCorrelationTime;
+    gzwarn << "[gazebo_vision_plugin] Using default correlation time of " << _corellation_time << " s\n";
   }
 
-  if (sdf->HasElement("random_walk")) {
-    _random_walk = sdf->GetElement("random_walk")->Get<float>();
+  if (sdf->HasElement("randomWalk")) {
+    _random_walk = sdf->GetElement("randomWalk")->Get<float>();
   } else {
-    _random_walk = DEFAULT_RANDOM_WALK;
-    gzerr << "[gazebo_vision_plugin] Using default random walk of " << DEFAULT_RANDOM_WALK << " (m/s) / sqrt(hz)\n";
+    _random_walk = kDefaultRandomWalk;
+    gzwarn << "[gazebo_vision_plugin] Using default random walk of " << _random_walk << " (m/s) / sqrt(hz)\n";
   }
 
-  if (sdf->HasElement("noise_density")) {
-    _noise_density = sdf->GetElement("noise_density")->Get<float>();
+  if (sdf->HasElement("noiseDensity")) {
+    _noise_density = sdf->GetElement("noiseDensity")->Get<float>();
   } else {
-    _noise_density = DEFAULT_NOISE_DENSITY;
-    gzerr << "[gazebo_vision_plugin] Using default noise density of " << DEFAULT_NOISE_DENSITY << " (m) / sqrt(hz)\n";
+    _noise_density = kDefaultNoiseDensity;
+    gzwarn << "[gazebo_vision_plugin] Using default noise density of " << _noise_density << " (m) / sqrt(hz)\n";
   }
 }
 
@@ -109,7 +109,6 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   // remember start pose -> VIO should always start with zero
   _pose_model_start = ignitionFromGazeboMath(_model->GetWorldPose());
 #endif
-
 
   _nh = transport::NodePtr(new transport::Node());
   _nh->Init(_namespace);
@@ -172,8 +171,7 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     double tau_g = _corellation_time;
     double sigma_g_d = 1 / sqrt(dt) * _noise_density;
     double sigma_b_g = _random_walk;
-    double sigma_b_g_d = sqrt(-sigma_b_g * sigma_b_g * tau_g / 2.0 *
-					(exp(-2.0 * dt / tau_g) - 1.0));
+    double sigma_b_g_d = sqrt(-sigma_b_g * sigma_b_g * tau_g / 2.0 * (exp(-2.0 * dt / tau_g) - 1.0));
     double phi_g_d = exp(-1.0 / tau_g * dt);
 
     noise_angvel.X() = phi_g_d * noise_angvel.X() + sigma_b_g_d * sqrt(dt) * _randn(_rand);
@@ -241,5 +239,4 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     _pub_odom->Publish(odom_msg);
   }
 }
-
 } // namespace gazebo
