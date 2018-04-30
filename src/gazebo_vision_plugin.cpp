@@ -148,8 +148,8 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     pose_model.Pos().Y() = cos(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().X() - _pose_model_start.Pos().X()) +
                        sin(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().Y() - _pose_model_start.Pos().Y());
     pose_model.Pos().Z() = pose_model_world.Pos().Z() - _pose_model_start.Pos().Z();
-    pose_model.Rot().Euler(pose_model_world.Rot().Pitch(),
-                           pose_model_world.Rot().Roll(),
+    pose_model.Rot().Euler(pose_model_world.Rot().Roll(),
+                           pose_model_world.Rot().Pitch(),
                            pose_model_world.Rot().Yaw() - _pose_model_start.Rot().Yaw());
 
     // update noise parameters
