@@ -759,7 +759,9 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom_message->orientation().y(),
     odom_message->orientation().z());
 
-  // transform orientation from local ENU to body FRD frame
+  // transform orientation from local ENU to body FLU frame
+  ignition::math::Quaterniond q_gb = q_gr * q_br.Inverse();
+  // transform orientation from body FLU to body FRD frame:
   // q_nb is the quaternion that represents a rotation from NED earth/local
   // frame to XYZ body FRD frame
   ignition::math::Quaterniond q_nb = q_ng * q_gr * q_ng.Inverse();
