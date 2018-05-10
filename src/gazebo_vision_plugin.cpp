@@ -142,11 +142,8 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     ignition::math::Vector3d angular_velocity_model = ignitionFromGazeboMath(_model->GetRelativeAngularVel());
 #endif
     ignition::math::Pose3d pose_model; // pose in local frame (relative to where it started)
-    // convert to local frame (ENU)
-    pose_model.Pos().X() = cos(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().Y() - _pose_model_start.Pos().Y()) -
-                       sin(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().X() - _pose_model_start.Pos().X());
-    pose_model.Pos().Y() = cos(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().X() - _pose_model_start.Pos().X()) +
-                       sin(_pose_model_start.Rot().Yaw()) * (pose_model_world.Pos().Y() - _pose_model_start.Pos().Y());
+    pose_model.Pos().X() = pose_model_world.Pos().X() - _pose_model_start.Pos().X();
+    pose_model.Pos().Y() = pose_model_world.Pos().Y() - _pose_model_start.Pos().Y();
     pose_model.Pos().Z() = pose_model_world.Pos().Z() - _pose_model_start.Pos().Z();
     pose_model.Rot().Euler(pose_model_world.Rot().Roll(),
                            pose_model_world.Rot().Pitch(),
