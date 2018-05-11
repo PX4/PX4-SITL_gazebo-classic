@@ -120,13 +120,14 @@ public:
   GazeboMavlinkInterface() : ModelPlugin(),
     received_first_referenc_(false),
     namespace_(kDefaultNamespace),
+    protocol_version_(2.0),
     motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
     use_propeller_pid_(false),
     use_elevator_pid_(false),
     use_left_elevon_pid_(false),
     use_right_elevon_pid_(false),
     vehicle_is_tailsitter_(false),
-    send_odometry_(false),
+    send_odometry_(true),
     imu_sub_topic_(kDefaultImuTopic),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
     lidar_sub_topic_(kDefaultLidarTopic),
@@ -177,6 +178,8 @@ protected:
 private:
   bool received_first_referenc_;
   Eigen::VectorXd input_reference_;
+
+  float protocol_version_;
 
   std::string namespace_;
   std::string motor_velocity_reference_pub_topic_;
