@@ -28,7 +28,7 @@ GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
-  /// TODO: make these gains part of sdf xml
+  /// defaults if sdf xml doesn't contain any pid gains
   this->pitchPid.Init(5, 0, 0, 0, 0, 0.3, -0.3);
   this->rollPid.Init(5, 0, 0, 0, 0, 0.3, -0.3);
   this->yawPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
@@ -46,6 +46,57 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
 
   this->sdf = _sdf;
 
+  // Create axis name -> pid map. It may be empty or not fully defined
+  std::map<std::string, common::PID> pids_;
+
+  if (_sdf->HasElement("control_gimbal_channels"))
+  {
+    sdf::ElementPtr control_channels = _sdf->GetElement("control_gimbal_channels");
+    sdf::ElementPtr channel = control_channels->GetElement("channel");
+    while(channel)
+    {
+      if (channel->HasElement("joint_axis"))
+      {
+        std::string joint_axis = channel->Get<std::string>("joint_axis");
+
+        // setup joint control pid to control joint
+        if (channel->HasElement("joint_control_pid"))
+        {
+          sdf::ElementPtr pid = channel->GetElement("joint_control_pid");
+          double p = 0;
+          if (pid->HasElement("p"))
+            p = pid->Get<double>("p");
+          double i = 0;
+          if (pid->HasElement("i"))
+            i = pid->Get<double>("i");
+          double d = 0;
+          if (pid->HasElement("d"))
+            d = pid->Get<double>("d");
+          double iMax = 0;
+          if (pid->HasElement("iMax"))
+            iMax = pid->Get<double>("iMax");
+          double iMin = 0;
+          if (pid->HasElement("iMin"))
+            iMin = pid->Get<double>("iMin");
+          double cmdMax = 0;
+          if (pid->HasElement("cmdMax"))
+            cmdMax = pid->Get<double>("cmdMax");
+          double cmdMin = 0;
+          if (pid->HasElement("cmdMin"))
+            cmdMin = pid->Get<double>("cmdMin");
+
+          // insert pid gains into map for the respective named joint axis
+          pids_.insert(std::pair<std::string, common::PID>(joint_axis, common::PID(p, i, d, iMax, iMin, cmdMax, cmdMin)));
+        }
+        channel = channel->GetNextElement("channel");
+      }
+    }
+  }
+  else
+  {
+    gzwarn << "Control channels for gimbal not found. Using default pid gains\n";
+  }
+
   std::string yawJointName = "cgo3_vertical_arm_joint";
   this->yawJoint = this->model->GetJoint(yawJointName);
   if (this->sdf->HasElement("joint_yaw"))
@@ -55,6 +106,19 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     if (this->model->GetJoint(yawJointName))
     {
       this->yawJoint = this->model->GetJoint(yawJointName);
+
+      // Try to find respective pid for the named axis control
+      std::map<std::string, common::PID>::iterator it = pids_.find("joint_yaw");
+      if(it != pids_.end()) {
+        // Found pid for this axis (and therefore for this joint)
+        this->yawPid = it->second;
+      }
+      else
+      {
+        // If user defines control channels for gimbal but don't define yaw gains explicitly
+        // then display warning
+        gzwarn << "joint_yaw [" << yawJointName << "] pid control gains do not defined?\n";
+      }
     }
     else
     {
@@ -76,6 +140,19 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     if (this->model->GetJoint(rollJointName))
     {
       this->rollJoint = this->model->GetJoint(rollJointName);
+
+      // Try to find respective pid for the named axis control
+      std::map<std::string, common::PID>::iterator it = pids_.find("joint_roll");
+      if(it != pids_.end()) {
+        // Found pid for this axis (and therefore for this joint)
+        this->rollPid = it->second;
+      }
+      else
+      {
+        // If user defines control channels for gimbal but don't define roll gains explicitly
+        // then display warning
+        gzwarn << "joint_roll [" << rollJointName << "] pid control gains do not defined?\n";
+      }
     }
     else
     {
@@ -88,7 +165,6 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
           << rollJointName << "' " << endl;
   }
 
-
   std::string pitchJointName = "cgo3_camera_joint";
   this->pitchJoint = this->model->GetJoint(pitchJointName);
   if (this->sdf->HasElement("joint_pitch"))
@@ -98,6 +174,19 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     if (this->model->GetJoint(pitchJointName))
     {
       this->pitchJoint = this->model->GetJoint(pitchJointName);
+
+      // Try to find respective pid for the named axis
+      std::map<std::string, common::PID>::iterator it = pids_.find("joint_pitch");
+      if(it != pids_.end()) {
+        // Found pid for this axis (and therefore for this joint)
+        this->pitchPid = it->second;
+      }
+      else
+      {
+        // If user defines control channels for gimbal but don't define pitch gains explicitly
+        // then display warning
+        gzwarn << "joint_pitch [" << pitchJointName << "] pid control gains do not defined?\n";
+      }
     }
     else
     {
@@ -109,7 +198,6 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     gzerr << "GimbalControllerPlugin::Load ERROR! Can't get pitch joint '"
           << pitchJointName << "' " << endl;
   }
-
 
   // get imu sensors
   std::string cameraImuSensorName = "camera_imu";
