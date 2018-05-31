@@ -309,7 +309,8 @@ if (NOT roscpp_FOUND)
   list(APPEND plugins gazebo_geotagged_images_plugin)
 endif()
 
-#If BUILD_ROS_INTERFACE set to ON, build gazebo_hil_interface and gazebo_motor_failure_plugin
+# If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
+# Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
 if (BUILD_ROS_INTERFACE)
   add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
   target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
@@ -323,21 +324,21 @@ if (BUILD_ROS_INTERFACE)
     ${sensor_msgs_INCLUDE_DIRS}
     ${mav_msgs_INCLUDE_DIRS}
     )
-  add_executable(gazebo_hil_interface
-    src/gazebo_hil_interface.cpp
+  add_executable(gazebo_motor_failure_plugin
+    src/gazebo_motor_failure_plugin.cpp
   )
 
-  add_dependencies(gazebo_hil_interface
+  add_dependencies(gazebo_motor_failure_plugin
     ${catkin_EXPORTED_TARGETS}
     ${mavros_EXPORTED_TARGETS}
     ${mavros_msgs_EXPORTED_TARGETS}
   )
 
-  target_link_libraries(gazebo_hil_interface
+  target_link_libraries(gazebo_motor_failure_plugin
     ${catkin_LIBRARIES}
     ${mavros_LIBRARIES}
   )
-  message(STATUS "adding gazebo_hil_interface to build")
+  message(STATUS "adding gazebo_motor_failure_plugin to build")
 endif()
 
 if (GSTREAMER_FOUND)
