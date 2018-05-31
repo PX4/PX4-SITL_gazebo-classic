@@ -113,7 +113,7 @@
   <!-- Macro to add the controller interface. -->
   <xacro:macro name="controller_plugin_macro" params="namespace imu_sub_topic">
     <gazebo>
-      <plugin name="controller_interface" filename="librotors_gazebo_controller_interface.so">
+      <plugin name="controller_interface" filename="libgazebo_controller_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
         <commandAttitudeThrustSubTopic>/command/attitude</commandAttitudeThrustSubTopic>
         <commandRateThrustSubTopic>/command/rate</commandRateThrustSubTopic>
@@ -137,7 +137,7 @@
   <!-- Macro to add the mavlink interface. -->
   <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mavlink_addr mavlink_udp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port hil_mode hil_state_level vehicle_is_tailsitter">
     <gazebo>
-      <plugin name="mavlink_interface" filename="librotors_gazebo_mavlink_interface.so">
+      <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
         <imuSubTopic>${imu_sub_topic}</imuSubTopic>
         <gpsSubTopic>${gps_sub_topic}</gpsSubTopic>
@@ -278,7 +278,7 @@
       <limit upper="0" lower="0" effort="0" velocity="0" />
     </joint>
     <gazebo>
-      <plugin filename="librotors_gazebo_imu_plugin.so" name="rotors_gazebo_imu${imu_suffix}_plugin">
+      <plugin filename="libgazebo_imu_plugin.so" name="rotors_gazebo_imu${imu_suffix}_plugin">
       <!-- A good description of the IMU parameters can be found in the kalibr documentation:
            https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics -->
         <robotNamespace>${namespace}</robotNamespace> <!-- (string, required): ros namespace in which the messages are published -->
@@ -356,7 +356,7 @@
       wind_gust_direction wind_gust_duration wind_gust_start
       wind_gust_force_mean">
     <gazebo>
-      <plugin filename="librotors_gazebo_wind_plugin.so" name="wind_plugin">
+      <plugin filename="libgazebo_wind_plugin.so" name="wind_plugin">
         <frameId>base_link</frameId>
         <linkName>base_link</linkName>
         <robotNamespace>${namespace}</robotNamespace>

@@ -694,7 +694,7 @@
     <!--
         The gazebo_mavlink_plugin.cpp is called. Parameters are transferred.
     -->
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps</gpsSubTopic>
@@ -778,7 +778,7 @@
     <!--
         The gazebo_imu_plugin.cpp is called.
     -->
-    <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <linkName>hippocampus/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
@@ -797,7 +797,7 @@
         Forces and Moments are set to zero since they are already calculated using the gazebo_uuv_plugin.
         The motor model plugins can be removed if you don't need the rotors to spin.
     -->
-    <plugin name='front_right_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <jointName>rotor_0_joint</jointName>
       <linkName>rotor_0</linkName>
@@ -814,7 +814,7 @@
       <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>0.05</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='back_left_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <jointName>rotor_1_joint</jointName>
       <linkName>rotor_1</linkName>
@@ -831,7 +831,7 @@
       <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>0.05</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='front_left_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <jointName>rotor_2_joint</jointName>
       <linkName>rotor_2</linkName>
@@ -848,7 +848,7 @@
       <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>0.05</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='back_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace>hippocampus</robotNamespace>
       <jointName>rotor_3_joint</jointName>
       <linkName>rotor_3</linkName>

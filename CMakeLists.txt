@@ -265,15 +265,15 @@ add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
-add_library(rotors_gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
-add_library(rotors_gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
-add_library(rotors_gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(rotors_gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
-add_library(rotors_gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
-add_library(rotors_gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
-#add_library(rotors_gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
+add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
+add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
+add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
+add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
+add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
+#add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 
-target_link_libraries(rotors_gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
 
 set(plugins
@@ -285,13 +285,13 @@ set(plugins
   gazebo_sonar_plugin
   gazebo_uuv_plugin
   gazebo_vision_plugin
-  rotors_gazebo_controller_interface
-  rotors_gazebo_gimbal_controller_plugin
-  rotors_gazebo_imu_plugin
-  rotors_gazebo_mavlink_interface
-  rotors_gazebo_motor_model
-  rotors_gazebo_multirotor_base_plugin
-  #rotors_gazebo_wind_plugin
+  gazebo_controller_interface
+  gazebo_gimbal_controller_plugin
+  gazebo_imu_plugin
+  gazebo_mavlink_interface
+  gazebo_motor_model
+  gazebo_multirotor_base_plugin
+  #gazebo_wind_plugin
   )
 
 # If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
