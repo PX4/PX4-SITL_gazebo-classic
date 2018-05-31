@@ -1554,6 +1554,44 @@
       <joint_yaw>typhoon_h480::cgo3_vertical_arm_joint</joint_yaw>
       <joint_roll>typhoon_h480::cgo3_horizontal_arm_joint</joint_roll>
       <joint_pitch>typhoon_h480::cgo3_camera_joint</joint_pitch>
+      <control_gimbal_channels>
+        <channel>
+          <joint_control_pid>
+            <p>1.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>1.0</cmdMax>
+            <cmdMin>-1.0</cmdMin>
+          </joint_control_pid>
+          <joint_axis>joint_yaw</joint_axis>
+        </channel>
+        <channel>
+          <joint_control_pid>
+            <p>5.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>0.3</cmdMax>
+            <cmdMin>-0.3</cmdMin>
+          </joint_control_pid>
+          <joint_axis>joint_roll</joint_axis>
+        </channel>
+        <channel>
+          <joint_control_pid>
+            <p>5.0</p>
+            <i>0</i>
+            <d>0.1</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>0.3</cmdMax>
+            <cmdMin>-0.3</cmdMin>
+          </joint_control_pid>
+          <joint_axis>joint_pitch</joint_axis>
+        </channel>
+      </control_gimbal_channels>
       <gimbal_imu>camera_imu</gimbal_imu>
     </plugin>
   </model>
