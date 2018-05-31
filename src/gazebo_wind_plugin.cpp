@@ -19,10 +19,8 @@
  * limitations under the License.
  */
 
-
 #include "gazebo_wind_plugin.h"
 #include "common.h"
-#include "Wind.pb.h"
 
 namespace gazebo {
 
@@ -79,7 +77,7 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // simulation iteration.
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboWindPlugin::OnUpdate, this, _1));
 
-  wind_pub_ = node_handle_->Advertise<wind_msgs::msgs::Wind>(wind_pub_topic_, 1);
+  wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>(wind_pub_topic_, 1);
 }
 
 // This gets called by the world update start event.
@@ -102,8 +100,6 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
     link_->AddForceAtRelativePosition(wind_gust, xyz_offset_);
   }
 
-  wind_msgs::msgs::Wind wind_msg;
-
   gazebo::msgs::Vector3d* force = new gazebo::msgs::Vector3d();
   force->set_x(wind.x + wind_gust.x);
   force->set_y(wind.y + wind_gust.y);
@@ -112,7 +108,7 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
   wind_msg.set_frame_id(frame_id_);
   Set(wind_msg.mutable_stamp(), now);
   wind_msg.set_allocated_force(force);
-  
+
   wind_pub_->Publish(wind_msg);
 }
 
