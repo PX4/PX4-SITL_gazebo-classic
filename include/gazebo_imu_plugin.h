@@ -21,7 +21,7 @@
 #include <random>
 
 #include <Eigen/Core>
-#include "SensorImu.pb.h"
+#include "Imu.pb.h"
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>

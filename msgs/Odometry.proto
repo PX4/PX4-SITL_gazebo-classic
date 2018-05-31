@@ -1,9 +1,9 @@
 syntax = "proto2";
-package odom_msgs.msgs;
+package nav_msgs.msgs;
 import "quaternion.proto";
 import "vector3d.proto";
 
-message odom
+message Odometry
 {
   required int32 usec                            = 1;
   required gazebo.msgs.Vector3d position         = 2;

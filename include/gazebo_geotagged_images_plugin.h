@@ -34,7 +34,7 @@
 namespace gazebo
 {
 
-typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 
 /**
  * @class GeotaggedImagesPlugin

@@ -27,7 +27,7 @@
 #include "gazebo/sensors/RaySensor.hh"
 #include "gazebo/util/system.hh"
 
-#include "lidar.pb.h"
+#include "Range.pb.h"
 
 #define SENSOR_MIN_DISTANCE   0.06 // values smaller than that cause issues
 #define SENSOR_MAX_DISTANCE  35.0 // values bigger than that cause issues
@@ -68,7 +68,7 @@ namespace gazebo
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:
       event::ConnectionPtr newLaserScansConnection;
-      lidar_msgs::msgs::lidar lidar_message;
+      sensor_msgs::msgs::Range lidar_message;
   };
 }
 #endif

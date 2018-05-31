@@ -1,5 +1,5 @@
 syntax = "proto2";
-package gps_msgs.msgs;
+package sensor_msgs.msgs;
 
 message SITLGps
 {

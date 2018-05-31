@@ -235,18 +235,16 @@ glob_generate(models_gen ${CMAKE_CURRENT_SOURCE_DIR}/models/*.jinja)
 
 set (msgs
   msgs/CommandMotorSpeed.proto
-  msgs/CollisionMapRequest.proto
   msgs/Int32.proto
+  msgs/Imu.proto
   msgs/IRLock.proto
   msgs/Float.proto
   msgs/Groundtruth.proto
-  msgs/lidar.proto
   msgs/MotorSpeed.proto
-  msgs/SensorImu.proto
+  msgs/Range.proto
   msgs/SITLGps.proto
-  msgs/sonarSens.proto
-  msgs/OpticalFlow.proto
   msgs/Odometry.proto
+  msgs/OpticalFlow.proto
   #msgs/Wind.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
@@ -256,13 +254,13 @@ add_library(mav_msgs SHARED ${PROTO_SRCS})
 # Plugins #
 #---------#
 
-link_libraries(mav_msgs)
+target_link_libraries(mav_msgs ${PROTOBUF_LIBRARY})
 
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
-add_library(gazebo_opticalFlow_plugin SHARED src/gazebo_opticalFlow_plugin.cpp)
+add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
 add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
@@ -275,14 +273,14 @@ add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plug
 #add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 
 target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
-target_link_libraries(gazebo_opticalFlow_plugin ${OpticalFlow_LIBS})
+target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
 set(plugins
   gazebo_geotagged_images_plugin
   gazebo_gps_plugin
   gazebo_irlock_plugin
   gazebo_lidar_plugin
-  gazebo_opticalFlow_plugin
+  gazebo_opticalflow_plugin
   gazebo_sonar_plugin
   gazebo_uuv_plugin
   gazebo_vision_plugin
@@ -384,10 +382,11 @@ install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
 configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})
 
-
 #############
 ## Testing ##
 #############
+
+# TODO
 
 ###############
 ## Packaging ##

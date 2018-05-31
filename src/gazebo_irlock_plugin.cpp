@@ -71,7 +71,7 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   string topicName = "~/" + scopedName + "/irlock";
   boost::replace_all(topicName, "::", "/");
 
-  irlock_pub_ = node_handle_->Advertise<irlock_msgs::msgs::irlock>(topicName, 10);
+  irlock_pub_ = node_handle_->Advertise<sensor_msgs::msgs::IRLock>(topicName, 10);
 
   this->updateConnection = this->camera->ConnectUpdated(
       std::bind(&IRLockPlugin::OnUpdated, this));

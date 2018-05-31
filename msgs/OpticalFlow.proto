@@ -1,7 +1,7 @@
 syntax = "proto2";
-package opticalFlow_msgs.msgs;
+package sensor_msgs.msgs;
 
-message opticalFlow
+message OpticalFlow
 {
   required int32 time_usec              = 1;
   required int32 sensor_id              = 2;
