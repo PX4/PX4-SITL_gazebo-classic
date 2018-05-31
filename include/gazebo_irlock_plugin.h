@@ -12,7 +12,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 
-#include "irlock.pb.h"
+#include "IRLock.pb.h"
 
 #include <iostream>
 

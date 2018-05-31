@@ -54,7 +54,7 @@
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
 
-#include <odom.pb.h>
+#include <Odometry.pb.h>
 
 namespace gazebo
 {
