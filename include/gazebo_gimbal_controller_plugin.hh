@@ -36,6 +36,31 @@
 
 namespace gazebo
 {
+  // Default PID gains
+  static double kPIDPitchP = 5.0;
+  static double kPIDPitchI = 0.0;
+  static double kPIDPitchD = 0.0;
+  static double kPIDPitchIMax = 0.0;
+  static double kPIDPitchIMin = 0.0;
+  static double kPIDPitchCmdMax = 0.3;
+  static double kPIDPitchCmdMin = -0.3;
+
+  static double kPIDRollP = 5.0;
+  static double kPIDRollI = 0.0;
+  static double kPIDRollD = 0.0;
+  static double kPIDRollIMax = 0.0;
+  static double kPIDRollIMin = 0.0;
+  static double kPIDRollCmdMax = 0.3;
+  static double kPIDRollCmdMin = -0.3;
+
+  static double kPIDYawP = 1.0;
+  static double kPIDYawI = 0.0;
+  static double kPIDYawD = 0.0;
+  static double kPIDYawIMax = 0.0;
+  static double kPIDYawIMin = 0.0;
+  static double kPIDYawCmdMax = 1.0;
+  static double kPIDYawCmdMin = -1.0;
+
   typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 
   class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
