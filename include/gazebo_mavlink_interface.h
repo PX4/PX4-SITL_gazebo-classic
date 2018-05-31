@@ -56,10 +56,9 @@
 #include <common.h>
 #include <CommandMotorSpeed.pb.h>
 #include <MotorSpeed.pb.h>
-#include <SensorImu.pb.h>
+#include <Imu.pb.h>
 #include <OpticalFlow.pb.h>
-#include <lidar.pb.h>
-#include <sonarSens.pb.h>
+#include <Range.pb.h>
 #include <SITLGps.pb.h>
 #include <IRLock.pb.h>
 #include <Groundtruth.pb.h>
@@ -82,15 +81,16 @@ static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
 namespace gazebo {
+
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
+typedef const boost::shared_ptr<const nav_msgs::msgs::Odometry> OdomPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
-typedef const boost::shared_ptr<const lidar_msgs::msgs::lidar> LidarPtr;
-typedef const boost::shared_ptr<const opticalFlow_msgs::msgs::opticalFlow> OpticalFlowPtr;
-typedef const boost::shared_ptr<const sonarSens_msgs::msgs::sonarSens> SonarSensPtr;
-typedef const boost::shared_ptr<const irlock_msgs::msgs::irlock> IRLockPtr;
-typedef const boost::shared_ptr<const gps_msgs::msgs::SITLGps> GpsPtr;
-typedef const boost::shared_ptr<const gps_msgs::msgs::Groundtruth> GtPtr;
-typedef const boost::shared_ptr<const odom_msgs::msgs::odom> OdomPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::IRLock> IRLockPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::OpticalFlow> OpticalFlowPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> SonarPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -224,7 +224,7 @@ private:
   void GpsCallback(GpsPtr& gps_msg);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg);
-  void SonarCallback(SonarSensPtr& sonar_msg);
+  void SonarCallback(SonarPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);

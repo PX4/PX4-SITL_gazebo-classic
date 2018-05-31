@@ -21,7 +21,7 @@
 #endif
 
 #include "gazebo/sensors/DepthCameraSensor.hh"
-#include "gazebo_opticalFlow_plugin.h"
+#include "gazebo_opticalflow_plugin.h"
 
 #include <highgui.h>
 #include <math.h>
@@ -123,7 +123,7 @@ this->camera = this->parentSensor->Camera();
   string topicName = "~/" + scopedName + "/opticalFlow";
   boost::replace_all(topicName, "::", "/");
 
-  opticalFlow_pub_ = node_handle_->Advertise<opticalFlow_msgs::msgs::opticalFlow>(topicName, 10);
+  opticalFlow_pub_ = node_handle_->Advertise<sensor_msgs::msgs::OpticalFlow>(topicName, 10);
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
       boost::bind(&OpticalFlowPlugin::OnNewFrame, this, _1, this->width, this->height, this->depth, this->format));

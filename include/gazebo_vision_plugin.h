@@ -75,6 +75,8 @@ private:
   physics::WorldPtr _world;
   event::ConnectionPtr _updateConnection;
 
+  nav_msgs::msgs::Odometry odom_msg;
+
   transport::NodePtr _nh;
   transport::PublisherPtr _pub_odom;
 

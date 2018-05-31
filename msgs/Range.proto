@@ -1,7 +1,7 @@
 syntax = "proto2";
-package lidar_msgs.msgs;
+package sensor_msgs.msgs;
 
-message lidar
+message Range
 {
   required float time_msec       	= 1;
   required float min_distance      	= 2;

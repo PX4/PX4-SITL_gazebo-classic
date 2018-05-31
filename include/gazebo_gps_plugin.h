@@ -76,8 +76,8 @@ private:
   transport::PublisherPtr gt_pub_;
   transport::PublisherPtr gps_pub_;
 
-  gps_msgs::msgs::SITLGps gps_msg;
-  gps_msgs::msgs::Groundtruth groundtruth_msg;
+  sensor_msgs::msgs::SITLGps gps_msg;
+  sensor_msgs::msgs::Groundtruth groundtruth_msg;
 
   common::Time last_gps_time_;
   common::Time last_time_;
@@ -105,7 +105,7 @@ private:
   static constexpr double gps_update_interval_ = 0.2; // 5hz
   static constexpr double gps_delay = 0.12;           // 120 ms
   static constexpr int gps_buffer_size_max = 1000;
-  std::queue<gps_msgs::msgs::SITLGps> gps_delay_buffer;
+  std::queue<sensor_msgs::msgs::SITLGps> gps_delay_buffer;
 
   ignition::math::Vector3d gps_bias;
   ignition::math::Vector3d noise_gps_pos;

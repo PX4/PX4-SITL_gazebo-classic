@@ -117,7 +117,7 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&VisionPlugin::OnUpdate, this, _1));
 
-  _pub_odom = _nh->Advertise<odom_msgs::msgs::odom>("~/" + _model->GetName() + "/vision_odom", 10);
+  _pub_odom = _nh->Advertise<nav_msgs::msgs::Odometry>("~/" + _model->GetName() + "/vision_odom", 10);
 }
 
 void VisionPlugin::OnUpdate(const common::UpdateInfo&)
@@ -187,7 +187,6 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     _bias.Z() += random_walk.Z() * dt - _bias.Z() / _corellation_time;
 
     // Fill odom msg
-    odom_msgs::msgs::odom odom_msg;
     odom_msg.set_usec(current_time.Double() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();

@@ -32,7 +32,7 @@
 #include <gazebo/sensors/sensors.hh>
 #include <ignition/math.hh>
 
-#include "SensorImu.pb.h"
+#include "Imu.pb.h"
 
 namespace gazebo
 {

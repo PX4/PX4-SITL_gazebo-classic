@@ -723,7 +723,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   send_mavlink_message(&msg);
 }
 
-void GazeboMavlinkInterface::SonarCallback(SonarSensPtr& sonar_message) {
+void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   mavlink_distance_sensor_t sensor_msg;
 #if GAZEBO_MAJOR_VERSION >= 9
   sensor_msg.time_boot_ms = world_->SimTime().Double() * 1e3;

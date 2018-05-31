@@ -63,7 +63,7 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     std::dynamic_pointer_cast<sensors::SonarSensor>(_parent);
 #else
     boost::dynamic_pointer_cast<sensors::SonarSensor>(_parent);
-#endif  
+#endif
 
   if (!this->parentSensor)
     gzthrow("SonarPlugin requires a Sonar Sensor as its parent");
@@ -94,13 +94,12 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   string topicName = "~/" + scopedName + "/sonar";
   boost::replace_all(topicName, "::", "/");
 
-
-  sonar_pub_ = node_handle_->Advertise<sonarSens_msgs::msgs::sonarSens>(topicName, 10);
+  sonar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>(topicName, 10);
 }
 
 void SonarPlugin::OnNewScans()
 {
-  
+
   sonar_message.set_time_msec(0);
 #if GAZEBO_MAJOR_VERSION >= 7
   sonar_message.set_min_distance(parentSensor->RangeMin());
@@ -114,6 +113,3 @@ void SonarPlugin::OnNewScans()
 
   sonar_pub_->Publish(sonar_message);
 }
-
-
-

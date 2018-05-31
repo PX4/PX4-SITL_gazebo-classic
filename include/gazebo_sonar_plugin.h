@@ -27,7 +27,7 @@
 #include "gazebo/sensors/SonarSensor.hh"
 #include "gazebo/util/system.hh"
 
-#include "sonarSens.pb.h"
+#include "Range.pb.h"
 
 namespace gazebo
 {
@@ -51,7 +51,7 @@ namespace gazebo
     protected: physics::WorldPtr world;
 
     /// \brief The parent sensor
-    private: 
+    private:
       sensors::SonarSensorPtr parentSensor;
       transport::NodePtr node_handle_;
       transport::PublisherPtr sonar_pub_;
@@ -59,9 +59,9 @@ namespace gazebo
 
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
-    private: 
+    private:
       event::ConnectionPtr newScansConnection;
-      sonarSens_msgs::msgs::sonarSens sonar_message;
+      sensor_msgs::msgs::Range sonar_message;
   };
 }
 #endif
