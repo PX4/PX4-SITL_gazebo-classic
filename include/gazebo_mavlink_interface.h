@@ -57,13 +57,13 @@
 #include <CommandMotorSpeed.pb.h>
 #include <MotorSpeed.pb.h>
 #include <SensorImu.pb.h>
-#include <opticalFlow.pb.h>
+#include <OpticalFlow.pb.h>
 #include <lidar.pb.h>
 #include <sonarSens.pb.h>
 #include <SITLGps.pb.h>
-#include <irlock.pb.h>
+#include <IRLock.pb.h>
 #include <Groundtruth.pb.h>
-#include <odom.pb.h>
+#include <Odometry.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"

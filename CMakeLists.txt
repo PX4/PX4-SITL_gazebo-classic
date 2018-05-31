@@ -235,8 +235,9 @@ glob_generate(models_gen ${CMAKE_CURRENT_SOURCE_DIR}/models/*.jinja)
 
 set (msgs
   msgs/CommandMotorSpeed.proto
+  msgs/CollisionMapRequest.proto
   msgs/Int32.proto
-  msgs/irlock.proto
+  msgs/IRLock.proto
   msgs/Float.proto
   msgs/Groundtruth.proto
   msgs/lidar.proto
@@ -244,8 +245,8 @@ set (msgs
   msgs/SensorImu.proto
   msgs/SITLGps.proto
   msgs/sonarSens.proto
-  msgs/opticalFlow.proto
-  msgs/odom.proto
+  msgs/OpticalFlow.proto
+  msgs/Odometry.proto
   #msgs/Wind.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
