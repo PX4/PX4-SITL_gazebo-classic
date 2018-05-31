@@ -30,6 +30,8 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
+#include "Wind.pb.h"
+
 namespace gazebo {
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -106,6 +108,8 @@ class GazeboWindPlugin : public ModelPlugin {
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr wind_pub_;
+
+  physics_msgs::msgs::Wind wind_msg;
 };
 }
 

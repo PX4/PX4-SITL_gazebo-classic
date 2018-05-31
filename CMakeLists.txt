@@ -142,7 +142,7 @@ include_directories(
   ${GAZEBO_MSG_INCLUDE_DIRS}
   ${MAVLINK_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
-  ${OGRE_INCLUDE_DIRS}/Paging	# Workaround for "fatal error: OgrePagedWorldSection.h: No such file or directory"
+  ${OGRE_INCLUDE_DIRS}/Paging		# Workaround for "fatal error: OgrePagedWorldSection.h: No such file or directory"
   ${OpenCV_INCLUDE_DIRS}
   ${OpticalFlow_INCLUDE_DIRS}
   )
@@ -233,28 +233,39 @@ glob_generate(models_gen ${CMAKE_CURRENT_SOURCE_DIR}/models/*.jinja)
 # Message Generation #
 #--------------------#
 
-set (msgs
+set(mav_msgs
   msgs/CommandMotorSpeed.proto
+  msgs/MotorSpeed.proto
+  )
+set(nav_msgs msgs/Odometry.proto)
+#set(physics_msgs msgs/Wind.proto)
+set(std_msgs msgs/Int32.proto)
+set(sensor_msgs
   msgs/Int32.proto
   msgs/Imu.proto
   msgs/IRLock.proto
   msgs/Float.proto
   msgs/Groundtruth.proto
-  msgs/MotorSpeed.proto
   msgs/Range.proto
   msgs/SITLGps.proto
-  msgs/Odometry.proto
   msgs/OpticalFlow.proto
-  #msgs/Wind.proto
-)
-PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
-add_library(mav_msgs SHARED ${PROTO_SRCS})
+  )
+
+PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
+PROTOBUF_GENERATE_CPP(NAV_PROTO_SRCS NAV_PROTO_HDRS ${nav_msgs})
+#PROTOBUF_GENERATE_CPP(PHY_PROTO_SRCS PHY_PROTO_HDRS ${physics_msgs})
+PROTOBUF_GENERATE_CPP(STD_PROTO_SRCS STD_PROTO_HDRS ${std_msgs})
+PROTOBUF_GENERATE_CPP(SEN_PROTO_SRCS SEN_PROTO_HDRS ${sensor_msgs})
+
+add_library(mav_msgs SHARED ${MAV_PROTO_SRCS})
+add_library(nav_msgs SHARED ${NAV_PROTO_SRCS})
+#add_library(physics_msgs SHARED ${PHY_PROTO_SRCS})
+add_library(std_msgs SHARED ${STD_PROTO_SRCS})
+add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 
 #---------#
 # Plugins #
 #---------#
-
-target_link_libraries(mav_msgs ${PROTOBUF_LIBRARY})
 
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
@@ -271,6 +282,9 @@ add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 #add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+
+target_link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs ${PROTOBUF_LIBRARY})
+#target_link_libraries(physics_msgs ${PROTOBUF_LIBRARY})
 
 target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
