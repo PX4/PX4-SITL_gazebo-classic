@@ -276,7 +276,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   if (_sdf->HasElement("mavlink_udp_port")) {
     mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
   }
-  model_param(world_->GetName(), model_->GetName(), "mavlink_udp_port", mavlink_udp_port_);
+#if GAZEBO_MAJOR_VERSION >= 9
+  auto worldName = world_->Name();
+#else
+  auto worldName = world_->GetName();
+#endif
+  model_param(worldName, model_->GetName(), "mavlink_udp_port", mavlink_udp_port_);
 
   qgc_addr_ = htonl(INADDR_ANY);
   if (_sdf->HasElement("qgc_addr")) {
