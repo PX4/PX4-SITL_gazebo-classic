@@ -223,7 +223,7 @@
       <!--<link_name>rotor_{{n}}</link_name>-->
     <!--</plugin>-->
 
-    <plugin name='rotor_{{n}}_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='rotor_{{n}}_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_{{n}}_joint</jointName>
       <linkName>rotor_{{n}}</linkName>
@@ -278,7 +278,7 @@
         <gpsNoise>true</gpsNoise>
     </plugin>
 
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps</gpsSubTopic>
@@ -296,7 +296,7 @@
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
     </plugin>
 
-    <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>fuselage</linkName>
       <imuTopic>/imu</imuTopic>

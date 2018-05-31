@@ -564,12 +564,12 @@
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
     </plugin>
-    <plugin name='rosbag' filename='librotors_gazebo_multirotor_base_plugin.so'>
+    <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>base_link</linkName>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='front_right_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_0_joint</jointName>
       <linkName>rotor_0</linkName>
@@ -586,7 +586,7 @@
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='back_left_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='back_left_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_1_joint</jointName>
       <linkName>rotor_1</linkName>
@@ -603,7 +603,7 @@
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='front_left_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='front_left_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_2_joint</jointName>
       <linkName>rotor_2</linkName>
@@ -620,7 +620,7 @@
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='back_right_motor_model' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='back_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_3_joint</jointName>
       <linkName>rotor_3</linkName>
@@ -637,7 +637,7 @@
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>tailsitter/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
@@ -654,7 +654,7 @@
         <robotNamespace></robotNamespace>
         <gpsNoise>true</gpsNoise>
     </plugin>
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps</gpsSubTopic>

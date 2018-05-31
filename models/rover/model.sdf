@@ -851,7 +851,7 @@
         </ode>
       </physics>
     </joint> -->
-    <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>rover/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
@@ -868,7 +868,7 @@
 	<robotNamespace></robotNamespace>
 	<gpsNoise>true</gpsNoise>
     </plugin>
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <gpsSubTopic>/gps</gpsSubTopic>

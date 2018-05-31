@@ -210,7 +210,7 @@
     -->
 
     <!-- copied from Plane model
-    <plugin name='pusher' filename='librotors_gazebo_motor_model.so'>
+    <plugin name='pusher' filename='libgazebo_motor_model.so'>
       <robotNamespace>delta_wing</robotNamespace>
       <jointName>pusher_joint</jointName>
       <linkName>pusher</linkName>
@@ -238,7 +238,7 @@
     </plugin>
     -->
 
-    <plugin name='rotors_gazebo_imu_plugin' filename='librotors_gazebo_imu_plugin.so'>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace>delta_wing</robotNamespace>
       <linkName>delta_wing/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
@@ -256,7 +256,7 @@
         <robotNamespace></robotNamespace>
         <gpsNoise>true</gpsNoise>
     </plugin>
-    <plugin name='mavlink_interface' filename='librotors_gazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace>delta_wing</robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
       <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>
