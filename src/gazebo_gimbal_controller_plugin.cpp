@@ -29,9 +29,9 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
 {
   /// defaults if sdf xml doesn't contain any pid gains
-  this->pitchPid.Init(5, 0, 0, 0, 0, 0.3, -0.3);
-  this->rollPid.Init(5, 0, 0, 0, 0, 0.3, -0.3);
-  this->yawPid.Init(1.0, 0, 0, 0, 0, 1.0, -1.0);
+  this->pitchPid.Init(kPIDPitchP, kPIDPitchI, kPIDPitchD, kPIDPitchIMax, kPIDPitchIMin, kPIDPitchCmdMax, kPIDPitchCmdMin);
+  this->rollPid.Init(kPIDRollP, kPIDRollI, kPIDRollD, kPIDRollIMax, kPIDRollIMin, kPIDRollCmdMax, kPIDRollCmdMin);
+  this->yawPid.Init(kPIDYawP, kPIDYawI, kPIDYawD, kPIDYawIMax, kPIDYawIMin, kPIDYawCmdMax, kPIDYawCmdMin);
   this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
   this->yawCommand = 0;
