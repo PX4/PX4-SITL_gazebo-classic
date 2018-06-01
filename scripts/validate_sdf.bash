@@ -44,7 +44,7 @@ delete_schema() {
 # TODO: make the generated SDF from xacro remove unused args (for iris.sdf)
 # TODO: add a way SDFormat schema consider Xacro xmlns declarations (for delta_wing.sdf)
 if [ -d ${MODELS_DIR} ]; then
-	echo "Validating Gazebo worlds at ${MODELS_DIR}:"
+	echo "Validating models at ${MODELS_DIR}:"
 	while read fname; do
 		ret="$(xmllint_run ${fname})"
 		if [[ $ret -ge 1 ]]; then
@@ -62,7 +62,7 @@ fi
 
 # Validate the worlds SDF schemas according to http://sdformat.org/schemas/root.xsd format
 if [ -d ${WORLDS_DIR} ]; then
-	echo "Validating Gazebo worlds at ${WORLDS_DIR}:"
+	echo "Validating worlds at ${WORLDS_DIR}:"
 	while read fname; do
 		ret="$(xmllint_run ${fname})"
 		if [[ $ret -ge 1 ]]; then
