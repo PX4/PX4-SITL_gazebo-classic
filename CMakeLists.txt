@@ -267,6 +267,9 @@ add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 # Plugins #
 #---------#
 
+link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
+#link_libraries(physics_msgs)
+
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
@@ -282,9 +285,6 @@ add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 #add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
-
-target_link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs ${PROTOBUF_LIBRARY})
-#target_link_libraries(physics_msgs ${PROTOBUF_LIBRARY})
 
 target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
@@ -365,7 +365,8 @@ endif()
 #endif()
 
 foreach(plugin ${plugins})
-  add_dependencies(${plugin} mav_msgs)
+  add_dependencies(${plugin} mav_msgs nav_msgs std_msgs sensor_msgs)
+  # add_dependencies(${plugin} physics_msgs)
 endforeach()
 
 # Configure the setup script
@@ -389,7 +390,7 @@ file(GLOB models_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/models/*)
 file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/worlds/.DS_Store)
 file(GLOB worlds_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/worlds/*)
 
-install(TARGETS ${plugins} mav_msgs DESTINATION ${PLUGIN_PATH})
+install(TARGETS ${plugins} mav_msgs nav_msgs std_msgs sensor_msgs DESTINATION ${PLUGIN_PATH})
 install(DIRECTORY ${models_list} DESTINATION ${MODEL_PATH})
 install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
 
