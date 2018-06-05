@@ -42,7 +42,7 @@ Clone the gazebo plugins repository to your computer. IMPORTANT: If you do not c
 ```bash
 mkdir -p ~/src
 cd src
-git clone https://github.com/Dronecode/sitl_gazebo.git
+git clone --recursive https://github.com/PX4/sitl_gazebo.git
 ```
 
 Create a build folder in the top level of your repository:
