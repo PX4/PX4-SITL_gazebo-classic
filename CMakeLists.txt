@@ -31,6 +31,7 @@ find_package(PkgConfig REQUIRED)
 find_program(px4 REQUIRED)
 find_package(PythonInterp REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(TinyXML REQUIRED)
 if (BUILD_GSTREAMER_PLUGIN)
   find_package(GStreamer)
   if (GSTREAMER_FOUND)
@@ -145,6 +146,7 @@ include_directories(
   ${OGRE_INCLUDE_DIRS}/Paging		# Workaround for "fatal error: OgrePagedWorldSection.h: No such file or directory"
   ${OpenCV_INCLUDE_DIRS}
   ${OpticalFlow_INCLUDE_DIRS}
+  ${TinyXML_INCLUDE_DIRS}
   )
 
 if (GSTREAMER_FOUND)
@@ -286,8 +288,9 @@ add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 #add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 
-target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE})
+target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${TinyXML_LIBRARIES})
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
+target_link_libraries(gazebo_mavlink_interface ${TinyXML_LIBRARIES})
 
 set(plugins
   gazebo_geotagged_images_plugin
