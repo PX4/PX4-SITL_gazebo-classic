@@ -243,7 +243,6 @@ set(nav_msgs msgs/Odometry.proto)
 #set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
-  msgs/Int32.proto
   msgs/Imu.proto
   msgs/IRLock.proto
   msgs/Float.proto
