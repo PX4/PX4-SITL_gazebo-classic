@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0054 NEW)
@@ -25,7 +25,7 @@ option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
 option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" "OFF")
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost 1.40 REQUIRED COMPONENTS system thread timer)
+find_package(Boost 1.58 REQUIRED COMPONENTS system thread timer)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_program(px4 REQUIRED)
@@ -287,10 +287,6 @@ add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 #add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 
-target_link_libraries(gazebo_gimbal_controller_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_SYSTEM_LIBRARY_RELEASE} ${Boost_THREAD_LIBRARY_RELEASE} ${TinyXML_LIBRARIES})
-target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
-target_link_libraries(gazebo_mavlink_interface ${TinyXML_LIBRARIES})
-
 set(plugins
   gazebo_geotagged_images_plugin
   gazebo_gps_plugin
@@ -308,6 +304,11 @@ set(plugins
   gazebo_multirotor_base_plugin
   #gazebo_wind_plugin
   )
+
+foreach(plugin ${plugins})
+  target_link_libraries(${plugin} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
+endforeach()
+target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
 # If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
