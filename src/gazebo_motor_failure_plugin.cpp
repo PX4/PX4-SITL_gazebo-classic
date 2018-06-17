@@ -19,14 +19,11 @@
 
 namespace gazebo {
 
-GazeboMotorFailure::~GazeboMotorFailure() {
-  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+GazeboMotorFailure::GazeboMotorFailure() : ModelPlugin(), ROS_motor_num_sub_topic_(kDefaultROSMotorNumSubTopic), motor_failure_num_pub_topic_(kDefaultMotorFailureNumPubTopic) {
 }
 
-
-void GazeboMotorFailure::Publish_num() {
-  motor_failure_msg_.set_data(motor_Failure_Number_);
-  motor_failure_pub_->Publish(motor_failure_msg_);
+GazeboMotorFailure::~GazeboMotorFailure() {
+  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
 }
 
 void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -40,7 +37,6 @@ void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
   getSdfParam<std::string>(_sdf, "ROSMotorNumSubTopic", ROS_motor_num_sub_topic_, ROS_motor_num_sub_topic_);
   getSdfParam<std::string>(_sdf, "MotorFailureNumPubTopic", motor_failure_num_pub_topic_, motor_failure_num_pub_topic_);
-
 
   // ROS Topic subscriber
   // Initialize ROS, if it has not already bee initialized.
@@ -68,6 +64,23 @@ void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 void GazeboMotorFailure::OnUpdate(const common::UpdateInfo& _info) {
   Publish_num();
+}
+
+void GazeboMotorFailure::motorFailNumCallBack(const std_msgs::Int32ConstPtr& _msg) {
+  this->motor_Failure_Number_ = _msg->data;
+  //std::cout << "[gazebo_motor_failure_plugin]: Subscribe to " << ROS_motor_num_sub_topic_ << std::endl;
+}
+
+void GazeboMotorFailure::Publish_num() {
+  motor_failure_msg_.set_data(motor_Failure_Number_);
+  motor_failure_pub_->Publish(motor_failure_msg_);
+}
+
+void GazeboMotorFailure::QueueThread() {
+  static const double timeout = 0.01;
+  while (this->rosNode->ok()) {
+    this->rosQueue.callAvailable(ros::WallDuration(timeout));
+  }
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorFailure);

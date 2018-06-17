@@ -41,17 +41,9 @@ static const std::string kDefaultMotorFailureNumPubTopic = "/gazebo/motor_failur
 
 class GazeboMotorFailure : public ModelPlugin {
  public:
+  GazeboMotorFailure();
 
-  void motorFailNumCallBack(const std_msgs::Int32ConstPtr& _msg) {
-    this->motor_Failure_Number_ = _msg->data;
-    //std::cout << "[gazebo_motor_failure_plugin]: Subscribe to " << ROS_motor_num_sub_topic_ << std::endl;
-  }
-
-  GazeboMotorFailure()
-      : ModelPlugin(),
-	ROS_motor_num_sub_topic_(kDefaultROSMotorNumSubTopic),
-	motor_failure_num_pub_topic_(kDefaultMotorFailureNumPubTopic) {
-  }
+  void motorFailNumCallBack(const std_msgs::Int32ConstPtr& _msg);
 
   virtual ~GazeboMotorFailure();
   virtual void Publish_num();
@@ -61,11 +53,13 @@ class GazeboMotorFailure : public ModelPlugin {
   /// \brief Create subscription to ROS topic that triggers the motor failure
   /// \details Inits a rosnode in case there's not one and subscribes to ROS_motor_num_sub_topic_
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-	
+
   /// \brief Updates and publishes the motor_Failure_Number_ to motor_failure_num_pub_topic_
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 
  private:
+
+  void QueueThread();
 
   event::ConnectionPtr updateConnection_;
 
@@ -77,14 +71,6 @@ class GazeboMotorFailure : public ModelPlugin {
   transport::PublisherPtr motor_failure_pub_; /*!< Publish the motor_Failure_num to gazebo topic motor_failure_num_pub_topic_ */
 
   boost::thread callback_queue_thread_;
-  void QueueThread()
-  {
-    static const double timeout = 0.01;
-    while (this->rosNode->ok())
-    {
-      this->rosQueue.callAvailable(ros::WallDuration(timeout));
-    }
-  }
 
   msgs::Int motor_failure_msg_;
   int32_t motor_Failure_Number_;
