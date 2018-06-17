@@ -67,10 +67,13 @@ class GazeboMotorFailure : public ModelPlugin {
 
  private:
 
+  event::ConnectionPtr updateConnection_;
+
   std::string ROS_motor_num_sub_topic_;
   std::string motor_failure_num_pub_topic_;
   std::string namespace_;
 
+  transport::NodePtr node_handle_;
   transport::PublisherPtr motor_failure_pub_; /*!< Publish the motor_Failure_num to gazebo topic motor_failure_num_pub_topic_ */
 
   boost::thread callback_queue_thread_;
@@ -84,6 +87,7 @@ class GazeboMotorFailure : public ModelPlugin {
   }
 
   msgs::Int motor_failure_msg_;
+  int32_t motor_Failure_Number_;
 
   // ROS communication
   std::unique_ptr<ros::NodeHandle> rosNode;
