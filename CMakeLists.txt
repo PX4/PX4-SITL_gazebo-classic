@@ -325,9 +325,10 @@ if (BUILD_ROS_INTERFACE)
     ${sensor_msgs_INCLUDE_DIRS}
     ${mav_msgs_INCLUDE_DIRS}
     )
-  add_executable(gazebo_motor_failure_plugin
+  add_executable(gazebo_motor_failure_node
     src/gazebo_motor_failure_plugin.cpp
   )
+  target_link_libraries(gazebo_motor_failure_node ${catkin_LIBRARIES} ${roscpp_LIBRARIES} ${GAZEBO_libraries})
 
   add_dependencies(gazebo_motor_failure_plugin
     ${catkin_EXPORTED_TARGETS}
@@ -338,6 +339,8 @@ if (BUILD_ROS_INTERFACE)
   target_link_libraries(gazebo_motor_failure_plugin
     ${catkin_LIBRARIES}
     ${mavros_LIBRARIES}
+    ${roscpp_LIBRARIES}
+    ${GAZEBO_libraries}
   )
   message(STATUS "adding gazebo_motor_failure_plugin to build")
 endif()
