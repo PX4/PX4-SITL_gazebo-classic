@@ -317,11 +317,9 @@ if (BUILD_ROS_INTERFACE)
 
   include_directories(
     include
-    ${mavros_msgs_INCLUDE_DIRS}
     ${geometry_msgs_INCLUDE_DIRS}
     ${sensor_msgs_INCLUDE_DIRS}
-    ${mav_msgs_INCLUDE_DIRS}
-    )
+  )
   add_executable(gazebo_motor_failure_node
     src/gazebo_motor_failure_plugin.cpp
   )
