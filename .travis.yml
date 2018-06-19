@@ -20,7 +20,7 @@ matrix:
           cache:
             ccache: true
           env: # Catkin build
-            - BUILD="source /opt/ros/kinetic/setup.bash; mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc)"
+            - BUILD="source /opt/ros/kinetic/setup.bash; mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON"
         - os: linux
           language: cpp
           services:
