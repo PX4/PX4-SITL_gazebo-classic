@@ -323,11 +323,9 @@ if (BUILD_ROS_INTERFACE)
 
   target_link_libraries(gazebo_motor_failure_plugin
     ${catkin_LIBRARIES}
-    ${mavros_LIBRARIES}
     ${roscpp_LIBRARIES}
     ${GAZEBO_libraries}
   )
-  message(STATUS "adding gazebo_motor_failure_plugin to build")
 endif()
 
 if (GSTREAMER_FOUND)
