@@ -321,12 +321,6 @@ if (BUILD_ROS_INTERFACE)
     ${sensor_msgs_INCLUDE_DIRS}
   )
 
-  add_dependencies(gazebo_motor_failure_plugin
-    ${catkin_EXPORTED_TARGETS}
-    ${mavros_EXPORTED_TARGETS}
-    ${mavros_msgs_EXPORTED_TARGETS}
-  )
-
   target_link_libraries(gazebo_motor_failure_plugin
     ${catkin_LIBRARIES}
     ${mavros_LIBRARIES}
