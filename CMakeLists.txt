@@ -320,10 +320,6 @@ if (BUILD_ROS_INTERFACE)
     ${geometry_msgs_INCLUDE_DIRS}
     ${sensor_msgs_INCLUDE_DIRS}
   )
-  add_executable(gazebo_motor_failure_node
-    src/gazebo_motor_failure_plugin.cpp
-  )
-  target_link_libraries(gazebo_motor_failure_node ${catkin_LIBRARIES} ${roscpp_LIBRARIES} ${GAZEBO_libraries})
 
   add_dependencies(gazebo_motor_failure_plugin
     ${catkin_EXPORTED_TARGETS}
