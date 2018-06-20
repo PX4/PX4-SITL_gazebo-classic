@@ -56,6 +56,15 @@
 
 #include <Odometry.pb.h>
 
+// IF ROS DEFINED
+// ROS Topic subscriber
+#include <thread>
+#include <ros/ros.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <message_filters/subscriber.h>
+#include <ros/callback_queue.h>
+// ENDIF
+
 namespace gazebo
 {
 class GAZEBO_VISIBLE VisionPlugin : public ModelPlugin
@@ -68,6 +77,9 @@ protected:
   virtual void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
   virtual void OnUpdate(const common::UpdateInfo&);
   void getSdfParams(sdf::ElementPtr sdf);
+  // IF ROS DEFINED
+  void rosOdomCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr&);
+  // ENDIF
 
 private:
   std::string _namespace;
@@ -79,6 +91,14 @@ private:
 
   transport::NodePtr _nh;
   transport::PublisherPtr _pub_odom;
+  // IF ROS DEFINED
+  void queueThread();
+  std::string _ros_sub_topic;
+  ros::CallbackQueue _ros_queue;
+  std::unique_ptr<ros::NodeHandle> _ros_node;
+  ros::Subscriber _ros_sub;
+  std::thread _ros_queue_thread;
+  // ENDIF
 
   common::Time _last_pub_time;
   common::Time _last_time;

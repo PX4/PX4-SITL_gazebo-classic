@@ -113,12 +113,44 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _nh = transport::NodePtr(new transport::Node());
   _nh->Init(_namespace);
 
+  // IF ROS DEFINED
+  // ROS Topic subscriber
+  // Initialize ROS, if it has not already bee initialized.
+  if (!ros::isInitialized())  {
+    int argc = 0;
+    char **argv = NULL;
+    ros::init(argc, argv, "gazebo_ros_sub", ros::init_options::NoSigintHandler);
+  }
+
+  // Create our ROS node. This acts in a similar manner to the Gazebo node
+  this->_ros_node.reset(new ros::NodeHandle("gazebo_client"));
+
+  // Create a named topic, and subscribe to it.
+  ros::SubscribeOptions so = ros::SubscribeOptions::create<geometry_msgs::PoseWithCovarianceStamped>(_ros_sub_topic, 1, boost::bind(&VisionPlugin::rosOdomCallBack, this, _1), ros::VoidPtr(), &this->_ros_queue);
+  this->_ros_sub = this->_ros_node->subscribe(so);
+
+  this->_ros_queue_thread = std::thread(std::bind(&VisionPlugin::queueThread, this));
+  // ENDIF
+
   // Listen to the update event. This event is broadcast every simulation iteration.
   _updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&VisionPlugin::OnUpdate, this, _1));
 
   _pub_odom = _nh->Advertise<nav_msgs::msgs::Odometry>("~/" + _model->GetName() + "/vision_odom", 10);
 }
+
+// IF ROS DEFINED
+void VisionPlugin::rosOdomCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr& odomMsg) 
+{
+}
+
+void VisionPlugin::queueThread()
+{
+  static const double timeout = 0.01;
+  while (this->_ros_node->ok())
+    this->_ros_queue.callAvailable(ros::WallDuration(timeout));
+}
+// ENDIF
 
 void VisionPlugin::OnUpdate(const common::UpdateInfo&)
 {
