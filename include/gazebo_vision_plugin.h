@@ -98,7 +98,9 @@ private:
   std::unique_ptr<ros::NodeHandle> _ros_node;
   ros::Subscriber _ros_sub;
   std::thread _ros_queue_thread;
+  bool _enable_ros_odom;
   static constexpr auto kDefaultRosOdomTopic = "/svo/pose";
+  static constexpr auto kDefaultEnableRosOdom = false;
 #endif
 
   common::Time _last_pub_time;

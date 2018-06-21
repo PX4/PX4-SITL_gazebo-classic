@@ -89,6 +89,11 @@ void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
     gzwarn << "[gazebo_vision_plugin] Using default noise density of " << _noise_density << " (m) / sqrt(hz)\n";
   }
 #if BUILD_ROS_INTERFACE == 1
+  if(sdf->HasElement("enableRosOdom")) {
+    _enable_ros_odom = sdf->GetElement("enableRosOdom")->Get<bool>();
+  } else {
+    _enable_ros_odom = kDefaultEnableRosOdom;
+  }
   if(sdf->HasElement("rosOdomSubTopic")) {
     _ros_sub_topic = sdf->GetElement("rosOdomSubTopic")->Get<std::string>();
   } else {
