@@ -275,7 +275,6 @@ add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
-add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
 add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
@@ -292,7 +291,6 @@ set(plugins
   gazebo_opticalflow_plugin
   gazebo_sonar_plugin
   gazebo_uuv_plugin
-  gazebo_vision_plugin
   gazebo_controller_interface
   gazebo_gimbal_controller_plugin
   gazebo_imu_plugin
@@ -326,6 +324,28 @@ if (BUILD_ROS_INTERFACE)
     ${roscpp_LIBRARIES}
     ${GAZEBO_libraries}
   )
+
+  add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
+  target_link_libraries(gazebo_vision_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+  list(APPEND plugins gazebo_vision_plugin)
+  message(STATUS "adding gazebo_vision_plugin to build")
+
+  include_directories(
+    include
+    ${geometry_msgs_INCLUDE_DIRS}
+    ${sensor_msgs_INCLUDE_DIRS}
+  )
+
+  target_link_libraries(gazebo_vision_plugin
+    ${catkin_LIBRARIES}
+    ${roscpp_LIBRARIES}
+    ${GAZEBO_libraries}
+  )
+else()
+  add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
+  target_link_libraries(gazebo_vision_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
+  list(APPEND plugins gazebo_vision_plugin)
+  message(STATUS "adding gazebo_vision_plugin to build")
 endif()
 
 if (GSTREAMER_FOUND)
