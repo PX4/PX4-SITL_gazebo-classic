@@ -99,7 +99,7 @@ private:
   ros::Subscriber _ros_sub;
   std::thread _ros_queue_thread;
   bool _enable_ros_odom;
-  static constexpr auto kDefaultRosOdomTopic = "/svo/pose";
+  static constexpr auto kDefaultRosOdomTopic = "/visual/odometry";
   static constexpr auto kDefaultEnableRosOdom = false;
 #endif
 
