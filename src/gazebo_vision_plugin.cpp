@@ -113,7 +113,7 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _nh = transport::NodePtr(new transport::Node());
   _nh->Init(_namespace);
 
-  // IF ROS DEFINED
+#if BUILD_ROS_INTERFACE == 1
   // ROS Topic subscriber
   // Initialize ROS, if it has not already bee initialized.
   if (!ros::isInitialized())  {
@@ -130,7 +130,7 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   this->_ros_sub = this->_ros_node->subscribe(so);
 
   this->_ros_queue_thread = std::thread(std::bind(&VisionPlugin::queueThread, this));
-  // ENDIF
+#endif
 
   // Listen to the update event. This event is broadcast every simulation iteration.
   _updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -139,7 +139,7 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _pub_odom = _nh->Advertise<nav_msgs::msgs::Odometry>("~/" + _model->GetName() + "/vision_odom", 10);
 }
 
-// IF ROS DEFINED
+#if BUILD_ROS_INTERFACE == 1
 void VisionPlugin::rosOdomCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr& odomMsg) 
 {
 }
@@ -150,7 +150,7 @@ void VisionPlugin::queueThread()
   while (this->_ros_node->ok())
     this->_ros_queue.callAvailable(ros::WallDuration(timeout));
 }
-// ENDIF
+#endif
 
 void VisionPlugin::OnUpdate(const common::UpdateInfo&)
 {
