@@ -98,6 +98,7 @@ private:
   std::unique_ptr<ros::NodeHandle> _ros_node;
   ros::Subscriber _ros_sub;
   std::thread _ros_queue_thread;
+  static constexpr auto kDefaultRosOdomTopic = "/svo/pose";
 #endif
 
   common::Time _last_pub_time;

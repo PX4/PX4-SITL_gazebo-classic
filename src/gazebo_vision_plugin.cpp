@@ -88,6 +88,14 @@ void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
     _noise_density = kDefaultNoiseDensity;
     gzwarn << "[gazebo_vision_plugin] Using default noise density of " << _noise_density << " (m) / sqrt(hz)\n";
   }
+#if BUILD_ROS_INTERFACE == 1
+  if(sdf->HasElement("rosOdomSubTopic")) {
+    _ros_sub_topic = sdf->GetElement("rosOdomSubTopic")->Get<std::string>();
+  } else {
+    _ros_sub_topic = kDefaultRosOdomTopic;
+    gzwarn << "[gazebo_vision_plugin] Using default ros odometry subcription to topic " << _ros_sub_topic << "\n";
+  }
+#endif
 }
 
 void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
