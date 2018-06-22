@@ -135,7 +135,7 @@
   </xacro:macro>
 
   <!-- Macro to add the mavlink interface. -->
-  <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mavlink_addr mavlink_udp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port hil_mode hil_state_level vehicle_is_tailsitter">
+  <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mavlink_addr mavlink_udp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_odometry">
     <gazebo>
       <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
@@ -151,6 +151,7 @@
         <hil_mode>$(arg hil_mode)</hil_mode>
         <hil_state_level>$(arg hil_state_level)</hil_state_level>
         <vehicle_is_tailsitter>$(arg vehicle_is_tailsitter)</vehicle_is_tailsitter>
+        <send_odometry>$(arg send_odometry)</send_odometry>
         <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
         <control_channels>
           <channel name="rotor1">
