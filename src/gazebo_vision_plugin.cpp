@@ -156,6 +156,63 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
 #if BUILD_ROS_INTERFACE == 1
 void VisionPlugin::rosOdomCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr& odomMsg) 
 {
+#if GAZEBO_MAJOR_VERSION >= 9
+  common::Time current_time = _world->SimTime();
+#else
+  common::Time current_time = _world->GetSimTime();
+#endif
+  double dt = (current_time - _last_pub_time).Double();
+
+  if (dt > 1.0 / _pub_rate) {
+
+    // Fill odom msg
+    odom_msg.set_usec(current_time.Double() * 1e6);
+
+    gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
+    position->set_x(odomMsg->pose.pose.position.x);
+    position->set_y(odomMsg->pose.pose.position.y);
+    position->set_z(odomMsg->pose.pose.position.z);
+    odom_msg.set_allocated_position(position);
+
+    gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
+    orientation->set_x(odomMsg->pose.pose.orientation.x);
+    orientation->set_y(odomMsg->pose.pose.orientation.y);
+    orientation->set_z(odomMsg->pose.pose.orientation.z);
+    orientation->set_w(odomMsg->pose.pose.orientation.w);
+    odom_msg.set_allocated_orientation(orientation);
+
+    gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
+    // linear velocity is not provided by sensor
+    linear_velocity->set_x(0);
+    linear_velocity->set_y(0);
+    linear_velocity->set_z(0);
+    odom_msg.set_allocated_linear_velocity(linear_velocity);
+
+    gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
+    // angular velocity is not provided by sensor
+    angular_velocity->set_x(0);
+    angular_velocity->set_y(0);
+    angular_velocity->set_z(0);
+    odom_msg.set_allocated_angular_velocity(angular_velocity);
+
+    for (int i = 0; i < 36; i++){
+      switch (i){
+        // principal diagonal = the variance of the random variables
+        case 0: case 7: case 14: case 21: case 28: case 35:
+          odom_msg.add_pose_covariance(odomMsg->pose.covariance[i]);
+          odom_msg.add_twist_covariance(0); // twist covariance is not provided by sensor
+          break;
+        default:
+          odom_msg.add_pose_covariance(0.0);
+          odom_msg.add_twist_covariance(0.0); // twist covariance is not provided by sensor
+      }
+    }
+
+    _last_pub_time = current_time;
+
+    // publish odom msg
+    _pub_odom->Publish(odom_msg);
+  }
 }
 
 void VisionPlugin::queueThread()
