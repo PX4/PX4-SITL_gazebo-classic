@@ -93,6 +93,7 @@ void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
     _enable_ros_odom = sdf->GetElement("enableRosOdom")->Get<bool>();
   } else {
     _enable_ros_odom = kDefaultEnableRosOdom;
+    gzwarn << "[gazebo_vision_plugin] Using default ros odometry switch " << _enable_ros_odom << "\n";
   }
   if(sdf->HasElement("rosOdomSubTopic")) {
     _ros_sub_topic = sdf->GetElement("rosOdomSubTopic")->Get<std::string>();
