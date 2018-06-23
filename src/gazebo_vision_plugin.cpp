@@ -88,13 +88,15 @@ void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
     _noise_density = kDefaultNoiseDensity;
     gzwarn << "[gazebo_vision_plugin] Using default noise density of " << _noise_density << " (m) / sqrt(hz)\n";
   }
-#if BUILD_ROS_INTERFACE == 1
+
   if(sdf->HasElement("enableRosOdom")) {
     _enable_ros_odom = sdf->GetElement("enableRosOdom")->Get<bool>();
   } else {
     _enable_ros_odom = kDefaultEnableRosOdom;
     gzwarn << "[gazebo_vision_plugin] Using default ros odometry switch " << _enable_ros_odom << "\n";
   }
+
+#if BUILD_ROS_INTERFACE == 1
   if(sdf->HasElement("rosOdomSubTopic")) {
     _ros_sub_topic = sdf->GetElement("rosOdomSubTopic")->Get<std::string>();
   } else {
@@ -132,7 +134,6 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
 #if BUILD_ROS_INTERFACE == 1
   // ROS Topic subscriber
   // Initialize ROS, if it has not already bee initialized.
-
   if (!ros::isInitialized())  {
     int argc = 0;
     char **argv = NULL;
