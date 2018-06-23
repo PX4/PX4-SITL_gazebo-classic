@@ -91,6 +91,8 @@ private:
 
   transport::NodePtr _nh;
   transport::PublisherPtr _pub_odom;
+  bool _enable_ros_odom;
+  static constexpr auto kDefaultEnableRosOdom = false;
 #if BUILD_ROS_INTERFACE == 1
   void queueThread();
   std::string _ros_sub_topic;
@@ -98,9 +100,7 @@ private:
   std::unique_ptr<ros::NodeHandle> _ros_node;
   ros::Subscriber _ros_sub;
   std::thread _ros_queue_thread;
-  bool _enable_ros_odom;
   static constexpr auto kDefaultRosOdomTopic = "/visual/odometry";
-  static constexpr auto kDefaultEnableRosOdom = false;
 #endif
 
   common::Time _last_pub_time;

@@ -127,9 +127,12 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _nh = transport::NodePtr(new transport::Node());
   _nh->Init(_namespace);
 
+  if(_enable_ros_odom)
+  {
 #if BUILD_ROS_INTERFACE == 1
   // ROS Topic subscriber
   // Initialize ROS, if it has not already bee initialized.
+
   if (!ros::isInitialized())  {
     int argc = 0;
     char **argv = NULL;
@@ -145,10 +148,11 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
 
   this->_ros_queue_thread = std::thread(std::bind(&VisionPlugin::queueThread, this));
 #endif
-
-  // Listen to the update event. This event is broadcast every simulation iteration.
-  _updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&VisionPlugin::OnUpdate, this, _1));
+  } else {
+    // Listen to the update event. This event is broadcast every simulation iteration.
+    _updateConnection = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&VisionPlugin::OnUpdate, this, _1));
+  }
 
   _pub_odom = _nh->Advertise<nav_msgs::msgs::Odometry>("~/" + _model->GetName() + "/vision_odom", 10);
 }
