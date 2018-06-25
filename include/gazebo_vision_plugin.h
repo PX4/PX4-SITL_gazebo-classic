@@ -61,6 +61,8 @@
 #include <thread>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <message_filters/subscriber.h>
 #include <ros/callback_queue.h>
 #endif
@@ -78,7 +80,9 @@ protected:
   virtual void OnUpdate(const common::UpdateInfo&);
   void getSdfParams(sdf::ElementPtr sdf);
 #if BUILD_ROS_INTERFACE == 1
-  void rosOdomCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr&);
+  void rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr&);
+  void rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr&);
+  void rosOdomCallBack(const nav_msgs::OdometryConstPtr&);
 #endif
 
 private:
