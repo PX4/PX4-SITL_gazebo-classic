@@ -86,6 +86,8 @@ protected:
 #endif
 
 private:
+  double calcTimeStep();
+
   std::string _namespace;
   physics::ModelPtr _model;
   physics::WorldPtr _world;
@@ -109,6 +111,7 @@ private:
 
   common::Time _last_pub_time;
   common::Time _last_time;
+  common::Time _current_time;
 
   ignition::math::Pose3d _pose_model_start;
 

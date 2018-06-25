@@ -158,20 +158,24 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   _pub_odom = _nh->Advertise<nav_msgs::msgs::Odometry>("~/" + _model->GetName() + "/vision_odom", 10);
 }
 
+double VisionPlugin::calcTimeStep() {
+#if GAZEBO_MAJOR_VERSION >= 9
+  _current_time = _world->SimTime();
+#else
+  _current_time = _world->GetSimTime();
+#endif
+  return (_current_time - _last_pub_time).Double();
+}
+
 #if BUILD_ROS_INTERFACE == 1
 void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr& odomMsg)
 {
-#if GAZEBO_MAJOR_VERSION >= 9
-  common::Time current_time = _world->SimTime();
-#else
-  common::Time current_time = _world->GetSimTime();
-#endif
-  double dt = (current_time - _last_pub_time).Double();
+  double dt = calcTimeStep();
 
   if (dt > 1.0 / _pub_rate) {
 
     // Fill odom msg
-    odom_msg.set_usec(current_time.Double() * 1e6);
+    odom_msg.set_usec(odomMsg->header.stamp.toSec() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
     position->set_x(odomMsg->pose.pose.position.x);
@@ -213,7 +217,7 @@ void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceSta
       }
     }
 
-    _last_pub_time = current_time;
+    _last_pub_time = _current_time;
 
     // publish odom msg
     _pub_odom->Publish(odom_msg);
@@ -222,17 +226,12 @@ void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceSta
 
 void VisionPlugin::rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr& odomMsg)
 {
-#if GAZEBO_MAJOR_VERSION >= 9
-  common::Time current_time = _world->SimTime();
-#else
-  common::Time current_time = _world->GetSimTime();
-#endif
-  double dt = (current_time - _last_pub_time).Double();
+  double dt = calcTimeStep();
 
   if (dt > 1.0 / _pub_rate) {
 
     // Fill odom msg
-    odom_msg.set_usec(current_time.Double() * 1e6);
+    odom_msg.set_usec(odomMsg->header.stamp.toSec() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
     position->set_x(odomMsg->pose.position.x);
@@ -266,7 +265,7 @@ void VisionPlugin::rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr& odo
       odom_msg.add_twist_covariance(0.0); // twist covariance is not provided by sensor
     }
 
-    _last_pub_time = current_time;
+    _last_pub_time = _current_time;
 
     // publish odom msg
     _pub_odom->Publish(odom_msg);
@@ -275,17 +274,12 @@ void VisionPlugin::rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr& odo
 
 void VisionPlugin::rosOdomCallBack(const nav_msgs::OdometryConstPtr& odomMsg)
 {
-#if GAZEBO_MAJOR_VERSION >= 9
-  common::Time current_time = _world->SimTime();
-#else
-  common::Time current_time = _world->GetSimTime();
-#endif
-  double dt = (current_time - _last_pub_time).Double();
+  double dt = calcTimeStep();
 
   if (dt > 1.0 / _pub_rate) {
 
     // Fill odom msg
-    odom_msg.set_usec(current_time.Double() * 1e6);
+    odom_msg.set_usec(odomMsg->header.stamp.toSec() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
     position->set_x(odomMsg->pose.pose.position.x);
@@ -325,7 +319,7 @@ void VisionPlugin::rosOdomCallBack(const nav_msgs::OdometryConstPtr& odomMsg)
       }
     }
 
-    _last_pub_time = current_time;
+    _last_pub_time = _current_time;
 
     // publish odom msg
     _pub_odom->Publish(odom_msg);
@@ -342,12 +336,7 @@ void VisionPlugin::queueThread()
 
 void VisionPlugin::OnUpdate(const common::UpdateInfo&)
 {
-#if GAZEBO_MAJOR_VERSION >= 9
-  common::Time current_time = _world->SimTime();
-#else
-  common::Time current_time = _world->GetSimTime();
-#endif
-  double dt = (current_time - _last_pub_time).Double();
+  double dt = calcTimeStep();
 
   if (dt > 1.0 / _pub_rate) {
 
@@ -407,7 +396,7 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     _bias.Z() += random_walk.Z() * dt - _bias.Z() / _corellation_time;
 
     // Fill odom msg
-    odom_msg.set_usec(current_time.Double() * 1e6);
+    odom_msg.set_usec(_current_time.Double() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
     position->set_x(pose_model.Pos().X() + noise_pos.X() + _bias.X());
@@ -449,7 +438,7 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
       }
     }
 
-    _last_pub_time = current_time;
+    _last_pub_time = _current_time;
 
     // publish odom msg
     _pub_odom->Publish(odom_msg);
