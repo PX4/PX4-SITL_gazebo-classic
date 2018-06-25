@@ -63,7 +63,6 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
-#include <message_filters/subscriber.h>
 #include <ros/callback_queue.h>
 #endif
 
@@ -101,12 +100,18 @@ private:
   static constexpr auto kDefaultEnableRosOdom = false;
 #if BUILD_ROS_INTERFACE == 1
   void queueThread();
-  std::string _ros_sub_topic;
+  std::string _ros_pose_sub_topic;
+  std::string _ros_posecov_sub_topic;
+  std::string _ros_odom_sub_topic;
   ros::CallbackQueue _ros_queue;
   std::unique_ptr<ros::NodeHandle> _ros_node;
-  ros::Subscriber _ros_sub;
+  ros::Subscriber _ros_pose_sub;
+  ros::Subscriber _ros_posecov_sub;
+  ros::Subscriber _ros_odom_sub;
   std::thread _ros_queue_thread;
   static constexpr auto kDefaultRosOdomTopic = "/visual/odometry";
+  static constexpr auto kDefaultRosPoseCovTopic = "/visual/pose_cov";
+  static constexpr auto kDefaultRosPoseTopic = "/visual/pose";
 #endif
 
   common::Time _last_pub_time;

@@ -97,11 +97,25 @@ void VisionPlugin::getSdfParams(sdf::ElementPtr sdf)
   }
 
 #if BUILD_ROS_INTERFACE == 1
-  if(sdf->HasElement("rosOdomSubTopic")) {
-    _ros_sub_topic = sdf->GetElement("rosOdomSubTopic")->Get<std::string>();
+  if(sdf->HasElement("rosPoseSubTopic")) {
+    _ros_pose_sub_topic = sdf->GetElement("rosPoseSubTopic")->Get<std::string>();
   } else {
-    _ros_sub_topic = kDefaultRosOdomTopic;
-    gzwarn << "[gazebo_vision_plugin] Using default ros odometry subcription to topic " << _ros_sub_topic << "\n";
+    _ros_pose_sub_topic = kDefaultRosPoseTopic;
+    gzwarn << "[gazebo_vision_plugin] Using default ROS PoseStamped subscription to topic " << _ros_pose_sub_topic << "\n";
+  }
+
+  if(sdf->HasElement("rosPoseCovSubTopic")) {
+    _ros_posecov_sub_topic = sdf->GetElement("rosPoseCovSubTopic")->Get<std::string>();
+  } else {
+    _ros_posecov_sub_topic = kDefaultRosPoseCovTopic;
+    gzwarn << "[gazebo_vision_plugin] Using default ROS PoseWithCovarianceStamped subscription to topic " << _ros_posecov_sub_topic << "\n";
+  }
+
+  if(sdf->HasElement("rosOdomSubTopic")) {
+    _ros_odom_sub_topic = sdf->GetElement("rosOdomSubTopic")->Get<std::string>();
+  } else {
+    _ros_odom_sub_topic = kDefaultRosOdomTopic;
+    gzwarn << "[gazebo_vision_plugin] Using default ROS Odometry subscription to topic " << _ros_odom_sub_topic << "\n";
   }
 #endif
 }
@@ -144,8 +158,13 @@ void VisionPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   this->_ros_node.reset(new ros::NodeHandle("gazebo_client"));
 
   // Create a named topic, and subscribe to it.
-  ros::SubscribeOptions so = ros::SubscribeOptions::create<geometry_msgs::PoseWithCovarianceStamped>(_ros_sub_topic, 1, boost::bind(&VisionPlugin::rosPoseCovCallBack, this, _1), ros::VoidPtr(), &this->_ros_queue);
-  this->_ros_sub = this->_ros_node->subscribe(so);
+  ros::SubscribeOptions so_pose = ros::SubscribeOptions::create<geometry_msgs::PoseStamped>(_ros_pose_sub_topic, 1, boost::bind(&VisionPlugin::rosPoseCallBack, this, _1), ros::VoidPtr(), &this->_ros_queue);
+  ros::SubscribeOptions so_posecov = ros::SubscribeOptions::create<geometry_msgs::PoseWithCovarianceStamped>(_ros_posecov_sub_topic, 1, boost::bind(&VisionPlugin::rosPoseCovCallBack, this, _1), ros::VoidPtr(), &this->_ros_queue);
+  ros::SubscribeOptions so_odom = ros::SubscribeOptions::create<nav_msgs::Odometry>(_ros_odom_sub_topic, 1, boost::bind(&VisionPlugin::rosOdomCallBack, this, _1), ros::VoidPtr(), &this->_ros_queue);
+
+  this->_ros_pose_sub = this->_ros_node->subscribe(so_pose);
+  this->_ros_posecov_sub = this->_ros_node->subscribe(so_posecov);
+  this->_ros_odom_sub = this->_ros_node->subscribe(so_odom);
 
   this->_ros_queue_thread = std::thread(std::bind(&VisionPlugin::queueThread, this));
 #endif
