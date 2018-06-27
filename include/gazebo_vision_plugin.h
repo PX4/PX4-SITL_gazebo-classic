@@ -86,6 +86,15 @@ protected:
 
 private:
   double calcTimeStep();
+#if BUILD_ROS_INTERFACE == 1
+  void handle_vision_data(double sec,
+                          geometry_msgs::Point pos,
+                          geometry_msgs::Quaternion att,
+                          geometry_msgs::Vector3 lin_vel,
+                          geometry_msgs::Vector3 ang_vel,
+                          double (&pose_cov)[36],
+                          double (&twist_cov)[36]);
+#endif
 
   std::string _namespace;
   physics::ModelPtr _model;

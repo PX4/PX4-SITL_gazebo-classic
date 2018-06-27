@@ -187,59 +187,75 @@ double VisionPlugin::calcTimeStep() {
 }
 
 #if BUILD_ROS_INTERFACE == 1
-void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr& odomMsg)
+void VisionPlugin::handle_vision_data(double sec,
+                                      geometry_msgs::Point pos,
+                                      geometry_msgs::Quaternion att,
+                                      geometry_msgs::Vector3 lin_vel,
+                                      geometry_msgs::Vector3 ang_vel,
+                                      double (&pose_cov)[36],
+                                      double (&twist_cov)[36])
 {
-  double dt = calcTimeStep();
-
-  if (dt > 1.0 / _pub_rate) {
-
-    // Fill odom msg
-    odom_msg.set_usec(odomMsg->header.stamp.toSec() * 1e6);
+   // Fill odom msg
+    odom_msg.set_usec(sec * 1e6); // convert sec to usec
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
-    position->set_x(odomMsg->pose.pose.position.x);
-    position->set_y(odomMsg->pose.pose.position.y);
-    position->set_z(odomMsg->pose.pose.position.z);
+    position->set_x(pos.x);
+    position->set_y(pos.y);
+    position->set_z(pos.z);
     odom_msg.set_allocated_position(position);
 
     gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-    orientation->set_x(odomMsg->pose.pose.orientation.x);
-    orientation->set_y(odomMsg->pose.pose.orientation.y);
-    orientation->set_z(odomMsg->pose.pose.orientation.z);
-    orientation->set_w(odomMsg->pose.pose.orientation.w);
+    orientation->set_x(att.x);
+    orientation->set_y(att.y);
+    orientation->set_z(att.z);
+    orientation->set_w(att.w);
     odom_msg.set_allocated_orientation(orientation);
 
     gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
-    // linear velocity is not provided by sensor
-    linear_velocity->set_x(0);
-    linear_velocity->set_y(0);
-    linear_velocity->set_z(0);
+    linear_velocity->set_x(lin_vel.x);
+    linear_velocity->set_y(lin_vel.y);
+    linear_velocity->set_z(lin_vel.z);
     odom_msg.set_allocated_linear_velocity(linear_velocity);
 
     gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
-    // angular velocity is not provided by sensor
-    angular_velocity->set_x(0);
-    angular_velocity->set_y(0);
-    angular_velocity->set_z(0);
+    angular_velocity->set_x(ang_vel.x);
+    angular_velocity->set_y(ang_vel.y);
+    angular_velocity->set_z(ang_vel.z);
     odom_msg.set_allocated_angular_velocity(angular_velocity);
 
-    for (int i = 0; i < 36; i++){
-      switch (i){
-        // principal diagonal = the variance of the random variables
-        case 0: case 7: case 14: case 21: case 28: case 35:
-          odom_msg.add_pose_covariance(odomMsg->pose.covariance[i]);
-          odom_msg.add_twist_covariance(0); // twist covariance is not provided by sensor
-          break;
-        default:
-          odom_msg.add_pose_covariance(0.0);
-          odom_msg.add_twist_covariance(0.0); // twist covariance is not provided by sensor
-      }
+    for (int i = 0; i < 36; i++) {
+      odom_msg.add_pose_covariance(pose_cov[i]);
+      odom_msg.add_twist_covariance(twist_cov[i]);
     }
 
     _last_pub_time = _current_time;
 
     // publish odom msg
     _pub_odom->Publish(odom_msg);
+}
+
+void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceStampedConstPtr& odomMsg)
+{
+  double dt = calcTimeStep();
+
+  if (dt > 1.0 / _pub_rate) {
+
+    geometry_msgs::Vector3 lin_vel;
+    lin_vel.x = lin_vel.y = lin_vel.z = 0; // linear velocity is not provided by sensor
+    geometry_msgs::Vector3 ang_vel;
+    ang_vel.x = ang_vel.y = ang_vel.z = 0; // angular velocity is not provided by sensor
+
+    double pose_covariance[36] = {};
+    double twist_covariance[36] = {}; // all values are zero
+    memcpy(pose_covariance, odomMsg->pose.covariance.data(), sizeof(double)*36);
+
+    handle_vision_data(odomMsg->header.stamp.toSec(),
+                       odomMsg->pose.pose.position,
+                       odomMsg->pose.pose.orientation,
+                       lin_vel,
+                       ang_vel,
+                       pose_covariance,
+                       twist_covariance);
   }
 }
 
@@ -249,45 +265,21 @@ void VisionPlugin::rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr& odo
 
   if (dt > 1.0 / _pub_rate) {
 
-    // Fill odom msg
-    odom_msg.set_usec(odomMsg->header.stamp.toSec() * 1e6);
+    geometry_msgs::Vector3 lin_vel;
+    lin_vel.x = lin_vel.y = lin_vel.z = 0; // linear velocity is not provided by sensor
+    geometry_msgs::Vector3 ang_vel;
+    ang_vel.x = ang_vel.y = ang_vel.z = 0; // angular velocity is not provided by sensor
 
-    gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
-    position->set_x(odomMsg->pose.position.x);
-    position->set_y(odomMsg->pose.position.y);
-    position->set_z(odomMsg->pose.position.z);
-    odom_msg.set_allocated_position(position);
+    double pose_covariance[36]; // pose covariance is not provided by sensor
+    double twist_covariance[36]; // twist covariance is not provided by sensor
 
-    gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-    orientation->set_x(odomMsg->pose.orientation.x);
-    orientation->set_y(odomMsg->pose.orientation.y);
-    orientation->set_z(odomMsg->pose.orientation.z);
-    orientation->set_w(odomMsg->pose.orientation.w);
-    odom_msg.set_allocated_orientation(orientation);
-
-    gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
-    // linear velocity is not provided by sensor
-    linear_velocity->set_x(0);
-    linear_velocity->set_y(0);
-    linear_velocity->set_z(0);
-    odom_msg.set_allocated_linear_velocity(linear_velocity);
-
-    gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
-    // angular velocity is not provided by sensor
-    angular_velocity->set_x(0);
-    angular_velocity->set_y(0);
-    angular_velocity->set_z(0);
-    odom_msg.set_allocated_angular_velocity(angular_velocity);
-
-    for (int i = 0; i < 36; i++) {
-      odom_msg.add_pose_covariance(0.0); // pose covariance is not provided by sensor 
-      odom_msg.add_twist_covariance(0.0); // twist covariance is not provided by sensor
-    }
-
-    _last_pub_time = _current_time;
-
-    // publish odom msg
-    _pub_odom->Publish(odom_msg);
+    handle_vision_data(odomMsg->header.stamp.toSec(),
+                       odomMsg->pose.position,
+                       odomMsg->pose.orientation,
+                       lin_vel,
+                       ang_vel,
+                       pose_covariance,
+                       twist_covariance);
   }
 }
 
@@ -297,51 +289,18 @@ void VisionPlugin::rosOdomCallBack(const nav_msgs::OdometryConstPtr& odomMsg)
 
   if (dt > 1.0 / _pub_rate) {
 
-    // Fill odom msg
-    odom_msg.set_usec(odomMsg->header.stamp.toSec() * 1e6);
+    double pose_covariance[36] = {};
+    double twist_covariance[36] = {};
+    memcpy(pose_covariance, odomMsg->pose.covariance.data(), sizeof(double)*36); 
+    memcpy(twist_covariance, odomMsg->twist.covariance.data(), sizeof(double)*36); 
 
-    gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
-    position->set_x(odomMsg->pose.pose.position.x);
-    position->set_y(odomMsg->pose.pose.position.y);
-    position->set_z(odomMsg->pose.pose.position.z);
-    odom_msg.set_allocated_position(position);
-
-    gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-    orientation->set_x(odomMsg->pose.pose.orientation.x);
-    orientation->set_y(odomMsg->pose.pose.orientation.y);
-    orientation->set_z(odomMsg->pose.pose.orientation.z);
-    orientation->set_w(odomMsg->pose.pose.orientation.w);
-    odom_msg.set_allocated_orientation(orientation);
-
-    gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
-    linear_velocity->set_x(odomMsg->twist.twist.linear.x);
-    linear_velocity->set_y(odomMsg->twist.twist.linear.y);
-    linear_velocity->set_z(odomMsg->twist.twist.linear.z);
-    odom_msg.set_allocated_linear_velocity(linear_velocity);
-
-    gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
-    angular_velocity->set_x(odomMsg->twist.twist.angular.x);
-    angular_velocity->set_y(odomMsg->twist.twist.angular.y);
-    angular_velocity->set_z(odomMsg->twist.twist.angular.z);
-    odom_msg.set_allocated_angular_velocity(angular_velocity);
-
-    for (int i = 0; i < 36; i++){
-      switch (i){
-        // principal diagonal = the variance of the random variables
-        case 0: case 7: case 14: case 21: case 28: case 35:
-          odom_msg.add_pose_covariance(odomMsg->pose.covariance[i]);
-          odom_msg.add_twist_covariance(odomMsg->twist.covariance[i]);
-          break;
-        default:
-          odom_msg.add_pose_covariance(0.0);
-          odom_msg.add_twist_covariance(0.0);
-      }
-    }
-
-    _last_pub_time = _current_time;
-
-    // publish odom msg
-    _pub_odom->Publish(odom_msg);
+    handle_vision_data(odomMsg->header.stamp.toSec(),
+                       odomMsg->pose.pose.position,
+                       odomMsg->pose.pose.orientation,
+                       odomMsg->twist.twist.linear,
+                       odomMsg->twist.twist.angular,
+                       pose_covariance,
+                       twist_covariance);
   }
 }
 
