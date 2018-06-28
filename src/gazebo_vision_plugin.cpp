@@ -187,40 +187,34 @@ double VisionPlugin::calcTimeStep() {
 }
 
 #if BUILD_ROS_INTERFACE == 1
-void VisionPlugin::handle_vision_data(double sec,
-                                      geometry_msgs::Point pos,
-                                      geometry_msgs::Quaternion att,
-                                      geometry_msgs::Vector3 lin_vel,
-                                      geometry_msgs::Vector3 ang_vel,
-                                      double (&pose_cov)[36],
-                                      double (&twist_cov)[36])
+void VisionPlugin::handle_vision_data(double sec, Eigen::Vector3d &p, Eigen::Quaterniond &q, Eigen::Vector3d &lin_vel, Eigen::Vector3d &ang_vel, std::array<double, 36> &pose_cov, std::array<double, 36> &twist_cov)
 {
    // Fill odom msg
     odom_msg.set_usec(sec * 1e6); // convert sec to usec
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
-    position->set_x(pos.x);
-    position->set_y(pos.y);
-    position->set_z(pos.z);
+    position->set_x(p.x());
+    position->set_y(p.y());
+    position->set_z(p.z());
     odom_msg.set_allocated_position(position);
 
     gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-    orientation->set_x(att.x);
-    orientation->set_y(att.y);
-    orientation->set_z(att.z);
-    orientation->set_w(att.w);
+    orientation->set_x(q.x());
+    orientation->set_y(q.y());
+    orientation->set_z(q.z());
+    orientation->set_w(q.w());
     odom_msg.set_allocated_orientation(orientation);
 
     gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
-    linear_velocity->set_x(lin_vel.x);
-    linear_velocity->set_y(lin_vel.y);
-    linear_velocity->set_z(lin_vel.z);
+    linear_velocity->set_x(lin_vel.x());
+    linear_velocity->set_y(lin_vel.y());
+    linear_velocity->set_z(lin_vel.z());
     odom_msg.set_allocated_linear_velocity(linear_velocity);
 
     gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();
-    angular_velocity->set_x(ang_vel.x);
-    angular_velocity->set_y(ang_vel.y);
-    angular_velocity->set_z(ang_vel.z);
+    angular_velocity->set_x(ang_vel.x());
+    angular_velocity->set_y(ang_vel.y());
+    angular_velocity->set_z(ang_vel.z());
     odom_msg.set_allocated_angular_velocity(angular_velocity);
 
     for (int i = 0; i < 36; i++) {
@@ -240,18 +234,18 @@ void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceSta
 
   if (dt > 1.0 / _pub_rate) {
 
-    geometry_msgs::Vector3 lin_vel;
-    lin_vel.x = lin_vel.y = lin_vel.z = 0; // linear velocity is not provided by sensor
-    geometry_msgs::Vector3 ang_vel;
-    ang_vel.x = ang_vel.y = ang_vel.z = 0; // angular velocity is not provided by sensor
+    Eigen::Vector3d position(odomMsg->pose.pose.position.x, odomMsg->pose.pose.position.y, odomMsg->pose.pose.position.z);
+    Eigen::Quaterniond orientation(odomMsg->pose.pose.orientation.w, odomMsg->pose.pose.orientation.x, odomMsg->pose.pose.orientation.y, odomMsg->pose.pose.orientation.z);
+    Eigen::Vector3d lin_vel(0, 0, 0); // linear velocity is not provided by sensor
+    Eigen::Vector3d ang_vel(0, 0, 0); // angular velocity is not provided by sensor
 
-    double pose_covariance[36] = {};
-    double twist_covariance[36] = {}; // all values are zero
-    memcpy(pose_covariance, odomMsg->pose.covariance.data(), sizeof(double)*36);
+    std::array<double, 36> pose_covariance{};
+    std::array<double, 36> twist_covariance{}; // all values are zero
+    std::copy(odomMsg->pose.covariance.begin(), odomMsg->pose.covariance.end(), pose_covariance.begin());
 
     handle_vision_data(odomMsg->header.stamp.toSec(),
-                       odomMsg->pose.pose.position,
-                       odomMsg->pose.pose.orientation,
+                       position,
+                       orientation,
                        lin_vel,
                        ang_vel,
                        pose_covariance,
@@ -265,17 +259,17 @@ void VisionPlugin::rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr& odo
 
   if (dt > 1.0 / _pub_rate) {
 
-    geometry_msgs::Vector3 lin_vel;
-    lin_vel.x = lin_vel.y = lin_vel.z = 0; // linear velocity is not provided by sensor
-    geometry_msgs::Vector3 ang_vel;
-    ang_vel.x = ang_vel.y = ang_vel.z = 0; // angular velocity is not provided by sensor
+    Eigen::Vector3d position(odomMsg->pose.position.x, odomMsg->pose.position.y, odomMsg->pose.position.z);
+    Eigen::Quaterniond orientation(odomMsg->pose.orientation.w, odomMsg->pose.orientation.x, odomMsg->pose.orientation.y, odomMsg->pose.orientation.z);
+    Eigen::Vector3d lin_vel(0, 0, 0); // linear velocity is not provided by sensor
+    Eigen::Vector3d ang_vel(0, 0, 0); // angular velocity is not provided by sensor
 
-    double pose_covariance[36]; // pose covariance is not provided by sensor
-    double twist_covariance[36]; // twist covariance is not provided by sensor
+    std::array<double, 36> pose_covariance{}; // all values are zero
+    std::array<double, 36> twist_covariance{}; // all values are zero
 
     handle_vision_data(odomMsg->header.stamp.toSec(),
-                       odomMsg->pose.position,
-                       odomMsg->pose.orientation,
+                       position,
+                       orientation,
                        lin_vel,
                        ang_vel,
                        pose_covariance,
@@ -289,16 +283,21 @@ void VisionPlugin::rosOdomCallBack(const nav_msgs::OdometryConstPtr& odomMsg)
 
   if (dt > 1.0 / _pub_rate) {
 
-    double pose_covariance[36] = {};
-    double twist_covariance[36] = {};
-    memcpy(pose_covariance, odomMsg->pose.covariance.data(), sizeof(double)*36); 
-    memcpy(twist_covariance, odomMsg->twist.covariance.data(), sizeof(double)*36); 
+    Eigen::Vector3d position(odomMsg->pose.pose.position.x, odomMsg->pose.pose.position.y, odomMsg->pose.pose.position.z);
+    Eigen::Quaterniond orientation(odomMsg->pose.pose.orientation.w, odomMsg->pose.pose.orientation.x, odomMsg->pose.pose.orientation.y, odomMsg->pose.pose.orientation.z);
+    Eigen::Vector3d lin_vel(0, 0, 0); // linear velocity is not provided by sensor
+    Eigen::Vector3d ang_vel(0, 0, 0); // angular velocity is not provided by sensor
+
+    std::array<double, 36> pose_covariance{};
+    std::array<double, 36> twist_covariance{};
+    std::copy(odomMsg->pose.covariance.begin(), odomMsg->pose.covariance.end(), pose_covariance.begin());
+    std::copy(odomMsg->twist.covariance.begin(), odomMsg->twist.covariance.end(), twist_covariance.begin());
 
     handle_vision_data(odomMsg->header.stamp.toSec(),
-                       odomMsg->pose.pose.position,
-                       odomMsg->pose.pose.orientation,
-                       odomMsg->twist.twist.linear,
-                       odomMsg->twist.twist.angular,
+                       position,
+                       orientation,
+                       lin_vel,
+                       ang_vel,
                        pose_covariance,
                        twist_covariance);
   }

@@ -58,7 +58,9 @@
 
 #if BUILD_ROS_INTERFACE == 1
 // ROS Topic subscriber
+#include <Eigen/Core>
 #include <thread>
+#include <array>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -88,12 +90,12 @@ private:
   double calcTimeStep();
 #if BUILD_ROS_INTERFACE == 1
   void handle_vision_data(double sec,
-                          geometry_msgs::Point pos,
-                          geometry_msgs::Quaternion att,
-                          geometry_msgs::Vector3 lin_vel,
-                          geometry_msgs::Vector3 ang_vel,
-                          double (&pose_cov)[36],
-                          double (&twist_cov)[36]);
+                          Eigen::Vector3d &p,
+                          Eigen::Quaterniond &q,
+                          Eigen::Vector3d &lin_vel,
+                          Eigen::Vector3d &ang_vel,
+                          std::array<double, 36> &pose_cov,
+                          std::array<double, 36> &twist_cov);
 #endif
 
   std::string _namespace;
