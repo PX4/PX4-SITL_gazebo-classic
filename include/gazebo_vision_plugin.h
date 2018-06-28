@@ -57,8 +57,8 @@
 #include <Odometry.pb.h>
 
 #if BUILD_ROS_INTERFACE == 1
-// ROS Topic subscriber
 #include <Eigen/Core>
+#include <eigen_conversions/eigen_msg.h>
 #include <thread>
 #include <array>
 #include <ros/ros.h>

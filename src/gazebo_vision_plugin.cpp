@@ -234,8 +234,10 @@ void VisionPlugin::rosPoseCovCallBack(const geometry_msgs::PoseWithCovarianceSta
 
   if (dt > 1.0 / _pub_rate) {
 
-    Eigen::Vector3d position(odomMsg->pose.pose.position.x, odomMsg->pose.pose.position.y, odomMsg->pose.pose.position.z);
-    Eigen::Quaterniond orientation(odomMsg->pose.pose.orientation.w, odomMsg->pose.pose.orientation.x, odomMsg->pose.pose.orientation.y, odomMsg->pose.pose.orientation.z);
+    Eigen::Vector3d position;
+    tf::pointMsgToEigen(odomMsg->pose.pose.position, position);
+    Eigen::Quaterniond orientation;
+    tf::quaternionMsgToEigen(odomMsg->pose.pose.orientation, orientation);
     Eigen::Vector3d lin_vel(0, 0, 0); // linear velocity is not provided by sensor
     Eigen::Vector3d ang_vel(0, 0, 0); // angular velocity is not provided by sensor
 
@@ -259,8 +261,10 @@ void VisionPlugin::rosPoseCallBack(const geometry_msgs::PoseStampedConstPtr& odo
 
   if (dt > 1.0 / _pub_rate) {
 
-    Eigen::Vector3d position(odomMsg->pose.position.x, odomMsg->pose.position.y, odomMsg->pose.position.z);
-    Eigen::Quaterniond orientation(odomMsg->pose.orientation.w, odomMsg->pose.orientation.x, odomMsg->pose.orientation.y, odomMsg->pose.orientation.z);
+    Eigen::Vector3d position;
+    tf::pointMsgToEigen(odomMsg->pose.position, position);
+    Eigen::Quaterniond orientation;
+    tf::quaternionMsgToEigen(odomMsg->pose.orientation, orientation);
     Eigen::Vector3d lin_vel(0, 0, 0); // linear velocity is not provided by sensor
     Eigen::Vector3d ang_vel(0, 0, 0); // angular velocity is not provided by sensor
 
@@ -283,10 +287,14 @@ void VisionPlugin::rosOdomCallBack(const nav_msgs::OdometryConstPtr& odomMsg)
 
   if (dt > 1.0 / _pub_rate) {
 
-    Eigen::Vector3d position(odomMsg->pose.pose.position.x, odomMsg->pose.pose.position.y, odomMsg->pose.pose.position.z);
-    Eigen::Quaterniond orientation(odomMsg->pose.pose.orientation.w, odomMsg->pose.pose.orientation.x, odomMsg->pose.pose.orientation.y, odomMsg->pose.pose.orientation.z);
-    Eigen::Vector3d lin_vel(0, 0, 0); // linear velocity is not provided by sensor
-    Eigen::Vector3d ang_vel(0, 0, 0); // angular velocity is not provided by sensor
+    Eigen::Vector3d position;
+    tf::pointMsgToEigen(odomMsg->pose.pose.position, position);
+    Eigen::Quaterniond orientation;
+    tf::quaternionMsgToEigen(odomMsg->pose.pose.orientation, orientation);
+    Eigen::Vector3d lin_vel;
+    tf::vectorMsgToEigen(odomMsg->twist.twist.linear, lin_vel);
+    Eigen::Vector3d ang_vel;
+    tf::vectorMsgToEigen(odomMsg->twist.twist.angular, ang_vel);
 
     std::array<double, 36> pose_covariance{};
     std::array<double, 36> twist_covariance{};
