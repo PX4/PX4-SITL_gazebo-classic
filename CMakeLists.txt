@@ -55,6 +55,7 @@ if (BUILD_ROS_INTERFACE)
   find_package(geometry_msgs REQUIRED)
   find_package(roscpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
+  find_package(eigen_conversions REQUIRED)
 endif()
 
 # find MAVLink
@@ -326,7 +327,7 @@ if (BUILD_ROS_INTERFACE)
   )
 
   add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
-  target_link_libraries(gazebo_vision_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+  target_link_libraries(gazebo_vision_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES} ${eigen_conversions_LIBRARIES})
   list(APPEND plugins gazebo_vision_plugin)
   message(STATUS "adding gazebo_vision_plugin to build")
 
@@ -340,6 +341,7 @@ if (BUILD_ROS_INTERFACE)
     ${catkin_LIBRARIES}
     ${roscpp_LIBRARIES}
     ${GAZEBO_libraries}
+    ${eigen_conversions_LIBRARIES}
   )
 else()
   add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
