@@ -343,9 +343,11 @@ if (BUILD_ROS_INTERFACE)
     ${GAZEBO_libraries}
     ${eigen_conversions_LIBRARIES}
   )
+  target_compile_definitions(gazebo_vision_plugin PUBLIC BUILD_ROS_INTERFACE=1)
 else()
   add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
   target_link_libraries(gazebo_vision_plugin ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
+  target_compile_definitions(gazebo_vision_plugin PUBLIC BUILD_ROS_INTERFACE=0)
   list(APPEND plugins gazebo_vision_plugin)
   message(STATUS "adding gazebo_vision_plugin to build")
 endif()
