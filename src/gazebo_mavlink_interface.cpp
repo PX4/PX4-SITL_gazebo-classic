@@ -526,7 +526,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 	w = x1 * x1 + x2 * x2;
       } while ( w >= 1.0 );
       w = sqrt( (-2.0 * log( w ) ) / w );
-      // calculate two values - the second value can be used next time becasue it is uncorrelated
+      // calculate two values - the second value can be used next time because it is uncorrelated
       y1 = x1 * w;
       y2 = x2 * w;
       use_last = true;
