@@ -517,9 +517,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
     // generate Gaussian noise sequence using polar form of Box-Muller transformation
     double x1, x2, w, y1;
-    static double y2;
-    static bool use_last = false;
-    if (!use_last) {
+    if (!baro_rnd_use_last_) {
       do {
 	x1 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
 	x2 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
@@ -528,12 +526,12 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
       w = sqrt( (-2.0 * log( w ) ) / w );
       // calculate two values - the second value can be used next time because it is uncorrelated
       y1 = x1 * w;
-      y2 = x2 * w;
-      use_last = true;
+      baro_rnd_y2_ = x2 * w;
+      baro_rnd_use_last_ = true;
     } else {
       // no need to repeat the calculation - use the second value from last update
-      y1 = y2;
-      use_last = false;
+      y1 = baro_rnd_y2_;
+      baro_rnd_use_last_ = false;
     }
 
     // Apply 1 Pa RMS noise
