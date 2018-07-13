@@ -9,11 +9,12 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+    <!-- An asphalt plane -->
     <include>
-      <uri>model://iris_rplidar</uri>
+      <uri>model://asphalt_plane</uri>
     </include>
     <include>
-      <uri>model://uneven_ground</uri>
+      <uri>model://iris_rplidar</uri>
     </include>
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
