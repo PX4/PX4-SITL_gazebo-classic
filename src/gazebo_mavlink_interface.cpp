@@ -516,19 +516,26 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     sensor_msg.abs_pressure = pressure_msl / pressure_ratio;
 
     // generate Gaussian noise sequence using polar form of Box-Muller transformation
-    // http://www.design.caltech.edu/erik/Misc/Gaussian.html
-    double x1, x2, w, y1, y2;
-    do {
-     x1 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
-     x2 = 2.0 * (rand() * (1.0 / (double)RAND_MAX)) - 1.0;
-     w = x1 * x1 + x2 * x2;
-    } while ( w >= 1.0 );
-    w = sqrt( (-2.0 * log( w ) ) / w );
-    y1 = x1 * w;
-    y2 = x2 * w;
+    double x1, x2, w, y1;
+    if (!baro_rnd_use_last_) {
+      do {
+	x1 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
+	x2 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
+	w = x1 * x1 + x2 * x2;
+      } while ( w >= 1.0 );
+      w = sqrt( (-2.0 * log( w ) ) / w );
+      // calculate two values - the second value can be used next time because it is uncorrelated
+      y1 = x1 * w;
+      baro_rnd_y2_ = x2 * w;
+      baro_rnd_use_last_ = true;
+    } else {
+      // no need to repeat the calculation - use the second value from last update
+      y1 = baro_rnd_y2_;
+      baro_rnd_use_last_ = false;
+    }
 
     // Apply 1 Pa RMS noise
-    float abs_pressure_noise = 1.0f * (float)w;
+    float abs_pressure_noise = 1.0f * (float)y1;
     sensor_msg.abs_pressure += abs_pressure_noise;
 
     // convert to hPa

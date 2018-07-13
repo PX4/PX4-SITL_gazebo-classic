@@ -164,7 +164,9 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
-    hil_state_level_(false)
+    hil_state_level_(false),
+    baro_rnd_y2_(0.0),
+    baro_rnd_use_last_(false)
     {}
 
   ~GazeboMavlinkInterface();
@@ -329,6 +331,10 @@ private:
 
   bool hil_mode_;
   bool hil_state_level_;
+
+  // state variables for baro pressure sensor random noise generator
+  double baro_rnd_y2_;
+  bool baro_rnd_use_last_;
 
   };
 }
