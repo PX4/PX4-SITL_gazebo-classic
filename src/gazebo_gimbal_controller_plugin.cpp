@@ -36,6 +36,9 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   this->rollCommand = 0;
   this->yawCommand = 0;
   this->lastImuYaw = 0;
+  this->rDir = kRollDir;
+  this->pDir = kPitchDir;
+  this->yDir = kYawDir;
 }
 
 /////////////////////////////////////////////////
@@ -107,9 +110,24 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     {
       this->yawJoint = this->model->GetJoint(yawJointName);
 
+      // Try to find yaw rotation direction
+      sdf::ElementPtr sdfElem = this->yawJoint->GetSDF();
+      if(sdfElem->HasElement("axis"))
+      {
+        // Rotation is found
+        yDir = this->yawJoint->GetLocalAxis(0)[2];
+      }
+      else
+      {
+        // If user do not defines axis for yaw joint explicitly
+        // then display warning
+        gzwarn << "joint_yaw [" << yawJointName << "] axis do not defined?\n";
+      }
+
       // Try to find respective pid for the named axis control
       std::map<std::string, common::PID>::iterator it = pids_.find("joint_yaw");
-      if(it != pids_.end()) {
+      if(it != pids_.end())
+      {
         // Found pid for this axis (and therefore for this joint)
         this->yawPid = it->second;
       }
@@ -141,9 +159,24 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     {
       this->rollJoint = this->model->GetJoint(rollJointName);
 
+      // Try to find roll rotation direction
+      sdf::ElementPtr sdfElem = this->rollJoint->GetSDF();
+      if(sdfElem->HasElement("axis"))
+      {
+        // Rotation is found
+        rDir = this->rollJoint->GetLocalAxis(0)[0];
+      }
+      else
+      {
+        // If user do not defines axis for roll joint explicitly
+        // then display warning
+        gzwarn << "joint_roll [" << rollJointName << "] axis do not defined?\n";
+      }
+
       // Try to find respective pid for the named axis control
       std::map<std::string, common::PID>::iterator it = pids_.find("joint_roll");
-      if(it != pids_.end()) {
+      if(it != pids_.end())
+      {
         // Found pid for this axis (and therefore for this joint)
         this->rollPid = it->second;
       }
@@ -175,9 +208,24 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     {
       this->pitchJoint = this->model->GetJoint(pitchJointName);
 
+      // Try to find pitch rotation direction
+      sdf::ElementPtr sdfElem = this->pitchJoint->GetSDF();
+      if(sdfElem->HasElement("axis"))
+      {
+        // Rotation is found
+        pDir = this->pitchJoint->GetLocalAxis(0)[1];
+      }
+      else
+      {
+        // If user do not defines axis for pitch joint explicitly
+        // then display warning
+        gzwarn << "joint_pitch [" << pitchJointName << "] axis do not defined?\n";
+      }
+
       // Try to find respective pid for the named axis
       std::map<std::string, common::PID>::iterator it = pids_.find("joint_pitch");
-      if(it != pids_.end()) {
+      if(it != pids_.end())
+      {
         // Found pid for this axis (and therefore for this joint)
         this->pitchPid = it->second;
       }
@@ -386,13 +434,6 @@ void GimbalControllerPlugin::OnUpdate()
   else if (time > this->lastUpdateTime)
   {
     double dt = (this->lastUpdateTime - time).Double();
-
-    // anything to do with gazebo joint has
-    // hardcoded negative joint axis for pitch and roll
-    // TODO: make joint direction a parameter
-    const double rDir = -1;
-    const double pDir = -1;
-    const double yDir = 1;
 
     // We want yaw to control in body frame, not in global.
     this->yawCommand += this->lastImuYaw;
