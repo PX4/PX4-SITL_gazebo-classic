@@ -131,6 +131,10 @@ namespace gazebo
 
     private: std::string status;
 
+    private: double rDir;
+    private: double pDir;
+    private: double yDir;
+
     private: double pitchCommand;
     private: double yawCommand;
     private: double rollCommand;
