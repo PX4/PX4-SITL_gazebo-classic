@@ -115,7 +115,11 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
       if(sdfElem->HasElement("axis"))
       {
         // Rotation is found
+#if GAZEBO_MAJOR_VERSION >= 9
+        yDir = this->yawJoint->LocalAxis(0)[2];
+#else
         yDir = this->yawJoint->GetLocalAxis(0)[2];
+#endif
       }
       else
       {
@@ -164,7 +168,11 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
       if(sdfElem->HasElement("axis"))
       {
         // Rotation is found
+#if GAZEBO_MAJOR_VERSION >= 9
+        rDir = this->rollJoint->LocalAxis(0)[0];
+#else
         rDir = this->rollJoint->GetLocalAxis(0)[0];
+#endif
       }
       else
       {
@@ -213,7 +221,11 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
       if(sdfElem->HasElement("axis"))
       {
         // Rotation is found
+#if GAZEBO_MAJOR_VERSION >= 9
+        pDir = this->pitchJoint->LocalAxis(0)[1];
+#else
         pDir = this->pitchJoint->GetLocalAxis(0)[1];
+#endif
       }
       else
       {
