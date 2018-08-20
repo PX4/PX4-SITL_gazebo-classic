@@ -418,13 +418,6 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
-    struct sockaddr_in dest_addr;
-    memcpy(&dest_addr, &_srcaddr, sizeof(_srcaddr));
-
-    if (destination_port != 0) {
-      dest_addr.sin_port = htons(destination_port);
-    }
-
     ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
 
     if (len <= 0) {
