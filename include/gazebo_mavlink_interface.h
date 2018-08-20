@@ -153,7 +153,7 @@ public:
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
     mavlink_udp_port_(kDefaultMavlinkUdpPort),
-    qgc_udp_port_(kDefaultMavlinkUdpPort),
+    qgc_udp_port_(kDefaultQGCUdpPort),
     serial_enabled_(false),
     tx_q {},
     rx_buf {},
