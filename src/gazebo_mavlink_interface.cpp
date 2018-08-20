@@ -891,25 +891,6 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   }
 }
 
-/*ssize_t GazeboMavlinkInterface::receive(void *_buf, const size_t _size, uint32_t _timeoutMs)
-   {
-   fd_set fds;
-   struct timeval tv;
-
-   FD_ZERO(&fds);
-   FD_SET(this->handle, &fds);
-
-   tv.tv_sec = _timeoutMs / 1000;
-   tv.tv_usec = (_timeoutMs % 1000) * 1000UL;
-
-   if (select(this->handle+1, &fds, NULL, NULL, &tv) != 1)
-   {
-      return -1;
-   }
-
-   return recv(this->handle, _buf, _size, 0);
-   }*/
-
 void GazeboMavlinkInterface::pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs)
 {
   // convert timeout in ms to timeval
