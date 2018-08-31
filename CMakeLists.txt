@@ -237,7 +237,7 @@ set(mav_msgs
   msgs/MotorSpeed.proto
   )
 set(nav_msgs msgs/Odometry.proto)
-#set(physics_msgs msgs/Wind.proto)
+set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
   msgs/Imu.proto
@@ -251,13 +251,13 @@ set(sensor_msgs
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
 PROTOBUF_GENERATE_CPP(NAV_PROTO_SRCS NAV_PROTO_HDRS ${nav_msgs})
-#PROTOBUF_GENERATE_CPP(PHY_PROTO_SRCS PHY_PROTO_HDRS ${physics_msgs})
+PROTOBUF_GENERATE_CPP(PHY_PROTO_SRCS PHY_PROTO_HDRS ${physics_msgs})
 PROTOBUF_GENERATE_CPP(STD_PROTO_SRCS STD_PROTO_HDRS ${std_msgs})
 PROTOBUF_GENERATE_CPP(SEN_PROTO_SRCS SEN_PROTO_HDRS ${sensor_msgs})
 
 add_library(mav_msgs SHARED ${MAV_PROTO_SRCS})
 add_library(nav_msgs SHARED ${NAV_PROTO_SRCS})
-#add_library(physics_msgs SHARED ${PHY_PROTO_SRCS})
+add_library(physics_msgs SHARED ${PHY_PROTO_SRCS})
 add_library(std_msgs SHARED ${STD_PROTO_SRCS})
 add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 
@@ -266,7 +266,7 @@ add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 #---------#
 
 link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
-#link_libraries(physics_msgs)
+link_libraries(physics_msgs)
 
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
@@ -282,7 +282,7 @@ add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
-#add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
@@ -299,7 +299,7 @@ set(plugins
   gazebo_mavlink_interface
   gazebo_motor_model
   gazebo_multirotor_base_plugin
-  #gazebo_wind_plugin
+  gazebo_wind_plugin
   )
 
 foreach(plugin ${plugins})
@@ -355,7 +355,7 @@ endif()
 
 foreach(plugin ${plugins})
   add_dependencies(${plugin} mav_msgs nav_msgs std_msgs sensor_msgs)
-  # add_dependencies(${plugin} physics_msgs)
+  add_dependencies(${plugin} physics_msgs)
 endforeach()
 
 # Configure the setup script
