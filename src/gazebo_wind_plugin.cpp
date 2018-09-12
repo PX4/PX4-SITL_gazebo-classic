@@ -109,7 +109,7 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
   force->set_z(wind.Z() + wind_gust.Z());
 
   wind_msg.set_frame_id(frame_id_);
-  Set(wind_msg.mutable_stamp(), now);
+  wind_msg.set_usec(now.Double() * 1e6);
   wind_msg.set_allocated_force(force);
 
   wind_pub_->Publish(wind_msg);
