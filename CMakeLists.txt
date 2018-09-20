@@ -387,6 +387,15 @@ if (catkin_FOUND)
     SHELLS sh)
 endif()
 
+
+################
+## Unit Tests ##
+################
+include(UnitTests)
+
+add_subdirectory(unit_tests)
+
+
 #############
 ## Install ##
 #############
