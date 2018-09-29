@@ -1,7 +1,7 @@
 env:
   global:
     - CCACHE_DIR=$HOME/.ccache
-    - PX4_DOCKER_REPO=px4io/px4-dev-ros:2018-06-14
+    - PX4_DOCKER_REPO=px4io/px4-dev-ros:2018-09-28
 
 matrix:
     include:
