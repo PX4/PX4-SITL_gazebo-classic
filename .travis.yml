@@ -2,57 +2,63 @@ env:
   global:
     - CCACHE_DIR=$HOME/.ccache
     - CMAKE_BUILD="mkdir Build; cd Build; cmake ..; make -j$(nproc) -l$(nproc)"
-    - CATKIN_BUILD="source /opt/ros/kinetic/setup.bash; mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON"
+    - CATKIN_BUILD="mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON"
+    - KINETIC="source /opt/ros/kinetic/setup.bash; ${CATKIN_BUILD}"
+    - MELODIC="source /opt/ros/melodic/setup.bash; ${CATKIN_BUILD}"
 
 matrix:
     include:
-        - os: linux
+        - name: CMake build (Gazebo 9)
+          os: linux
           language: cpp
           services:
             - docker
           cache:
             ccache: true
-          env: # Cmake build (Gazebo 9)
-            - Cmake build (Gazebo 9)
+          env:
             - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2018-09-28
             - BUILD=${CMAKE_BUILD}
-        - os: linux
+        - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
+          os: linux
           language: cpp
           services:
             - docker
           cache:
             ccache: true
-          env: # Catkin build on Ubuntu 16.04 with ROS Kinetic
-            - Catkin build on Ubuntu 16.04 with ROS Kinetic
+          env:
             - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2018-09-28
-            - BUILD=${CATKIN_BUILD}
-        - os: linux
+            - BUILD=${KINETIC}
+        - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
+          os: linux
           language: cpp
           services:
             - docker
           cache:
             ccache: true
-          env: # Catkin build on Ubuntu 18.04 with ROS Melodic
-            - Catkin build on Ubuntu 18.04 with ROS Melodic
+          env:
             - PX4_DOCKER_REPO=px4io/px4-dev-ros:2018-09-28
-            - BUILD=${CATKIN_BUILD}
-        - os: linux
+            - BUILD=${MELODIC}
+        - name: Validate SDF schemas
+          os: linux
           language: cpp
           services:
             - docker
           cache:
             ccache: true
-          env: # Validate SDF schemas
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2018-09-28
             - BUILD="source ./scripts/validate_sdf.bash"
-        - os: osx
-          osx_image: xcode9.3
+        - name: MacOSX 10.13 build with Gazebo8
+          os: osx
+          osx_image: xcode10
           language: cpp
           cache:
             ccache: true
           env:
             - GAZEBO_VERSION="gazebo8"
-        - os: osx
-          osx_image: xcode9.3
+        - name: MacOSX 10.13 build with Gazebo9
+          os: osx
+          osx_image: xcode10
           language: cpp
           cache:
             ccache: true
