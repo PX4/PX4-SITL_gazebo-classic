@@ -43,10 +43,9 @@ class GazeboMotorFailure : public ModelPlugin {
  public:
   GazeboMotorFailure();
 
-  void motorFailNumCallBack(const std_msgs::Int32ConstPtr& _msg);
+  void motorFailNumCallBack(const std_msgs::Int32ConstPtr &_msg);
 
   virtual ~GazeboMotorFailure();
-  virtual void Publish_num();
 
  protected:
 
@@ -76,7 +75,7 @@ class GazeboMotorFailure : public ModelPlugin {
   int32_t motor_Failure_Number_;
 
   // ROS communication
-  std::unique_ptr<ros::NodeHandle> rosNode;
+  ros::NodeHandle* rosNode;
   ros::Subscriber rosSub;
   ros::CallbackQueue rosQueue;
   std::thread rosQueueThread;
