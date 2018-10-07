@@ -14,6 +14,7 @@
   <xacro:arg name='qgc_udp_port' default='14550' />
   <xacro:arg name='hil_mode' default='false' />
   <xacro:arg name='hil_state_level' default='false' />
+  <xacro:arg name='send_vision_estimation' default='false' />
   <xacro:arg name='send_odometry' default='false' />
   <xacro:arg name='vehicle_is_tailsitter' default='false' />
   <xacro:arg name='visual_material' default='DarkGrey' />
@@ -67,6 +68,7 @@
     hil_mode="$(arg hil_mode)"
     hil_state_level="$(arg hil_state_level)"
     vehicle_is_tailsitter="$(arg vehicle_is_tailsitter)"
+    send_vision_estimation="$(arg send_vision_estimation)"
     send_odometry="$(arg send_odometry)"
     >
   </xacro:mavlink_interface_macro>

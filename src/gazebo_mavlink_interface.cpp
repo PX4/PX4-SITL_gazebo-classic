@@ -309,6 +309,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     vehicle_is_tailsitter_ = _sdf->GetElement("vehicle_is_tailsitter")->Get<bool>();
   }
 
+  if(_sdf->HasElement("send_vision_estimation"))
+  {
+    send_vision_estimation_ = _sdf->GetElement("send_vision_estimation")->Get<bool>();
+  }
+
   if(_sdf->HasElement("send_odometry"))
   {
     send_odometry_ = _sdf->GetElement("send_odometry")->Get<bool>();
@@ -846,7 +851,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     mavlink_msg_odometry_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &odom);
     send_mavlink_message(&msg);
   }
-  else {
+  else if (send_vision_estimation_) {
     // send VISION_POSITION_ESTIMATE Mavlink msg
     mavlink_vision_position_estimate_t vision;
 
