@@ -182,7 +182,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 
     while (true) {
       gps_msg = gps_delay_buffer.front();
-      double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time();
+      double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time_usec() / 1e6f;
       if (gps_delay_buffer.empty()) {
         // abort if buffer is empty already
         break;
