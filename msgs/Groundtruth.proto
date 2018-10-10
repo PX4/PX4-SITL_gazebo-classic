@@ -3,7 +3,7 @@ package sensor_msgs.msgs;
 
 message Groundtruth
 {
-  required double time                  = 1;
+  required int64  time_usec             = 1;
   required double latitude_rad          = 2;
   required double longitude_rad         = 3;
   required double altitude              = 4;

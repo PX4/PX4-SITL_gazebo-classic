@@ -3,7 +3,7 @@ package sensor_msgs.msgs;
 
 message Range
 {
-  required float time_msec       	= 1;
+  required int64 time_usec       	= 1;
   required float min_distance      	= 2;
   required float max_distance  	 	= 3;
   required float current_distance     	= 4;

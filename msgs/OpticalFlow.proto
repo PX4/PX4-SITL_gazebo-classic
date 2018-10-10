@@ -3,7 +3,7 @@ package sensor_msgs.msgs;
 
 message OpticalFlow
 {
-  required int32 time_usec              = 1;
+  required int64 time_usec              = 1;
   required int32 sensor_id              = 2;
   required int32 integration_time_us    = 3;
   required float integrated_x           = 4;
