@@ -99,8 +99,14 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
 void SonarPlugin::OnNewScans()
 {
+  // Get the current simulation time.
+#if GAZEBO_MAJOR_VERSION >= 9
+  common::Time now = world->SimTime();
+#else
+  common::Time now = world->GetSimTime();
+#endif
 
-  sonar_message.set_time_msec(0);
+  sonar_message.set_time_usec(now.Double() * 1e6);
 #if GAZEBO_MAJOR_VERSION >= 7
   sonar_message.set_min_distance(parentSensor->RangeMin());
   sonar_message.set_max_distance(parentSensor->RangeMax());
