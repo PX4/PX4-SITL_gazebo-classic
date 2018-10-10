@@ -5,7 +5,7 @@ import "vector3d.proto";
 
 message Odometry
 {
-  required int32 usec                            = 1;
+  required int64 time_usec                       = 1;
   required gazebo.msgs.Vector3d position         = 2;
   required gazebo.msgs.Quaternion orientation    = 3;
   required gazebo.msgs.Vector3d linear_velocity  = 4;
