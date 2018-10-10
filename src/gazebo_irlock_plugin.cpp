@@ -51,7 +51,7 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   if (!_sensor)
     gzerr << "Invalid sensor pointer.\n";
 
-#if GAZEBO_MAJOR_VERSION >= 7
+#if GAZEBO_MAJOR_VERSION >= 9
   this->world = physics::get_world(_sensor->WorldName());
 #else
   this->world = physics::get_world(_sensor->GetWorldName());
