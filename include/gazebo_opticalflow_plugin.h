@@ -27,6 +27,7 @@
 #include "gazebo/util/system.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
 
 #include "OpticalFlow.pb.h"
 
@@ -59,6 +60,7 @@ namespace gazebo
       std::string format;
       sensors::CameraSensorPtr parentSensor;
       rendering::CameraPtr camera;
+      physics::WorldPtr world;
 
     private:
       event::ConnectionPtr newFrameConnection;

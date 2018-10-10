@@ -30,6 +30,7 @@ namespace gazebo
 
     protected:
       sensors::LogicalCameraSensorPtr camera;
+      physics::WorldPtr world;
 
     private:
       event::ConnectionPtr updateConnection;

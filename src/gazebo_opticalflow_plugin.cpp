@@ -80,6 +80,12 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   }
 
 #if GAZEBO_MAJOR_VERSION >= 7
+  this->world = physics::get_world(this->parentSensor->WorldName());
+#else
+  this->world = physics::get_world(this->parentSensor->GetWorldName());
+#endif
+
+#if GAZEBO_MAJOR_VERSION >= 7
 this->camera = this->parentSensor->Camera();
   this->width = this->camera->ImageWidth();
   this->height = this->camera->ImageHeight();
@@ -166,9 +172,9 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
     //prepare optical flow message
     // Get the current simulation time.
     #if GAZEBO_MAJOR_VERSION >= 9
-      common::Time now = world_->SimTime();
+      common::Time now = world->SimTime();
     #else
-      common::Time now = world_->GetSimTime();
+      common::Time now = world->GetSimTime();
     #endif
 
     opticalFlow_message.set_time_usec(now.Double() * 1e6);
