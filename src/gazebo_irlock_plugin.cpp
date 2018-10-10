@@ -82,6 +82,13 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
 void IRLockPlugin::OnUpdated()
 {
+  // Get the current simulation time.
+#if GAZEBO_MAJOR_VERSION >= 9
+  common::Time now = world_->SimTime();
+#else
+  common::Time now = world_->GetSimTime();
+#endif
+
   gazebo::msgs::LogicalCameraImage img = this->camera->Image();
 
   for (int idx = 0; idx < img.model_size(); idx++) {
