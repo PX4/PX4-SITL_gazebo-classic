@@ -62,28 +62,14 @@ RayPlugin::~RayPlugin()
 void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
-  this->parentSensor_ =
-#if GAZEBO_MAJOR_VERSION >= 7
-    std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
-#else
-    boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
-#endif
+  this->parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!this->parentSensor_)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-#if GAZEBO_MAJOR_VERSION >= 7
   this->world = physics::get_world(this->parentSensor_->WorldName());
-#else
-  this->world = physics::get_world(this->parentSensor_->GetWorldName());
-#endif
 
-  this->newLaserScansConnection =
-#if GAZEBO_MAJOR_VERSION >= 7
-    this->parentSensor_->LaserShape()->ConnectNewLaserScans(
-#else
-    this->parentSensor_->GetLaserShape()->ConnectNewLaserScans(
-#endif
+  this->newLaserScansConnection = this->parentSensor_->LaserShape()->ConnectNewLaserScans(
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
@@ -116,11 +102,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-#if GAZEBO_MAJOR_VERSION >= 7
   const string scopedName = _parent->ParentName();
-#else
-  const string scopedName = _parent->GetParentName();
-#endif
   vector<string> names_splitted;
   boost::split(names_splitted,scopedName,boost::is_any_of("::"));
   string topicName = "~/" + names_splitted[0] + "/link/lidar";
@@ -142,13 +124,7 @@ void RayPlugin::OnNewLaserScans()
   lidar_message.set_min_distance(min_distance_);
   lidar_message.set_max_distance(max_distance_);
 
-  double current_distance;
-
-#if GAZEBO_MAJOR_VERSION >= 7
-  current_distance = parentSensor_->Range(0);
-#else
-  current_distance = parentSensor_->GetRange(0);
-#endif
+  double current_distance = parentSensor_->Range(0);
 
   // set distance to min/max if actual value is smaller/bigger
   if (current_distance < min_distance_ || std::isinf(current_distance)) {
