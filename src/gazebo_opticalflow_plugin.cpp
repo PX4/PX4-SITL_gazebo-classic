@@ -55,21 +55,12 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   if (!_sensor)
     gzerr << "Invalid sensor pointer.\n";
 
-  this->parentSensor =
-#if GAZEBO_MAJOR_VERSION >= 7
-    std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
-#else
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
-#endif
+  this->parentSensor = std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
   if (!this->parentSensor)
   {
     gzerr << "OpticalFlowPlugin requires a CameraSensor.\n";
-#if GAZEBO_MAJOR_VERSION >= 7
     if (std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
-#else
-    if (boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
-#endif
       gzmsg << "It is a depth camera sensor\n";
   }
 
@@ -79,14 +70,10 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     return;
   }
 
-#if GAZEBO_MAJOR_VERSION >= 7
   this->world = physics::get_world(this->parentSensor->WorldName());
-#else
-  this->world = physics::get_world(this->parentSensor->GetWorldName());
-#endif
 
 #if GAZEBO_MAJOR_VERSION >= 7
-this->camera = this->parentSensor->Camera();
+  this->camera = this->parentSensor->Camera();
   this->width = this->camera->ImageWidth();
   this->height = this->camera->ImageHeight();
   this->depth = this->camera->ImageDepth();
