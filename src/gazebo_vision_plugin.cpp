@@ -187,7 +187,7 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     _bias.Z() += random_walk.Z() * dt - _bias.Z() / _corellation_time;
 
     // Fill odom msg
-    odom_msg.set_usec(current_time.Double() * 1e6);
+    odom_msg.set_time_usec(current_time.Double() * 1e6);
 
     gazebo::msgs::Vector3d* position = new gazebo::msgs::Vector3d();
     position->set_x(pose_model.Pos().X() + noise_pos.X() + _bias.X());

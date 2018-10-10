@@ -164,7 +164,14 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
 
   if (quality >= 0) { // calcFlow(...) returns -1 if data should not be published yet -> output_rate
     //prepare optical flow message
-    opticalFlow_message.set_time_usec(0);//will be filled in simulator_mavlink.cpp
+    // Get the current simulation time.
+    #if GAZEBO_MAJOR_VERSION >= 9
+      common::Time now = world_->SimTime();
+    #else
+      common::Time now = world_->GetSimTime();
+    #endif
+
+    opticalFlow_message.set_time_usec(now.Double() * 1e6);
     opticalFlow_message.set_sensor_id(2.0);
     opticalFlow_message.set_integration_time_us(quality ? dt_us_ : 0);
     opticalFlow_message.set_integrated_x(quality ? flow_x_ang : 0.0f);

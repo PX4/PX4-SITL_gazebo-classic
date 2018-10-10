@@ -131,7 +131,14 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void RayPlugin::OnNewLaserScans()
 {
-  lidar_message.set_time_msec(0);
+  // Get the current simulation time.
+#if GAZEBO_MAJOR_VERSION >= 9
+  common::Time now = world_->SimTime();
+#else
+  common::Time now = world_->GetSimTime();
+#endif
+
+  lidar_message.set_time_usec(now.Double() * 1e6);
   lidar_message.set_min_distance(min_distance_);
   lidar_message.set_max_distance(max_distance_);
 
