@@ -133,9 +133,9 @@ void RayPlugin::OnNewLaserScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
-  common::Time now = world_->SimTime();
+  common::Time now = world->SimTime();
 #else
-  common::Time now = world_->GetSimTime();
+  common::Time now = world->GetSimTime();
 #endif
 
   lidar_message.set_time_usec(now.Double() * 1e6);
