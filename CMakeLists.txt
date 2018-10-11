@@ -11,6 +11,20 @@ message(STATUS "install-prefix: ${CMAKE_INSTALL_PREFIX}")
 
 project(mavlink_sitl_gazebo VERSION 1.0.0)
 include(GNUInstallDirs)
+include(CMakeDependentOption)
+
+# gold linker - use if available
+CMAKE_DEPENDENT_OPTION(USE_LD_GOLD "Use GNU gold linker" ON
+                       "NOT WIN32;NOT APPLE" OFF)
+if(USE_LD_GOLD)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -fuse-ld=gold -Wl,--version ERROR_QUIET OUTPUT_VARIABLE LD_VERSION)
+    if("${LD_VERSION}" MATCHES "GNU gold")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold -Wl,--disable-new-dtags")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold -Wl,--disable-new-dtags")
+    else()
+        set(USE_LD_GOLD OFF)
+    endif()
+endif()
 
 #######################
 ## Find Dependencies ##
