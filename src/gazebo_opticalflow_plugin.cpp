@@ -110,6 +110,24 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     gzwarn << "[gazebo_optical_flow_plugin] Using default output rate " << output_rate_ << ".";
   }
 
+  bool has_gyro = HAS_GYRO;
+  if(_sdf->HasElement("hasGyro"))
+    has_gyro = _sdf->GetElement("hasGyro")->Get<bool>();
+  else
+    has_gyro = HAS_GYRO;
+
+  if(has_gyro) {
+    //get real values in gazebo_mavlink_interface.cpp
+    opticalFlow_message.set_integrated_xgyro(0.0f);
+    opticalFlow_message.set_integrated_ygyro(0.0f);
+    opticalFlow_message.set_integrated_zgyro(0.0f);
+  } else {
+    //no gyro
+    opticalFlow_message.set_integrated_xgyro(NAN);
+    opticalFlow_message.set_integrated_ygyro(NAN);
+    opticalFlow_message.set_integrated_zgyro(NAN);
+  }
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -169,9 +187,6 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
     opticalFlow_message.set_integration_time_us(quality ? dt_us_ : 0);
     opticalFlow_message.set_integrated_x(quality ? flow_x_ang : 0.0f);
     opticalFlow_message.set_integrated_y(quality ? flow_y_ang : 0.0f);
-    opticalFlow_message.set_integrated_xgyro(0.0f); //get real values in gazebo_mavlink_interface.cpp
-    opticalFlow_message.set_integrated_ygyro(0.0f); //get real values in gazebo_mavlink_interface.cpp
-    opticalFlow_message.set_integrated_zgyro(0.0f); //get real values in gazebo_mavlink_interface.cpp
     opticalFlow_message.set_temperature(20.0f);
     opticalFlow_message.set_quality(quality);
     opticalFlow_message.set_time_delta_distance_us(0);
