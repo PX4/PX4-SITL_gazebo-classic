@@ -30,10 +30,12 @@
 #include "gazebo/physics/physics.hh"
 
 #include "OpticalFlow.pb.h"
+#include "Imu.pb.h"
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <boost/timer/timer.hpp>
+#include <ignition/math.hh>
 
 #include "flow_opencv.hpp"
 #include "flow_px4.hpp"
@@ -46,6 +48,8 @@ using namespace std;
 
 namespace gazebo
 {
+  typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
+
   class GAZEBO_VISIBLE OpticalFlowPlugin : public SensorPlugin
   {
     public:
@@ -55,6 +59,7 @@ namespace gazebo
       virtual void OnNewFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
+      virtual void ImuCallback(const ImuPtr& _imu);
 
     protected:
       unsigned int width, height, depth;
@@ -67,7 +72,9 @@ namespace gazebo
       event::ConnectionPtr newFrameConnection;
       transport::PublisherPtr opticalFlow_pub_;
       transport::NodePtr node_handle_;
+      transport::SubscriberPtr imuSub_;
       sensor_msgs::msgs::OpticalFlow opticalFlow_message;
+      ignition::math::Vector3d opticalFlow_rate;
       std::string namespace_;
       boost::timer::cpu_timer timer_;
       OpticalFlowOpenCV *optical_flow_;
@@ -79,6 +86,7 @@ namespace gazebo
       float focal_length_;
       double first_frame_time_;
       uint32_t frame_time_us_;
+      bool has_gyro_;
   };
 }
 #endif
