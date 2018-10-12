@@ -559,14 +559,6 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
     sensor_msg.fields_updated = 4095;
 
-    //accumulate gyro measurements that are needed for the optical flow message
-    static uint32_t last_dt_us = sensor_msg.time_usec;
-    uint32_t dt_us = sensor_msg.time_usec - last_dt_us;
-    if (dt_us > 1000) {
-      optflow_gyro += gyro_b * (dt_us / 1000000.0f);
-      last_dt_us = sensor_msg.time_usec;
-    }
-
     mavlink_message_t msg;
     mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
     if (hil_mode_) {
@@ -717,17 +709,14 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
     sensor_msg.integrated_ygyro = NAN;
     sensor_msg.integrated_zgyro = NAN;
   } else {
-    sensor_msg.integrated_xgyro = opticalFlow_message->quality() ? -optflow_gyro.Y() : 0.0f;//xy switched
-    sensor_msg.integrated_ygyro = opticalFlow_message->quality() ? optflow_gyro.X() : 0.0f;  //xy switched
-    sensor_msg.integrated_zgyro = opticalFlow_message->quality() ? -optflow_gyro.Z() : 0.0f;//change direction
+    sensor_msg.integrated_xgyro = opticalFlow_message->quality() ? opticalFlow_message->integrated_xgyro() : 0.0f;
+    sensor_msg.integrated_ygyro = opticalFlow_message->quality() ? opticalFlow_message->integrated_ygyro() : 0.0f;
+    sensor_msg.integrated_zgyro = opticalFlow_message->quality() ? opticalFlow_message->integrated_zgyro() : 0.0f;
   }
   sensor_msg.temperature = opticalFlow_message->temperature();
   sensor_msg.quality = opticalFlow_message->quality();
   sensor_msg.time_delta_distance_us = opticalFlow_message->time_delta_distance_us();
   sensor_msg.distance = optflow_distance;
-
-  //reset gyro integral
-  optflow_gyro.Set();
 
   mavlink_message_t msg;
   mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
