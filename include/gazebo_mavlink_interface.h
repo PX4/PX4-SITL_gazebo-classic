@@ -307,7 +307,6 @@ private:
   struct sockaddr_in _srcaddr_2;  ///< MAVROS
 
   //so we dont have to do extra callbacks
-  ignition::math::Vector3d optflow_gyro {};
   double optflow_distance;
   double sonar_distance;
 
