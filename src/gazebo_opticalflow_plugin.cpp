@@ -115,15 +115,19 @@ void OpticalFlowPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   else
     has_gyro_ = HAS_GYRO;
 
-  if(has_gyro_) {
-    string topicName = "~/" + scopedName + "/imu";
-    boost::replace_all(topicName, "::", "/");
-    std::cout << topicName << std::endl;
-    imuSub_ = node_handle_->Subscribe(topicName, &OpticalFlowPlugin::ImuCallback, this);
-  }
-
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
+
+  if(has_gyro_) {
+    if(_sdf->HasElement("hasGyro"))
+      gyro_sub_topic_ = _sdf->GetElement("gyroTopic")->Get<std::string>();
+    else
+      gyro_sub_topic_ = kDefaultGyroTopic;
+
+    string topicName = "~/" + _sensor->ParentName() + gyro_sub_topic_;
+    boost::replace_all(topicName, "::", "/");
+    imuSub_ = node_handle_->Subscribe(topicName, &OpticalFlowPlugin::ImuCallback, this);
+  }
 
   string topicName = "~/" + scopedName + "/opticalFlow";
   boost::replace_all(topicName, "::", "/");
@@ -202,7 +206,7 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
   }
 }
 
-void OpticalFlowPlugin::ImuCallback(const ImuPtr& _imu) {
+void OpticalFlowPlugin::ImuCallback(ConstIMUPtr& _imu) {
   //accumulate gyro measurements that are needed for the optical flow message
   #if GAZEBO_MAJOR_VERSION >= 9
     common::Time now = world->SimTime();
@@ -210,16 +214,17 @@ void OpticalFlowPlugin::ImuCallback(const ImuPtr& _imu) {
     common::Time now = world->GetSimTime();
   #endif
 
-  int64_t now_us = now.Double() * 1e6;
+  uint32_t now_us = now.Double() * 1e6;
   ignition::math::Vector3d px4flow_gyro = ignition::math::Vector3d(_imu->angular_velocity().x(),
                                                                    _imu->angular_velocity().y(),
                                                                    _imu->angular_velocity().z());
 
-  static int64_t last_time_us = now_us;
-  int64_t dt_us = now_us - last_time_us;
+  static uint32_t last_dt_us = now_us;
+  uint32_t dt_us = now_us - last_dt_us;
+
   if (dt_us > 1000) {
-      opticalFlow_rate += px4flow_gyro * (dt_us / 1000000.0f);
-      dt_us = now_us;
+    opticalFlow_rate += px4flow_gyro * (dt_us / 1000000.0f);
+    last_dt_us = now_us;
   }
 }
 /* vim: set et fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : */
