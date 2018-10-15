@@ -42,6 +42,12 @@
         {{ box(l, w, h)|indent(8) }}
       </collision>
 
+      <sensor name="px4flow" type="imu">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>200</update_rate>
+      </sensor>
+
       <!-- Sonar: HRLV EZ4-->
       <!--<sensor name="sonar" type="sonar">-->
         <!--<sonar>-->
@@ -84,6 +90,8 @@
         <plugin name="opticalflow_plugin" filename="libgazebo_opticalflow_plugin.so">
             <robotNamespace></robotNamespace>
             <outputRate>20</outputRate>
+            <hasGyro>true</hasGyro>
+            <gyroTopic>/px4flow/imu</gyroTopic>
         </plugin>
         <!--<plugin name="camera_controller" filename="libgazebo_ros_camera.so">-->
             <!--<robotNamespace></robotNamespace>-->
