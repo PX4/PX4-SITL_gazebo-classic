@@ -325,10 +325,11 @@ target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 # If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
 if (BUILD_ROS_INTERFACE)
+  # gazebo_motor_failure_plugin only builds with a ROS interface
   add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
   target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
   list(APPEND plugins gazebo_motor_failure_plugin)
-  message(STATUS "adding gazebo_motor_failure_plugin to build")
+  message(STATUS "ROS:\tAdding gazebo_motor_failure_plugin to build...")
 
   include_directories(
     include
@@ -341,6 +342,17 @@ if (BUILD_ROS_INTERFACE)
     ${roscpp_LIBRARIES}
     ${GAZEBO_libraries}
   )
+
+  # gazebo_gps_plugin can be built with ROS interface
+  message(STATUS "\tBuilding gazebo_gps_plugin with ROS interface...")
+  target_link_libraries(gazebo_gps_plugin
+    ${catkin_LIBRARIES}
+    ${roscpp_LIBRARIES}
+  )
+  target_compile_definitions(gazebo_gps_plugin PUBLIC BUILD_ROS_INTERFACE=TRUE)
+else()
+  target_compile_definitions(gazebo_gps_plugin PUBLIC BUILD_ROS_INTERFACE=FALSE)
+  message(STATUS "Building gazebo_gps_plugin without ROS interface...")
 endif()
 
 if (GSTREAMER_FOUND)

@@ -47,6 +47,19 @@
 #include <SITLGps.pb.h>
 #include <Groundtruth.pb.h>
 
+#if BUILD_ROS_INTERFACE
+#include <thread>
+#include "ros/ros.h"
+#include "ros/callback_queue.h"
+#include "ros/subscribe_options.h"
+
+#include <gazebo_plugins/PubQueue.h>
+#include <sensor_msgs/NavSatFix.h>
+#include <sensor_msgs/NavSatStatus.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <std_srvs/Empty.h>
+#endif
+
 namespace gazebo
 {
 class GAZEBO_VISIBLE GpsPlugin : public ModelPlugin
@@ -60,7 +73,55 @@ protected:
   virtual void OnUpdate(const common::UpdateInfo&);
 
 private:
+  /// \brief The default GPS EPH
+  static constexpr auto kDefaultEPH = 1.0;
+  /// \brief The default GPS EPV
+  static constexpr auto kDefaultEPV = 1.0;
+
   std::pair<double, double> reproject(ignition::math::Vector3d& pos);
+
+#if BUILD_ROS_INTERFACE
+  /// \brief A node use for ROS transport
+  std::unique_ptr<ros::NodeHandle> rosnode_;
+  /// \brief The PoseWithCovarianceStamped publisher with reprojected global data in the ENU frame
+  ros::Publisher gps_pose_pub_;
+  /// \brief The NavSatFix publisher with GPS data
+  ros::Publisher gps_fix_pub_;
+  /// \brief The default reprojected GPS data topic
+  static constexpr auto kDefaultRosGPSENUPubTopic = "/gps/local_enu";
+  /// \brief The default GPS fix data topic
+  static constexpr auto kDefaultRosGPSFixPubTopic = "/gps/fix";
+  /// \brief A mutex to lock access to fields are used in message callbacks
+  private: boost::mutex lock_;
+  /// \brief Prevents blocking
+  PubMultiQueue pmq_;
+  /// \brief Fix pub custom queue
+  ros::ServiceServer fix_srv_;
+  /// \brief Pose pub custom queue
+  ros::ServiceServer pose_srv_;
+  /// \brief Fix topic name
+  std::string ros_gps_fix_pub_topic_;
+  /// \brief Pose topic name
+  std::string ros_gps_pose_pub_topic_;
+  /// \brief call back when using service
+  bool ServiceCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+  /// \brief A ROS callback queue that helps process GPS fix messages
+  ros::CallbackQueue fix_queue_;
+  /// \brief A ROS callback queue that helps process pose messages
+  ros::CallbackQueue pose_queue_;
+  /// \brief A ROS publisher queue for GPS fix messages
+  PubQueue<sensor_msgs::NavSatFix>::Ptr fix_pub_queue_;
+  /// \brief A ROS publisher queue for pose messages
+  PubQueue<geometry_msgs::PoseWithCovarianceStamped>::Ptr pose_pub_queue_;
+  /// \brief Put local ENU pose data to the interface
+  void PoseQueueThread();
+  /// \brief Put GPS fix data to the interface
+  void FixQueueThread();
+  /// \brief A thread the keeps running the fix_pub_queue_
+  boost::thread fix_callback_queue_thread_;
+  /// \brief A thread the keeps running the pose_pub_queue_
+  boost::thread pose_callback_queue_thread_;
+#endif
 
   std::string namespace_;
   std::default_random_engine random_generator_;
@@ -115,17 +176,20 @@ private:
   ignition::math::Vector3d velocity_prev_W_;
 
   // gps noise parameters
-  double std_xy;    // meters
-  double std_z;     // meters
+  double _std_x;    // meters
+  double _std_y;    // meters
+  double _std_z;    // meters
+  double eph_;     // meters
+  double epv_;     // meters
   std::default_random_engine rand_;
   std::normal_distribution<float> randn_;
-  static constexpr double gps_corellation_time = 60.0;    // s
-  static constexpr double gps_xy_random_walk = 2.0;       // (m/s) / sqrt(hz)
-  static constexpr double gps_z_random_walk = 4.0;        // (m/s) / sqrt(hz)
-  static constexpr double gps_xy_noise_density = 2e-4;    // (m) / sqrt(hz)
-  static constexpr double gps_z_noise_density = 4e-4;     // (m) / sqrt(hz)
-  static constexpr double gps_vxy_noise_density = 2e-1;   // (m/s) / sqrt(hz)
-  static constexpr double gps_vz_noise_density = 4e-1;    // (m/s) / sqrt(hz)
+  static constexpr double _gps_corellation_time = 60.0;    // s
+  static constexpr double _gps_xy_random_walk = 0.02;      // (m/s) / sqrt(hz)
+  static constexpr double _gps_z_random_walk = 0.04;       // (m/s) / sqrt(hz)
+  static constexpr double _gps_xy_noise_density = 2e-4;    // (m) / sqrt(hz)
+  static constexpr double _gps_z_noise_density = 4e-4;     // (m) / sqrt(hz)
+  static constexpr double _gps_vxy_noise_density = 2e-1;   // (m/s) / sqrt(hz)
+  static constexpr double _gps_vz_noise_density = 4e-1;    // (m/s) / sqrt(hz)
 };     // class GAZEBO_VISIBLE GpsPlugin
 }      // namespace gazebo
 #endif // _GAZEBO_GPS_PLUGIN_HH_
