@@ -92,7 +92,7 @@ private:
   /// \brief The default GPS fix data topic
   static constexpr auto kDefaultRosGPSFixPubTopic = "/gps/fix";
   /// \brief A mutex to lock access to fields are used in message callbacks
-  private: boost::mutex lock_;
+  boost::mutex lock_;
   /// \brief Prevents blocking
   PubMultiQueue pmq_;
   /// \brief Fix pub custom queue
