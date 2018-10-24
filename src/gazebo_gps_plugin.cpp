@@ -252,13 +252,11 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
   gps_msg.set_altitude(pos_W_I.Z() + alt_home + noise_gps_pos.Z() + gps_bias.Z());
-  if (eph_ == kDefaultEPH && gps_noise_) {
+  if (gps_noise_) {
     gps_msg.set_eph(std::min(_std_x + _gps_xy_noise_density * _gps_xy_noise_density, _std_y + _gps_xy_noise_density * _gps_xy_noise_density));
-  }
-  if (epv_ == kDefaultEPV && gps_noise_) {
     gps_msg.set_epv(_std_z + _gps_z_noise_density);
   }
-  if (eph_ != kDefaultEPH && epv_ != kDefaultEPV) {
+  else {
     gps_msg.set_eph(eph_);
     gps_msg.set_epv(epv_);
   }
@@ -285,14 +283,12 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   fix_msg->status.service = sensor_msgs::NavSatStatus::SERVICE_GPS;
   fix_msg->status.status = sensor_msgs::NavSatStatus::STATUS_FIX;
 
-  if (eph_ == kDefaultEPH && gps_noise_) {
-    fix_msg->position_covariance[0] = fix_msg->position_covariance[4] = std::pow(_std_x + _gps_xy_noise_density, 2);
-    fix_msg->position_covariance[4] = fix_msg->position_covariance[4] = std::pow(_std_y + _gps_xy_noise_density, 2);
-  }
-  if (epv_ == kDefaultEPV && gps_noise_) {
+  if (gps_noise_) {
+    fix_msg->position_covariance[0] = std::pow(_std_x + _gps_xy_noise_density, 2);
+    fix_msg->position_covariance[4] = std::pow(_std_y + _gps_xy_noise_density, 2);
     fix_msg->position_covariance[8] = std::pow(_std_z + _gps_z_noise_density, 2);
   }
-  if (eph_ != kDefaultEPH && epv_ != kDefaultEPV) {
+  else {
     fix_msg->position_covariance[0] = fix_msg->position_covariance[4] = eph_ * eph_;
     fix_msg->position_covariance[8] = epv_ * epv_;
   }
