@@ -50,7 +50,7 @@ matrix:
             - BUILD="source ./scripts/validate_sdf.bash"
         - name: MacOSX 10.13 build with Gazebo8
           os: osx
-          osx_image: xcode10
+          osx_image: xcode10.1
           language: cpp
           cache:
             ccache: true
@@ -58,7 +58,7 @@ matrix:
             - GAZEBO_VERSION="gazebo8"
         - name: MacOSX 10.13 build with Gazebo9
           os: osx
-          osx_image: xcode10
+          osx_image: xcode10.1
           language: cpp
           cache:
             ccache: true
