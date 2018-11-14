@@ -47,8 +47,9 @@ static constexpr double kDefaultWindGustStart = 10.0;
 static constexpr double kDefaultWindGustDuration = 0.0;
 
 static const ignition::math::Vector3d kDefaultWindDirectionMean = ignition::math::Vector3d(1, 0, 0);
-static const ignition::math::Vector3d kDefaultWindGustDirection = ignition::math::Vector3d(0, 1, 0);
+static const ignition::math::Vector3d kDefaultWindGustDirectionMean = ignition::math::Vector3d(0, 1, 0);
 static constexpr double kDefaultWindDirectionVariance = 0.0;
+static constexpr double kDefaultWindGustDirectionVariance = 0.0;
 
 /// \brief This gazebo plugin simulates wind acting on a model.
 class GazeboWindPlugin : public ModelPlugin {
@@ -63,7 +64,8 @@ class GazeboWindPlugin : public ModelPlugin {
         wind_gust_force_variance_(kDefaultWindGustForceVariance),
         wind_direction_mean_(kDefaultWindDirectionMean),
         wind_direction_variance_(kDefaultWindDirectionVariance),
-        wind_gust_direction_(kDefaultWindGustDirection),
+        wind_gust_direction_mean_(kDefaultWindGustDirectionMean),
+        wind_gust_direction_variance_(kDefaultWindGustDirectionVariance),
         frame_id_(kDefaultFrameId),
         link_name_(kDefaultLinkName),
         node_handle_(NULL) {}
@@ -81,7 +83,7 @@ class GazeboWindPlugin : public ModelPlugin {
   void OnUpdate(const common::UpdateInfo& /*_info*/);
 
  private:
-    /// \brief Pointer to the update event connection.
+  /// \brief Pointer to the update event connection.
   event::ConnectionPtr update_connection_;
 
   physics::WorldPtr world_;
@@ -100,15 +102,22 @@ class GazeboWindPlugin : public ModelPlugin {
   double wind_gust_force_variance_;
   std::default_random_engine wind_force_generator_;
   std::normal_distribution<double> wind_force_distribution_;
+  std::default_random_engine wind_gust_force_generator_;
+  std::normal_distribution<double> wind_gust_force_distribution_;
 
   ignition::math::Vector3d xyz_offset_;
   ignition::math::Vector3d wind_direction_mean_;
-  ignition::math::Vector3d wind_gust_direction_;
+  ignition::math::Vector3d wind_gust_direction_mean_;
   double wind_direction_variance_;
+  double wind_gust_direction_variance_;
   std::default_random_engine wind_direction_generator_;
   std::normal_distribution<double> wind_direction_distribution_X_;
   std::normal_distribution<double> wind_direction_distribution_Y_;
   std::normal_distribution<double> wind_direction_distribution_Z_;
+  std::default_random_engine wind_gust_direction_generator_;
+  std::normal_distribution<double> wind_gust_direction_distribution_X_;
+  std::normal_distribution<double> wind_gust_direction_distribution_Y_;
+  std::normal_distribution<double> wind_gust_direction_distribution_Z_;
 
   common::Time wind_gust_end_;
   common::Time wind_gust_start_;
