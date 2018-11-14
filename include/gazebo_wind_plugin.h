@@ -39,8 +39,10 @@ static const std::string kDefaultFrameId = "world";
 static const std::string kDefaultLinkName = "base_link";
 
 static constexpr double kDefaultWindForceMean = 0.0;
+static constexpr double kDefaultWindForceMax = 100.0;
 static constexpr double kDefaultWindForceVariance = 0.0;
 static constexpr double kDefaultWindGustForceMean = 0.0;
+static constexpr double kDefaultWindGustForceMax = 100.0;
 static constexpr double kDefaultWindGustForceVariance = 0.0;
 
 static constexpr double kDefaultWindGustStart = 10.0;
@@ -59,8 +61,10 @@ class GazeboWindPlugin : public ModelPlugin {
         namespace_(kDefaultNamespace),
         wind_pub_topic_("wind"),
         wind_force_mean_(kDefaultWindForceMean),
+        wind_force_max_(kDefaultWindForceMax),
         wind_force_variance_(kDefaultWindForceVariance),
         wind_gust_force_mean_(kDefaultWindGustForceMean),
+        wind_gust_force_max_(kDefaultWindGustForceMax),
         wind_gust_force_variance_(kDefaultWindGustForceVariance),
         wind_direction_mean_(kDefaultWindDirectionMean),
         wind_direction_variance_(kDefaultWindDirectionVariance),
@@ -97,8 +101,10 @@ class GazeboWindPlugin : public ModelPlugin {
   std::string wind_pub_topic_;
 
   double wind_force_mean_;
+  double wind_force_max_;
   double wind_force_variance_;
   double wind_gust_force_mean_;
+  double wind_gust_force_max_;
   double wind_gust_force_variance_;
   std::default_random_engine wind_force_generator_;
   std::normal_distribution<double> wind_force_distribution_;
