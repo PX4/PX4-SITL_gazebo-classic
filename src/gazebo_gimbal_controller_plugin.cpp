@@ -581,7 +581,7 @@ void GimbalControllerPlugin::OnUpdate()
  // Although gazebo above 7.4 support Any, still use GzString instead
     std::stringstream ss;
     gazebo::msgs::GzString m;
-
+#if GAZEBO_MAJOR_VERSION >= 9
     ss << this->pitchJoint->Position(0);
     m.set_data(ss.str());
     this->pitchPub->Publish(m);
@@ -593,6 +593,19 @@ void GimbalControllerPlugin::OnUpdate()
     ss << this->yawJoint->Position(0);
     m.set_data(ss.str());
     this->yawPub->Publish(m);
+#else
+    ss << this->pitchJoint->GetAngle(0).Radian();
+    m.set_data(ss.str());
+    this->pitchPub->Publish(m);
+
+    ss << this->rollJoint->GetAngle(0).Radian();
+    m.set_data(ss.str());
+    this->rollPub->Publish(m);
+
+    ss << this->yawJoint->GetAngle(0).Radian();
+    m.set_data(ss.str());
+    this->yawPub->Publish(m);	  
+#endif	  
   }
 }
 
