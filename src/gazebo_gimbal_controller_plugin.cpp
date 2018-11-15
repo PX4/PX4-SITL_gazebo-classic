@@ -315,32 +315,20 @@ void GimbalControllerPlugin::Init()
   // publish pitch status via gz transport
   pitchTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_pitch_status";
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
-  /// only gazebo 7.4 and above support Any
-  this->pitchPub = node->Advertise<gazebo::msgs::Any>(pitchTopic);
-#else
+  // Although gazebo above 7.4 support Any, still use GzString instead
   this->pitchPub = node->Advertise<gazebo::msgs::GzString>(pitchTopic);
-#endif
 
   // publish roll status via gz transport
   rollTopic = std::string("~/") +  this->model->GetName()
     + "/gimbal_roll_status";
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
-  /// only gazebo 7.4 and above support Any
-  this->rollPub = node->Advertise<gazebo::msgs::Any>(rollTopic);
-#else
+  // Although gazebo above 7.4 support Any, still use GzString instead
   this->rollPub = node->Advertise<gazebo::msgs::GzString>(rollTopic);
-#endif
 
   // publish yaw status via gz transport
   yawTopic = std::string("~/") +  this->model->GetName()
-    + "/gimbal_yaw_status";
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
-  /// only gazebo 7.4 and above support Any
-  this->yawPub = node->Advertise<gazebo::msgs::Any>(yawTopic);
-#else
+    + "/gimbal_yaw_status";	
+  // Although gazebo above 7.4 support Any, still use GzString instead	
   this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
-#endif
 
   imuSub = node->Subscribe("~/" + model->GetName() + "/imu", &GimbalControllerPlugin::ImuCallback, this);
 
@@ -589,46 +577,22 @@ void GimbalControllerPlugin::OnUpdate()
   if (++i>100)
   {
     i = 0;
-#if GAZEBO_MAJOR_VERSION >= 9
-    gazebo::msgs::Any m;
-    m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
-
-    m.set_double_value(this->pitchJoint->Position(0));
-    this->pitchPub->Publish(m);
-
-    m.set_double_value(this->rollJoint->Position(0));
-    this->rollPub->Publish(m);
-
-    m.set_double_value(this->yawJoint->Position(0));
-    this->yawPub->Publish(m);
-#elif GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
-    gazebo::msgs::Any m;
-    m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
-
-    m.set_double_value(this->pitchJoint->GetAngle(0).Radian());
-    this->pitchPub->Publish(m);
-
-    m.set_double_value(this->rollJoint->GetAngle(0).Radian());
-    this->rollPub->Publish(m);
-
-    m.set_double_value(this->yawJoint->GetAngle(0).Radian());
-    this->yawPub->Publish(m);
-#else
+ // There is bug when use gazebo::msgs::Any m, so still use GzString instead
+ // Although gazebo above 7.4 support Any, still use GzString instead
     std::stringstream ss;
     gazebo::msgs::GzString m;
 
-    ss << this->pitchJoint->GetAngle(0).Radian();
+    ss << this->pitchJoint->Position(0);
     m.set_data(ss.str());
     this->pitchPub->Publish(m);
 
-    ss << this->rollJoint->GetAngle(0).Radian();
+    ss << this->rollJoint->Position(0);
     m.set_data(ss.str());
     this->rollPub->Publish(m);
 
-    ss << this->yawJoint->GetAngle(0).Radian();
+    ss << this->yawJoint->Position(0);
     m.set_data(ss.str());
     this->yawPub->Publish(m);
-#endif
   }
 }
 
