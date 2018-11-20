@@ -764,20 +764,18 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom_message->position().y(),
     odom_message->position().z()));
 
-  // q_gr is the quaternion that represents a rotation from ENU earth/local
-  // frame to XYZ body FLU frame
+  // q_gr is the quaternion that represents the orientation of the vehicle
+  // the ENU earth/local
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
     odom_message->orientation().w(),
     odom_message->orientation().x(),
     odom_message->orientation().y(),
     odom_message->orientation().z());
 
-  // transform orientation from local ENU to body FLU frame
-  ignition::math::Quaterniond q_gb = q_gr * q_br.Inverse();
-  // transform orientation from body FLU to body FRD frame:
-  // q_nb is the quaternion that represents a rotation from NED earth/local
-  // frame to XYZ body FRD frame
-  ignition::math::Quaterniond q_nb = q_ng * q_gb;
+  // transform the vehicle orientation from the ENU to the NED frame
+  // q_nb is the quaternion that represents the orientation of the vehicle
+  // the NED earth/local
+  ignition::math::Quaterniond q_nb = q_ng * q_gr * q_ng.Inverse();
 
   // transform linear velocity from local ENU to body FRD frame
   ignition::math::Vector3d linear_velocity = q_ng.RotateVector(
