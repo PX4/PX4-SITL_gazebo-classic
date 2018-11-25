@@ -16,7 +16,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2018-09-28
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2018-11-22
             - BUILD=${CMAKE_BUILD}
         - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
           os: linux
@@ -26,7 +26,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2018-09-28
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2018-11-22
             - BUILD=${KINETIC}
         - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
           os: linux
@@ -36,7 +36,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros:2018-09-28
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros:2018-11-22
             - BUILD=${MELODIC}
         - name: Validate SDF schemas
           os: linux
@@ -46,7 +46,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2018-09-28
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2018-11-22
             - BUILD="source ./scripts/validate_sdf.bash"
         - name: MacOSX 10.13 build with Gazebo8
           os: osx
