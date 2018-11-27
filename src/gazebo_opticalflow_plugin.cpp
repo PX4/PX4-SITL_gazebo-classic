@@ -23,7 +23,6 @@
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "gazebo_opticalflow_plugin.h"
 
-#include <highgui.h>
 #include <math.h>
 #include <string>
 #include <iostream>

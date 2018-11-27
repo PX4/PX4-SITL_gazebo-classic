@@ -23,7 +23,7 @@
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "gazebo_irlock_plugin.h"
 
-#include <highgui.h>
+#include <opencv2/opencv.hpp>
 #include <math.h>
 #include <string>
 #include <iostream>

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+#include <opencv2/opencv.hpp>
 #include <mavlink/v2.0/common/mavlink.h>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/CameraSensor.hh>
