@@ -1,5 +1,5 @@
 <sdf version='1.6'>
-  <model name='iris_1'>
+  <model name='iris_2'>
     <link name='base_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
