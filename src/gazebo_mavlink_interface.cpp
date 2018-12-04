@@ -891,15 +891,49 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
 }
 
 void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
-  mavlink_distance_sensor_t sensor_msg;
+  mavlink_distance_sensor_t sensor_msg = {};
   sensor_msg.time_boot_ms = sonar_message->time_usec() / 1e3;
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
+  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+    sonar_message->orientation().w(),
+    sonar_message->orientation().x(),
+    sonar_message->orientation().y(),
+    sonar_message->orientation().z());
+
+  // rotation of the sensor with respect to the vehicle
+  ignition::math::Vector3d euler = q_gr.Euler();
+  int roll = static_cast<int>(round(GetDegrees360(euler.X())));
+  int pitch = static_cast<int>(round(GetDegrees360(euler.Y())));
+  int yaw = static_cast<int>(round(GetDegrees360(euler.Z())));
+  
+
+  if (roll == 0 && pitch == 0 && yaw == 0) {
+    sensor_msg.orientation = 25;  // downward facing
+  } else if (roll == 0 && pitch == 180 && yaw == 0) {
+    sensor_msg.orientation = 24;  // upward facing
+  } else if (roll == 0 && pitch == 90 && yaw == 180) {
+    sensor_msg.orientation = 12;  // backward facing
+  } else if (roll == 0 && pitch == 90  && yaw == 0) {
+    sensor_msg.orientation = 0;  // forward facing
+  } else if (roll == 0 && pitch == 90 && yaw == 90) {
+     sensor_msg.orientation = 6;  // left facing
+  } else if (roll == 0 && pitch == 90 && yaw == -90) {
+     sensor_msg.orientation = 2;  // right facing
+  } else {
+    sensor_msg.orientation = 100;  // custom orientation
+    sensor_msg.q[0] = sonar_message->orientation().w();
+    sensor_msg.q[1] = sonar_message->orientation().x();
+    sensor_msg.q[2] = sonar_message->orientation().y();
+    sensor_msg.q[3] = sonar_message->orientation().z();
+  }
+
   sensor_msg.type = 1;
   sensor_msg.id = 1;
-  sensor_msg.orientation = 0;  // forward facing
   sensor_msg.covariance = 0;
+  sensor_msg.h_fov = sonar_message->h_fov();
+  sensor_msg.v_fov = sonar_message->v_fov();
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
