@@ -19,7 +19,7 @@
     </include>
     <include>
       <uri>model://iris_1</uri>
-      <pose>3.0 0.00 000 0 0 1.14</pose>
+      <pose>3.00 0.00 000 0 0 1.14</pose>
     </include>
     <include>
       <uri>model://iris_2</uri>
