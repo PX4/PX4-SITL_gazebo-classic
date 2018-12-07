@@ -266,13 +266,6 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   orientation->set_z(C_W_I.Z());
   orientation->set_w(C_W_I.W());
 
-
-
-
-
-
-
-
 #if GAZEBO_MAJOR_VERSION < 5
   ignition::math::Vector3d velocity_current_W = link_->GetWorldLinearVel();
   // link_->RelativeLinearAccel() does not work sometimes with old gazebo versions.
@@ -333,7 +326,6 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   imu_message_.set_allocated_linear_acceleration(linear_acceleration);
   imu_message_.set_allocated_angular_velocity(angular_velocity);
 
-  // gzerr << "publishing: " << imu_message_.linear_acceleration().z() << "\n";
   imu_pub_->Publish(imu_message_);
 }
 
