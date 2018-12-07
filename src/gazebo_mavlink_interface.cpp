@@ -180,6 +180,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
   }
 
+  if (_sdf->HasElement("use_tcp"))
+  {
+    use_tcp_ = _sdf->GetElement("use_tcp")->Get<bool>();
+  }
+  gzmsg << "Conecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
+
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
@@ -258,28 +264,33 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     open();
   }
 
-  //Create socket
-  // udp socket data
   mavlink_addr_ = htonl(INADDR_ANY);
   if (_sdf->HasElement("mavlink_addr")) {
-    std::string mavlink_addr = _sdf->GetElement("mavlink_addr")->Get<std::string>();
-    if (mavlink_addr != "INADDR_ANY") {
-      mavlink_addr_ = inet_addr(mavlink_addr.c_str());
+    std::string mavlink_addr_str = _sdf->GetElement("mavlink_addr")->Get<std::string>();
+    if (mavlink_addr_str != "INADDR_ANY") {
+      mavlink_addr_ = inet_addr(mavlink_addr_str.c_str());
       if (mavlink_addr_ == INADDR_NONE) {
-        fprintf(stderr, "invalid mavlink_addr \"%s\"\n", mavlink_addr.c_str());
-        return;
+        gzerr << "Invalid mavlink_addr: " << mavlink_addr_str << ", aborting\n";
+        abort();
       }
     }
   }
-  if (_sdf->HasElement("mavlink_udp_port")) {
-    mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
-  }
+
 #if GAZEBO_MAJOR_VERSION >= 9
   auto worldName = world_->Name();
 #else
   auto worldName = world_->GetName();
 #endif
+
+  if (_sdf->HasElement("mavlink_udp_port")) {
+    mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
+  }
   model_param(worldName, model_->GetName(), "mavlink_udp_port", mavlink_udp_port_);
+
+  if (_sdf->HasElement("mavlink_tcp_port")) {
+    mavlink_tcp_port_ = _sdf->GetElement("mavlink_tcp_port")->Get<int>();
+  }
+  model_param(worldName, model_->GetName(), "mavlink_tcp_port", mavlink_tcp_port_);
 
   qgc_addr_ = htonl(INADDR_ANY);
   if (_sdf->HasElement("qgc_addr")) {
@@ -287,8 +298,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     if (qgc_addr != "INADDR_ANY") {
       qgc_addr_ = inet_addr(qgc_addr.c_str());
       if (qgc_addr_ == INADDR_NONE) {
-        fprintf(stderr, "invalid qgc_addr \"%s\"\n", qgc_addr.c_str());
-        return;
+        gzerr << "Invalid qgc_addr: " << qgc_addr << ", aborting\n";
+        abort();
       }
     }
   }
@@ -296,10 +307,72 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     qgc_udp_port_ = _sdf->GetElement("qgc_udp_port")->Get<int>();
   }
 
-  // try to setup udp socket for communcation
-  if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-    printf("create socket failed\n");
-    return;
+  memset((char *)&_srcaddr, 0, sizeof(_srcaddr));
+  _srcaddr.sin_family = AF_INET;
+  _srcaddr_len = sizeof(_srcaddr);
+
+  memset((char *)&_myaddr, 0, sizeof(_myaddr));
+  _myaddr.sin_family = AF_INET;
+  _myaddr_len = sizeof(_myaddr);
+
+  if (serial_enabled_) {
+    // gcs link
+    _myaddr.sin_addr.s_addr = mavlink_addr_;
+    _myaddr.sin_port = htons(mavlink_udp_port_);
+    _srcaddr.sin_addr.s_addr = qgc_addr_;
+    _srcaddr.sin_port = htons(qgc_udp_port_);
+  }
+
+  else {
+    if (use_tcp_) {
+      _myaddr.sin_addr.s_addr = htonl(mavlink_addr_);
+      _myaddr.sin_port = htons(mavlink_tcp_port_);
+    } else {
+      _srcaddr.sin_addr.s_addr = mavlink_addr_;
+      _srcaddr.sin_port = htons(mavlink_udp_port_);
+
+      _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+      _myaddr.sin_port = htons(0);
+    }
+  }
+
+  // try to setup socket for communcation
+  if (use_tcp_) {
+    if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+      gzerr << "Creating TCP socket failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    int yes = 1;
+    int result = setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *) &yes, sizeof(yes));
+    if (result != 0) {
+      gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    if (bind(_fd, (struct sockaddr *)&_myaddr, _myaddr_len) < 0) {
+      gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    errno = 0;
+    if (listen(_fd, 0) < 0) {
+      gzerr << "listen failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    tcp_client_fd_ = accept(_fd, (struct sockaddr *)&_srcaddr, &_srcaddr_len);
+
+  } else {
+    if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+      gzerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    if (bind(_fd, (struct sockaddr *)&_myaddr, _myaddr_len) < 0) {
+      gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
   }
 
   if(_sdf->HasElement("vehicle_is_tailsitter"))
@@ -317,35 +390,13 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     send_odometry_ = _sdf->GetElement("send_odometry")->Get<bool>();
   }
 
-  memset((char *)&_myaddr, 0, sizeof(_myaddr));
-  _myaddr.sin_family = AF_INET;
-  _srcaddr.sin_family = AF_INET;
 
-  if (serial_enabled_) {
-    // gcs link
-    _myaddr.sin_addr.s_addr = mavlink_addr_;
-    _myaddr.sin_port = htons(mavlink_udp_port_);
-    _srcaddr.sin_addr.s_addr = qgc_addr_;
-    _srcaddr.sin_port = htons(qgc_udp_port_);
+  if (use_tcp_) {
+    fds_[0].fd = tcp_client_fd_;
+  } else {
+    fds_[0].fd = _fd;
   }
-
-  else {
-    _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    // Let the OS pick the port
-    _myaddr.sin_port = htons(0);
-    _srcaddr.sin_addr.s_addr = mavlink_addr_;
-    _srcaddr.sin_port = htons(mavlink_udp_port_);
-  }
-
-  _addrlen = sizeof(_srcaddr);
-
-  if (bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
-    printf("bind failed\n");
-    return;
-  }
-
-  fds[0].fd = _fd;
-  fds[0].events = POLLIN;
+  fds_[0].events = POLLIN;
 
   mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_0);
 

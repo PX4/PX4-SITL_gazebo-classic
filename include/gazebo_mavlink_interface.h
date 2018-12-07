@@ -70,6 +70,7 @@
 #include <geo_mag_declination.h>
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
+static const uint32_t kDefaultMavlinkTcpPort = 4560;
 static const uint32_t kDefaultQGCUdpPort = 14550;
 
 using lock_guard = std::lock_guard<std::recursive_mutex>;
@@ -154,6 +155,9 @@ public:
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
     mavlink_udp_port_(kDefaultMavlinkUdpPort),
+    mavlink_tcp_port_(kDefaultMavlinkTcpPort),
+    tcp_client_fd_(0),
+    use_tcp_(false),
     qgc_udp_port_(kDefaultQGCUdpPort),
     serial_enabled_(false),
     tx_q {},
@@ -297,19 +301,20 @@ private:
 
   int _fd;
   struct sockaddr_in _myaddr;     ///< The locally bound address
+  socklen_t _myaddr_len;
   struct sockaddr_in _srcaddr;    ///< SITL instance
-  socklen_t _addrlen;
+  socklen_t _srcaddr_len;
   unsigned char _buf[65535];
-  struct pollfd fds[1];
+  struct pollfd fds_[1];
 
-  struct sockaddr_in _srcaddr_2;  ///< MAVROS
-
-  //so we dont have to do extra callbacks
   double optflow_distance;
   double sonar_distance;
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
+  int mavlink_tcp_port_;
+  int tcp_client_fd_;
+  bool use_tcp_;
 
   in_addr_t qgc_addr_;
   int qgc_udp_port_;
