@@ -237,8 +237,11 @@ private:
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
-  void handle_message(mavlink_message_t *msg);
-  void pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs);
+  void handle_message(mavlink_message_t *msg, bool &received_actuator);
+  void pollForMAVLinkMessages();
+  void SendSensorMessages();
+  void handle_control(double _dt);
+
 
   // Serial interface
   void open();
@@ -280,6 +283,7 @@ private:
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
 
+  sensor_msgs::msgs::Imu last_imu_message_;
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
@@ -288,9 +292,7 @@ private:
   double groundtruth_lon_rad;
   double groundtruth_altitude;
 
-  double imu_update_interval_ = 0.004;
-
-  void handle_control(double _dt);
+  double imu_update_interval_ = 0.004; ///< Used for non-lockstep
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
@@ -318,6 +320,10 @@ private:
 
   in_addr_t qgc_addr_;
   int qgc_udp_port_;
+
+  bool enable_lockstep_ = false;
+  double speed_factor_ = 1.0;
+  int64_t previous_imu_seq_ = 0;
 
   // Serial interface
   mavlink_status_t m_status;
