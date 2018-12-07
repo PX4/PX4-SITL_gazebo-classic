@@ -320,6 +320,8 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   // ADD HEaders
   // imu_message_.header.stamp.sec = current_time.sec;
   // imu_message_.header.stamp.nsec = current_time.nsec;
+  imu_message_.set_time_usec(_info.simTime.sec * 1000000 + _info.simTime.nsec / 1000);
+  imu_message_.set_seq(seq_++);
 
   // TODO(burrimi): Add orientation estimator.
   // imu_message_.orientation.w = 1;
