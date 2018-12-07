@@ -186,6 +186,64 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
   gzmsg << "Conecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
 
+  if (_sdf->HasElement("enable_lockstep"))
+  {
+    enable_lockstep_ = _sdf->GetElement("enable_lockstep")->Get<bool>();
+  }
+  gzmsg << "Lockstep is " << (enable_lockstep_ ? "enabled" : "disabled") << "\n";
+
+  // When running in lockstep, we can run the simulation slower or faster than
+  // realtime. The speed can be set using the env variable PX4_SIM_SPEED_FACTOR.
+  if (enable_lockstep_)
+  {
+    const char *speed_factor_str = std::getenv("PX4_SIM_SPEED_FACTOR");
+    if (speed_factor_str)
+    {
+      speed_factor_ = std::atof(speed_factor_str);
+      if (!std::isfinite(speed_factor_) || speed_factor_ <= 0.0)
+      {
+        gzerr << "Invalid speed factor '" << speed_factor_str << "', aborting\n";
+        abort();
+      }
+    }
+    gzmsg << "Speed factor set to: " << speed_factor_ << "\n";
+
+		boost::any param;
+    physics::PresetManagerPtr presetManager = world_->PresetMgr();
+    presetManager->CurrentProfile("default_physics");
+
+    // We currently need to have the max_step_size pinned at 4 ms and the
+    // real_time_update_rate set to 250 Hz for lockstep.
+    // Therefore it makes sense to check these params.
+
+    presetManager->GetCurrentProfileParam("real_time_update_rate", param);
+    double real_time_update_rate = boost::any_cast<double>(param);
+    const double correct_real_time_update_rate = 250.0;
+    if (real_time_update_rate != correct_real_time_update_rate)
+    {
+      gzerr << "real_time_update_rate is set to " << real_time_update_rate
+            << " instead of " << correct_real_time_update_rate
+            << ", check your world file, aborting\n";
+      abort();
+    }
+
+    presetManager->GetCurrentProfileParam("max_step_size", param);
+    const double max_step_size = boost::any_cast<double>(param);
+    const double correct_max_step_size = 0.004;
+    if (max_step_size != correct_max_step_size)
+    {
+      gzerr << "max_step_size is set to " << max_step_size
+            << " instead of " << correct_max_step_size
+            << ", check your world file, aborting\n";
+      abort();
+    }
+
+    // Adapt the real_time_update_rate according to the speed
+    // that we ask for in the env variable.
+    real_time_update_rate *= speed_factor_;
+    presetManager->SetCurrentProfileParam("real_time_update_rate", real_time_update_rate);
+  }
+
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
@@ -214,6 +272,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   gravity_W_ = ignitionFromGazeboMath(world_->GetPhysicsEngine()->GetGravity());
 #endif
 
+  // This doesn't seem to be used anywhere but we leave it here
+  // for potential compatibility
   if (_sdf->HasElement("imu_rate")) {
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
   }
@@ -416,6 +476,15 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
+
+  if (previous_imu_seq_ > 0) {
+    while (previous_imu_seq_ == last_imu_message_.seq() && world_->Running()) {
+      std::this_thread::sleep_for(std::chrono::microseconds(1));
+    }
+  }
+
+  previous_imu_seq_ = last_imu_message_.seq();
+
 #if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
 #else
@@ -423,7 +492,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 #endif
   double dt = (current_time - last_time_).Double();
 
-  pollForMAVLinkMessages(dt, 1000);
+  SendSensorMessages();
+
+  pollForMAVLinkMessages();
 
   handle_control(dt);
 
@@ -471,71 +542,95 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
-    ssize_t len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, sizeof(_srcaddr));
+    ssize_t len;
+    if (use_tcp_) {
+      len = send(tcp_client_fd_, buffer, packetlen, 0);
+    } else {
+      len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, _srcaddr_len);
+    }
 
-    if (len <= 0) {
-      printf("Failed sending mavlink message\n");
+    if (len <= 0)
+    {
+      gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
+    }
+  }
+}
+
+void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
+{
+  const int64_t diff = imu_message->seq() - last_imu_message_.seq();
+  if (diff != 1 && imu_message->seq() != 0)
+  {
+    gzerr << "Skipped " << (diff - 1) << " IMU samples (presumably CPU usage is too high)\n";
+  }
+
+  last_imu_message_ = *imu_message;
+}
+
+void GazeboMavlinkInterface::SendSensorMessages()
+{
+	ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+		last_imu_message_.orientation().w(),
+		last_imu_message_.orientation().x(),
+		last_imu_message_.orientation().y(),
+		last_imu_message_.orientation().z());
+
+	ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
+	ignition::math::Quaterniond q_nb = q_ng*q_gb;
+
+#if GAZEBO_MAJOR_VERSION >= 9
+	ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
+#else
+	ignition::math::Vector3d pos_g = ignitionFromGazeboMath(model_->GetWorldPose().pos);
+#endif
+	ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
+
+	float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
+
+	ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
+	ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
+
+#if GAZEBO_MAJOR_VERSION >= 9
+	ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
+	ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
+	ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
+#else
+	ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
+	ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
+	ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
+#endif
+
+	ignition::math::Vector3d mag_noise_b(
+		0.01 * randn_(rand_),
+		0.01 * randn_(rand_),
+		0.01 * randn_(rand_));
+
+	ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
+		last_imu_message_.linear_acceleration().x(),
+		last_imu_message_.linear_acceleration().y(),
+		last_imu_message_.linear_acceleration().z()));
+	ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
+		last_imu_message_.angular_velocity().x(),
+		last_imu_message_.angular_velocity().y(),
+		last_imu_message_.angular_velocity().z()));
+	ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
+
+  bool should_send_imu = false;
+  if (!enable_lockstep_) {
+#if GAZEBO_MAJOR_VERSION >= 9
+    common::Time current_time = world_->SimTime();
+#else
+    common::Time current_time = world_->GetSimTime();
+#endif
+    double dt = (current_time - last_imu_time_).Double();
+
+    if (imu_update_interval_!=0 && dt >= imu_update_interval_) {
+      should_send_imu = true;
+      last_imu_time_ = current_time;
     }
   }
 
-}
-
-void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
-#if GAZEBO_MAJOR_VERSION >= 9
-  common::Time current_time = world_->SimTime();
-#else
-  common::Time current_time = world_->GetSimTime();
-#endif
-  double dt = (current_time - last_imu_time_).Double();
-
-    ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
-      imu_message->orientation().w(),
-      imu_message->orientation().x(),
-      imu_message->orientation().y(),
-      imu_message->orientation().z());
-
-    ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
-    ignition::math::Quaterniond q_nb = q_ng*q_gb;
-
-#if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
-#else
-    ignition::math::Vector3d pos_g = ignitionFromGazeboMath(model_->GetWorldPose().pos);
-#endif
-    ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
-
-    float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
-
-    ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
-    ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
-
-#if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
-    ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
-    ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
-#else
-    ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
-    ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
-    ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
-#endif
-
-    ignition::math::Vector3d mag_noise_b(
-      0.01 * randn_(rand_),
-      0.01 * randn_(rand_),
-      0.01 * randn_(rand_));
-
-    ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
-      imu_message->linear_acceleration().x(),
-      imu_message->linear_acceleration().y(),
-      imu_message->linear_acceleration().z()));
-    ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
-      imu_message->angular_velocity().x(),
-      imu_message->angular_velocity().y(),
-      imu_message->angular_velocity().z()));
-    ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
-
-  if (imu_update_interval_!=0 && dt >= imu_update_interval_)
-  {
+  if (enable_lockstep_ || should_send_imu) {
     mavlink_hil_sensor_t sensor_msg;
 #if GAZEBO_MAJOR_VERSION >= 9
     sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
@@ -607,18 +702,11 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
 
     sensor_msg.fields_updated = 4095;
 
-    mavlink_message_t msg;
-    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-    if (hil_mode_) {
-      if (!hil_state_level_){
-        send_mavlink_message(&msg);
-      }
-    }
-
-    else {
+    if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+      mavlink_message_t msg;
+      mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
       send_mavlink_message(&msg);
     }
-    last_imu_time_ = current_time;
   }
 
   // ground truth
@@ -666,17 +754,11 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
   hil_state_quat.yacc = accel_true_b.Y() * 1000;
   hil_state_quat.zacc = accel_true_b.Z() * 1000;
 
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
-    if (hil_mode_) {
-      if (hil_state_level_){
-        send_mavlink_message(&msg);
-      }
-    }
-
-    else {
-      send_mavlink_message(&msg);
-    }
+    send_mavlink_message(&msg);
+  }
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg) {
@@ -986,6 +1068,7 @@ void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, bool &receiv
       }
     }
 
+    received_actuator = true;
     received_first_actuator_ = true;
     break;
   }
@@ -1114,7 +1197,8 @@ void GazeboMavlinkInterface::parse_buffer(const boost::system::error_code& err, 
     if(msg_received != Framing::incomplete){
       // send to gcs
       send_mavlink_message(&message, qgc_udp_port_);
-      handle_message(&message);
+      bool not_used;
+      handle_message(&message, not_used);
     }
   }
   do_read();
