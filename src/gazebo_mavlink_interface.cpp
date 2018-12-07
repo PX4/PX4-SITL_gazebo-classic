@@ -4,7 +4,7 @@
  * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
- * Copyright 2015-2018 PX4 Pro Development Team
+ * Copyright 2015-2018 PX4 Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,8 @@ GazeboMavlinkInterface::~GazeboMavlinkInterface() {
 }
 
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
-  // Store the pointer to the model.
-  model_ = _model;
 
+  model_ = _model;
   world_ = model_->GetWorld();
 
   const char *env_alt = std::getenv("PX4_HOME_ALT");
@@ -108,14 +107,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
               gztopic_[index] = "~/" + model_->GetName() + channel->Get<std::string>("gztopic");
             else
               gztopic_[index] = "control_position_gztopic_" + std::to_string(index);
-      #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
             /// only gazebo 7.4 and above support Any
             joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::Any>(
                 gztopic_[index]);
-      #else
+#else
             joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::GzString>(
                 gztopic_[index]);
-      #endif
+#endif
           }
 
           if (channel->HasElement("joint_name"))
@@ -186,7 +185,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GazeboMavlinkInterface::OnUpdate, this, _1));
 
-  // Subscriber to IMU sensor_msgs::Imu Message and SITL message
+  // Subscribe to messages of other plugins.
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
@@ -199,7 +198,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
 
-  _rotor_count = 5;
 #if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
   last_imu_time_ = world_->SimTime();
@@ -400,7 +398,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
 void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message, const int destination_port)
 {
-
   if(serial_enabled_ && destination_port == 0) {
     assert(message != nullptr);
     if (!is_open()) {
@@ -517,9 +514,9 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     double x1, x2, w, y1;
     if (!baro_rnd_use_last_) {
       do {
-	x1 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
-	x2 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
-	w = x1 * x1 + x2 * x2;
+        x1 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
+        x2 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
+        w = x1 * x1 + x2 * x2;
       } while ( w >= 1.0 );
       w = sqrt( (-2.0 * log( w ) ) / w );
       // calculate two values - the second value can be used next time because it is uncorrelated
@@ -573,50 +570,50 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     last_imu_time_ = current_time;
   }
 
-    // ground truth
+  // ground truth
 #if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d accel_true_b = q_br.RotateVector(model_->RelativeLinearAccel());
+  ignition::math::Vector3d accel_true_b = q_br.RotateVector(model_->RelativeLinearAccel());
 #else
-    ignition::math::Vector3d accel_true_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
+  ignition::math::Vector3d accel_true_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
 #endif
 
-    // send ground truth
+  // send ground truth
 
-    mavlink_hil_state_quaternion_t hil_state_quat;
+  mavlink_hil_state_quaternion_t hil_state_quat;
 #if GAZEBO_MAJOR_VERSION >= 9
-    hil_state_quat.time_usec = world_->SimTime().Double() * 1e6;
+  hil_state_quat.time_usec = world_->SimTime().Double() * 1e6;
 #else
-    hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
+  hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
 #endif
-    hil_state_quat.attitude_quaternion[0] = q_nb.W();
-    hil_state_quat.attitude_quaternion[1] = q_nb.X();
-    hil_state_quat.attitude_quaternion[2] = q_nb.Y();
-    hil_state_quat.attitude_quaternion[3] = q_nb.Z();
+  hil_state_quat.attitude_quaternion[0] = q_nb.W();
+  hil_state_quat.attitude_quaternion[1] = q_nb.X();
+  hil_state_quat.attitude_quaternion[2] = q_nb.Y();
+  hil_state_quat.attitude_quaternion[3] = q_nb.Z();
 
-    hil_state_quat.rollspeed = omega_nb_b.X();
-    hil_state_quat.pitchspeed = omega_nb_b.Y();
-    hil_state_quat.yawspeed = omega_nb_b.Z();
+  hil_state_quat.rollspeed = omega_nb_b.X();
+  hil_state_quat.pitchspeed = omega_nb_b.Y();
+  hil_state_quat.yawspeed = omega_nb_b.Z();
 
-    hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
-    hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
-    hil_state_quat.alt = groundtruth_altitude * 1000;
+  hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
+  hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
+  hil_state_quat.alt = groundtruth_altitude * 1000;
 
-    hil_state_quat.vx = vel_n.X() * 100;
-    hil_state_quat.vy = vel_n.Y() * 100;
-    hil_state_quat.vz = vel_n.Z() * 100;
+  hil_state_quat.vx = vel_n.X() * 100;
+  hil_state_quat.vy = vel_n.Y() * 100;
+  hil_state_quat.vz = vel_n.Z() * 100;
 
-    // assumed indicated airspeed due to flow aligned with pitot (body x)
-    hil_state_quat.ind_airspeed = vel_b.X();
+  // assumed indicated airspeed due to flow aligned with pitot (body x)
+  hil_state_quat.ind_airspeed = vel_b.X();
 
 #if GAZEBO_MAJOR_VERSION >= 9
-    hil_state_quat.true_airspeed = model_->WorldLinearVel().Length() * 100;  //no wind simulated
+  hil_state_quat.true_airspeed = model_->WorldLinearVel().Length() * 100;  //no wind simulated
 #else
-    hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
+  hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
 #endif
 
-    hil_state_quat.xacc = accel_true_b.X() * 1000;
-    hil_state_quat.yacc = accel_true_b.Y() * 1000;
-    hil_state_quat.zacc = accel_true_b.Z() * 1000;
+  hil_state_quat.xacc = accel_true_b.X() * 1000;
+  hil_state_quat.yacc = accel_true_b.Y() * 1000;
+  hil_state_quat.zacc = accel_true_b.Z() * 1000;
 
     mavlink_message_t msg;
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
@@ -631,7 +628,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message) {
     }
 }
 
-void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
+void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg) {
   // fill HIL GPS Mavlink msg
   mavlink_hil_gps_t hil_gps_msg;
   hil_gps_msg.time_usec = gps_msg->time_usec();
@@ -652,20 +649,14 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg){
   hil_gps_msg.satellites_visible = 10;
 
   // send HIL_GPS Mavlink msg
-  mavlink_message_t msg;
-  mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
-  if (hil_mode_) {
-    if (!hil_state_level_){
-      send_mavlink_message(&msg);
-    }
-  }
-
-  else {
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
     send_mavlink_message(&msg);
   }
 }
 
-void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg){
+void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
   // update groundtruth lat_rad, lon_rad and altitude
   groundtruth_lat_rad = groundtruth_msg->latitude_rad();
   groundtruth_lon_rad = groundtruth_msg->longitude_rad();
@@ -704,7 +695,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   bool no_gyro = (ignition::math::isnan(opticalFlow_message->integrated_xgyro())) ||
                  (ignition::math::isnan(opticalFlow_message->integrated_ygyro())) ||
                  (ignition::math::isnan(opticalFlow_message->integrated_zgyro()));
-  if(no_gyro) {
+  if (no_gyro) {
     sensor_msg.integrated_xgyro = NAN;
     sensor_msg.integrated_ygyro = NAN;
     sensor_msg.integrated_zgyro = NAN;
@@ -873,48 +864,55 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   }
 }
 
-void GazeboMavlinkInterface::pollForMAVLinkMessages(double _dt, uint32_t _timeoutMs)
+void GazeboMavlinkInterface::pollForMAVLinkMessages()
 {
-  // convert timeout in ms to timeval
-  struct timeval tv;
-  tv.tv_sec = _timeoutMs / 1000;
-  tv.tv_usec = (_timeoutMs % 1000) * 1000UL;
+  bool received_actuator = false;
 
-  // poll
-  ::poll(&fds[0], (sizeof(fds[0]) / sizeof(fds[0])), 0);
+  do {
+    int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
 
-  if (fds[0].revents & POLLIN) {
-    int len = recvfrom(_fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_addrlen);
-    if (len > 0) {
-      mavlink_message_t msg;
-      mavlink_status_t status;
-      for (unsigned i = 0; i < len; ++i)
-      {
-        if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
+    int ret = ::poll(&fds_[0], 1, timeout_ms);
+
+    if (ret == 0 && timeout_ms > 0) {
+      gzerr << "poll timeout, aborting\n";
+      abort();
+    }
+
+    if (ret < 0) {
+      gzerr << "poll error: " << strerror(errno) << "\n";
+    }
+
+    if (fds_[0].revents & POLLIN) {
+
+      int len = recvfrom(fds_[0].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_srcaddr_len);
+      if (len > 0) {
+        mavlink_message_t msg;
+        mavlink_status_t status;
+        for (unsigned i = 0; i < len; ++i)
         {
-          if (serial_enabled_) {
-            // forward message from qgc to serial
-            send_mavlink_message(&msg);
+          if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
+          {
+            if (serial_enabled_) {
+              // forward message from qgc to serial
+              send_mavlink_message(&msg);
+            }
+            // have a message, handle it
+            handle_message(&msg, received_actuator);
           }
-          // have a message, handle it
-          handle_message(&msg);
         }
       }
     }
-  }
+  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && world_->Running());
 }
 
-void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg)
+void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, bool &received_actuator)
 {
   switch (msg->msgid) {
   case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
     mavlink_hil_actuator_controls_t controls;
     mavlink_msg_hil_actuator_controls_decode(msg, &controls);
-    bool armed = false;
 
-    if ((controls.mode & MAV_MODE_FLAG_SAFETY_ARMED) > 0) {
-      armed = true;
-    }
+    bool armed = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
 
 #if GAZEBO_MAJOR_VERSION >= 9
     last_actuator_time_ = world_->SimTime();
