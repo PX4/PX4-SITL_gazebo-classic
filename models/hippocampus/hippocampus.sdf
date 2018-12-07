@@ -707,6 +707,8 @@
       <qgc_udp_port>14550</qgc_udp_port>
       <hil_mode>false</hil_mode>
       <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
 
       <!-- control channels, this way for every channel different settings can be realized -->
