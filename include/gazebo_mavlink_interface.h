@@ -249,8 +249,6 @@ private:
   static const unsigned n_out_max = 16;
   double alt_home = 488.0;   // meters
 
-  unsigned _rotor_count;
-
   double input_offset_[n_out_max];
   double input_scaling_[n_out_max];
   std::string joint_control_type_[n_out_max];
@@ -336,6 +334,5 @@ private:
   // state variables for baro pressure sensor random noise generator
   double baro_rnd_y2_;
   bool baro_rnd_use_last_;
-
   };
 }
