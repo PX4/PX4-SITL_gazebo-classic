@@ -221,10 +221,10 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     const double correct_real_time_update_rate = 250.0;
     if (real_time_update_rate != correct_real_time_update_rate)
     {
-      gzerr << "real_time_update_rate is set to " << real_time_update_rate
-            << " instead of " << correct_real_time_update_rate
-            << ", check your world file, aborting\n";
-      abort();
+      gzwarn << "real_time_update_rate is set to " << real_time_update_rate
+             << " instead of " << correct_real_time_update_rate
+			       << ", the param will be overwritten.\n";
+      presetManager->SetCurrentProfileParam("real_time_update_rate", correct_real_time_update_rate);
     }
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
@@ -232,10 +232,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     const double correct_max_step_size = 0.004;
     if (max_step_size != correct_max_step_size)
     {
-      gzerr << "max_step_size is set to " << max_step_size
-            << " instead of " << correct_max_step_size
-            << ", check your world file, aborting\n";
-      abort();
+      gzwarn << "max_step_size is set to " << max_step_size
+             << " instead of " << correct_max_step_size
+			       << ", the param will be overwritten.\n";
+
+      presetManager->SetCurrentProfileParam("max_step_size", correct_max_step_size);
     }
 
     // Adapt the real_time_update_rate according to the speed
