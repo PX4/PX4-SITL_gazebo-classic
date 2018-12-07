@@ -118,7 +118,7 @@ enum class Framing : uint8_t {
 class GazeboMavlinkInterface : public ModelPlugin {
 public:
   GazeboMavlinkInterface() : ModelPlugin(),
-    received_first_referenc_(false),
+    received_first_actuator_(false),
     namespace_(kDefaultNamespace),
     protocol_version_(2.0),
     motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
@@ -179,7 +179,7 @@ protected:
   void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
 private:
-  bool received_first_referenc_;
+  bool received_first_actuator_;
   Eigen::VectorXd input_reference_;
 
   float protocol_version_;
