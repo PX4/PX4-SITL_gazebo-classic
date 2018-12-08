@@ -208,7 +208,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
     gzmsg << "Speed factor set to: " << speed_factor_ << "\n";
 
-		boost::any param;
+    boost::any param;
     physics::PresetManagerPtr presetManager = world_->PresetMgr();
     presetManager->CurrentProfile("default_physics");
 
@@ -567,51 +567,51 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 
 void GazeboMavlinkInterface::SendSensorMessages()
 {
-	ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
-		last_imu_message_.orientation().w(),
-		last_imu_message_.orientation().x(),
-		last_imu_message_.orientation().y(),
-		last_imu_message_.orientation().z());
+  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+    last_imu_message_.orientation().w(),
+    last_imu_message_.orientation().x(),
+    last_imu_message_.orientation().y(),
+    last_imu_message_.orientation().z());
 
-	ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
-	ignition::math::Quaterniond q_nb = q_ng*q_gb;
-
-#if GAZEBO_MAJOR_VERSION >= 9
-	ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
-#else
-	ignition::math::Vector3d pos_g = ignitionFromGazeboMath(model_->GetWorldPose().pos);
-#endif
-	ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
-
-	float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
-
-	ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
-	ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
+  ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
+  ignition::math::Quaterniond q_nb = q_ng*q_gb;
 
 #if GAZEBO_MAJOR_VERSION >= 9
-	ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
-	ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
-	ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
+  ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
 #else
-	ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
-	ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
-	ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
+  ignition::math::Vector3d pos_g = ignitionFromGazeboMath(model_->GetWorldPose().pos);
+#endif
+  ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
+
+  float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
+
+  ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
+  ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
+
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
+  ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
+  ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
+#else
+  ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
+  ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
+  ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
 #endif
 
-	ignition::math::Vector3d mag_noise_b(
-		0.01 * randn_(rand_),
-		0.01 * randn_(rand_),
-		0.01 * randn_(rand_));
+  ignition::math::Vector3d mag_noise_b(
+    0.01 * randn_(rand_),
+    0.01 * randn_(rand_),
+    0.01 * randn_(rand_));
 
-	ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
-		last_imu_message_.linear_acceleration().x(),
-		last_imu_message_.linear_acceleration().y(),
-		last_imu_message_.linear_acceleration().z()));
-	ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
-		last_imu_message_.angular_velocity().x(),
-		last_imu_message_.angular_velocity().y(),
-		last_imu_message_.angular_velocity().z()));
-	ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
+  ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
+    last_imu_message_.linear_acceleration().x(),
+    last_imu_message_.linear_acceleration().y(),
+    last_imu_message_.linear_acceleration().z()));
+  ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
+    last_imu_message_.angular_velocity().x(),
+    last_imu_message_.angular_velocity().y(),
+    last_imu_message_.angular_velocity().z()));
+  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
 
   bool should_send_imu = false;
   if (!enable_lockstep_) {
