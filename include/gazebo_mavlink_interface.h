@@ -241,6 +241,7 @@ private:
   void pollForMAVLinkMessages();
   void SendSensorMessages();
   void handle_control(double _dt);
+  bool IsRunning();
 
 
   // Serial interface

@@ -209,7 +209,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     gzmsg << "Speed factor set to: " << speed_factor_ << "\n";
 
     boost::any param;
+#if GAZEBO_MAJOR_VERSION >= 8
     physics::PresetManagerPtr presetManager = world_->PresetMgr();
+#else
+    physics::PresetManagerPtr presetManager = world_->GetPresetManager();
+#endif
     presetManager->CurrentProfile("default_physics");
 
     // We currently need to have the max_step_size pinned at 4 ms and the
@@ -476,7 +480,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   if (previous_imu_seq_ > 0) {
-    while (previous_imu_seq_ == last_imu_message_.seq() && world_->Running()) {
+    while (previous_imu_seq_ == last_imu_message_.seq() && IsRunning()) {
       std::this_thread::sleep_for(std::chrono::microseconds(1));
     }
   }
@@ -1033,7 +1037,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
-  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && world_->Running());
+  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning());
 }
 
 void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, bool &received_actuator)
@@ -1130,6 +1134,15 @@ void GazeboMavlinkInterface::handle_control(double _dt)
       }
     }
   }
+}
+
+bool GazeboMavlinkInterface::IsRunning()
+{
+#if GAZEBO_MAJOR_VERSION >= 8
+    return world_->Running();
+#else
+    return world_->GetRunning();
+#endif
 }
 
 void GazeboMavlinkInterface::open() {
