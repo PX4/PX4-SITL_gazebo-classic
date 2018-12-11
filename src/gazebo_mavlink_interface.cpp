@@ -246,6 +246,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     presetManager->SetCurrentProfileParam("real_time_update_rate", real_time_update_rate);
   }
 
+  imu_message_ready_promise_ = std::make_unique<std::promise<void>>();
+  imu_message_ready_future_ = imu_message_ready_promise_->get_future();
+
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
@@ -474,16 +477,23 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   else {
     gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default \n";
   }
+
 }
 
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   if (previous_imu_seq_ > 0) {
-    while (previous_imu_seq_ == last_imu_message_.seq() && IsRunning()) {
-      std::this_thread::sleep_for(std::chrono::microseconds(1));
-    }
+    imu_message_ready_future_.wait();
+    // Once we're in the rythm of waiting for the next sample, we don't
+    // expect any skips between ImuCallback and OnUpdate.
+    assert(previous_imu_seq_ + 1 == last_imu_message_.seq());
   }
+
+  // Reset the future/promise. We need to do this no matter what, otherwise
+  // we rist that the promise is set twice in a row on startup.
+  imu_message_ready_promise_ = std::make_unique<std::promise<void>>();
+  imu_message_ready_future_ = imu_message_ready_promise_->get_future();
 
   previous_imu_seq_ = last_imu_message_.seq();
 
@@ -567,6 +577,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
   }
 
   last_imu_message_ = *imu_message;
+  imu_message_ready_promise_->set_value();
 }
 
 void GazeboMavlinkInterface::SendSensorMessages()
