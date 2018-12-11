@@ -756,7 +756,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
   hil_state_quat.yacc = accel_true_b.Y() * 1000;
   hil_state_quat.zacc = accel_true_b.Z() * 1000;
 
-  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+  if (!hil_mode_ || (hil_mode_ && hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
     send_mavlink_message(&msg);
