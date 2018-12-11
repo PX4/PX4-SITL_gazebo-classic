@@ -40,6 +40,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <string>
+#include <future>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
