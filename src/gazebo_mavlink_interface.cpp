@@ -479,9 +479,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
+  std::unique_lock<std::mutex> lock(last_imu_message_mutex_);
+
   if (previous_imu_seq_ > 0) {
     while (previous_imu_seq_ == last_imu_message_.seq() && IsRunning()) {
-      std::this_thread::sleep_for(std::chrono::microseconds(1));
+      last_imu_message_cond_.wait_for(lock, std::chrono::milliseconds(10));
     }
   }
 
@@ -530,7 +532,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     }
 
     {
-      lock_guard lock(mutex);
+      std::lock_guard<std::recursive_mutex> lock(mutex);
 
       if (tx_q.size() >= MAX_TXQ_SIZE) {
 //         gzwarn << "TX queue overflow. \n";
@@ -560,6 +562,8 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 {
+  std::unique_lock<std::mutex> lock(last_imu_message_mutex_);
+
   const int64_t diff = imu_message->seq() - last_imu_message_.seq();
   if (diff != 1 && imu_message->seq() != 0)
   {
@@ -567,6 +571,8 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
   }
 
   last_imu_message_ = *imu_message;
+  lock.unlock();
+  last_imu_message_cond_.notify_one();
 }
 
 void GazeboMavlinkInterface::SendSensorMessages()
@@ -1162,7 +1168,7 @@ void GazeboMavlinkInterface::open() {
 
 void GazeboMavlinkInterface::close()
 {
-  lock_guard lock(mutex);
+  std::lock_guard<std::recursive_mutex> lock(mutex);
   if (!is_open())
     return;
 
@@ -1219,7 +1225,7 @@ void GazeboMavlinkInterface::do_write(bool check_tx_state){
   if (check_tx_state && tx_in_progress)
     return;
 
-  lock_guard lock(mutex);
+  std::lock_guard<std::recursive_mutex> lock(mutex);
   if (tx_q.empty())
     return;
 
@@ -1235,7 +1241,7 @@ void GazeboMavlinkInterface::do_write(bool check_tx_state){
       return;
       }
 
-    lock_guard lock(mutex);
+    std::lock_guard<std::recursive_mutex> lock(mutex);
 
     if (tx_q.empty()) {
       tx_in_progress = false;
