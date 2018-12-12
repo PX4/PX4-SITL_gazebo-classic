@@ -21,6 +21,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <deque>
 #include <atomic>
 #include <chrono>
@@ -284,6 +285,8 @@ private:
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
 
+  std::mutex last_imu_message_mutex_ {};
+  std::condition_variable last_imu_message_cond_ {};
   sensor_msgs::msgs::Imu last_imu_message_;
   common::Time last_time_;
   common::Time last_imu_time_;
