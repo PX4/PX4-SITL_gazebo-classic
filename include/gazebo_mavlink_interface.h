@@ -27,7 +27,6 @@
 #include <memory>
 #include <sstream>
 #include <cassert>
-#include <memory>
 #include <stdexcept>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -286,8 +285,6 @@ private:
   std::string vision_sub_topic_;
 
   sensor_msgs::msgs::Imu last_imu_message_;
-  std::unique_ptr<std::promise<void>> imu_message_ready_promise_;
-  std::future<void> imu_message_ready_future_;
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
