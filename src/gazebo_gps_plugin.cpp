@@ -206,7 +206,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   groundtruth_msg.set_time_usec(current_time.Double() * 1e6);
   groundtruth_msg.set_latitude_rad(latlon_gt.first);
   groundtruth_msg.set_longitude_rad(latlon_gt.second);
-  groundtruth_msg.set_altitude(-pos_W_I.Z() + alt_home);
+  groundtruth_msg.set_altitude(pos_W_I.Z() + alt_home);
   groundtruth_msg.set_velocity_east(velocity_current_W.X());
   groundtruth_msg.set_velocity_north(velocity_current_W.Y());
   groundtruth_msg.set_velocity_up(velocity_current_W.Z());
