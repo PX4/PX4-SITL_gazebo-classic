@@ -81,6 +81,7 @@ install:
     brew cask reinstall xquartz java;
     sudo -H pip2 install --upgrade pip setuptools;
     sudo -H pip2 install rospkg pyserial empy toml numpy pandas jinja2;
+    sudo -H pip2 install --upgrade --force-reinstall numpy;
     fi
 
 script:
