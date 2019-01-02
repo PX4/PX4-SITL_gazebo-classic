@@ -176,22 +176,6 @@ if (GSTREAMER_FOUND)
   )
 endif()
 
-link_libraries(
-  ${Boost_SYSTEM_LIBRARY_RELEASE}
-  ${Boost_THREAD_LIBRARY_RELEASE}
-  ${Boost_TIMER_LIBRARY_RELEASE}
-  ${GAZEBO_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-  ${PROTOBUF_LIBRARY}
-  )
-
-if (GSTREAMER_FOUND)
-  link_libraries(
-    ${GSTREAMER_LIBRARIES}
-    glib-2.0
-    gobject-2.0
-  )
-endif()
 
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
@@ -306,8 +290,6 @@ add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 # Plugins #
 #---------#
 
-link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
-link_libraries(physics_msgs)
 
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
@@ -357,7 +339,24 @@ set(plugins
 
 foreach(plugin ${plugins})
   target_link_libraries(${plugin} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
+  target_link_libraries(${plugin} mav_msgs nav_msgs std_msgs sensor_msgs)
+  target_link_libraries(${plugin} physics_msgs)
+  target_link_libraries(${plugin}
+    ${Boost_SYSTEM_LIBRARY_RELEASE}
+    ${Boost_THREAD_LIBRARY_RELEASE}
+    ${Boost_TIMER_LIBRARY_RELEASE}
+    ${GAZEBO_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${PROTOBUF_LIBRARY}
+  )
+
+  if (GSTREAMER_FOUND)
+    target_link_libraries(${plugin}
+      ${GSTREAMER_LIBRARIES}
+    )
+  endif()
 endforeach()
+
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
 # If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
