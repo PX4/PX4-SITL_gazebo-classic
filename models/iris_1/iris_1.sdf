@@ -549,5 +549,7 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+    <plugin name='reset_plugin' filename='libResetPlugin.so'>    
+    </plugin>	
   </model>
 </sdf>
