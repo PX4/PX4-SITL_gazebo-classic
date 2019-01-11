@@ -1015,8 +1015,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
     int ret = ::poll(&fds_[0], 1, timeout_ms);
 
     if (ret == 0 && timeout_ms > 0) {
-      gzerr << "poll timeout, aborting\n";
-      abort();
+      gzerr << "poll timeout\n";
     }
 
     if (ret < 0) {
