@@ -11,7 +11,7 @@
     </include>
 
     <joint name="px4flow_joint" type="revolute">
-      <parent>iris::base_link</parent>
+      <parent>iris_1::base_link</parent>
       <child>px4flow::link</child>
       <axis>
         <xyz>0 0 1</xyz>
@@ -29,7 +29,7 @@
     </include>
 
     <joint name="sf10a_joint" type="fixed">
-      <parent>iris::base_link</parent>
+      <parent>iris_1::base_link</parent>
       <child>sf10a::link</child>
     </joint>
 
