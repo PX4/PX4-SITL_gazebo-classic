@@ -25,7 +25,7 @@ option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" "OFF")
 option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" "OFF")
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost 1.58 REQUIRED COMPONENTS system thread timer)
+find_package(Boost 1.58 REQUIRED COMPONENTS system thread timer filesystem)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_program(px4 REQUIRED)
