@@ -17,6 +17,8 @@ include(GNUInstallDirs)
 #######################
 
 # Add search directory for CMake on OS X
+list(APPEND CMAKE_PREFIX_PATH "/usr/lib/OGRE/OGRE/cmake")
+list(APPEND CMAKE_MODULE_PATH "/usr/lib/OGRE/OGRE/cmake")
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
