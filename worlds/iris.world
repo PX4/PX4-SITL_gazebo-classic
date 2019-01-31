@@ -15,8 +15,16 @@
     </include>
     <include>
       <uri>model://iris</uri>
-      <pose>1.01 0.98 0.83 0 0 1.14</pose>
+      <pose>3.00 3.00 0.00 0 0 1.14</pose>
     </include>
+    <include>
+      <uri>model://iris_1</uri>
+      <pose>3.00 0.00 000 0 0 1.14</pose>
+    </include>
+    <include>
+      <uri>model://iris_2</uri>
+      <pose>0.00 3.00 0.00 0 0 1.14</pose>
+    </include>	    
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
