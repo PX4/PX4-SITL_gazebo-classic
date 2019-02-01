@@ -401,6 +401,8 @@ install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
 configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})
 
+install(FILES ${PROJECT_SOURCE_DIR}/package.xml DESTINATION ${RESOURCE_PATH})
+
 #############
 ## Testing ##
 #############
