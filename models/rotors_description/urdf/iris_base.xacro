@@ -119,6 +119,11 @@
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:imu_plugin_macro>
 
+
+      <!-- Macro to add the reset the quadcopters. -->
+      <xacro:reset_plugin_macro namespace="${namespace}">
+      </xacro:reset_plugin_macro>
+
     <!-- Mount a generic odometry sensor providing ground truth. -->
     <xacro:odometry_plugin_macro
       namespace="${namespace}/ground_truth"
