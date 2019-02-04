@@ -123,7 +123,16 @@
       </plugin>
     </gazebo>
   </xacro:macro>
+  
+  <!-- Macro to add the reset the quadcopters. -->
+  <xacro:macro name="reset_plugin_macro" params="namespace reset_sub_topic">
+    <gazebo>
+      <plugin name="reset_plugin" filename="libResetPlugin.so">
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
+  
     <!-- Macro to add the gps_plugin. -->
   <xacro:macro name="gps_plugin_macro" params="namespace gps_noise">
     <gazebo>
