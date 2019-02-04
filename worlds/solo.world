@@ -10,15 +10,15 @@
       <uri>model://ground_plane</uri>
     </include>
     <include>
-      <uri>model://solo_3</uri>
+      <uri>model://solo_1</uri>
       <pose>3.00 3.00 0.00 0 0 1.14</pose>
     </include>
     <include>
-      <uri>model://solo_1</uri>
+      <uri>model://solo_2</uri>
       <pose>3.00 0.00 000 0 0 1.14</pose>
     </include>
     <include>
-      <uri>model://solo_2</uri>
+      <uri>model://solo_3</uri>
       <pose>0.00 3.00 0.00 0 0 1.14</pose>
     </include>
     <include>
