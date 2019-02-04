@@ -11,6 +11,15 @@
     </include>
     <include>
       <uri>model://solo</uri>
+      <pose>3.00 3.00 0.00 0 0 1.14</pose>
+    </include>
+    <include>
+      <uri>model://solo_1</uri>
+      <pose>3.00 0.00 000 0 0 1.14</pose>
+    </include>
+    <include>
+      <uri>model://solo_2</uri>
+      <pose>0.00 3.00 0.00 0 0 1.14</pose>
     </include>
     <include>
       <uri>model://asphalt_plane</uri>
