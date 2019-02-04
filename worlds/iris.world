@@ -14,15 +14,15 @@
       <uri>model://asphalt_plane</uri>
     </include>
     <include>
-      <uri>model://iris</uri>
+      <uri>model://iris_1</uri>
       <pose>3.00 3.00 0.00 0 0 1.14</pose>
     </include>
     <include>
-      <uri>model://iris_1</uri>
+      <uri>model://iris_2</uri>
       <pose>3.00 0.00 000 0 0 1.14</pose>
     </include>
     <include>
-      <uri>model://iris_2</uri>
+      <uri>model://iris_3</uri>
       <pose>0.00 3.00 0.00 0 0 1.14</pose>
     </include>	    
     <physics name='default_physics' default='0' type='ode'>
