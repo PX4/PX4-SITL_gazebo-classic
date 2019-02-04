@@ -10,7 +10,7 @@
       <uri>model://ground_plane</uri>
     </include>
     <include>
-      <uri>model://solo</uri>
+      <uri>model://solo_3</uri>
       <pose>3.00 3.00 0.00 0 0 1.14</pose>
     </include>
     <include>

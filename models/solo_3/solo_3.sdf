@@ -1,5 +1,5 @@
 <sdf version='1.5'>
-  <model name='solo'>
+  <model name='solo_3'>
     <!-- Solo body -->
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
