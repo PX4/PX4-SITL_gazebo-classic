@@ -38,7 +38,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://IF750A/meshes/if750a.stl</uri>
+            <uri>model://if750a/meshes/if750a.stl</uri>
           </mesh>
         </geometry>
         <material>
