@@ -289,7 +289,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // frame d is the magnetic north frame
   mag_d_.X() = 0.21523;
   mag_d_.Y() = 0;
-  mag_d_.Z() = -0.42741;
+  mag_d_.Z() = 0.42741;
 
   if(_sdf->HasElement("hil_state_level"))
   {
