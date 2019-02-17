@@ -7,6 +7,7 @@
   <xacro:arg name='name' default='iris' />
   <xacro:arg name='mavlink_addr' default='INADDR_ANY' />
   <xacro:arg name='mavlink_udp_port' default='14560' />
+  <xacro:arg name='mavlink_tcp_port' default='4560' />
   <xacro:arg name='serial_enabled' default='false' />
   <xacro:arg name='serial_device' default='/dev/ttyACM0' />
   <xacro:arg name='baudrate' default='921600' />
@@ -62,6 +63,7 @@
     gps_sub_topic="/gps"
     mavlink_addr="$(arg mavlink_addr)"
     mavlink_udp_port="$(arg mavlink_udp_port)"
+    mavlink_tcp_port="$(arg mavlink_tcp_port)"
     serial_enabled="$(arg serial_enabled)"
     serial_device="$(arg serial_device)"
     baudrate="$(arg baudrate)"
