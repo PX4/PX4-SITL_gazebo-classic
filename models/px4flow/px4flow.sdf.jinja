@@ -1,0 +1,117 @@
+{%- set rad2deg = 57.2957795131 -%}
+{%- set deg2rad = 0.01745329251 -%}
+{%- set m = 0.050 -%}
+{%- set l = 0.005 -%}
+{%- set w = 0.030 -%}
+{%- set h = 0.010 -%}
+{%- set ixx = m/12*(w**2 + h**2) -%}
+{%- set iyy = m/12*(l**2 + h**2) -%}
+{%- set izz = m/12*(l**2 + w**2) -%}
+
+{%- macro box(l, w, h) -%}
+<geometry>
+  <box>
+    <size>{{l}} {{w}} {{h}}</size>
+  </box>
+</geometry>
+{%- endmacro -%}
+
+<?xml version="1.0" ?>
+<sdf version="1.5">
+
+  <model name="px4flow">
+
+    <link name="link">
+
+      <pose>0 0 0 {{ -90*deg2rad }} {{ 90*deg2rad }} 0</pose>
+
+      <inertial>
+        <mass>{{m}}</mass>
+        <inertia>
+          <ixx>{{ixx}}</ixx>
+          <iyy>{{iyy}}</iyy>
+          <izz>{{izz}}</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="visual">
+        {{ box(l, w, h)|indent(8) }}
+      </visual>
+
+      <collision name="collision">
+        {{ box(l, w, h)|indent(8) }}
+      </collision>
+
+      <sensor name="px4flow" type="imu">
+        <pose>0 0 0 0 -1.5707963259 3.141592652</pose>
+        <always_on>1</always_on>
+        <update_rate>200</update_rate>
+      </sensor>
+
+      <!-- Sonar: HRLV EZ4-->
+      <!--<sensor name="sonar" type="sonar">-->
+        <!--<sonar>-->
+          <!--<min>0</min>-->
+          <!--<max>5.00</max>-->
+          <!--<radius>0.6</radius>-->
+        <!--</sonar>-->
+        <!--<always_on>1</always_on>-->
+        <!--<update_rate>10</update_rate>-->
+        <!--<visualize>false</visualize>-->
+      <!--</sensor>-->
+
+      <!--752x480 MT9V034 image sensor, only 64x64 pixels used-->
+      <sensor name="px4flow" type="camera">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <visualize>true</visualize>
+        <topic>/px4flow</topic>
+        <camera>
+          <horizontal_fov>0.25</horizontal_fov>
+          <lens>
+            <type>gnomonical</type>
+            <scale_to_hfov>false</scale_to_hfov>
+          </lens>
+          <image>
+            <width>64</width>
+            <height>64</height>
+            <format>L8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.001</stddev>
+          </noise>
+        </camera>
+        <plugin name="opticalflow_plugin" filename="libgazebo_opticalflow_plugin.so">
+            <robotNamespace></robotNamespace>
+            <outputRate>20</outputRate>
+            <hasGyro>true</hasGyro>
+            <gyroTopic>/px4flow/imu</gyroTopic>
+        </plugin>
+        <!--<plugin name="camera_controller" filename="libgazebo_ros_camera.so">-->
+            <!--<robotNamespace></robotNamespace>-->
+            <!--<cameraName>flow_camera</cameraName>-->
+            <!--<imageTopicName>image_raw</imageTopicName>-->
+            <!--<cameraInfoTopicName>camera_info</cameraInfoTopicName>-->
+            <!--<frameName>link</frameName>-->
+            <!--<hackBaseline>0.07</hackBaseline>-->
+            <!--<distortionK1>0.0</distortionK1>-->
+            <!--<distortionK2>0.0</distortionK2>-->
+            <!--<distortionK3>0.0</distortionK3>-->
+            <!--<distortionT1>0.0</distortionT1>-->
+            <!--<distortionT2>0.0</distortionT2>-->
+        <!--</plugin>-->
+      </sensor>
+    </link>
+  </model>
+
+</sdf>
+
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->
+{# vim: set et ft=jinja fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : #}

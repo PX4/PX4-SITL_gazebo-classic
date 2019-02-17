@@ -1,0 +1,88 @@
+{%- set m = 0.050 -%}
+{%- set l = 0.005 -%}
+{%- set w = 0.030 -%}
+{%- set h = 0.010 -%}
+{%- set ixx = m/12*(w**2 + h**2) -%}
+{%- set iyy = m/12*(l**2 + h**2) -%}
+{%- set izz = m/12*(l**2 + w**2) -%}
+
+{%- macro box(l, w, h) -%}
+<geometry>
+  <box>
+    <size>{{l}} {{w}} {{h}}</size>
+  </box>
+</geometry>
+{%- endmacro -%}
+
+<?xml version="1.0" ?>
+<sdf version="1.5">
+
+  <model name="c920">
+
+    <link name="link">
+
+      <inertial>
+        <mass>{{m}}</mass>
+        <inertia>
+          <ixx>{{ixx}}</ixx>
+          <iyy>{{iyy}}</iyy>
+          <izz>{{izz}}</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="visual">
+        {{ box(l, w, h)|indent(8) }}
+      </visual>
+
+      <collision name="collision">
+        {{ box(l, w, h)|indent(8) }}
+      </collision>
+
+      <sensor type="camera" name="c920_sensor">
+        <always_on>true</always_on>
+        <update_rate>30.0</update_rate>
+        <camera name="head">
+          <horizontal_fov>1.229</horizontal_fov>
+          <image>
+            <width>1920</width>
+            <height>1080</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>10</far>
+          </clip>
+          <lens>
+            <type>gnomonical</type>
+            <scale_to_hfov>1</scale_to_hfov>
+          </lens>
+          <noise>
+            <type>gaussian</type>
+            <!-- Noise is sampled independently per pixel on each frame.
+                 That pixel's noise value is added to each of its color
+                 channels, which at that point lie in the range [0,1]. -->
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <robotNamespace></robotNamespace>
+          <cameraName>c920</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>camera_link</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </link>
+  </model>
+
+</sdf>
+
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

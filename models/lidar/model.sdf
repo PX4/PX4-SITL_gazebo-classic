@@ -3,7 +3,7 @@
   <model name="lidar">
     <link name="link">
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.01</mass>
         <inertia>
           <ixx>2.1733e-6</ixx>
@@ -19,7 +19,9 @@
           <cylinder><radius>0.006</radius><length>0.05</length></cylinder>
         </geometry>
         <material>
-          <script>Gazebo/Black</script>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
         </material>
       </visual>
       <sensor name="laser" type="ray">
@@ -34,20 +36,24 @@
             </horizontal>
           </scan>
           <range>
-            <min>0.09</min>
-            <max>15</max>
+            <min>0.06</min> <!-- do not change: use min_distance (below) for realistic behavior (smaller values cause issues) -->
+            <max>35</max>   <!-- do not change: use min_distance (below) for realistic behavior (bigger values cause issues) -->
             <resolution>0.01</resolution>
           </range>
           <noise>
             <type>gaussian</type>
             <mean>0.0</mean>
-            <stddev>0.01</stddev>
+            <stddev>0.02</stddev>
           </noise>
         </ray>
-	<plugin name="LaserPlugin" filename="libgazebo_lidar_plugin.so"/>
+        <plugin name="LaserPlugin" filename="libgazebo_lidar_plugin.so">
+          <robotNamespace></robotNamespace>
+          <min_distance>0.2</min_distance>
+          <max_distance>15.0</max_distance>
+        </plugin>
         <always_on>1</always_on>
-        <update_rate>10</update_rate>
-        <visualize>false</visualize>
+        <update_rate>20</update_rate>
+        <visualize>true</visualize>
       </sensor>
     </link>
   </model>

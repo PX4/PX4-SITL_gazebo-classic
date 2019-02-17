@@ -36,7 +36,7 @@ GazeboImuPlugin::GazeboImuPlugin()
 }
 
 GazeboImuPlugin::~GazeboImuPlugin() {
-  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+  updateConnection_->~Connection();
 }
 
 
@@ -70,7 +70,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   getSdfParam<double>(_sdf, "gyroscopeNoiseDensity",
                       imu_parameters_.gyroscope_noise_density,
                       imu_parameters_.gyroscope_noise_density);
-  getSdfParam<double>(_sdf, "gyroscopeBiasRandomWalk",
+  getSdfParam<double>(_sdf, "gyroscopeRandomWalk",
                       imu_parameters_.gyroscope_random_walk,
                       imu_parameters_.gyroscope_random_walk);
   getSdfParam<double>(_sdf, "gyroscopeBiasCorrelationTime",
@@ -94,7 +94,11 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
                       imu_parameters_.accelerometer_turn_on_bias_sigma,
                       imu_parameters_.accelerometer_turn_on_bias_sigma);
 
+  #if GAZEBO_MAJOR_VERSION >= 9
+  last_time_ = world_->SimTime();
+  #else
   last_time_ = world_->GetSimTime();
+  #endif
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -102,7 +106,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
       event::Events::ConnectWorldUpdateBegin(
           boost::bind(&GazeboImuPlugin::OnUpdate, this, _1));
 
-  imu_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Imu>(imu_topic_, 1);
+  imu_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Imu>("~/" + model_->GetName() + imu_topic_, 10);
 
   // Fill imu message.
   // imu_message_.header.frame_id = frame_id_; TODO Add header
@@ -161,8 +165,8 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     }
   }
 
-  gravity_W_ = world_->GetPhysicsEngine()->GetGravity();
-  imu_parameters_.gravity_magnitude = gravity_W_.GetLength();
+  gravity_W_ = world_->Gravity();
+  imu_parameters_.gravity_magnitude = gravity_W_.Length();
 
   standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
 
@@ -238,50 +242,58 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
 
 // This gets called by the world update start event.
 void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
+#if GAZEBO_MAJOR_VERSION >= 9
+  common::Time current_time  = world_->SimTime();
+#else
   common::Time current_time  = world_->GetSimTime();
+#endif
   double dt = (current_time - last_time_).Double();
   last_time_ = current_time;
   double t = current_time.Double();
 
-  math::Pose T_W_I = link_->GetWorldPose(); //TODO(burrimi): Check tf.
-  math::Quaternion C_W_I = T_W_I.rot;
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Pose3d T_W_I = link_->WorldPose(); //TODO(burrimi): Check tf.
+#else
+  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(link_->GetWorldPose()); //TODO(burrimi): Check tf.
+#endif
 
-  // Copy math::Quaternion to gazebo::msgs::Quaternion
+  ignition::math::Quaterniond C_W_I = T_W_I.Rot();
+
+  // Copy ignition::math::Quaterniond to gazebo::msgs::Quaternion
   gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-  orientation->set_x(C_W_I.x);
-  orientation->set_y(C_W_I.y);
-  orientation->set_z(C_W_I.z);
-  orientation->set_w(C_W_I.w);
-
-
-
-
-
-
-
+  orientation->set_x(C_W_I.X());
+  orientation->set_y(C_W_I.Y());
+  orientation->set_z(C_W_I.Z());
+  orientation->set_w(C_W_I.W());
 
 #if GAZEBO_MAJOR_VERSION < 5
-  math::Vector3 velocity_current_W = link_->GetWorldLinearVel();
-  // link_->GetRelativeLinearAccel() does not work sometimes with old gazebo versions.
+  ignition::math::Vector3d velocity_current_W = link_->GetWorldLinearVel();
+  // link_->RelativeLinearAccel() does not work sometimes with old gazebo versions.
   // TODO For an accurate simulation, this might have to be fixed. Consider the
   // This issue is solved in gazebo 5.
-  math::Vector3 acceleration = (velocity_current_W - velocity_prev_W_) / dt;
-  math::Vector3 acceleration_I =
+  ignition::math::Vector3d acceleration = (velocity_current_W - velocity_prev_W_) / dt;
+  ignition::math::Vector3d acceleration_I =
       C_W_I.RotateVectorReverse(acceleration - gravity_W_);
 
   velocity_prev_W_ = velocity_current_W;
+#elif GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d acceleration_I = link_->RelativeLinearAccel() - C_W_I.RotateVectorReverse(gravity_W_);
 #else
-  math::Vector3 acceleration_I = link_->GetRelativeLinearAccel() - C_W_I.RotateVectorReverse(gravity_W_);
+  ignition::math::Vector3d acceleration_I = ignitionFromGazeboMath(link_->GetRelativeLinearAccel() - C_W_I.RotateVectorReverse(gravity_W_));
 #endif
 
-  math::Vector3 angular_vel_I = link_->GetRelativeAngularVel();
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d angular_vel_I = link_->RelativeAngularVel();
+#else
+  ignition::math::Vector3d angular_vel_I = ignitionFromGazeboMath(link_->GetRelativeAngularVel());
+#endif
 
-  Eigen::Vector3d linear_acceleration_I(acceleration_I.x,
-                                        acceleration_I.y,
-                                        acceleration_I.z);
-  Eigen::Vector3d angular_velocity_I(angular_vel_I.x,
-                                     angular_vel_I.y,
-                                     angular_vel_I.z);
+  Eigen::Vector3d linear_acceleration_I(acceleration_I.X(),
+                                        acceleration_I.Y(),
+                                        acceleration_I.Z());
+  Eigen::Vector3d angular_velocity_I(angular_vel_I.X(),
+                                     angular_vel_I.Y(),
+                                     angular_vel_I.Z());
 
   addNoise(&linear_acceleration_I, &angular_velocity_I, dt);
 
@@ -301,13 +313,15 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   // ADD HEaders
   // imu_message_.header.stamp.sec = current_time.sec;
   // imu_message_.header.stamp.nsec = current_time.nsec;
+  imu_message_.set_time_usec(_info.simTime.sec * 1000000 + _info.simTime.nsec / 1000);
+  imu_message_.set_seq(seq_++);
 
   // TODO(burrimi): Add orientation estimator.
   // imu_message_.orientation.w = 1;
   // imu_message_.orientation.x = 0;
   // imu_message_.orientation.y = 0;
   // imu_message_.orientation.z = 0;
-  
+
   imu_message_.set_allocated_orientation(orientation);
   imu_message_.set_allocated_linear_acceleration(linear_acceleration);
   imu_message_.set_allocated_angular_velocity(angular_velocity);

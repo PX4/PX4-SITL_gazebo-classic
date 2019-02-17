@@ -1,10 +1,12 @@
-# Gazebo for PX4 SITL
+# Gazebo for MAVLink SITL and HITL [![Build Status](https://travis-ci.org/PX4/sitl_gazebo.svg?branch=master)](https://travis-ci.org/PX4/sitl_gazebo)
 
-This is a flight simulator for multirotors, VTOL and fixed wing.
+This is a flight simulator for multirotors, VTOL and fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. This repository is in the process of being re-integrated into RotorS, which then will support ROS and MAVLink as transport options: https://github.com/ethz-asl/rotors_simulator
+
+**If you use this simulator in academic work, please cite RotorS as per the README in the above link.**
 
 ## Install Gazebo Simulator
 
-Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS users should install Gazebo 7, Linux users Gazebo 6. Failing to install the right version can render the simulation inoperational.
+Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS and Linux users should install Gazebo 7.
 
 
 ## Protobuf
@@ -14,14 +16,23 @@ Install the protobuf library, which is used as interface to Gazebo.
 ### Ubuntu Linux
 
 ```bash
-sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev libgazebo6-dev
+sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev \
+			gazebo7 libgazebo7-dev libxml2-utils python-rospkg python-jinja2
 ```
 
 ### Mac OS
 
 ```bash
-brew install graphviz sdformat3 protobuf eigen opencv
+pip install rospkg jinja2
+brew install graphviz libxml2 sdformat3 eigen opencv
 brew install gazebo7
+```
+
+An older version of protobuf (`< 3.0.0`) is required on Mac OS:
+
+```bash
+brew tap homebrew/versions
+brew install homebrew/versions/protobuf260
 ```
 
 ## Build Gazebo Plugins (all operating systems)
@@ -31,7 +42,7 @@ Clone the gazebo plugins repository to your computer. IMPORTANT: If you do not c
 ```bash
 mkdir -p ~/src
 cd src
-git clone https://github.com/PX4/sitl_gazebo.git
+git clone --recursive https://github.com/PX4/sitl_gazebo.git
 ```
 
 Create a build folder in the top level of your repository:
@@ -66,21 +77,60 @@ cd Build
 cmake ..
 ```
 
-Autogenerate the sdf file with the command
-```bash
-make sdf
-```
-
 Now build the gazebo plugins by typing:
 
 ```bash
 make
 ```
 
+### GStreamer Support
+If you want support for the GStreamer camera plugin, make sure to install
+GStreamer before running `cmake`. Eg. on Ubuntu with:
+```
+sudo apt-get install gstreamer1.0-* libgstreamer1.0-*
+```
+
+### Geotagging Plugin
+If you want to use the geotagging plugin, make sure you have `exiftool`
+installed on your system. On Ubuntu it can be installed with:
+```
+sudo apt-get install libimage-exiftool-perl
+```
+
+## Install
+
+If you wish the libraries and models to be usable anywhere on your system without
+specifying th paths, install as shown below.
+
+**Note: If you are using ubuntu, it is best to see the packaging section.**
+
+```bash
+sudo make install
+```
+
+## Testing
+
 Gazebo will now launch when typing 'gazebo' on the shell:
 
 ```bash
-gazebo
+. /usr/share/gazebo/setup.sh
+. /usr/share/mavlink_sitl_gazebo/setup.sh
+gazebo worlds/iris.world
 ```
 
-Start the PX4 SITL executable as documented [in the PX4 SITL documentation](http://dev.px4.io/simulation-gazebo.html). Then insert the IRIS model from the **insert** tab. This should trigger the communication with the PX4 SITL app.
+Please refer to the documentation of the particular flight stack how to run it against this framework, e.g. [PX4](http://dev.px4.io/simulation-gazebo.html)
+
+## Packaging
+
+### Deb
+
+To create a debian package for ubuntu and install it to your system.
+
+```bash
+cd Build
+cmake ..
+make
+rm *.deb
+cpack -G DEB
+sudo dpkg -i *.deb
+```

@@ -1,0 +1,92 @@
+env:
+  global:
+    - CCACHE_DIR=$HOME/.ccache
+    - CMAKE_BUILD="mkdir Build; cd Build; cmake ..; make -j$(nproc) -l$(nproc)"
+    - CATKIN_BUILD="mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON"
+    - KINETIC="source /opt/ros/kinetic/setup.bash; ${CATKIN_BUILD}"
+    - MELODIC="source /opt/ros/melodic/setup.bash; ${CATKIN_BUILD}"
+
+matrix:
+    include:
+        - name: CMake build (Gazebo 9)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-02-09
+            - BUILD=${CMAKE_BUILD}
+        - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2019-02-09
+            - BUILD=${KINETIC}
+        - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros:2019-02-09
+            - BUILD=${MELODIC}
+        - name: Validate SDF schemas
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-02-09
+            - BUILD="source ./scripts/validate_sdf.bash"
+        - name: MacOSX 10.13 build with Gazebo8
+          os: osx
+          osx_image: xcode10.1
+          language: cpp
+          cache:
+            ccache: true
+          env:
+            - GAZEBO_VERSION="gazebo8"
+        - name: MacOSX 10.13 build with Gazebo9
+          os: osx
+          osx_image: xcode10.1
+          language: cpp
+          cache:
+            ccache: true
+          env:
+            - GAZEBO_VERSION="gazebo9"
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    brew update;
+    git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0;
+    rm -rf /usr/local/include/mavlink/v2.0/.git;
+    fi
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    brew tap PX4/px4;
+    brew install px4-dev;
+    brew tap osrf/simulation;
+    brew install opencv ${GAZEBO_VERSION};
+    brew cask reinstall xquartz java;
+    sudo -H pip2 install --upgrade pip setuptools;
+    sudo -H pip2 install rospkg pyserial empy toml numpy pandas jinja2;
+    sudo -H pip2 install --upgrade --force-reinstall numpy;
+    fi
+
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    mkdir Build;
+    cd Build && cmake .. && make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu);
+    else docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}" --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
+    fi

@@ -1,0 +1,170 @@
+{# parameters #}
+{%- set m = 0.038 -%}
+{%- set w = 0.049784 -%}
+{%- set l = 0.081534 -%}
+{%- set h = 0.01557 -%}
+{%- set ixx = m/12*(w**2 + l**2) -%}
+{%- set iyy = m/12*(l**2 + h**2) -%}
+{%- set izz = m/12*(w**2 + h**2) -%}
+
+{%- macro box(l, w, h) -%}
+<geometry>
+  <box>
+    <size>{{l}} {{w}} {{h}}</size>
+  </box>
+</geometry>
+{%- endmacro -%}
+
+<?xml version="1.0" ?>
+<sdf version="1.5">
+
+  <model name="pixhawk">
+
+    <link name="link">
+
+      <inertial>
+        <mass>{{m}}</mass>
+        <inertia>
+          <ixx>{{ixx}}</ixx>
+          <iyy>{{iyy}}</iyy>
+          <izz>{{izz}}</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="visual">
+        {{ box(l, w, h)|indent(8) }}
+        <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/FlatBlack</name>
+            </script>
+        </material>
+      </visual>
+
+      <collision name="collision">
+        {{ box(l, w, h)|indent(8) }}
+      </collision>
+
+      <sensor name='mpu-6000' type='imu'>
+        <always_on>true</always_on>
+        <update_rate>300</update_rate>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+               <mean>0</mean>
+               <stddev>0.0002</stddev>
+               <bias_mean>7.5e-06</bias_mean>
+               <bias_stddev>8e-07</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+               <mean>0</mean>
+               <stddev>0.0002</stddev>
+               <bias_mean>7.5e-06</bias_mean>
+               <bias_stddev>8e-07</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+               <mean>0</mean>
+               <stddev>0.0002</stddev>
+               <bias_mean>7.5e-06</bias_mean>
+               <bias_stddev>8e-07</bias_stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+
+      <sensor name='ms5611' type='altimeter'>
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <altimeter>
+          <vertical_position>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.0</stddev>
+              <bias_mean>0.0</bias_mean>
+              <bias_stddev>1.0</bias_stddev>
+            </noise>
+          </vertical_position>
+          <vertical_velocity>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>1.0</stddev>
+              <bias_mean>0.0</bias_mean>
+              <bias_stddev>1.0</bias_stddev>
+            </noise>
+          </vertical_velocity>
+        </altimeter>
+      </sensor>
+
+      <sensor name="LSM303D" type="magnetometer">
+        <always_on>true</always_on>
+        <update_rate>50</update_rate>
+        <magnetometer>
+          <x>
+            <noise type="gaussian">
+             <mean>0</mean>
+             <stddev>0.0002</stddev>
+             <bias_mean>7.5e-06</bias_mean>
+             <bias_stddev>8e-07</bias_stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+             <mean>0</mean>
+             <stddev>0.0002</stddev>
+             <bias_mean>7.5e-06</bias_mean>
+             <bias_stddev>8e-07</bias_stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+             <mean>0</mean>
+             <stddev>0.0002</stddev>
+             <bias_mean>7.5e-06</bias_mean>
+             <bias_stddev>8e-07</bias_stddev>
+            </noise>
+          </z>
+        </magnetometer>
+
+      </sensor>
+
+    </link>
+
+  </model>
+
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

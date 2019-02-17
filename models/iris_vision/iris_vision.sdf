@@ -1,0 +1,18 @@
+<sdf version='1.5'>
+  <model name='iris_vision'>
+    <plugin name="vision_plugin" filename="libgazebo_vision_plugin.so">
+        <robotNamespace></robotNamespace>
+        <pubRate>30</pubRate>
+        <randomWalk>1.0</randomWalk>
+        <noiseDensity>5e-04</noiseDensity>
+        <corellationTime>60.0</corellationTime>
+    </plugin>
+
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+  </model>
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->
