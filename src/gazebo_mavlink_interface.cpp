@@ -583,17 +583,17 @@ void GazeboMavlinkInterface::SendSensorMessages()
   ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
 
   // Magnetic declination and inclination (radians)
-  float declination = get_mag_declination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
-  float inclination = get_mag_inclination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
+  float declination_rad = get_mag_declination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
+  float inclination_rad = get_mag_inclination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
 
   // Magnetic strength (10^5xnanoTesla)
-  float strength = 0.01f * get_mag_strength(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI);
+  float strength_ga = 0.01f * get_mag_strength(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI);
 
   // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
-  float H = strength * cosf(inclination);
-  float Z = tanf(inclination) * H;
-  float X = H * cosf(declination);
-  float Y = H * sinf(declination);
+  float H = strength_ga * cosf(inclination_rad);
+  float Z = tanf(inclination_rad) * H;
+  float X = H * cosf(declination_rad);
+  float Y = H * sinf(declination_rad);
 
   // Magnetic field data from WMM2018 (10^5xnanoTesla (N, E D) n-frame )
   mag_d_.X() = X;
