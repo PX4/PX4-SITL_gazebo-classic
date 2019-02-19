@@ -31,6 +31,9 @@ namespace gazebo {
 
 GazeboImuPlugin::GazeboImuPlugin()
     : ModelPlugin(),
+      groundtruth_lat_rad(0.0),
+      groundtruth_lon_rad(0.0),
+      groundtruth_altitude(0.0),
       velocity_prev_W_(0,0,0)
 {
 }
@@ -93,6 +96,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   getSdfParam<double>(_sdf, "accelerometerTurnOnBiasSigma",
                       imu_parameters_.accelerometer_turn_on_bias_sigma,
                       imu_parameters_.accelerometer_turn_on_bias_sigma);
+  gt_sub_topic_ = "/groundtruth";
 
   #if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
@@ -107,6 +111,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
           boost::bind(&GazeboImuPlugin::OnUpdate, this, _1));
 
   imu_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Imu>("~/" + model_->GetName() + imu_topic_, 10);
+  gt_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gt_sub_topic_, &GazeboImuPlugin::GroundtruthCallback, this);
 
   // Fill imu message.
   // imu_message_.header.frame_id = frame_id_; TODO Add header
@@ -182,6 +187,13 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // TODO(nikolicj) incorporate steady-state covariance of bias process
   gyroscope_bias_.setZero();
   accelerometer_bias_.setZero();
+}
+
+void GazeboImuPlugin::GroundtruthCallback(GtPtr& gt_msg) {
+  // update groundtruth lat_rad, lon_rad and altitude
+  groundtruth_lat_rad = gt_msg->latitude_rad();
+  groundtruth_lon_rad = gt_msg->longitude_rad();
+  groundtruth_altitude = gt_msg->altitude();
 }
 
 /// \brief This function adds noise to acceleration and angular rates for
