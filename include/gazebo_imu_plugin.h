@@ -33,6 +33,8 @@
 
 #include "common.h"
 
+#include <geo_mag_declination.h>
+
 namespace gazebo {
 //typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
@@ -156,6 +158,8 @@ class GazeboImuPlugin : public ModelPlugin {
 
   Eigen::Vector3d gyroscope_turn_on_bias_;
   Eigen::Vector3d accelerometer_turn_on_bias_;
+
+  Eigen::Vector3d mag_noise_;
 
   ImuParameters imu_parameters_;
 

@@ -250,6 +250,10 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
         accelerometer_turn_on_bias_[i];
   }
 
+  // Magnetometer
+  for(int i = 0; i < 3; ++i) {
+    mag_noise_[i] = 0.01 * standard_normal_distribution_(random_generator_);
+  }
 }
 
 // This gets called by the world update start event.
@@ -321,6 +325,26 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   angular_velocity->set_y(angular_velocity_I[1]);
   angular_velocity->set_z(angular_velocity_I[2]);
 
+  // Magnetic declination and inclination (radians)
+  float declination_rad = get_mag_declination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
+  float inclination_rad = get_mag_inclination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
+
+  // Magnetic strength (10^5xnanoTesla)
+  float strength_ga = 0.01f * get_mag_strength(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI);
+
+  // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
+  float H = strength_ga * cosf(inclination_rad);
+  float Z = tanf(inclination_rad) * H;
+  float X = H * cosf(declination_rad);
+  float Y = H * sinf(declination_rad);
+
+  Eigen::Vector3d magnetic_field_I(X, Y, Z);
+
+  gazebo::msgs::Vector3d* magnetic_field = new gazebo::msgs::Vector3d();
+  magnetic_field->set_x(X + mag_noise_[0]);
+  magnetic_field->set_y(Y + mag_noise_[1]);
+  magnetic_field->set_z(Z + mag_noise_[2]);
+
   // Fill IMU message.
   // ADD HEaders
   // imu_message_.header.stamp.sec = current_time.sec;
@@ -337,6 +361,7 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   imu_message_.set_allocated_orientation(orientation);
   imu_message_.set_allocated_linear_acceleration(linear_acceleration);
   imu_message_.set_allocated_angular_velocity(angular_velocity);
+  imu_message_.set_allocated_magnetic_field(magnetic_field);
 
   imu_pub_->Publish(imu_message_);
 }
