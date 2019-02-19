@@ -21,7 +21,8 @@
 #include <random>
 
 #include <Eigen/Core>
-#include "Imu.pb.h"
+#include <Groundtruth.pb.h>
+#include <Imu.pb.h>
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
@@ -34,6 +35,7 @@
 
 namespace gazebo {
 //typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
 // Default values for use with ADIS16448 IMU
 static constexpr double kDefaultAdisGyroscopeNoiseDensity =
@@ -113,14 +115,21 @@ class GazeboImuPlugin : public ModelPlugin {
       const double dt);
 
   void OnUpdate(const common::UpdateInfo&);
+  void GroundtruthCallback(GtPtr&);
 
  private:
   std::string namespace_;
   std::string imu_topic_;
   transport::NodePtr node_handle_;
   transport::PublisherPtr imu_pub_;
+  transport::SubscriberPtr gt_sub_;
   std::string frame_id_;
   std::string link_name_;
+  std::string gt_sub_topic_;
+
+  double groundtruth_lat_rad;
+  double groundtruth_lon_rad;
+  double groundtruth_altitude;
 
   std::default_random_engine random_generator_;
   std::normal_distribution<double> standard_normal_distribution_;
@@ -137,6 +146,7 @@ class GazeboImuPlugin : public ModelPlugin {
   common::Time last_time_;
 
   sensor_msgs::msgs::Imu imu_message_;
+  sensor_msgs::msgs::Groundtruth gt_message_;
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
