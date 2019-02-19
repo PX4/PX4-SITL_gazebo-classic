@@ -11,6 +11,7 @@ message Imu
   repeated float   angular_velocity_covariance = 4 [packed=true];
   required gazebo.msgs.Vector3d linear_acceleration = 5;
   repeated float   linear_acceleration_covariance = 6 [packed=true];
-  required int64 time_usec = 7;
-  required int64 seq = 8;
+  required gazebo.msgs.Vector3d magnetic_field = 7;
+  required int64 time_usec = 8;
+  required int64 seq = 9;
 }
