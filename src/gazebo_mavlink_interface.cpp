@@ -582,24 +582,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
 #endif
   ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
 
-  // Magnetic declination and inclination (radians)
-  float declination_rad = get_mag_declination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
-  float inclination_rad = get_mag_inclination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
-
-  // Magnetic strength (10^5xnanoTesla)
-  float strength_ga = 0.01f * get_mag_strength(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI);
-
-  // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
-  float H = strength_ga * cosf(inclination_rad);
-  float Z = tanf(inclination_rad) * H;
-  float X = H * cosf(declination_rad);
-  float Y = H * sinf(declination_rad);
-
-  // Magnetic field data from WMM2018 (10^5xnanoTesla (N, E D) n-frame )
-  mag_d_.X() = X;
-  mag_d_.Y() = Y;
-  mag_d_.Z() = Z;
-
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
   ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
@@ -610,11 +592,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
   ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
 #endif
 
-  ignition::math::Vector3d mag_noise_b(
-    0.01 * randn_(rand_),
-    0.01 * randn_(rand_),
-    0.01 * randn_(rand_));
-
   ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
     last_imu_message_.linear_acceleration().x(),
     last_imu_message_.linear_acceleration().y(),
@@ -623,7 +600,10 @@ void GazeboMavlinkInterface::SendSensorMessages()
     last_imu_message_.angular_velocity().x(),
     last_imu_message_.angular_velocity().y(),
     last_imu_message_.angular_velocity().z()));
-  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_d_) + mag_noise_b;
+  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(ignition::math::Vector3d(
+    last_imu_message_.magnetic_field().x(),
+    last_imu_message_.magnetic_field().y(),
+    last_imu_message_.magnetic_field().z()));
 
   bool should_send_imu = false;
   if (!enable_lockstep_) {

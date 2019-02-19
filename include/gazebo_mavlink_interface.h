@@ -68,8 +68,6 @@
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
 
-#include <geo_mag_declination.h>
-
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 static const uint32_t kDefaultMavlinkTcpPort = 4560;
 static const uint32_t kDefaultQGCUdpPort = 14550;
@@ -300,7 +298,6 @@ private:
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
-  ignition::math::Vector3d mag_d_;
 
   std::default_random_engine rand_;
   std::normal_distribution<float> randn_;
