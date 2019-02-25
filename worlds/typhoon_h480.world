@@ -39,5 +39,8 @@
       <real_time_update_rate>250</real_time_update_rate>
       <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
     </physics>
+    <scene>
+      <shadows>false</shadows>
+    </scene>
   </world>
 </sdf>
