@@ -33,12 +33,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   model_ = _model;
   world_ = model_->GetWorld();
 
-  const char *env_alt = std::getenv("PX4_HOME_ALT");
-  if (env_alt) {
-    gzmsg << "Home altitude is set to " << env_alt << ".\n";
-    alt_home = std::stod(env_alt);
-  }
-
   namespace_.clear();
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -64,6 +58,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
   getSdfParam<std::string>(_sdf, "magSubTopic", mag_sub_topic_, mag_sub_topic_);
+  getSdfParam<std::string>(_sdf, "baroSubTopic", baro_sub_topic_, baro_sub_topic_);
   groundtruth_sub_topic_ = "/groundtruth";
 
   // set input_reference_ from inputs.control
@@ -272,6 +267,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
+  baro_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + baro_sub_topic_, &GazeboMavlinkInterface::BarometerCallback, this);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
@@ -636,47 +632,14 @@ void GazeboMavlinkInterface::SendSensorMessages()
     sensor_msg.ymag = mag_b.Y();
     sensor_msg.zmag = mag_b.Z();
 
-    // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
-    const float lapse_rate = 0.0065f; // reduction in temperature with altitude (Kelvin/m)
+    sensor_msg.temperature = temperature_;
+    sensor_msg.abs_pressure = abs_pressure_;
+    sensor_msg.pressure_alt = pressure_alt_;
+
     const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
-    float alt_msl = (float)alt_home - pos_n.Z();
-    float temperature_local = temperature_msl - lapse_rate * alt_msl;
-    float pressure_ratio = powf((temperature_msl/temperature_local) , 5.256f);
-    const float pressure_msl = 101325.0f; // pressure at MSL
-    sensor_msg.abs_pressure = pressure_msl / pressure_ratio;
-
-    // generate Gaussian noise sequence using polar form of Box-Muller transformation
-    double x1, x2, w, y1;
-    if (!baro_rnd_use_last_) {
-      do {
-        x1 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
-        x2 = 2.0 * ((double)rand() / (double)RAND_MAX) - 1.0;
-        w = x1 * x1 + x2 * x2;
-      } while ( w >= 1.0 );
-      w = sqrt( (-2.0 * log( w ) ) / w );
-      // calculate two values - the second value can be used next time because it is uncorrelated
-      y1 = x1 * w;
-      baro_rnd_y2_ = x2 * w;
-      baro_rnd_use_last_ = true;
-    } else {
-      // no need to repeat the calculation - use the second value from last update
-      y1 = baro_rnd_y2_;
-      baro_rnd_use_last_ = false;
-    }
-
-    // Apply 1 Pa RMS noise
-    float abs_pressure_noise = 1.0f * (float)y1;
-    sensor_msg.abs_pressure += abs_pressure_noise;
-
-    // convert to hPa
-    sensor_msg.abs_pressure *= 0.01f;
-
-    // calculate density using an ISA model for the tropsphere (valid up to 11km above MSL)
+    float temperature_local = sensor_msg.temperature + 273.0f;
     const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
     float rho = 1.225f / density_ratio;
-
-    // calculate pressure altitude including effect of pressure noise
-    sensor_msg.pressure_alt = alt_msl - abs_pressure_noise / (gravity_W_.Length() * rho);
 
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
@@ -685,9 +648,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
     } else {
       sensor_msg.diff_pressure = 0.005f*rho*vel_b.X()*vel_b.X();
     }
-
-    // calculate temperature in Celsius
-    sensor_msg.temperature = temperature_local - 273.0f;
 
     sensor_msg.fields_updated = 4095;
 
@@ -992,6 +952,12 @@ void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
     mag_msg->magnetic_field().x(),
     mag_msg->magnetic_field().y(),
     mag_msg->magnetic_field().z());
+}
+
+void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
+  temperature_ = baro_msg->temperature();
+  pressure_alt_ = baro_msg->pressure_altitude();
+  abs_pressure_ = baro_msg->absolute_pressure();
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()

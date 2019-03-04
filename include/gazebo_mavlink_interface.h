@@ -65,6 +65,7 @@
 #include <Groundtruth.pb.h>
 #include <Odometry.pb.h>
 #include <MagneticField.pb.h>
+#include <Barometer.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
@@ -93,6 +94,7 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> SonarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::MagneticField> MagnetometerPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Barometer> BarometerPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -109,6 +111,7 @@ static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
 static const std::string kDefaultMagTopic = "/mag";
+static const std::string kDefaultBarometerTopic = "/baro";
 
 //! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
 enum class Framing : uint8_t {
@@ -140,6 +143,7 @@ public:
     gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
     mag_sub_topic_(kDefaultMagTopic),
+    baro_sub_topic_(kDefaultBarometerTopic),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -172,9 +176,7 @@ public:
     device_(kDefaultDevice),
     baudrate_(kDefaultBaudRate),
     hil_mode_(false),
-    hil_state_level_(false),
-    baro_rnd_y2_(0.0),
-    baro_rnd_use_last_(false)
+    hil_state_level_(false)
     {}
 
   ~GazeboMavlinkInterface();
@@ -240,6 +242,7 @@ private:
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
   void MagnetometerCallback(MagnetometerPtr& mag_msg);
+  void BarometerCallback(BarometerPtr& baro_msg);
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
   void handle_message(mavlink_message_t *msg, bool &received_actuator);
   void pollForMAVLinkMessages();
@@ -258,7 +261,6 @@ private:
   }
 
   static const unsigned n_out_max = 16;
-  double alt_home = 488.0;   // meters
 
   double input_offset_[n_out_max];
   double input_scaling_[n_out_max];
@@ -278,6 +280,7 @@ private:
   transport::SubscriberPtr groundtruth_sub_;
   transport::SubscriberPtr vision_sub_;
   transport::SubscriberPtr mag_sub_;
+  transport::SubscriberPtr baro_sub_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -288,6 +291,7 @@ private:
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
   std::string mag_sub_topic_;
+  std::string baro_sub_topic_;
 
   std::mutex last_imu_message_mutex_ {};
   std::condition_variable last_imu_message_cond_ {};
@@ -304,7 +308,11 @@ private:
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
-  ignition::math::Vector3d mag_n_; // magnetometer NED measurements (gauss)
+  ignition::math::Vector3d mag_n_;
+
+  double temperature_;
+  double pressure_alt_;
+  double abs_pressure_;
 
   std::default_random_engine rand_;
   std::normal_distribution<float> randn_;
@@ -349,9 +357,5 @@ private:
 
   bool hil_mode_;
   bool hil_state_level_;
-
-  // state variables for baro pressure sensor random noise generator
-  double baro_rnd_y2_;
-  bool baro_rnd_use_last_;
-  };
+};
 }
