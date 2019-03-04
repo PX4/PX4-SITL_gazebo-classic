@@ -264,7 +264,8 @@ set(sensor_msgs
   msgs/SITLGps.proto
   msgs/OpticalFlow.proto
   msgs/MagneticField.proto
-  )
+  msgs/Barometer.proto
+f  )
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
 PROTOBUF_GENERATE_CPP(NAV_PROTO_SRCS NAV_PROTO_HDRS ${nav_msgs})
@@ -301,6 +302,7 @@ add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp)
+add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
@@ -319,6 +321,7 @@ set(plugins
   gazebo_multirotor_base_plugin
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
+  gazebo_barometer_plugin
   )
 
 foreach(plugin ${plugins})
