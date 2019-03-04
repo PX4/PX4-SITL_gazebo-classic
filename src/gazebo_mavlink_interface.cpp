@@ -63,6 +63,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
   getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
+  getSdfParam<std::string>(_sdf, "magnetometerSubTopic", magnetometer_sub_topic_, magnetometer_sub_topic_);
   groundtruth_sub_topic_ = "/groundtruth";
 
   // set input_reference_ from inputs.control
@@ -270,6 +271,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   gps_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gps_sub_topic_, &GazeboMavlinkInterface::GpsCallback, this);
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
+  magnetometer_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + magnetometer_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
@@ -582,24 +584,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
 #endif
   ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
 
-  // Magnetic declination and inclination (radians)
-  float declination_rad = get_mag_declination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
-  float inclination_rad = get_mag_inclination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
-
-  // Magnetic strength (10^5xnanoTesla)
-  float strength_ga = 0.01f * get_mag_strength(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI);
-
-  // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
-  float H = strength_ga * cosf(inclination_rad);
-  float Z = tanf(inclination_rad) * H;
-  float X = H * cosf(declination_rad);
-  float Y = H * sinf(declination_rad);
-
-  // Magnetic field data from WMM2018 (10^5xnanoTesla (N, E D) n-frame )
-  mag_d_.X() = X;
-  mag_d_.Y() = Y;
-  mag_d_.Z() = Z;
-
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
   ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
@@ -610,11 +594,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
   ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
 #endif
 
-  ignition::math::Vector3d mag_noise_b(
-    0.01 * randn_(rand_),
-    0.01 * randn_(rand_),
-    0.01 * randn_(rand_));
-
   ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
     last_imu_message_.linear_acceleration().x(),
     last_imu_message_.linear_acceleration().y(),
@@ -623,7 +602,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     last_imu_message_.angular_velocity().x(),
     last_imu_message_.angular_velocity().y(),
     last_imu_message_.angular_velocity().z()));
-  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_d_) + mag_noise_b;
+  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n_);
 
   bool should_send_imu = false;
   if (!enable_lockstep_) {
@@ -1005,6 +984,14 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &vision);
     send_mavlink_message(&msg);
   }
+}
+
+void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
+  // update groundtruth magnetometer NED components
+  mag_n_ = ignition::math::Vector3d(
+    mag_msg->magnetic_field().x(),
+    mag_msg->magnetic_field().y(),
+    mag_msg->magnetic_field().z());
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
