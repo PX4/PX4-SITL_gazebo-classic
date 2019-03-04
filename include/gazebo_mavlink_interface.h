@@ -64,11 +64,10 @@
 #include <IRLock.pb.h>
 #include <Groundtruth.pb.h>
 #include <Odometry.pb.h>
+#include <Magnetometer.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
-
-#include <geo_mag_declination.h>
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 static const uint32_t kDefaultMavlinkTcpPort = 4560;
@@ -93,6 +92,7 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::OpticalFlow> OpticalFlo
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> SonarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Magnetometer> MagnetometerPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -108,6 +108,7 @@ static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
+static const std::string kDefaultMagnetometerTopic = "/mag";
 
 //! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
 enum class Framing : uint8_t {
@@ -138,6 +139,7 @@ public:
     irlock_sub_topic_(kDefaultIRLockTopic),
     gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
+    magnetometer_sub_topic_(kDefaultMagnetometerTopic),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -237,13 +239,13 @@ private:
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
+  void MagnetometerCallback(MagnetometerPtr& mag_msg);
   void send_mavlink_message(const mavlink_message_t *message, const int destination_port = 0);
   void handle_message(mavlink_message_t *msg, bool &received_actuator);
   void pollForMAVLinkMessages();
   void SendSensorMessages();
   void handle_control(double _dt);
   bool IsRunning();
-
 
   // Serial interface
   void open();
@@ -275,6 +277,7 @@ private:
   transport::SubscriberPtr gps_sub_;
   transport::SubscriberPtr groundtruth_sub_;
   transport::SubscriberPtr vision_sub_;
+  transport::SubscriberPtr magnetometer_sub_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -284,6 +287,7 @@ private:
   std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
+  std::string magnetometer_sub_topic_;
 
   std::mutex last_imu_message_mutex_ {};
   std::condition_variable last_imu_message_cond_ {};
@@ -300,7 +304,7 @@ private:
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
-  ignition::math::Vector3d mag_d_;
+  ignition::math::Vector3d mag_n_; // magnetometer NED measurements (gauss)
 
   std::default_random_engine rand_;
   std::normal_distribution<float> randn_;
