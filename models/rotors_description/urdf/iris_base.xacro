@@ -48,12 +48,21 @@
   </xacro:if>
 
 
-    <!-- Instantiate gps plugin. -->
+  <!-- Instantiate gps plugin. -->
   <xacro:gps_plugin_macro
     namespace="${namespace}"
     gps_noise="true"
     >
   </xacro:gps_plugin_macro>
+
+  <!-- Instantiate magnetometer plugin. -->
+  <xacro:magnetometer_plugin_macro
+    namespace="${namespace}"
+    pub_rate="20"
+    noise_density="0.01"
+    mag_topic="/mag"
+    >
+  </xacro:magnetometer_plugin_macro>
 
   <xacro:if value="$(arg enable_mavlink_interface)">
   <!-- Instantiate mavlink telemetry interface. -->
@@ -61,6 +70,7 @@
     namespace="${namespace}"
     imu_sub_topic="/imu"
     gps_sub_topic="/gps"
+    mag_sub_topic="/mag"
     mavlink_addr="$(arg mavlink_addr)"
     mavlink_udp_port="$(arg mavlink_udp_port)"
     mavlink_tcp_port="$(arg mavlink_tcp_port)"
