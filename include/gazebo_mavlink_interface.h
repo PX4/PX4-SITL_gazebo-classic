@@ -108,7 +108,7 @@ static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
-static const std::string kDefaultMagnetometerTopic = "/mag";
+static const std::string kDefaultMagTopic = "/mag";
 
 //! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
 enum class Framing : uint8_t {
@@ -139,7 +139,7 @@ public:
     irlock_sub_topic_(kDefaultIRLockTopic),
     gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
-    magnetometer_sub_topic_(kDefaultMagnetometerTopic),
+    mag_sub_topic_(kDefaultMagTopic),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -277,7 +277,7 @@ private:
   transport::SubscriberPtr gps_sub_;
   transport::SubscriberPtr groundtruth_sub_;
   transport::SubscriberPtr vision_sub_;
-  transport::SubscriberPtr magnetometer_sub_;
+  transport::SubscriberPtr mag_sub_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -287,7 +287,7 @@ private:
   std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
-  std::string magnetometer_sub_topic_;
+  std::string mag_sub_topic_;
 
   std::mutex last_imu_message_mutex_ {};
   std::condition_variable last_imu_message_cond_ {};
