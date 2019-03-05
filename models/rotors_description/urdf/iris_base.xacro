@@ -66,6 +66,14 @@
     >
   </xacro:magnetometer_plugin_macro>
 
+  <!-- Instantiate barometer plugin. -->
+  <xacro:barometer_plugin_macro
+    namespace="${namespace}"
+    pub_rate="10"
+    baro_topic="/baro"
+    >
+  </xacro:barometer_plugin_macro>
+
   <xacro:if value="$(arg enable_mavlink_interface)">
   <!-- Instantiate mavlink telemetry interface. -->
   <xacro:mavlink_interface_macro
@@ -73,6 +81,7 @@
     imu_sub_topic="/imu"
     gps_sub_topic="/gps"
     mag_sub_topic="/mag"
+    baro_sub_topic="/baro"
     mavlink_addr="$(arg mavlink_addr)"
     mavlink_udp_port="$(arg mavlink_udp_port)"
     mavlink_tcp_port="$(arg mavlink_tcp_port)"
