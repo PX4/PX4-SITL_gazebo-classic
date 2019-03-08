@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="bumper_sensor">
+    <pose>0 0 0.0 0 0 0</pose>
+    <link name="bumper_link">
+      <inertial>
+        <pose>0.0 0.0 0.0 0 0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>4.15e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.407e-6</iyy>
+          <iyz>0</iyz>
+          <izz>2.407e-6</izz>
+        </inertia>
+      </inertial>
+
+      <!-- Only difference to regular iris is this sensor. Was not able to figure
+      out how to include it and be attached properly to this link -->
+      	<sensor name='bumper' type='contact'>
+                <plugin name="contact_plugin" filename="libgazebo_benchmark_plugin.so"/>
+                <contact>
+                  <collision>base_link_inertia_collision</collision>
+                </contact>
+              </sensor>
+    </link>
+  </model>
+</sdf>

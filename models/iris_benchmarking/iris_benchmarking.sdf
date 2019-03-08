@@ -1,0 +1,24 @@
+<sdf version='1.5'>
+  <model name='iris_benchmarking'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <include>
+      <uri>model://bumper_sensor</uri>
+      <pose>0 0 -0.1 0 0 0</pose>
+    </include>
+    <joint name="bumper_sensor_joint" type="revolute">
+      <child>bumper_sensor::bumper_link</child>
+      <parent>iris::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
+  </model>
+</sdf>
