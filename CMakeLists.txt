@@ -26,6 +26,9 @@ option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
 option(SEND_ODOMETRY_DATA "Send Mavlink ODOMETRY msgs" OFF)
 
+# Set c++11 or higher
+include(EnableC++XX)
+
 ## System dependencies are found with CMake's conventions
 find_package(Boost 1.58 REQUIRED COMPONENTS system thread timer filesystem)
 find_package(gazebo REQUIRED)
@@ -121,8 +124,6 @@ endif()
 ###########
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations")
-
-include(EnableC++XX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
