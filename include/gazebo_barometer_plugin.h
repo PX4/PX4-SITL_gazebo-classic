@@ -55,7 +55,7 @@
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
 
-#include <Barometer.pb.h>
+#include <Pressure.pb.h>
 
 namespace gazebo {
 
@@ -83,7 +83,7 @@ namespace gazebo {
     transport::NodePtr node_handle_;
     transport::PublisherPtr pub_baro_;
 
-    sensor_msgs::msgs::Barometer baro_msg_;
+    sensor_msgs::msgs::Pressure baro_msg_;
     unsigned int pub_rate_;
 
     std::default_random_engine random_generator_;
