@@ -109,7 +109,7 @@ void MagnetometerPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   update_connection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&MagnetometerPlugin::OnUpdate, this, _1));
 
-  pub_mag_ = node_handle_->Advertise<sensor_msgs::msgs::Magnetometer>("~/" + model_->GetName() + mag_topic_, 10);
+  pub_mag_ = node_handle_->Advertise<sensor_msgs::msgs::MagneticField>("~/" + model_->GetName() + mag_topic_, 10);
   gt_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gt_sub_topic_, &MagnetometerPlugin::GroundtruthCallback, this);
 
   standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);

@@ -262,7 +262,7 @@ set(sensor_msgs
   msgs/Range.proto
   msgs/SITLGps.proto
   msgs/OpticalFlow.proto
-  msgs/Magnetometer.proto
+  msgs/MagneticField.proto
   )
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
