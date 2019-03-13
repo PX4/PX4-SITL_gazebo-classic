@@ -20,7 +20,7 @@
       </inertial>
 
       <collision name='bumper_collision'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.47 0.47 0.11</size>
