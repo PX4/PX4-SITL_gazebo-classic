@@ -264,8 +264,8 @@ set(sensor_msgs
   msgs/SITLGps.proto
   msgs/OpticalFlow.proto
   msgs/MagneticField.proto
-  msgs/Barometer.proto
-f  )
+  msgs/Pressure.proto
+  )
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
 PROTOBUF_GENERATE_CPP(NAV_PROTO_SRCS NAV_PROTO_HDRS ${nav_msgs})

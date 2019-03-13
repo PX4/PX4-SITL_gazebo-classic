@@ -1,7 +1,7 @@
 syntax = "proto2";
 package sensor_msgs.msgs;
 
-message Barometer
+message Pressure
 {
   required int64 time_usec       	= 1;
   required float temperature    	= 2;

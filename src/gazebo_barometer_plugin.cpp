@@ -111,7 +111,7 @@ void BarometerPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   update_connection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&BarometerPlugin::OnUpdate, this, _1));
 
-  pub_baro_ = node_handle_->Advertise<sensor_msgs::msgs::Barometer>("~/" + model_->GetName() + baro_topic_, 10);
+  pub_baro_ = node_handle_->Advertise<sensor_msgs::msgs::Pressure>("~/" + model_->GetName() + baro_topic_, 10);
 
   standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
   gravity_W_ = world_->Gravity();
