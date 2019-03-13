@@ -64,7 +64,7 @@
 #include <IRLock.pb.h>
 #include <Groundtruth.pb.h>
 #include <Odometry.pb.h>
-#include <Magnetometer.pb.h>
+#include <MagneticField.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
@@ -92,7 +92,7 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::OpticalFlow> OpticalFlo
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> SonarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
-typedef const boost::shared_ptr<const sensor_msgs::msgs::Magnetometer> MagnetometerPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::MagneticField> MagnetometerPtr;
 
 // Default values
 static const std::string kDefaultNamespace = "";

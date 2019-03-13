@@ -46,7 +46,7 @@
 
 #include <Eigen/Core>
 
-#include <Magnetometer.pb.h>
+#include <MagneticField.pb.h>
 #include <Groundtruth.pb.h>
 
 #include <gazebo/common/common.hh>
@@ -94,7 +94,7 @@ private:
   double groundtruth_lon_rad_;
 
   event::ConnectionPtr update_connection_;
-  sensor_msgs::msgs::Magnetometer mag_message_;
+  sensor_msgs::msgs::MagneticField mag_message_;
 
   common::Time last_time_;
   common::Time last_pub_time_;
