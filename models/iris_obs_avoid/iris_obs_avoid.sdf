@@ -1,5 +1,5 @@
 <sdf version='1.6'>
-  <model name='iris_avoidance_benchmarking'>
+  <model name='iris_obs_avoid'>
     <include>
       <uri>model://iris</uri>
     </include>
