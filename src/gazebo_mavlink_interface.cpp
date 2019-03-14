@@ -180,13 +180,23 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
   }
 
-  if (_sdf->HasElement("use_tcp"))
+  if(_sdf->HasElement("hil_mode"))
+  {
+    hil_mode_ = _sdf->GetElement("hil_mode")->Get<bool>();
+  }
+
+  if(_sdf->HasElement("hil_state_level"))
+  {
+    hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
+  }
+
+  if (!hil_mode_ && _sdf->HasElement("use_tcp"))
   {
     use_tcp_ = _sdf->GetElement("use_tcp")->Get<bool>();
   }
   gzmsg << "Conecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
 
-  if (_sdf->HasElement("enable_lockstep"))
+  if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
     enable_lockstep_ = _sdf->GetElement("enable_lockstep")->Get<bool>();
   }
@@ -278,16 +288,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // for potential compatibility
   if (_sdf->HasElement("imu_rate")) {
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
-  }
-
-  if(_sdf->HasElement("hil_state_level"))
-  {
-    hil_mode_ = _sdf->GetElement("hil_mode")->Get<bool>();
-  }
-
-  if(_sdf->HasElement("hil_state_level"))
-  {
-    hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
   }
 
   // Get serial params

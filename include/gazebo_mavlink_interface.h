@@ -320,7 +320,7 @@ private:
   int mavlink_udp_port_;
   int mavlink_tcp_port_;
   int tcp_client_fd_;
-  bool use_tcp_;
+  bool use_tcp_ = false;
 
   in_addr_t qgc_addr_;
   int qgc_udp_port_;
