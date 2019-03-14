@@ -175,11 +175,6 @@ void LiftDragPlugin::OnUpdate()
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
 
-  // smoothing
-  // double e = 0.8;
-  // this->velSmooth = e*vel + (1.0 - e)*velSmooth;
-  // vel = this->velSmooth;
-
   if (vel.Length() <= 0.01)
     return;
 
