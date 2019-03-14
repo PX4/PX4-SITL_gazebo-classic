@@ -69,7 +69,7 @@ namespace gazebo
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     protected: double cma;
 
-    /// \brief angle of attach when airfoil stalls
+    /// \brief angle of attack when airfoil stalls
     protected: double alphaStall;
 
     /// \brief Cl-alpha rate after stall
@@ -118,9 +118,6 @@ namespace gazebo
     /// vector. Inflow velocity orthogonal to forward and upward vectors
     /// is considered flow in the wing sweep direction.
     protected: ignition::math::Vector3d upward;
-
-    /// \brief Smoothed velocity
-    protected: ignition::math::Vector3d velSmooth;
 
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
