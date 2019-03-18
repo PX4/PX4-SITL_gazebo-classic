@@ -262,6 +262,7 @@ set(sensor_msgs
   msgs/Range.proto
   msgs/SITLGps.proto
   msgs/OpticalFlow.proto
+  msgs/Contacts.proto
   )
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
@@ -298,6 +299,7 @@ add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+add_library(gazebo_collision_plugin SHARED src/gazebo_collision_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
@@ -315,6 +317,7 @@ set(plugins
   gazebo_motor_model
   gazebo_multirotor_base_plugin
   gazebo_wind_plugin
+  gazebo_collision_plugin
   )
 
 foreach(plugin ${plugins})

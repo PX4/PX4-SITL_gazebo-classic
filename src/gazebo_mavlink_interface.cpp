@@ -63,6 +63,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
   getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
+  getSdfParam<std::string>(_sdf, "collisionSubTopic", collision_sub_topic_, collision_sub_topic_);
   groundtruth_sub_topic_ = "/groundtruth";
 
   // set input_reference_ from inputs.control
@@ -270,6 +271,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   gps_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gps_sub_topic_, &GazeboMavlinkInterface::GpsCallback, this);
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
+  collision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + collision_sub_topic_, &GazeboMavlinkInterface::CollisionCallback, this);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
@@ -870,6 +872,21 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::CollisionCallback(CollisionPtr& collision_message) {
+  mavlink_collision_t collision_msg;
+  collision_msg.horizontal_minimum_delta = collision_message->depth();
+  collision_msg.altitude_minimum_delta = 0.0;
+  collision_msg.time_to_minimum_delta = 0.0;
+  collision_msg.threat_level = 0;
+  collision_msg.action = 0; //MAV_COLLISION_ACTION_NONE
+  collision_msg.id = 3;
+  collision_msg.src = 3;
+
+  mavlink_message_t msg;
+  mavlink_msg_collision_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &collision_msg);
   send_mavlink_message(&msg);
 }
 

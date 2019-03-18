@@ -1,0 +1,13 @@
+syntax = "proto2";
+package contacts_msgs.msgs;
+import "vector3d.proto";
+
+message Contacts
+{
+  required int64 time_usec       	= 1;
+  required string collision1 = 2;
+  required string collision2 = 3;
+  required gazebo.msgs.Vector3d position = 4;
+  required gazebo.msgs.Vector3d normal = 5;
+  required float depth     	= 6;
+}
