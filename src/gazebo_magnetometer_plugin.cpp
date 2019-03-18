@@ -78,6 +78,20 @@ void MagnetometerPlugin::getSdfParams(sdf::ElementPtr sdf)
     gzwarn << "[gazebo_magnetometer_plugin] Using default noise density of " << noise_density_ << " (gauss) / sqrt(hz)\n";
   }
 
+  if (sdf->HasElement("randomWalk")) {
+    random_walk_ = sdf->GetElement("randomWalk")->Get<double>();
+  } else {
+    random_walk_ = kDefaultRandomWalk;
+    gzwarn << "[gazebo_magnetometer_plugin] Using default random walk of " << random_walk_ << " (gauss) * sqrt(hz)\n";
+  }
+
+  if (sdf->HasElement("biasCorrelationTime")) {
+    bias_correlation_time_ = sdf->GetElement("biasCorrelationTime")->Get<double>();
+  } else {
+    bias_correlation_time_ = kDefaultBiasCorrelationTime;
+    gzwarn << "[gazebo_magnetometer_plugin] Using default bias correlation time of " << random_walk_ << " s\n";
+  }
+
   if(sdf->HasElement("magTopic")) {
     mag_topic_ = sdf->GetElement("magTopic")->Get<std::string>();
   } else {
@@ -121,6 +135,25 @@ void MagnetometerPlugin::GroundtruthCallback(GtPtr& gt_msg) {
   groundtruth_lon_rad_ = gt_msg->longitude_rad();
 }
 
+void MagnetometerPlugin::addNoise(Eigen::Vector3d* magnetic_field, const double dt) {
+  assert(dt > 0.0);
+
+  double tau = bias_correlation_time_;
+  // Discrete-time standard deviation equivalent to an "integrating" sampler
+  // with integration time dt.
+  double sigma_d = 1 / sqrt(dt) * noise_density_;
+  double sigma_b = random_walk_;
+  // Compute exact covariance of the process after dt [Maybeck 4-114].
+  double sigma_b_d = sqrt( - sigma_b * sigma_b * tau / 2.0 * (exp(-2.0 * dt / tau) - 1.0));
+  // Compute state-transition.
+  double phi_d = exp(-1.0 / tau * dt);
+  // Simulate magnetometer noise processes and add them to the true signal.
+  for (int i = 0; i < 3; ++i) {
+    bias_[i] = phi_d * bias_[i] + sigma_b_d * standard_normal_distribution_(random_generator_);
+    (*magnetic_field)[i] = (*magnetic_field)[i] + bias_[i] + sigma_d * standard_normal_distribution_(random_generator_);
+  }
+}
+
 void MagnetometerPlugin::OnUpdate(const common::UpdateInfo&)
 {
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -148,17 +181,16 @@ void MagnetometerPlugin::OnUpdate(const common::UpdateInfo&)
     float Y = H * sinf(declination_rad);
 
     // Magnetometer noise
-    for(int i = 0; i < 3; ++i) {
-      mag_noise_[i] = noise_density_ * standard_normal_distribution_(random_generator_);
-    }
+    Eigen::Vector3d magnetic_field_I(X, Y, Z);
+    addNoise(&magnetic_field_I, dt);
 
     // Fill magnetometer messgae
     mag_message_.set_time_usec(current_time.Double() * 1e6);
 
     gazebo::msgs::Vector3d* magnetic_field = new gazebo::msgs::Vector3d();
-    magnetic_field->set_x(X + mag_noise_[0]);
-    magnetic_field->set_y(Y + mag_noise_[1]);
-    magnetic_field->set_z(Z + mag_noise_[2]);
+    magnetic_field->set_x(magnetic_field_I[0]);
+    magnetic_field->set_y(magnetic_field_I[1]);
+    magnetic_field->set_z(magnetic_field_I[2]);
     mag_message_.set_allocated_magnetic_field(magnetic_field);
 
     for (auto i = 0; i < 9; ++i) {

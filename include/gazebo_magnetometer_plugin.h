@@ -66,7 +66,10 @@ namespace gazebo {
 
 static constexpr auto kDefaultMagnetometerTopic = "mag";
 static constexpr auto kDefaultPubRate = 20.0; // [Hz]
-static constexpr auto kDefaultNoiseDensity = 0.01; // [gauss / sqrt(hz)]
+static constexpr auto kDefaultNoiseDensity = 3.7*1e-3; // [gauss / sqrt(hz)]
+static constexpr auto kDefaultRandomWalk = 6.4*1e-6; // [gauss * sqrt(hz)]
+static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2; // [s]
+
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
 class MagnetometerPlugin : public ModelPlugin {
@@ -77,6 +80,7 @@ public:
 protected:
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo&);
+  void addNoise(Eigen::Vector3d* magnetic_field, const double dt);
   void GroundtruthCallback(GtPtr&);
   void getSdfParams(sdf::ElementPtr sdf);
 
@@ -100,8 +104,10 @@ private:
   common::Time last_pub_time_;
   unsigned int pub_rate_;
   double noise_density_;
+  double random_walk_;
+  double bias_correlation_time_;
 
-  Eigen::Vector3d mag_noise_;
+  Eigen::Vector3d bias_;
 
   std::default_random_engine random_generator_;
   std::normal_distribution<double> standard_normal_distribution_;
