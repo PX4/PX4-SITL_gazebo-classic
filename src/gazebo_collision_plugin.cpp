@@ -62,7 +62,7 @@ void CollisionPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   std::cout << topicName << "\n";
 
-  collision_pub_ = node_handle_->Advertise<contacts_msgs::msgs::Contacts>(topicName, 10);
+  collision_pub_ = node_handle_->Advertise<contacts_msgs::msgs::Contacts>("/gazebo/default/iris_obs_avoid/bumper_link/collision", 10);
 }
 
 void CollisionPlugin::OnUpdate()
