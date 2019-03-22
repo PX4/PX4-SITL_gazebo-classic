@@ -37,14 +37,14 @@ CollisionPlugin::~CollisionPlugin()
 void CollisionPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
 
-//  Get then name of the parent sensor
+  //  Get then name of the parent sensor
   this->parentSensor = std::dynamic_pointer_cast<sensors::ContactSensor>(_parent);
 
   if (!this->parentSensor)
     gzthrow("CollisionPlugin requires a ContactSensor");
 
   this->world = physics::get_world(this->parentSensor->WorldName());
-  // this->parentSensor->SetActive(false);
+
   this->updateConnection = this->parentSensor->ConnectUpdated(boost::bind(&CollisionPlugin::OnUpdate, this));
   this->parentSensor->SetActive(true);
 
@@ -60,9 +60,7 @@ void CollisionPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   string topicName = "~/" + scopedName + "/contacts";
   boost::replace_all(topicName, "::", "/");
 
-  std::cout << topicName << "\n";
-
-  collision_pub_ = node_handle_->Advertise<contacts_msgs::msgs::Contacts>("/gazebo/default/iris_obs_avoid/bumper_link/collision", 10);
+  collision_pub_ = node_handle_->Advertise<contacts_msgs::msgs::Contacts>("/gazebo/default/iris_obs_avoid/bumper_link/contacts", 10);
 }
 
 void CollisionPlugin::OnUpdate()

@@ -36,10 +36,9 @@ namespace gazebo
       std::string namespace_;
 
 
-    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    /// \brief The connection tied to CollisionPlugin::OnUpdate()
     private:
       event::ConnectionPtr updateConnection;
-
       contacts_msgs::msgs::Contacts contact_message;
   };
 }

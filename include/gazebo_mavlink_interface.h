@@ -110,7 +110,7 @@ static const std::string kDefaultSonarTopic = "/sonar_model/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
-static const std::string kDefaultCollisionTopic = "/bumper_link/collision";
+static const std::string kDefaultCollisionTopic = "/bumper_link/contacts";
 
 //! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
 enum class Framing : uint8_t {
