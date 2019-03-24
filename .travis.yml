@@ -16,7 +16,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-01-01
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-02-09
             - BUILD=${CMAKE_BUILD}
         - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
           os: linux
@@ -26,7 +26,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2019-01-01
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2019-02-09
             - BUILD=${KINETIC}
         - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
           os: linux
@@ -36,7 +36,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros:2019-01-01
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros:2019-02-09
             - BUILD=${MELODIC}
         - name: Validate SDF schemas
           os: linux
@@ -46,7 +46,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-01-01
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-02-09
             - BUILD="source ./scripts/validate_sdf.bash"
         - name: MacOSX 10.13 build with Gazebo8
           os: osx
@@ -88,5 +88,5 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     mkdir Build;
     cd Build && cmake .. && make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu);
-    else docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}" --env=LOCAL_USER_ID="$(id -u)" --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
+    else docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}" --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
     fi

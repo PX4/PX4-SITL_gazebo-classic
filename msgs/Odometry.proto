@@ -11,5 +11,5 @@ message Odometry
   required gazebo.msgs.Vector3d linear_velocity  = 4;
   required gazebo.msgs.Vector3d angular_velocity = 5;
   repeated float pose_covariance                 = 6 [packed=true]; // x.y.z.r.p.y.
-  repeated float twist_covariance                = 7 [packed=true]; // vx.vy.vz.rr.pr.yr
+  repeated float velocity_covariance             = 7 [packed=true]; // vx.vy.vz.rr.pr.yr
 }

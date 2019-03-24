@@ -180,13 +180,23 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
   }
 
-  if (_sdf->HasElement("use_tcp"))
+  if(_sdf->HasElement("hil_mode"))
+  {
+    hil_mode_ = _sdf->GetElement("hil_mode")->Get<bool>();
+  }
+
+  if(_sdf->HasElement("hil_state_level"))
+  {
+    hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
+  }
+
+  if (!hil_mode_ && _sdf->HasElement("use_tcp"))
   {
     use_tcp_ = _sdf->GetElement("use_tcp")->Get<bool>();
   }
   gzmsg << "Conecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
 
-  if (_sdf->HasElement("enable_lockstep"))
+  if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
     enable_lockstep_ = _sdf->GetElement("enable_lockstep")->Get<bool>();
   }
@@ -278,27 +288,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // for potential compatibility
   if (_sdf->HasElement("imu_rate")) {
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
-  }
-
-  // Magnetic field data for Zurich from WMM2015 (10^5xnanoTesla (N, E D) n-frame )
-  // mag_n_ = {0.21523, 0.00771, -0.42741};
-  // We set the world Y component to zero because we apply
-  // the declination based on the global position,
-  // and so we need to start without any offsets.
-  // The real value for Zurich would be 0.00771
-  // frame d is the magnetic north frame
-  mag_d_.X() = 0.21523;
-  mag_d_.Y() = 0;
-  mag_d_.Z() = -0.42741;
-
-  if(_sdf->HasElement("hil_state_level"))
-  {
-    hil_mode_ = _sdf->GetElement("hil_mode")->Get<bool>();
-  }
-
-  if(_sdf->HasElement("hil_state_level"))
-  {
-    hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
   }
 
   // Get serial params
@@ -593,10 +582,23 @@ void GazeboMavlinkInterface::SendSensorMessages()
 #endif
   ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
 
-  float declination = get_mag_declination(groundtruth_lat_rad, groundtruth_lon_rad);
+  // Magnetic declination and inclination (radians)
+  float declination_rad = get_mag_declination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
+  float inclination_rad = get_mag_inclination(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI) * M_PI / 180;
 
-  ignition::math::Quaterniond q_dn(0.0, 0.0, declination);
-  ignition::math::Vector3d mag_n = q_dn.RotateVector(mag_d_);
+  // Magnetic strength (10^5xnanoTesla)
+  float strength_ga = 0.01f * get_mag_strength(groundtruth_lat_rad * 180 / M_PI, groundtruth_lon_rad * 180 / M_PI);
+
+  // Magnetic filed components are calculated by http://geomag.nrcan.gc.ca/mag_fld/comp-en.php
+  float H = strength_ga * cosf(inclination_rad);
+  float Z = tanf(inclination_rad) * H;
+  float X = H * cosf(declination_rad);
+  float Y = H * sinf(declination_rad);
+
+  // Magnetic field data from WMM2018 (10^5xnanoTesla (N, E D) n-frame )
+  mag_d_.X() = X;
+  mag_d_.Y() = Y;
+  mag_d_.Z() = Z;
 
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
@@ -621,7 +623,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     last_imu_message_.angular_velocity().x(),
     last_imu_message_.angular_velocity().y(),
     last_imu_message_.angular_velocity().z()));
-  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n) + mag_noise_b;
+  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_d_) + mag_noise_b;
 
   bool should_send_imu = false;
   if (!enable_lockstep_) {
@@ -960,7 +962,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
         size_t index = 6 * x + y;
 
         odom.pose_covariance[count++] = odom_message->pose_covariance().data()[index];
-        odom.twist_covariance[count++] = odom_message->twist_covariance().data()[index];
+        odom.velocity_covariance[count++] = odom_message->velocity_covariance().data()[index];
       }
     }
 

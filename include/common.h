@@ -104,7 +104,7 @@ void model_param(const std::string& world_name, const std::string& model_name, c
 /**
  * \brief Get a math::Angle as an angle from [0, 360)
  */
-double GetDegrees360(const ignition::math::Angle& angle) {
+inline double GetDegrees360(const ignition::math::Angle& angle) {
   double degrees = angle.Degree();
   while (degrees < 0.) degrees += 360.0;
   while (degrees >= 360.0) degrees -= 360.0;
@@ -163,7 +163,11 @@ discretized system (ZoH):
     T previousState_;
 };
 
-
+/// Returns scalar value constrained by (min_val, max_val)
+template<typename Scalar>
+static inline constexpr const Scalar &constrain(const Scalar &val, const Scalar &min_val, const Scalar &max_val) {
+    return (val < min_val) ? min_val : ((val > max_val) ? max_val : val);
+}
 
 /// Computes a quaternion from the 3-element small angle approximation theta.
 template<class Derived>

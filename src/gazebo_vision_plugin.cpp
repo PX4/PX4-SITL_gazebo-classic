@@ -221,11 +221,11 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
         // = noise_density²
         case 0: case 7: case 14: case 21: case 28: case 35:
           odom_msg.add_pose_covariance(_noise_density * _noise_density);
-          odom_msg.add_twist_covariance(_noise_density * _noise_density);
+          odom_msg.add_velocity_covariance(_noise_density * _noise_density);
           break;
         default:
           odom_msg.add_pose_covariance(0.0);
-          odom_msg.add_twist_covariance(0.0);
+          odom_msg.add_velocity_covariance(0.0);
       }
     }
 
