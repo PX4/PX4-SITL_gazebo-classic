@@ -20,6 +20,16 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+# Include Ogre cmake file on Arch linux
+execute_process(
+  COMMAND uname --kernel-release
+  OUTPUT_VARIABLE KERNEL
+  )
+if(KERNEL MATCHES "ARCH")
+  list(APPEND CMAKE_MODULE_PATH "/usr/lib/OGRE/OGRE/cmake")
+  list(APPEND CMAKE_PREFIX_PATH "/usr/lib/OGRE/OGRE/cmake")
+endif()
+
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" OFF)
 option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
 
