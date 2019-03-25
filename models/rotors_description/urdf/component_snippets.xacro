@@ -135,12 +135,14 @@
   </xacro:macro>
 
   <!-- Macro to add the magnetometer_plugin. -->
-  <xacro:macro name="magnetometer_plugin_macro" params="namespace pub_rate noise_density mag_topic">
+  <xacro:macro name="magnetometer_plugin_macro" params="namespace pub_rate noise_density random_walk bias_correlation_time mag_topic">
     <gazebo>
       <plugin name="magnetometer_plugin" filename="libgazebo_magnetometer_plugin.so">
         <robotNamespace>${namespace}</robotNamespace>
         <pubRate>${pub_rate}</pubRate>
         <noiseDensity>${noise_density}</noiseDensity>
+        <randomWalk>${random_walk}</randomWalk>
+        <biasCorrelationTime>${bias_correlation_time}</biasCorrelationTime>
         <magTopic>${mag_topic}</magTopic>
       </plugin>
     </gazebo>
