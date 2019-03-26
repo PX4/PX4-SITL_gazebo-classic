@@ -22,15 +22,17 @@
 #ifndef _GAZEBO_SONAR_PLUGIN_HH_
 #define _GAZEBO_SONAR_PLUGIN_HH_
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sensors/SonarSensor.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/SonarSensor.hh>
+#include <gazebo/util/system.hh>
 
-#include "Range.pb.h"
+#include <Range.pb.h>
 
 namespace gazebo
 {
+  static constexpr uint8_t kDefaultFacing = 0; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE SonarPlugin : public SensorPlugin
   {
@@ -56,7 +58,7 @@ namespace gazebo
       transport::NodePtr node_handle_;
       transport::PublisherPtr sonar_pub_;
       std::string namespace_;
-
+      int facing_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:

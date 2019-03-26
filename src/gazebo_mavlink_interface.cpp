@@ -849,7 +849,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   sensor_msg.current_distance = lidar_message->current_distance() * 100.0;
   sensor_msg.type = 0;
   sensor_msg.id = 0;
-  sensor_msg.orientation = 25;//downward facing
+  sensor_msg.orientation = lidar_message->facing();
   sensor_msg.covariance = 0;
 
   //distance needed for optical flow message
@@ -931,6 +931,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
 
   sensor_msg.type = 1;
   sensor_msg.id = 1;
+  sensor_msg.orientation = sonar_message->rotation();
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = sonar_message->h_fov();
   sensor_msg.vertical_fov = sonar_message->v_fov();

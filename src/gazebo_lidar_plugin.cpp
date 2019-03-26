@@ -80,23 +80,31 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   // get minimum distance
   if (_sdf->HasElement("min_distance")) {
     min_distance_ = _sdf->GetElement("min_distance")->Get<double>();
-    if (min_distance_ < SENSOR_MIN_DISTANCE) {
-      min_distance_ = SENSOR_MIN_DISTANCE;
+    if (min_distance_ < kSensorMinDistance) {
+      min_distance_ = kSensorMinDistance;
     }
   } else {
-    gzwarn << "[gazebo_lidar_plugin] Using default minimum distance: 0.3\n";
-    min_distance_ = DEFAULT_MIN_DISTANCE;
+    gzwarn << "[gazebo_lidar_plugin] Using default minimum distance: " << kDefaultMinDistance << "\n";
+    min_distance_ = kDefaultMinDistance;
   }
 
   // get maximum distance
   if (_sdf->HasElement("max_distance")) {
     max_distance_ = _sdf->GetElement("max_distance")->Get<double>();
-    if (max_distance_ > SENSOR_MAX_DISTANCE) {
-      max_distance_ = SENSOR_MAX_DISTANCE;
+    if (max_distance_ > kSensorMaxDistance) {
+      max_distance_ = kSensorMaxDistance;
     }
   } else {
-    gzwarn << "[gazebo_lidar_plugin] Using default maximum distance: 15\n";
-    max_distance_ = DEFAULT_MAX_DISTANCE;
+    gzwarn << "[gazebo_lidar_plugin] Using default maximum distance: " << kDefaultMaxDistance << "\n";
+    max_distance_ = kDefaultMaxDistance;
+  }
+
+  // get facing of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  if (_sdf->HasElement("facing")) {
+    facing_ = _sdf->GetElement("facing")->Get<int>();
+  } else {
+    gzwarn << "[gazebo_lidar_plugin] Using default facing: " << kDefaultFacing << "\n";
+    facing_ = kDefaultFacing;
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
@@ -134,6 +142,7 @@ void RayPlugin::OnNewLaserScans()
   }
 
   lidar_message.set_current_distance(current_distance);
+  lidar_message.set_facing(facing_);
 
   lidar_pub_->Publish(lidar_message);
 }

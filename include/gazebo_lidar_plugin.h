@@ -22,20 +22,21 @@
 #ifndef _GAZEBO_RAY_PLUGIN_HH_
 #define _GAZEBO_RAY_PLUGIN_HH_
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sensors/RaySensor.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/RaySensor.hh>
+#include <gazebo/util/system.hh>
 
-#include "Range.pb.h"
-
-#define SENSOR_MIN_DISTANCE   0.06 // values smaller than that cause issues
-#define SENSOR_MAX_DISTANCE  35.0 // values bigger than that cause issues
-#define DEFAULT_MIN_DISTANCE  0.2
-#define DEFAULT_MAX_DISTANCE 15.0
+#include <Range.pb.h>
 
 namespace gazebo
 {
+  static constexpr double kSensorMinDistance = 0.06; // values smaller than that cause issues
+  static constexpr double kSensorMaxDistance = 35.0; // values bigger than that cause issues
+  static constexpr double kDefaultMinDistance = 0.2;
+  static constexpr double kDefaultMaxDistance = 15.0;
+  static constexpr uint8_t kDefaultFacing = 25; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
   {
@@ -63,7 +64,7 @@ namespace gazebo
       std::string namespace_;
       double min_distance_;
       double max_distance_;
-
+      int facing_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:
