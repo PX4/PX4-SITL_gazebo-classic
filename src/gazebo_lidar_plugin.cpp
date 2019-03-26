@@ -15,23 +15,22 @@
  *
 */
 /*
- * Desc: Contact plugin
- * Author: Nate Koenig mod by John Hsu
+ * Desc: Distance Sensor plugin
+ * Author: Nate Koenig mod by John Hsu and Elia Tarasov
  */
 
-#include "gazebo/physics/physics.hh"
-#include "gazebo_lidar_plugin.h"
+#include <gazebo/physics/physics.hh>
+#include <gazebo_lidar_plugin.h>
 
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-#include "gazebo/transport/transport.hh"
-#include "gazebo/msgs/msgs.hh"
+#include <gazebo/transport/transport.hh>
+#include <gazebo/msgs/msgs.hh>
 
 #include <chrono>
 #include <cmath>
-#include <iostream>
 #include <memory>
 #include <stdio.h>
 #include <boost/algorithm/string.hpp>
@@ -43,33 +42,27 @@ using namespace std;
 GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
 
 /////////////////////////////////////////////////
-RayPlugin::RayPlugin()
-{
-}
+RayPlugin::RayPlugin(){}
 
 /////////////////////////////////////////////////
-RayPlugin::~RayPlugin()
-{
-  this->newLaserScansConnection->~Connection();
-
-  this->newLaserScansConnection.reset();
-
-  this->parentSensor_.reset();
+RayPlugin::~RayPlugin() {
+  this->new_scans_connection_->~Connection();
+  this->new_scans_connection_.reset();
+  this->parent_sensor_.reset();
   this->world.reset();
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
-{
+void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf) {
   // Get then name of the parent sensor
-  this->parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+  this->parent_sensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
-  if (!this->parentSensor_)
+  if (!this->parent_sensor_)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor_->WorldName());
+  this->world = physics::get_world(this->parent_sensor_->WorldName());
 
-  this->newLaserScansConnection = this->parentSensor_->LaserShape()->ConnectNewLaserScans(
+  this->new_scans_connection_ = this->parent_sensor_->LaserShape()->ConnectNewLaserScans(
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
@@ -99,15 +92,31 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     max_distance_ = DEFAULT_MAX_DISTANCE;
   }
 
+  // get type of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  if (_sdf->HasElement("type")) {
+    type_ = _sdf->GetElement("type")->Get<uint8_t>();
+  } else {
+    gzwarn << "[gazebo_lidar_plugin] Using default type: 0\n";
+    type_ = DEFAULT_SENSOR_TYPE;
+  }
+
+  // get facing of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  if (_sdf->HasElement("facing")) {
+    facing_ = _sdf->GetElement("facing")->Get<uint8_t>();
+  } else {
+    gzwarn << "[gazebo_lidar_plugin] Using default facing: 25\n";
+    facing_ = DEFAULT_SENSOR_FACING;
+  }
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
   const string scopedName = _parent->ParentName();
   vector<string> names_splitted;
   boost::split(names_splitted,scopedName,boost::is_any_of("::"));
-  string topicName = "~/" + names_splitted[0] + "/link/lidar";
+  string topicName = "~/" + names_splitted[0] + "/link/distance_sensor";
 
-  lidar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>(topicName, 10);
+  distance_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>(topicName, 10);
 }
 
 /////////////////////////////////////////////////
@@ -120,11 +129,11 @@ void RayPlugin::OnNewLaserScans()
   common::Time now = world->GetSimTime();
 #endif
 
-  lidar_message.set_time_usec(now.Double() * 1e6);
-  lidar_message.set_min_distance(min_distance_);
-  lidar_message.set_max_distance(max_distance_);
+  distance_message_.set_time_usec(now.Double() * 1e6);
+  distance_message_.set_min_distance(min_distance_);
+  distance_message_.set_max_distance(max_distance_);
 
-  double current_distance = parentSensor_->Range(0);
+  double current_distance = parent_sensor_->Range(0);
 
   // set distance to min/max if actual value is smaller/bigger
   if (current_distance < min_distance_ || std::isinf(current_distance)) {
@@ -133,7 +142,9 @@ void RayPlugin::OnNewLaserScans()
     current_distance = max_distance_;
   }
 
-  lidar_message.set_current_distance(current_distance);
+  distance_message_.set_current_distance(current_distance);
+  distance_message_.set_type(type_);
+  distance_message_.set_facing(facing_);
 
-  lidar_pub_->Publish(lidar_message);
+  distance_pub_->Publish(distance_message_);
 }

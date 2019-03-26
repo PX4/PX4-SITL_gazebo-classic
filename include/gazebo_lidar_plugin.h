@@ -15,24 +15,26 @@
  *
 */
 /*
- * Desc: Ray Plugin
- * Author: Nate Koenig mod by John Hsu
+ * Desc: Distance Sensor Plugin
+ * Author: Nate Koenig mod by John Hsu and Elia Tarasov
  */
 
-#ifndef _GAZEBO_RAY_PLUGIN_HH_
-#define _GAZEBO_RAY_PLUGIN_HH_
+#ifndef _GAZEBO_DISTANCE_SENSOR_PLUGIN_HH_
+#define _GAZEBO_DISTANCE_SENSOR_PLUGIN_HH_
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sensors/RaySensor.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/RaySensor.hh>
+#include <gazebo/util/system.hh>
 
-#include "Range.pb.h"
+#include <Range.pb.h>
 
 #define SENSOR_MIN_DISTANCE   0.06 // values smaller than that cause issues
 #define SENSOR_MAX_DISTANCE  35.0 // values bigger than that cause issues
 #define DEFAULT_MIN_DISTANCE  0.2
 #define DEFAULT_MAX_DISTANCE 15.0
+#define DEFAULT_SENSOR_TYPE   0
+#define DEFAULT_SENSOR_FACING 25
 
 namespace gazebo
 {
@@ -57,18 +59,19 @@ namespace gazebo
 
     /// \brief The parent sensor
     private:
-      sensors::RaySensorPtr parentSensor_;
+      sensors::RaySensorPtr parent_sensor_;
       transport::NodePtr node_handle_;
-      transport::PublisherPtr lidar_pub_;
+      transport::PublisherPtr distance_pub_;
       std::string namespace_;
       double min_distance_;
       double max_distance_;
-
+      uint8_t type_;
+      uint8_t facing_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:
-      event::ConnectionPtr newLaserScansConnection;
-      sensor_msgs::msgs::Range lidar_message;
+      event::ConnectionPtr new_scans_connection_;
+      sensor_msgs::msgs::Range distance_message_;
   };
 }
-#endif
+#endif // _GAZEBO_DISTANCE_SENSOR_PLUGIN_HH_
