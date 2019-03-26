@@ -83,6 +83,7 @@ private:
   common::Time last_time_;
 
   // Set global reference point
+  // Zurich, Auterion Headquarters: 47.358144, 8.520449, 488m
   // Zurich Irchel Park: 47.397742, 8.545594, 488m
   // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
   // Moscow downtown: 55.753395, 37.625427, 155m
@@ -90,9 +91,9 @@ private:
   // The home position can be specified using the environment variables:
   // PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
 
-  // Zurich Irchel Park
-  double lat_home = 47.397742 * M_PI / 180.0;  // rad
-  double lon_home = 8.545594 * M_PI / 180.0;   // rad
+  // Zurich Auterion Headquarters
+  double lat_home = 47.358144 * M_PI / 180.0;  // rad
+  double lon_home = 8.520449 * M_PI / 180.0;   // rad
   double alt_home = 488.0;                     // meters
   // Seattle downtown (15 deg declination): 47.592182, -122.316031
   // static const double lat_home = 47.592182 * M_PI / 180;    // rad
