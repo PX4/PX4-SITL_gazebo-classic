@@ -433,7 +433,7 @@ void GimbalControllerPlugin::OnUpdate()
   }
   else if (time > this->lastUpdateTime)
   {
-    double dt = (this->lastUpdateTime - time).Double();
+    double dt = (time - this->lastUpdateTime).Double();
 
     // We want yaw to control in body frame, not in global.
     this->yawCommand += this->lastImuYaw;
