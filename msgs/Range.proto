@@ -7,5 +7,5 @@ message Range
   required float min_distance           = 2;
   required float max_distance           = 3;
   required float current_distance       = 4;
-  required int32 facing                 = 5;
+  required int32 rotation               = 5;
 }
