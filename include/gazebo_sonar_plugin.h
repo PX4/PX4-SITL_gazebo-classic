@@ -31,7 +31,7 @@
 
 namespace gazebo
 {
-  static constexpr uint8_t kDefaultFacing = 0; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  static constexpr uint8_t kDefaultRotation = 0; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
 
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE SonarPlugin : public SensorPlugin
@@ -58,7 +58,7 @@ namespace gazebo
       transport::NodePtr node_handle_;
       transport::PublisherPtr sonar_pub_;
       std::string namespace_;
-      int facing_;
+      int rotation_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:
