@@ -35,7 +35,7 @@ namespace gazebo
   static constexpr double kSensorMaxDistance = 35.0; // values bigger than that cause issues
   static constexpr double kDefaultMinDistance = 0.2;
   static constexpr double kDefaultMaxDistance = 15.0;
-  static constexpr uint8_t kDefaultFacing = 25; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  static constexpr uint8_t kDefaultRotation = 25; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
 
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
@@ -64,7 +64,7 @@ namespace gazebo
       std::string namespace_;
       double min_distance_;
       double max_distance_;
-      int facing_;
+      int rotation_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:

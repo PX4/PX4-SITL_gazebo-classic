@@ -99,12 +99,12 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     max_distance_ = kDefaultMaxDistance;
   }
 
-  // get facing of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
-  if (_sdf->HasElement("facing")) {
-    facing_ = _sdf->GetElement("facing")->Get<int>();
+  // get rotation of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  if (_sdf->HasElement("rotation")) {
+    rotation_ = _sdf->GetElement("rotation")->Get<int>();
   } else {
-    gzwarn << "[gazebo_lidar_plugin] Using default facing: " << kDefaultFacing << "\n";
-    facing_ = kDefaultFacing;
+    gzwarn << "[gazebo_lidar_plugin] Using default rotation: " << kDefaultRotation << "\n";
+    rotation_ = kDefaultRotation;
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
@@ -142,7 +142,7 @@ void RayPlugin::OnNewLaserScans()
   }
 
   lidar_message.set_current_distance(current_distance);
-  lidar_message.set_facing(facing_);
+  lidar_message.set_rotation(rotation_);
 
   lidar_pub_->Publish(lidar_message);
 }
