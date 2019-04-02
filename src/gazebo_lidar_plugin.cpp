@@ -35,6 +35,7 @@
 #include <memory>
 #include <stdio.h>
 #include <boost/algorithm/string.hpp>
+#include <common.h>
 
 using namespace gazebo;
 using namespace std;
@@ -99,14 +100,6 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     max_distance_ = kDefaultMaxDistance;
   }
 
-  // get rotation of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
-  if (_sdf->HasElement("rotation")) {
-    rotation_ = _sdf->GetElement("rotation")->Get<int>();
-  } else {
-    gzwarn << "[gazebo_lidar_plugin] Using default rotation: " << kDefaultRotation << "\n";
-    rotation_ = kDefaultRotation;
-  }
-
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -116,6 +109,84 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   string topicName = "~/" + names_splitted[0] + "/link/lidar";
 
   lidar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>(topicName, 10);
+
+  // Precaution: remove empty strings
+  names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                              [](const string& name)
+                              { return name.size() == 0; }), end(names_splitted));
+
+  std::string rootModelName = names_splitted.front(); // The first element is the name of the root model
+
+  // Get the pointer to the root model
+#if GAZEBO_MAJOR_VERSION >= 9
+  physics::ModelPtr rootModel = this->world->ModelByName(rootModelName);
+#else
+  physics::ModelPtr rootModel = this->world->GetModel(rootModelName);
+#endif
+
+  // Get the `base_link` rotation WRT world
+  physics::LinkPtr baseLink = nullptr;
+  std::vector<physics::LinkPtr> linkList = rootModel->GetLinks(); // Get list of all links in the root model
+  for(auto link : linkList) {
+    std::string linkName = link->GetName();
+    if(linkName.find("::base_link") != std::string::npos) {
+      baseLink = rootModel->GetLink(linkName); // Get the pointer to the `base_link`
+      break;
+    }
+  }
+  if (!baseLink)
+    gzthrow("RayPlugin requires the `base_link` element to be defined");
+
+  // This is the rotation of the 'base_link` WRT world
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Quaterniond q_wb = baseLink->WorldPose().Rot();
+#else
+  ignition::math::Quaterniond q_wb = ignitionFromGazeboMath(baseLink->GetWorldPose()).Rot();
+#endif
+
+  // Get the parent sensor link rotation WRT world
+  physics::LinkPtr parentSensorLink = nullptr;
+  std::string parentSensorModelName = names_splitted.rbegin()[1]; // the second to the last name is the model name
+  for(auto link : linkList) {
+    std::string linkName = link->GetName();
+    if(linkName.find(parentSensorModelName) != std::string::npos) {
+      parentSensorLink = rootModel->GetLink(linkName); // Get the pointer to the parent sensor link
+      break;
+    }
+  }
+  if (!parentSensorLink)
+    gzthrow("RayPlugin requires a `link` element for its parent sensor to be defined");
+
+  // This is the rotation of the parentSensorLink WRT world
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Quaterniond q_wl = parentSensorLink->WorldPose().Rot();
+#else
+  ignition::math::Quaterniond q_wl = ignitionFromGazeboMath(parentSensorLink->GetWorldPose()).Rot();
+#endif
+
+  // Calculate parent sensor rotation WRT `base_link`
+  ignition::math::Quaterniond q_bl = q_wb.Inverse() * q_wl; // This is the rotation of the parent sensor link WRT `base_link`
+
+  ignition::math::Quaterniond q_ls = parentSensor_->Pose().Rot(); // This is the rotation of the parent sensor WRT parent sensor link
+  ignition::math::Quaterniond q_bs = (q_bl * q_ls).Inverse(); // This is the rotation of the parent sensor WRT `base_link`
+
+  const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
+  const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
+
+  // Current rotation types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  rotation_ = -1; // Invalid rotation
+  if(u_Xs.Dot(kDownwardRotation) > 0.99)
+    rotation_ = 25;
+  else if(u_Xs.Dot(kUpwardRotation) > 0.99)
+    rotation_ = 24;
+  else if(u_Xs.Dot(kBackwardRotation) > 0.99)
+    rotation_ = 12;
+  else if(u_Xs.Dot(kForwardRotation) > 0.99)
+    rotation_ = 0;
+  else if(u_Xs.Dot(kLeftRotation) > 0.99)
+    rotation_ = 6;
+  else if(u_Xs.Dot(kRightRotation) > 0.99)
+    rotation_ = 2;
 }
 
 /////////////////////////////////////////////////

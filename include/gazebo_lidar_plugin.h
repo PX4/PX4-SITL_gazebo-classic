@@ -35,7 +35,14 @@ namespace gazebo
   static constexpr double kSensorMaxDistance = 35.0; // values bigger than that cause issues
   static constexpr double kDefaultMinDistance = 0.2;
   static constexpr double kDefaultMaxDistance = 15.0;
-  static constexpr uint8_t kDefaultRotation = 25; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+
+  // sensor X-axis unit vector in `base_link` frame
+  static const ignition::math::Vector3d kDownwardRotation = ignition::math::Vector3d(0, 0, -1);
+  static const ignition::math::Vector3d kUpwardRotation = ignition::math::Vector3d(0, 0, 1);
+  static const ignition::math::Vector3d kBackwardRotation = ignition::math::Vector3d(-1, 0, 0);
+  static const ignition::math::Vector3d kForwardRotation = ignition::math::Vector3d(1, 0, 0);
+  static const ignition::math::Vector3d kLeftRotation = ignition::math::Vector3d(0, 1, 0);
+  static const ignition::math::Vector3d kRightRotation = ignition::math::Vector3d(0, -1, 0);
 
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
