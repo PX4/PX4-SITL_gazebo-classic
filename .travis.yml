@@ -48,14 +48,6 @@ matrix:
           env:
             - PX4_DOCKER_REPO=px4io/px4-dev-simulation:2019-02-09
             - BUILD="source ./scripts/validate_sdf.bash"
-        - name: MacOSX 10.13 build with Gazebo8
-          os: osx
-          osx_image: xcode10.1
-          language: cpp
-          cache:
-            ccache: true
-          env:
-            - GAZEBO_VERSION="gazebo8"
         - name: MacOSX 10.13 build with Gazebo9
           os: osx
           osx_image: xcode10.1
