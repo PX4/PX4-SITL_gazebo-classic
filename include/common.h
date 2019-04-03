@@ -65,7 +65,7 @@ void model_param(const std::string& world_name, const std::string& model_name, c
 
     TiXmlElement* e_model = h_root.FirstChild("model").Element();
 
-    for( e_model; e_model; e_model=e_model->NextSiblingElement("model") )
+    for( ; e_model != nullptr; e_model=e_model->NextSiblingElement("model") )
     {
       const char* attr_name = e_model->Attribute("name");
       if (attr_name)
