@@ -30,7 +30,7 @@ option(SEND_ODOMETRY_DATA "Send Mavlink ODOMETRY msgs" OFF)
 include(EnableC++XX)
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost 1.58 REQUIRED COMPONENTS system thread timer filesystem)
+find_package(Boost 1.58 REQUIRED COMPONENTS system thread filesystem)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_program(px4 REQUIRED)
