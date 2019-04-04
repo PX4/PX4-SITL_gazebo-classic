@@ -34,7 +34,6 @@
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include <boost/timer/timer.hpp>
 #include <ignition/math.hh>
 
 #include "flow_opencv.hpp"
@@ -77,7 +76,6 @@ namespace gazebo
       ignition::math::Vector3d opticalFlow_rate;
       std::string namespace_;
       std::string gyro_sub_topic_;
-      boost::timer::cpu_timer timer_;
       OpticalFlowOpenCV *optical_flow_;
       // OpticalFlowPX4 *optical_flow_;
 

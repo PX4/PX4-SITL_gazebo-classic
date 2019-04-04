@@ -36,7 +36,7 @@ GZ_REGISTER_SENSOR_PLUGIN(OpticalFlowPlugin)
 
 /////////////////////////////////////////////////
 OpticalFlowPlugin::OpticalFlowPlugin()
-: SensorPlugin(), width(0), height(0), depth(0), timer_()
+: SensorPlugin(), width(0), height(0), depth(0)
 {
 
 }
@@ -162,8 +162,6 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
 
   frame_time_us_ = (frame_time - first_frame_time_) * 1e6; //since start
 
-  timer_.stop();
-
   float flow_x_ang = 0.0f;
   float flow_y_ang = 0.0f;
   //calculate angular flow
@@ -201,7 +199,6 @@ void OpticalFlowPlugin::OnNewFrame(const unsigned char * _image,
     opticalFlow_message.set_distance(0.0f); //get real values in gazebo_mavlink_interface.cpp
     //send message
     opticalFlow_pub_->Publish(opticalFlow_message);
-    timer_.start();
   }
 }
 
