@@ -36,7 +36,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros:2019-03-08
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2019-03-08
             - BUILD=${MELODIC}
         - name: Validate SDF schemas
           os: linux
