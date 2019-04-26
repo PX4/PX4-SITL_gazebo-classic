@@ -314,8 +314,8 @@ private:
   double pressure_alt_;
   double abs_pressure_;
 
-  std::default_random_engine rand_;
-  std::normal_distribution<float> randn_;
+  std::default_random_engine random_generator_;
+  std::normal_distribution<float> standard_normal_distribution_;
 
   int _fd;
   struct sockaddr_in _myaddr;     ///< The locally bound address
