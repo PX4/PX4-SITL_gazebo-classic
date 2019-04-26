@@ -461,6 +461,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   else {
     gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default \n";
   }
+
+  standard_normal_distribution_ = std::normal_distribution<float>(0.0f, 1.0f);
 }
 
 // This gets called by the world update start event.
@@ -641,12 +643,17 @@ void GazeboMavlinkInterface::SendSensorMessages()
     const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
     float rho = 1.225f / density_ratio;
 
+    // Let's use a rough guess of 0.05 hPa as the standard devitiation which roughly yields
+    // about +/- 1 m/s noise.
+    const float diff_pressure_stddev = 0.05f;
+    const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev;
+
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
     if (vehicle_is_tailsitter_) {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.Z()*vel_b.Z();
+      sensor_msg.diff_pressure = 0.005f*rho*vel_b.Z()*vel_b.Z() + diff_pressure_noise;
     } else {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.X()*vel_b.X();
+      sensor_msg.diff_pressure = 0.005f*rho*vel_b.X()*vel_b.X() + diff_pressure_noise;
     }
 
     sensor_msg.fields_updated = 4095;
