@@ -6,18 +6,18 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>1.5</mass>
+        <mass>5</mass>
         <inertia>
-          <ixx>0.197563</ixx>
+          <ixx>0.477708333333</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.1458929</iyy>
+          <iyy>0.341666666667</iyy>
           <iyz>0</iyz>
-          <izz>0.1477</izz>
+          <izz>0.811041666667</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>-0.01 0 -0.08 0 0 0</pose>
+        <pose>0 0 -0.07 0 0 0</pose>
         <geometry>
           <box>
             <size>0.55 2.144 0.05</size>
@@ -26,13 +26,17 @@
         <surface>
           <contact>
             <ode>
-              <max_vel>10</max_vel>
-              <min_depth>0.01</min_depth>
+              <kp>100000</kp>
+              <kd>1.0</kd>
+              <mu1>0.8</mu1>
+              <mu2>0.8</mu2>
+              <max_vel>0.1</max_vel>
+              <min_depth>0.001</min_depth>
             </ode>
           </contact>
-          <!--<friction>
+          <friction>
             <ode/>
-          </friction>-->
+          </friction>
         </surface>
       </collision>
       <visual name='base_link_visual'>
@@ -687,7 +691,7 @@
       <cda_stall>-0.9233984055</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>-0.05 0.3 0.05</cp>
-      <area>0.12</area>
+      <area>0.50</area>
       <air_density>1.2041</air_density>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
@@ -695,7 +699,7 @@
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -707,7 +711,7 @@
       <cda_stall>-0.9233984055</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>-0.05 -0.3 0.05</cp>
-      <area>0.12</area>
+      <area>0.50</area>
       <air_density>1.2041</air_density>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
@@ -715,7 +719,7 @@
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>
@@ -735,7 +739,7 @@
       <control_joint_name>
         elevator_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-12.0</control_joint_rad_to_cl>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
@@ -940,7 +944,7 @@
         <channel name="rotor4">
           <input_index>4</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>3500</input_scaling>
+          <input_scaling>5500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
