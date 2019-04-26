@@ -190,7 +190,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   {
     use_tcp_ = _sdf->GetElement("use_tcp")->Get<bool>();
   }
-  gzmsg << "Conecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
+  gzmsg << "Connecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
 
   if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
