@@ -209,6 +209,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       if (!std::isfinite(speed_factor_) || speed_factor_ <= 0.0)
       {
         gzerr << "Invalid speed factor '" << speed_factor_str << "', aborting\n";
+        sleep(1);
         abort();
       }
     }
@@ -233,6 +234,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     {
       gzerr << "real_time_update_rate is set to " << real_time_update_rate
             << " instead of " << correct_real_time_update_rate << ", aborting.\n";
+      sleep(1);
       abort();
     }
 
@@ -243,6 +245,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     {
       gzerr << "max_step_size is set to " << max_step_size
             << " instead of " << correct_max_step_size << ", aborting.\n";
+      sleep(1);
       abort();
     }
 
@@ -320,6 +323,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       mavlink_addr_ = inet_addr(mavlink_addr_str.c_str());
       if (mavlink_addr_ == INADDR_NONE) {
         gzerr << "Invalid mavlink_addr: " << mavlink_addr_str << ", aborting\n";
+        sleep(1);
         abort();
       }
     }
@@ -348,6 +352,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       qgc_addr_ = inet_addr(qgc_addr.c_str());
       if (qgc_addr_ == INADDR_NONE) {
         gzerr << "Invalid qgc_addr: " << qgc_addr << ", aborting\n";
+        sleep(1);
         abort();
       }
     }
@@ -389,6 +394,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   if (use_tcp_) {
     if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
       gzerr << "Creating TCP socket failed: " << strerror(errno) << ", aborting\n";
+      sleep(1);
       abort();
     }
 
@@ -396,17 +402,20 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     int result = setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *) &yes, sizeof(yes));
     if (result != 0) {
       gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
+      sleep(1);
       abort();
     }
 
     if (bind(_fd, (struct sockaddr *)&_myaddr, _myaddr_len) < 0) {
       gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
+      sleep(1);
       abort();
     }
 
     errno = 0;
     if (listen(_fd, 0) < 0) {
       gzerr << "listen failed: " << strerror(errno) << ", aborting\n";
+      sleep(1);
       abort();
     }
 
@@ -415,11 +424,13 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   } else {
     if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
       gzerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
+      sleep(1);
       abort();
     }
 
     if (bind(_fd, (struct sockaddr *)&_myaddr, _myaddr_len) < 0) {
       gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
+      sleep(1);
       abort();
     }
   }
