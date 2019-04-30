@@ -127,6 +127,8 @@ void MagnetometerPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   gt_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gt_sub_topic_, &MagnetometerPlugin::GroundtruthCallback, this);
 
   standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
+
+  bias_.setZero();
 }
 
 void MagnetometerPlugin::GroundtruthCallback(GtPtr& gt_msg) {
