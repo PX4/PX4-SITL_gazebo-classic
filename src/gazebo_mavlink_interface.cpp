@@ -356,32 +356,32 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     qgc_udp_port_ = _sdf->GetElement("qgc_udp_port")->Get<int>();
   }
 
-  memset((char *)&_srcaddr, 0, sizeof(_srcaddr));
-  _srcaddr.sin_family = AF_INET;
-  _srcaddr_len = sizeof(_srcaddr);
+  memset((char *)&remote_simulator_addr_, 0, sizeof(remote_simulator_addr_));
+  remote_simulator_addr_.sin_family = AF_INET;
+  remote_simulator_addr_len_ = sizeof(remote_simulator_addr_);
 
-  memset((char *)&_myaddr, 0, sizeof(_myaddr));
-  _myaddr.sin_family = AF_INET;
-  _myaddr_len = sizeof(_myaddr);
+  memset((char *)&local_simulator_addr_, 0, sizeof(local_simulator_addr_));
+  local_simulator_addr_.sin_family = AF_INET;
+  local_simulator_addr_len_ = sizeof(local_simulator_addr_);
 
   if (serial_enabled_) {
     // gcs link
-    _myaddr.sin_addr.s_addr = mavlink_addr_;
-    _myaddr.sin_port = htons(mavlink_udp_port_);
-    _srcaddr.sin_addr.s_addr = qgc_addr_;
-    _srcaddr.sin_port = htons(qgc_udp_port_);
+    local_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
+    local_simulator_addr_.sin_port = htons(mavlink_udp_port_);
+    remote_simulator_addr_.sin_addr.s_addr = qgc_addr_;
+    remote_simulator_addr_.sin_port = htons(qgc_udp_port_);
   }
 
   else {
     if (use_tcp_) {
-      _myaddr.sin_addr.s_addr = htonl(mavlink_addr_);
-      _myaddr.sin_port = htons(mavlink_tcp_port_);
+      local_simulator_addr_.sin_addr.s_addr = htonl(mavlink_addr_);
+      local_simulator_addr_.sin_port = htons(mavlink_tcp_port_);
     } else {
-      _srcaddr.sin_addr.s_addr = mavlink_addr_;
-      _srcaddr.sin_port = htons(mavlink_udp_port_);
+      remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
+      remote_simulator_addr_.sin_port = htons(mavlink_udp_port_);
 
-      _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-      _myaddr.sin_port = htons(0);
+      local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
+      local_simulator_addr_.sin_port = htons(0);
     }
   }
 
@@ -399,7 +399,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       abort();
     }
 
-    if (bind(_fd, (struct sockaddr *)&_myaddr, _myaddr_len) < 0) {
+    if (bind(_fd, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
       gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
@@ -410,7 +410,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       abort();
     }
 
-    tcp_client_fd_ = accept(_fd, (struct sockaddr *)&_srcaddr, &_srcaddr_len);
+    tcp_client_fd_ = accept(_fd, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
 
   } else {
     if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -418,7 +418,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       abort();
     }
 
-    if (bind(_fd, (struct sockaddr *)&_myaddr, _myaddr_len) < 0) {
+    if (bind(_fd, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
       gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
@@ -539,7 +539,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     if (use_tcp_) {
       len = send(tcp_client_fd_, buffer, packetlen, 0);
     } else {
-      len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&_srcaddr, _srcaddr_len);
+      len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
     }
 
     if (len <= 0)
@@ -986,7 +986,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
 
     if (fds_[0].revents & POLLIN) {
 
-      int len = recvfrom(fds_[0].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&_srcaddr, &_srcaddr_len);
+      int len = recvfrom(fds_[0].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
       if (len > 0) {
         mavlink_message_t msg;
         mavlink_status_t status;
