@@ -163,7 +163,8 @@ public:
     groundtruth_altitude(0.0),
     mavlink_udp_port_(kDefaultMavlinkUdpPort),
     mavlink_tcp_port_(kDefaultMavlinkTcpPort),
-    tcp_client_fd_(0),
+    simulator_socket_fd_(0),
+    simulator_tcp_client_fd_(0),
     use_tcp_(false),
     qgc_udp_port_(kDefaultQGCUdpPort),
     serial_enabled_(false),
@@ -317,7 +318,6 @@ private:
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
 
-  int _fd;
   struct sockaddr_in local_simulator_addr_;
   socklen_t local_simulator_addr_len_;
   struct sockaddr_in remote_simulator_addr_;
@@ -331,11 +331,10 @@ private:
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_;
   int mavlink_tcp_port_;
-  int tcp_client_fd_;
-  bool use_tcp_ = false;
 
-  in_addr_t qgc_addr_;
-  int qgc_udp_port_;
+  int simulator_socket_fd_;
+  int simulator_tcp_client_fd_;
+  bool use_tcp_ = false;
 
   bool enable_lockstep_ = false;
   double speed_factor_ = 1.0;

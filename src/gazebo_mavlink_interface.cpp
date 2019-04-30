@@ -387,38 +387,38 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // try to setup socket for communcation
   if (use_tcp_) {
-    if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((simulator_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
       gzerr << "Creating TCP socket failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
     int yes = 1;
-    int result = setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *) &yes, sizeof(yes));
+    int result = setsockopt(simulator_socket_fd_, IPPROTO_TCP, TCP_NODELAY, (char *) &yes, sizeof(yes));
     if (result != 0) {
       gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
-    if (bind(_fd, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
+    if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
       gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
     errno = 0;
-    if (listen(_fd, 0) < 0) {
+    if (listen(simulator_socket_fd_, 0) < 0) {
       gzerr << "listen failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
-    tcp_client_fd_ = accept(_fd, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
+    simulator_tcp_client_fd_ = accept(simulator_socket_fd_, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
 
   } else {
-    if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    if ((simulator_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
       gzerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
 
-    if (bind(_fd, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
+    if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
       gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
       abort();
     }
@@ -441,9 +441,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
 
   if (use_tcp_) {
-    fds_[0].fd = tcp_client_fd_;
+    fds_[0].fd = simulator_tcp_client_fd_;
   } else {
-    fds_[0].fd = _fd;
+    fds_[0].fd = simulator_socket_fd_;
   }
   fds_[0].events = POLLIN;
 
@@ -537,9 +537,9 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 
     ssize_t len;
     if (use_tcp_) {
-      len = send(tcp_client_fd_, buffer, packetlen, 0);
+      len = send(simulator_tcp_client_fd_, buffer, packetlen, 0);
     } else {
-      len = sendto(_fd, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
+      len = sendto(simulator_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
     }
 
     if (len <= 0)
