@@ -341,12 +341,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
   model_param(worldName, model_->GetName(), "mavlink_tcp_port", mavlink_tcp_port_);
 
-  qgc_addr_ = htonl(INADDR_ANY);
+  local_qgc_addr_.sin_port = htonl(INADDR_ANY);
   if (_sdf->HasElement("qgc_addr")) {
     std::string qgc_addr = _sdf->GetElement("qgc_addr")->Get<std::string>();
     if (qgc_addr != "INADDR_ANY") {
-      qgc_addr_ = inet_addr(qgc_addr.c_str());
-      if (qgc_addr_ == INADDR_NONE) {
+      local_qgc_addr_.sin_port = inet_addr(qgc_addr.c_str());
+      if (local_qgc_addr_.sin_port == INADDR_NONE) {
         gzerr << "Invalid qgc_addr: " << qgc_addr << ", aborting\n";
         abort();
       }
@@ -356,71 +356,115 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     qgc_udp_port_ = _sdf->GetElement("qgc_udp_port")->Get<int>();
   }
 
-  memset((char *)&remote_simulator_addr_, 0, sizeof(remote_simulator_addr_));
-  remote_simulator_addr_.sin_family = AF_INET;
-  remote_simulator_addr_len_ = sizeof(remote_simulator_addr_);
-
-  memset((char *)&local_simulator_addr_, 0, sizeof(local_simulator_addr_));
-  local_simulator_addr_.sin_family = AF_INET;
-  local_simulator_addr_len_ = sizeof(local_simulator_addr_);
-
-  if (serial_enabled_) {
-    // gcs link
-    local_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
-    local_simulator_addr_.sin_port = htons(mavlink_udp_port_);
-    remote_simulator_addr_.sin_addr.s_addr = qgc_addr_;
-    remote_simulator_addr_.sin_port = htons(qgc_udp_port_);
+  local_sdk_addr_.sin_port = htonl(INADDR_ANY);
+  if (_sdf->HasElement("sdk_addr")) {
+    std::string sdk_addr = _sdf->GetElement("sdk_addr")->Get<std::string>();
+    if (sdk_addr != "INADDR_ANY") {
+      local_sdk_addr_.sin_port = inet_addr(sdk_addr.c_str());
+      if (local_sdk_addr_.sin_port == INADDR_NONE) {
+        gzerr << "Invalid sdk_addr: " << sdk_addr << ", aborting\n";
+        abort();
+      }
+    }
+  }
+  if (_sdf->HasElement("sdk_udp_port")) {
+    sdk_udp_port_ = _sdf->GetElement("sdk_udp_port")->Get<int>();
   }
 
-  else {
+  if (serial_enabled_) {
+
+    local_qgc_addr_.sin_family = AF_INET;
+    local_qgc_addr_.sin_port = htons(0);
+    local_qgc_addr_len_ = sizeof(local_qgc_addr_);
+
+    remote_qgc_addr_.sin_family = AF_INET;
+    remote_qgc_addr_.sin_port = htons(qgc_udp_port_);
+    remote_qgc_addr_len_ = sizeof(remote_qgc_addr_);
+
+    local_sdk_addr_.sin_family = AF_INET;
+    local_sdk_addr_.sin_port = htons(0);
+    local_sdk_addr_len_ = sizeof(local_sdk_addr_);
+
+    remote_sdk_addr_.sin_family = AF_INET;
+    remote_sdk_addr_.sin_port = htons(sdk_udp_port_);
+    remote_sdk_addr_len_ = sizeof(remote_sdk_addr_);
+
+    if ((qgc_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+      gzerr << "Creating QGC UDP socket failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    if (bind(qgc_socket_fd_, (struct sockaddr *)&local_qgc_addr_, local_qgc_addr_len_) < 0) {
+      gzerr << "QGC UDP bind failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    if ((sdk_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+      gzerr << "Creating SDK UDP socket failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+    if (bind(sdk_socket_fd_, (struct sockaddr *)&local_sdk_addr_, local_sdk_addr_len_) < 0) {
+      gzerr << "SDK UDP bind failed: " << strerror(errno) << ", aborting\n";
+      abort();
+    }
+
+  } else {
+
+    memset((char *)&remote_simulator_addr_, 0, sizeof(remote_simulator_addr_));
+    remote_simulator_addr_.sin_family = AF_INET;
+    remote_simulator_addr_len_ = sizeof(remote_simulator_addr_);
+
+    memset((char *)&local_simulator_addr_, 0, sizeof(local_simulator_addr_));
+    local_simulator_addr_.sin_family = AF_INET;
+    local_simulator_addr_len_ = sizeof(local_simulator_addr_);
+
     if (use_tcp_) {
+
       local_simulator_addr_.sin_addr.s_addr = htonl(mavlink_addr_);
       local_simulator_addr_.sin_port = htons(mavlink_tcp_port_);
+
+      if ((simulator_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        gzerr << "Creating TCP socket failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
+
+      int yes = 1;
+      int result = setsockopt(simulator_socket_fd_, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
+      if (result != 0) {
+        gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
+
+      if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
+        gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
+
+      errno = 0;
+      if (listen(simulator_socket_fd_, 0) < 0) {
+        gzerr << "listen failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
+
+      simulator_tcp_client_fd_ = accept(simulator_socket_fd_, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
+
     } else {
       remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
       remote_simulator_addr_.sin_port = htons(mavlink_udp_port_);
 
       local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
       local_simulator_addr_.sin_port = htons(0);
-    }
-  }
 
-  // try to setup socket for communcation
-  if (use_tcp_) {
-    if ((simulator_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-      gzerr << "Creating TCP socket failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
+      if ((simulator_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        gzerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
 
-    int yes = 1;
-    int result = setsockopt(simulator_socket_fd_, IPPROTO_TCP, TCP_NODELAY, (char *) &yes, sizeof(yes));
-    if (result != 0) {
-      gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
-      gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    errno = 0;
-    if (listen(simulator_socket_fd_, 0) < 0) {
-      gzerr << "listen failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    simulator_tcp_client_fd_ = accept(simulator_socket_fd_, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
-
-  } else {
-    if ((simulator_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-      gzerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
-      gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
-      abort();
+      if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
+        gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
     }
   }
 
@@ -438,14 +482,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   {
     send_odometry_ = _sdf->GetElement("send_odometry")->Get<bool>();
   }
-
-
-  if (use_tcp_) {
-    fds_[0].fd = simulator_tcp_client_fd_;
-  } else {
-    fds_[0].fd = simulator_socket_fd_;
-  }
-  fds_[0].events = POLLIN;
 
   mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_0);
 
@@ -487,7 +523,11 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   SendSensorMessages();
 
-  pollForMAVLinkMessages();
+  if (!serial_enabled_) {
+    pollForMAVLinkMessages();
+  } else {
+    pollFromQgcAndSdk();
+  }
 
   handle_control(dt);
 
@@ -511,10 +551,12 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   last_time_ = current_time;
 }
 
-void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message, const int destination_port)
+void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
 {
-  if(serial_enabled_ && destination_port == 0) {
-    assert(message != nullptr);
+  assert(message != nullptr);
+
+  if(serial_enabled_) {
+
     if (!is_open()) {
       gzerr << "Serial port closed! \n";
       return;
@@ -524,14 +566,13 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
       std::lock_guard<std::recursive_mutex> lock(mutex);
 
       if (tx_q.size() >= MAX_TXQ_SIZE) {
-//         gzwarn << "TX queue overflow. \n";
+        gzwarn << "Tx queue overflow\n";
       }
       tx_q.emplace_back(message);
     }
     io_service.post(std::bind(&GazeboMavlinkInterface::do_write, this, true));
-  }
 
-  else {
+  } else {
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
@@ -546,6 +587,25 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     {
       gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
     }
+  }
+}
+
+void GazeboMavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
+{
+  uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+  int packetlen = mavlink_msg_to_send_buffer(buffer, message);
+
+  ssize_t len = sendto(qgc_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_qgc_addr_, remote_qgc_addr_len_);
+
+  if (len <= 0)
+  {
+    gzerr << "Failed sending mavlink message to QGC: " << strerror(errno) << "\n";
+  }
+
+  len = sendto(sdk_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_sdk_addr_, remote_sdk_addr_len_);
+  if (len <= 0)
+  {
+    gzerr << "Failed sending mavlink message to SDK: " << strerror(errno) << "\n";
   }
 }
 
@@ -969,12 +1029,21 @@ void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
 {
+  struct pollfd fds[1] = {};
+
+  if (use_tcp_) {
+    fds[0].fd = simulator_tcp_client_fd_;
+  } else {
+    fds[0].fd = simulator_socket_fd_;
+  }
+  fds[0].events = POLLIN;
+
   bool received_actuator = false;
 
   do {
     int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
 
-    int ret = ::poll(&fds_[0], 1, timeout_ms);
+    int ret = ::poll(&fds[0], 1, timeout_ms);
 
     if (ret == 0 && timeout_ms > 0) {
       gzerr << "poll timeout\n";
@@ -984,9 +1053,9 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
       gzerr << "poll error: " << strerror(errno) << "\n";
     }
 
-    if (fds_[0].revents & POLLIN) {
+    if (fds[0].revents & POLLIN) {
 
-      int len = recvfrom(fds_[0].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
+      int len = recvfrom(fds[0].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
       if (len > 0) {
         mavlink_message_t msg;
         mavlink_status_t status;
@@ -1005,6 +1074,54 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
       }
     }
   } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning());
+}
+
+void GazeboMavlinkInterface::pollFromQgcAndSdk()
+{
+  struct pollfd fds[2] = {};
+  fds[0].fd = qgc_socket_fd_;
+  fds[0].events = POLLIN;
+  fds[1].fd = sdk_socket_fd_;
+  fds[1].events = POLLIN;
+
+  const int timeout_ms = 0;
+
+  int ret = ::poll(&fds[0], 2, timeout_ms);
+
+  if (ret < 0) {
+    gzerr << "poll error: " << strerror(errno) << "\n";
+    return;
+  }
+
+  if (fds[0].revents & POLLIN) {
+    int len = recvfrom(qgc_socket_fd_, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_qgc_addr_, &remote_qgc_addr_len_);
+
+    if (len > 0) {
+      mavlink_message_t msg;
+      mavlink_status_t status;
+      for (unsigned i = 0; i < len; ++i) {
+        if (mavlink_parse_char(MAVLINK_COMM_1, _buf[i], &msg, &status)) {
+          // forward message from QGC to serial
+          send_mavlink_message(&msg);
+        }
+      }
+    }
+  }
+
+  if (fds[1].revents & POLLIN) {
+    int len = recvfrom(sdk_socket_fd_, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_sdk_addr_, &remote_sdk_addr_len_);
+
+    if (len > 0) {
+      mavlink_message_t msg;
+      mavlink_status_t status;
+      for (unsigned i = 0; i < len; ++i) {
+        if (mavlink_parse_char(MAVLINK_COMM_2, _buf[i], &msg, &status)) {
+          // forward message from SDK to serial
+          send_mavlink_message(&msg);
+        }
+      }
+    }
+  }
 }
 
 void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, bool &received_actuator)
@@ -1173,8 +1290,7 @@ void GazeboMavlinkInterface::parse_buffer(const boost::system::error_code& err, 
     }
 
     if(msg_received != Framing::incomplete){
-      // send to gcs
-      send_mavlink_message(&message, qgc_udp_port_);
+      forward_mavlink_message(&message);
       bool not_used;
       handle_message(&message, not_used);
     }
