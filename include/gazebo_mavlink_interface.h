@@ -318,10 +318,10 @@ private:
   std::normal_distribution<float> standard_normal_distribution_;
 
   int _fd;
-  struct sockaddr_in _myaddr;     ///< The locally bound address
-  socklen_t _myaddr_len;
-  struct sockaddr_in _srcaddr;    ///< SITL instance
-  socklen_t _srcaddr_len;
+  struct sockaddr_in local_simulator_addr_;
+  socklen_t local_simulator_addr_len_;
+  struct sockaddr_in remote_simulator_addr_;
+  socklen_t remote_simulator_addr_len_;
   unsigned char _buf[65535];
   struct pollfd fds_[1];
 
