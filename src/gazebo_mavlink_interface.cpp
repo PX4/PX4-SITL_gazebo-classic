@@ -523,10 +523,10 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   SendSensorMessages();
 
-  if (!serial_enabled_) {
-    pollForMAVLinkMessages();
-  } else {
+  if (serial_enabled_) {
     pollFromQgcAndSdk();
+  } else {
+    pollForMAVLinkMessages();
   }
 
   handle_control(dt);
