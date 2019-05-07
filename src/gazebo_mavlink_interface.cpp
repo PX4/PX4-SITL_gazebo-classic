@@ -25,7 +25,9 @@ namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
-    updateConnection_->~Connection();
+  close();
+  sigIntConnection_->~Connection();
+  updateConnection_->~Connection();
 }
 
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -256,6 +258,10 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GazeboMavlinkInterface::OnUpdate, this, _1));
+
+  // Listen to Ctrl+C / SIGINT.
+  sigIntConnection_ = event::Events::ConnectSigInt(
+      boost::bind(&GazeboMavlinkInterface::onSigInt, this));
 
   // Subscribe to messages of other plugins.
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
@@ -555,6 +561,10 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 {
   assert(message != nullptr);
 
+  if (gotSigInt_) {
+    return;
+  }
+
   if(serial_enabled_) {
 
     if (!is_open()) {
@@ -592,6 +602,10 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 
 void GazeboMavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
 {
+  if (gotSigInt_) {
+    return;
+  }
+
   uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
   int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
@@ -1029,6 +1043,10 @@ void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
 {
+  if (gotSigInt_) {
+    return;
+  }
+
   struct pollfd fds[1] = {};
 
   if (use_tcp_) {
@@ -1073,7 +1091,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
-  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning());
+  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning() && !gotSigInt_);
 }
 
 void GazeboMavlinkInterface::pollFromQgcAndSdk()
@@ -1246,15 +1264,28 @@ void GazeboMavlinkInterface::open() {
 
 void GazeboMavlinkInterface::close()
 {
-  std::lock_guard<std::recursive_mutex> lock(mutex);
-  if (!is_open())
-    return;
+  if(serial_enabled_) {
+    ::close(qgc_socket_fd_);
+    ::close(sdk_socket_fd_);
 
-  io_service.stop();
-  serial_dev.close();
+    std::lock_guard<std::recursive_mutex> lock(mutex);
+    if (!is_open())
+      return;
 
-  if (io_thread.joinable())
-    io_thread.join();
+    io_service.stop();
+    serial_dev.close();
+
+    if (io_thread.joinable())
+      io_thread.join();
+
+  } else {
+
+    if (use_tcp_) {
+      ::close(simulator_tcp_client_fd_);
+    } else {
+      ::close(simulator_socket_fd_);
+    }
+  }
 }
 
 void GazeboMavlinkInterface::do_read(void)
@@ -1337,6 +1368,11 @@ void GazeboMavlinkInterface::do_write(bool check_tx_state){
       tx_in_progress = false;
     }
   });
+}
+
+void GazeboMavlinkInterface::onSigInt() {
+  gotSigInt_ = true;
+  close();
 }
 
 }

@@ -239,6 +239,7 @@ private:
 
   /// \brief Pointer to the update event connection.
   event::ConnectionPtr updateConnection_;
+  event::ConnectionPtr sigIntConnection_;
 
   boost::thread callback_queue_thread_;
   void QueueThread();
@@ -260,6 +261,7 @@ private:
   void SendSensorMessages();
   void handle_control(double _dt);
   bool IsRunning();
+  void onSigInt();
 
   // Serial interface
   void open();
@@ -381,5 +383,7 @@ private:
 
   bool hil_mode_;
   bool hil_state_level_;
+
+  std::atomic<bool> gotSigInt_ {false};
 };
 }
