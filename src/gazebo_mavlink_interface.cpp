@@ -188,11 +188,16 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
   }
 
-  if (!hil_mode_ && _sdf->HasElement("use_tcp"))
+  if(_sdf->HasElement("serialEnabled"))
+  {
+    serial_enabled_ = _sdf->GetElement("serialEnabled")->Get<bool>();
+  }
+
+  if (!serial_enabled_ && _sdf->HasElement("use_tcp"))
   {
     use_tcp_ = _sdf->GetElement("use_tcp")->Get<bool>();
   }
-  gzmsg << "Connecting to PX4 SITL using " << (use_tcp_ ? "TCP" : "UDP") << "\n";
+  gzmsg << "Connecting to PX4 SITL using " << (serial_enabled_ ? "serial" : (use_tcp_ ? "TCP" : "UDP")) << "\n";
 
   if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
@@ -294,31 +299,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
   }
 
-  // Get serial params
-  if(_sdf->HasElement("serialEnabled"))
-  {
-    serial_enabled_ = _sdf->GetElement("serialEnabled")->Get<bool>();
-  }
-
-  if(serial_enabled_) {
-    // Set up serial interface
-    if(_sdf->HasElement("serialDevice"))
-    {
-      device_ = _sdf->GetElement("serialDevice")->Get<std::string>();
-    }
-
-    if (_sdf->HasElement("baudRate")) {
-      baudrate_ = _sdf->GetElement("baudRate")->Get<int>();
-    }
-    io_service.post(std::bind(&GazeboMavlinkInterface::do_read, this));
-
-    // run io_service for async io
-    io_thread = std::thread([this] () {
-    io_service.run();
-  });
-    open();
-  }
-
   mavlink_addr_ = htonl(INADDR_ANY);
   if (_sdf->HasElement("mavlink_addr")) {
     std::string mavlink_addr_str = _sdf->GetElement("mavlink_addr")->Get<std::string>();
@@ -377,7 +357,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     sdk_udp_port_ = _sdf->GetElement("sdk_udp_port")->Get<int>();
   }
 
-  if (serial_enabled_) {
+  if (hil_mode_) {
 
     local_qgc_addr_.sin_family = AF_INET;
     local_qgc_addr_.sin_port = htons(0);
@@ -415,8 +395,27 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       abort();
     }
 
-  } else {
+  }
 
+  if (serial_enabled_) {
+    // Set up serial interface
+    if(_sdf->HasElement("serialDevice"))
+    {
+      device_ = _sdf->GetElement("serialDevice")->Get<std::string>();
+    }
+
+    if (_sdf->HasElement("baudRate")) {
+      baudrate_ = _sdf->GetElement("baudRate")->Get<int>();
+    }
+    io_service.post(std::bind(&GazeboMavlinkInterface::do_read, this));
+
+    // run io_service for async io
+    io_thread = std::thread([this] () {
+      io_service.run();
+    });
+    open();
+
+  } else {
     memset((char *)&remote_simulator_addr_, 0, sizeof(remote_simulator_addr_));
     remote_simulator_addr_.sin_family = AF_INET;
     remote_simulator_addr_len_ = sizeof(remote_simulator_addr_);
@@ -539,7 +538,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   SendSensorMessages();
 
-  if (serial_enabled_) {
+  if (hil_mode_) {
     pollFromQgcAndSdk();
   } else {
     pollForMAVLinkMessages();
@@ -575,7 +574,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     return;
   }
 
-  if(serial_enabled_) {
+  if (serial_enabled_) {
 
     if (!is_open()) {
       gzerr << "Serial port closed! \n";
@@ -1095,11 +1094,9 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         {
           if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
           {
-            if (serial_enabled_) {
-              // forward message from qgc to serial
+            if (hil_mode_) {
               send_mavlink_message(&msg);
             }
-            // have a message, handle it
             handle_message(&msg, received_actuator);
           }
         }
@@ -1334,8 +1331,10 @@ void GazeboMavlinkInterface::parse_buffer(const boost::system::error_code& err, 
       }
     }
 
-    if(msg_received != Framing::incomplete){
-      forward_mavlink_message(&message);
+    if (msg_received != Framing::incomplete) {
+      if (hil_mode_) {
+        forward_mavlink_message(&message);
+      }
       bool not_used;
       handle_message(&message, not_used);
     }
