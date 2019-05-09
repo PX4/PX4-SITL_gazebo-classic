@@ -618,18 +618,22 @@ void GazeboMavlinkInterface::forward_mavlink_message(const mavlink_message_t *me
 
   uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
   int packetlen = mavlink_msg_to_send_buffer(buffer, message);
+  ssize_t len;
+  if (qgc_socket_fd_ > 0) {
+    len = sendto(qgc_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_qgc_addr_, remote_qgc_addr_len_);
 
-  ssize_t len = sendto(qgc_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_qgc_addr_, remote_qgc_addr_len_);
-
-  if (len <= 0)
-  {
-    gzerr << "Failed sending mavlink message to QGC: " << strerror(errno) << "\n";
+    if (len <= 0)
+    {
+      gzerr << "Failed sending mavlink message to QGC: " << strerror(errno) << "\n";
+    }
   }
 
-  len = sendto(sdk_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_sdk_addr_, remote_sdk_addr_len_);
-  if (len <= 0)
-  {
-    gzerr << "Failed sending mavlink message to SDK: " << strerror(errno) << "\n";
+  if (sdk_socket_fd_ > 0) {
+    len = sendto(sdk_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_sdk_addr_, remote_sdk_addr_len_);
+    if (len <= 0)
+    {
+      gzerr << "Failed sending mavlink message to SDK: " << strerror(errno) << "\n";
+    }
   }
 }
 
