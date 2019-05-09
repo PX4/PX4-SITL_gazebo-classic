@@ -360,8 +360,8 @@ private:
   int simulator_socket_fd_;
   int simulator_tcp_client_fd_;
 
-  int qgc_socket_fd_;
-  int sdk_socket_fd_;
+  int qgc_socket_fd_ {-1};
+  int sdk_socket_fd_ {-1};
 
   bool enable_lockstep_ = false;
   double speed_factor_ = 1.0;
