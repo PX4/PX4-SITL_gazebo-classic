@@ -34,7 +34,8 @@ GpsPlugin::GpsPlugin() : ModelPlugin()
 
 GpsPlugin::~GpsPlugin()
 {
-  updateConnection_->~Connection();
+    if (updateConnection_)
+      updateConnection_->~Connection();
 }
 
 void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
