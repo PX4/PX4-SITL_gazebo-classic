@@ -98,8 +98,8 @@ void SonarPlugin::OnNewScans()
   sonar_message.set_max_distance(parentSensor->RangeMax());
   sonar_message.set_current_distance(parentSensor->Range());
 
-  sonar_message.set_h_fov(2.0f * atan(parentSensor->GetRadius() / parentSensor->RangeMax()));
-  sonar_message.set_v_fov(2.0f * atan(parentSensor->GetRadius() / parentSensor->RangeMax()));
+  sonar_message.set_h_fov(2.0f * atan(parentSensor->Radius() / parentSensor->RangeMax()));
+  sonar_message.set_v_fov(2.0f * atan(parentSensor->Radius() / parentSensor->RangeMax()));
   ignition::math::Quaterniond pose_model_quaternion = parentSensor->Pose().Rot();
   gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
   orientation->set_x(pose_model_quaternion.X());

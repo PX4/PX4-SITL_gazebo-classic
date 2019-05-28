@@ -907,7 +907,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   int roll = static_cast<int>(round(GetDegrees360(euler.X())));
   int pitch = static_cast<int>(round(GetDegrees360(euler.Y())));
   int yaw = static_cast<int>(round(GetDegrees360(euler.Z())));
-  
+
 
   if (roll == 0 && pitch == 0 && yaw == 0) {
     sensor_msg.orientation = 25;  // downward facing
@@ -919,21 +919,21 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
     sensor_msg.orientation = 0;  // forward facing
   } else if (roll == 0 && pitch == 90 && yaw == 90) {
      sensor_msg.orientation = 6;  // left facing
-  } else if (roll == 0 && pitch == 90 && yaw == -90) {
+  } else if (roll == 0 && pitch == 90 && yaw == 270) {
      sensor_msg.orientation = 2;  // right facing
   } else {
     sensor_msg.orientation = 100;  // custom orientation
-    sensor_msg.q[0] = sonar_message->orientation().w();
-    sensor_msg.q[1] = sonar_message->orientation().x();
-    sensor_msg.q[2] = sonar_message->orientation().y();
-    sensor_msg.q[3] = sonar_message->orientation().z();
+    sensor_msg.quaternion[0] = sonar_message->orientation().w();
+    sensor_msg.quaternion[1] = sonar_message->orientation().x();
+    sensor_msg.quaternion[2] = sonar_message->orientation().y();
+    sensor_msg.quaternion[3] = sonar_message->orientation().z();
   }
 
   sensor_msg.type = 1;
   sensor_msg.id = 1;
   sensor_msg.covariance = 0;
-  sensor_msg.h_fov = sonar_message->h_fov();
-  sensor_msg.v_fov = sonar_message->v_fov();
+  sensor_msg.horizontal_fov = sonar_message->h_fov();
+  sensor_msg.vertical_fov = sonar_message->v_fov();
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
