@@ -3,7 +3,7 @@ env:
     - CCACHE_DIR=$HOME/.ccache
     - CMAKE_BUILD="mkdir Build; cd Build; cmake ..; make -j$(nproc) -l$(nproc)"
     - CMAKE_UNIT_TEST_BUILD="mkdir Build; cd Build; cmake -DENABLE_UNIT_TESTS=On ..; make -j$(nproc) -l$(nproc); make -j$(nproc) test"
-    - CATKIN_BUILD="mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON"
+    - CATKIN_BUILD="mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init; ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON; cd build/mavlink_sitl_gazebo/; catkin run_tests"
     - KINETIC="source /opt/ros/kinetic/setup.bash; ${CATKIN_BUILD}"
     - MELODIC="source /opt/ros/melodic/setup.bash; ${CATKIN_BUILD}"
 

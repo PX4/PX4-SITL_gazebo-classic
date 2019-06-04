@@ -135,7 +135,23 @@ sudo cp *.a /usr/lib
 
 Building the tests on an other platform than Linux is not yet supported.
 
-For building the tests, the flag `ENABLE_UNIT_TESTS` needs to be provided to cmake.
+When writing test it’s important to be careful which API functions of Gazebo are called. As no Gazebo server is running during the tests some functions can produce undefined behaviour (e.g. segfaults).
+
+
+### catkin
+
+With catkin the test are enabled by defult.
+
+```bash
+# After setting up the catkin workspace
+catkin build -j4 -l4 -DBUILD_ROS_INTERFACE=ON
+cd build/mavlink_sitl_gazebo/
+catkin run_tests
+```
+
+### Plain CMake
+
+For building the tests with plain CMake, the flag `ENABLE_UNIT_TESTS` needs to be provided.
 
 ```bash
 mkdir build && cd build
@@ -147,8 +163,6 @@ Then build and run the tests:
 ```bash
 make && make test
 ```
-
-When writing test it’s important to be careful which API functions of Gazebo are called. As no Gazebo server is running during the tests some functions can produce undefined behaviour (e.g. segfaults).
 
 ## Packaging
 
