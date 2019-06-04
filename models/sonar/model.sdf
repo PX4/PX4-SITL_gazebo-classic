@@ -28,8 +28,8 @@
         <pose>0 0 0 0 1.57 0</pose>
           <sonar>
             <min>0.02</min>
-            <max>5.0</max>
-            <radius>1.33974388395</radius>
+            <max>8.0</max>
+            <radius>0.2</radius>
           </sonar>
         <plugin name="SonarPlugin" filename="libgazebo_sonar_plugin.so"/>
         <always_on>1</always_on>

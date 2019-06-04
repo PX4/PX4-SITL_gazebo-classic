@@ -133,6 +133,15 @@ void RayPlugin::OnNewLaserScans()
     current_distance = max_distance_;
   }
 
+  ignition::math::Quaterniond pose_model_quaternion = parentSensor_->Pose().Rot();
+  gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
+  orientation->set_x(pose_model_quaternion.X());
+  orientation->set_y(pose_model_quaternion.Y());
+  orientation->set_z(pose_model_quaternion.Z());
+  orientation->set_w(pose_model_quaternion.W());
+  lidar_message.set_allocated_orientation(orientation);
+  lidar_message.set_h_fov(parentSensor_->RangeResolution());
+
   lidar_message.set_current_distance(current_distance);
 
   lidar_pub_->Publish(lidar_message);

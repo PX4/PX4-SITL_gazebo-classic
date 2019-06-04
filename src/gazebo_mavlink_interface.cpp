@@ -849,8 +849,42 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   sensor_msg.current_distance = lidar_message->current_distance() * 100.0;
   sensor_msg.type = 0;
   sensor_msg.id = 0;
-  sensor_msg.orientation = 25;//downward facing
+  // sensor_msg.orientation = 25;//downward facing
   sensor_msg.covariance = 0;
+  sensor_msg.horizontal_fov = lidar_message->h_fov();
+
+  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+    lidar_message->orientation().w(),
+    lidar_message->orientation().x(),
+    lidar_message->orientation().y(),
+    lidar_message->orientation().z());
+
+  // rotation of the sensor with respect to the vehicle
+  ignition::math::Vector3d euler = q_gr.Euler();
+  int roll = static_cast<int>(round(GetDegrees360(euler.X())));
+  int pitch = static_cast<int>(round(GetDegrees360(euler.Y())));
+  int yaw = static_cast<int>(round(GetDegrees360(euler.Z())));
+
+
+  if (roll == 0 && pitch == 0 && yaw == 0) {
+    sensor_msg.orientation = 25;  // downward facing
+  } else if (roll == 0 && pitch == 180 && yaw == 0) {
+    sensor_msg.orientation = 24;  // upward facing
+  } else if (roll == 0 && pitch == 90 && yaw == 180) {
+    sensor_msg.orientation = 12;  // backward facing
+  } else if (roll == 0 && pitch == 90  && yaw == 0) {
+    sensor_msg.orientation = 0;  // forward facing
+  } else if (roll == 0 && pitch == 90 && yaw == 90) {
+     sensor_msg.orientation = 6;  // left facing
+  } else if (roll == 0 && pitch == 90 && yaw == -90) {
+     sensor_msg.orientation = 2;  // right facing
+  } else {
+    sensor_msg.orientation = 100;  // custom orientation
+    sensor_msg.quaternion[0] = lidar_message->orientation().w();
+    sensor_msg.quaternion[1] = lidar_message->orientation().x();
+    sensor_msg.quaternion[2] = lidar_message->orientation().y();
+    sensor_msg.quaternion[3] = lidar_message->orientation().z();
+  }
 
   //distance needed for optical flow message
   optflow_distance = lidar_message->current_distance();  //[m]
