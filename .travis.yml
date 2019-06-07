@@ -73,6 +73,15 @@ before_install:
     brew update;
     git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0;
     rm -rf /usr/local/include/mavlink/v2.0/.git;
+    git clone https://github.com/google/googletest;
+    pushd googletest;
+    mkdir build;
+    pushd build;
+    cmake ..;
+    make;
+    make install;
+    popd;
+    popd;
     fi
 
 install:
@@ -90,6 +99,6 @@ install:
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     mkdir Build;
-    cd Build && cmake .. && make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu);
+    cd Build && cmake -DENABLE_UNIT_TESTS=On .. && make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu); make test;
     else docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}" --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
     fi

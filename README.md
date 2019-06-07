@@ -123,7 +123,9 @@ Please refer to the documentation of the particular flight stack how to run it a
 
 ## Unit Tests
 
-For building and running test an installation of 'googletest' is needed. On Ubuntu it can be installed with:
+For building and running test an installation of 'googletest' is needed.
+
+On Ubuntu it can be installed with:
 
 ```bash
 sudo apt-get install libgtest-dev
@@ -133,14 +135,25 @@ sudo make
 sudo cp *.a /usr/lib
 ```
 
-Building the tests on an other platform than Linux is not yet supported.
+On macOS it needs to be installed from source:
+
+```bash
+git clone https://github.com/google/googletest
+pushd googletest
+mkdir build
+pushd build
+cmake ..
+make && make install
+popd
+popd
+```bash
 
 When writing test it’s important to be careful which API functions of Gazebo are called. As no Gazebo server is running during the tests some functions can produce undefined behaviour (e.g. segfaults).
 
 
 ### catkin
 
-With catkin the test are enabled by defult.
+With catkin the test are enabled by default.
 
 ```bash
 # After setting up the catkin workspace
