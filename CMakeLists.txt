@@ -38,6 +38,7 @@ find_package(PythonInterp REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
 if (BUILD_GSTREAMER_PLUGIN)
+  set(GStreamer_FIND_VERSION "1.0")
   find_package(GStreamer)
   if (GSTREAMER_FOUND)
     if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
@@ -297,11 +298,11 @@ add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
 add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
+add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp )
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
-add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp)
+add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 
 set(plugins
@@ -386,6 +387,15 @@ if (catkin_FOUND)
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
     SHELLS sh)
 endif()
+
+
+################
+## Unit Tests ##
+################
+include(UnitTests)
+
+add_subdirectory(unit_tests)
+
 
 #############
 ## Install ##

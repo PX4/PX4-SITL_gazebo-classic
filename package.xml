@@ -36,7 +36,7 @@
   <!-- Use run_depend for packages you need at runtime: -->
   <!-- <run_depend>message_runtime</run_depend> -->
   <!-- Use test_depend for packages you need only for testing: -->
-  <!-- <test_depend>gtest</test_depend> -->
+  <test_depend>gtest</test_depend>
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>gazebo_ros</buildtool_depend>
   <build_depend>eigen</build_depend>

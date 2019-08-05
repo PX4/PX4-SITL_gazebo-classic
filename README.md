@@ -120,6 +120,63 @@ gazebo worlds/iris.world
 
 Please refer to the documentation of the particular flight stack how to run it against this framework, e.g. [PX4](http://dev.px4.io/simulation-gazebo.html)
 
+
+## Unit Tests
+
+For building and running test an installation of 'googletest' is needed.
+
+On Ubuntu it can be installed with:
+
+```bash
+sudo apt-get install libgtest-dev
+cd /usr/src/googletest
+sudo cmake . && cd googletest
+sudo make
+sudo cp *.a /usr/lib
+```
+
+On macOS it needs to be installed from source:
+
+```bash
+git clone https://github.com/google/googletest
+pushd googletest
+mkdir build
+pushd build
+cmake ..
+make && make install
+popd
+popd
+```bash
+
+When writing test it’s important to be careful which API functions of Gazebo are called. As no Gazebo server is running during the tests some functions can produce undefined behaviour (e.g. segfaults).
+
+
+### catkin
+
+With catkin the test are enabled by default.
+
+```bash
+# After setting up the catkin workspace
+catkin build -j4 -l4 -DBUILD_ROS_INTERFACE=ON
+cd build/mavlink_sitl_gazebo/
+catkin run_tests
+```
+
+### Plain CMake
+
+For building the tests with plain CMake, the flag `ENABLE_UNIT_TESTS` needs to be provided.
+
+```bash
+mkdir build && cd build
+cmake -DENABLE_UNIT_TESTS=On ..
+```
+
+Then build and run the tests:
+
+```bash
+make && make test
+```
+
 ## Packaging
 
 ### Deb
