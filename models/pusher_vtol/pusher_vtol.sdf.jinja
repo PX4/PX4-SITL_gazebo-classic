@@ -29,10 +29,10 @@
 {%- set rtr_blade_area = rtr_r*rtr_w -%}
 {%- set rtr_air_density = 1.2041 -%}
 {%- set rtr_arm_data_list = [
-  {'angle_deg': 45, 'dir': 'ccw', 'l': motor_sep/2},
-  {'angle_deg': -135, 'dir': 'ccw', 'l': motor_sep/2},
-  {'angle_deg': -45, 'dir': 'cw', 'l': motor_sep/2},
-  {'angle_deg': 135, 'dir': 'cw', 'l': motor_sep/2},
+  {'angle_deg': 45, 'dir': 'ccw', 'l': motor_sep/2, 'pitch': 0},
+  {'angle_deg': -135, 'dir': 'ccw', 'l': motor_sep/2, 'pitch': 0},
+  {'angle_deg': -45, 'dir': 'cw', 'l': motor_sep/2, 'pitch': 0},
+  {'angle_deg': 135, 'dir': 'cw', 'l': motor_sep/2, 'pitch': 0},
   ]%}
 {%- macro cylinder(r, h) -%}
 <geometry>
@@ -196,7 +196,7 @@
       <turningDirection>{{rtr_dir}}</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>1100</maxRotVelocity>
+      <maxRotVelocity>1500</maxRotVelocity>
       <motorConstant>8.54858e-06</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -204,15 +204,66 @@
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/{{n}}</motorSpeedPubTopic>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
 
     {% endfor %}
 
-    <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
-      <robotNamespace/>
-      <linkName>fuselage</linkName>
-      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    <!--Pusher -->
+    <link name="rotor_pusher">
+
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay/>
+
+      <pose>-0.4 0 0.2 0 1.57 0</pose>
+      {{ inertial(rtr_m, rtr_ixx, rtr_iyy, rtr_izz)| indent(8) }}
+      <visual name="rotor_pusher_visual">
+        <pose>0 0 0 0 0 0</pose>
+        {{ mesh_colored("model://pusher_vtol/meshes/dji_13455_prop_cw.dae", "DarkGrey")|indent(8) }}
+      </visual>
+
+      <collision name="rotor_pusher_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        {{ box(2*rtr_r, rtr_w, rtr_h) | indent(8) }}
+        {{ surface_props()|indent(8) }}
+      </collision>
+
+    </link>
+
+    <joint name="rotor_pusher_joint" type="revolute">
+      <parent>fuselage</parent>
+      <child>rotor_pusher</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <plugin name='rotor_pusher_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace></robotNamespace>
+      <jointName>rotor_pusher_joint</jointName>
+      <linkName>rotor_pusher</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1500</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>4</motorNumber>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
 
     <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
@@ -260,7 +311,7 @@
       <use_tcp>1</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
-      {% for n in range(4) -%}
+      {% for n in range(5) -%}
         <channel name='rotor{{n}}'>
           <input_index>{{n}}</input_index>
           <input_offset>0</input_offset>
