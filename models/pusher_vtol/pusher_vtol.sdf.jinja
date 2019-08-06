@@ -92,10 +92,10 @@
 {%- endmacro -%}
 
 <?xml version="1.0" ?>
-<!-- DO NOT EDIT: Generated from iris_pusher.sdf.jinja -->
+<!-- DO NOT EDIT: Generated from pusher_vtol.sdf.jinja -->
 <sdf version="1.5">
 
-  <model name="iris_pusher">
+  <model name="pusher_vtol">
 
     <pose>0 0 0.2 0 0 0</pose>
 
@@ -115,7 +115,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris_pusher/meshes/Matrice_100.dae</uri>
+            <uri>model://pusher_vtol/meshes/Matrice_100.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -146,7 +146,7 @@
         {% set rtr_dir = "cw" %}
       {% endif %}
 
-      {% set prop_uri = "model://iris_pusher/meshes/dji_13455_prop_{:s}.dae".format(rtr_dir) %}
+      {% set prop_uri = "model://pusher_vtol/meshes/dji_13455_prop_{:s}.dae".format(rtr_dir) %}
 
 
 
@@ -269,8 +269,8 @@
           <zero_position_armed>100</zero_position_armed>
           <joint_control_type>velocity</joint_control_type>
         </channel>
-      </control_channels>
       {% endfor %}
+      </control_channels>
     </plugin>
 
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
