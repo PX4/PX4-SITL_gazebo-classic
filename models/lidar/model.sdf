@@ -25,7 +25,7 @@
         </material>
       </visual>
       <sensor name="laser" type="ray">
-        <pose>0 0 0 0 -1.570896 0</pose>
+        <pose>0 0 0 0 1.570896 0</pose>
         <ray>
           <scan>
             <horizontal>

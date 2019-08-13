@@ -263,6 +263,9 @@ private:
   bool IsRunning();
   void onSigInt();
 
+  template <class T>
+  void setSensorOrientation(ignition::math::Vector3d u_Xs, T sensor_msg);
+
   // Serial interface
   void open();
   void close();

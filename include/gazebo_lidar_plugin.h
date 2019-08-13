@@ -36,14 +36,6 @@ namespace gazebo
   static constexpr double kDefaultMinDistance = 0.2;
   static constexpr double kDefaultMaxDistance = 15.0;
 
-  // sensor X-axis unit vector in `base_link` frame
-  static const ignition::math::Vector3d kDownwardRotation = ignition::math::Vector3d(0, 0, -1);
-  static const ignition::math::Vector3d kUpwardRotation = ignition::math::Vector3d(0, 0, 1);
-  static const ignition::math::Vector3d kBackwardRotation = ignition::math::Vector3d(-1, 0, 0);
-  static const ignition::math::Vector3d kForwardRotation = ignition::math::Vector3d(1, 0, 0);
-  static const ignition::math::Vector3d kLeftRotation = ignition::math::Vector3d(0, 1, 0);
-  static const ignition::math::Vector3d kRightRotation = ignition::math::Vector3d(0, -1, 0);
-
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
   {
@@ -71,7 +63,8 @@ namespace gazebo
       std::string namespace_;
       double min_distance_;
       double max_distance_;
-      int rotation_;
+
+      gazebo::msgs::Quaternion orientation_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:

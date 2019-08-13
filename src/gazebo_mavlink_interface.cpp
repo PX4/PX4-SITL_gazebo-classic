@@ -609,6 +609,29 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
   }
 }
 
+template <class T>
+void GazeboMavlinkInterface::setSensorOrientation(ignition::math::Vector3d u_Xs, T sensor_msg) {
+  const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
+
+  // Current rotation types are described as https://mavlink.io/en/messages/common.html#MAV_SENSOR_ORIENTATION
+  if(u_Xs.Dot(kDownwardRotation) > 0.99)
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270;
+  else if(u_Xs.Dot(kUpwardRotation) > 0.99)
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_90;
+  else if(u_Xs.Dot(kBackwardRotation) > 0.99)
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_180;
+  else if(u_Xs.Dot(kForwardRotation) > 0.99)
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_NONE;
+  else if(u_Xs.Dot(kLeftRotation) > 0.99)
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_YAW_270;
+  else if(u_Xs.Dot(kRightRotation) > 0.99)
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_YAW_90;
+  else {
+    sensor_msg.orientation = MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_CUSTOM;
+  }
+
+}
+
 void GazeboMavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
 {
   if (gotSigInt_) {
@@ -849,8 +872,24 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   sensor_msg.current_distance = lidar_message->current_distance() * 100.0;
   sensor_msg.type = 0;
   sensor_msg.id = 0;
-  sensor_msg.orientation = lidar_message->rotation();
   sensor_msg.covariance = 0;
+  sensor_msg.horizontal_fov = lidar_message->h_fov();
+  sensor_msg.vertical_fov = lidar_message->v_fov();
+  sensor_msg.quaternion[0] = lidar_message->orientation().w();
+  sensor_msg.quaternion[1] = lidar_message->orientation().x();
+  sensor_msg.quaternion[2] = lidar_message->orientation().y();
+  sensor_msg.quaternion[3] = lidar_message->orientation().z();
+
+  ignition::math::Quaterniond q_bs = ignition::math::Quaterniond(
+    lidar_message->orientation().w(),
+    lidar_message->orientation().x(),
+    lidar_message->orientation().y(),
+    lidar_message->orientation().z());
+
+  const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
+  const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
+
+  setSensorOrientation(u_Xs, sensor_msg);
 
   //distance needed for optical flow message
   optflow_distance = lidar_message->current_distance();  //[m]
@@ -896,45 +935,27 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
-  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+
+  ignition::math::Quaterniond q_bs = ignition::math::Quaterniond(
     sonar_message->orientation().w(),
     sonar_message->orientation().x(),
     sonar_message->orientation().y(),
     sonar_message->orientation().z());
 
-  // rotation of the sensor with respect to the vehicle
-  ignition::math::Vector3d euler = q_gr.Euler();
-  int roll = static_cast<int>(round(GetDegrees360(euler.X())));
-  int pitch = static_cast<int>(round(GetDegrees360(euler.Y())));
-  int yaw = static_cast<int>(round(GetDegrees360(euler.Z())));
+  const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
+  const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
 
-
-  if (roll == 0 && pitch == 0 && yaw == 0) {
-    sensor_msg.orientation = 25;  // downward facing
-  } else if (roll == 0 && pitch == 180 && yaw == 0) {
-    sensor_msg.orientation = 24;  // upward facing
-  } else if (roll == 0 && pitch == 90 && yaw == 180) {
-    sensor_msg.orientation = 12;  // backward facing
-  } else if (roll == 0 && pitch == 90  && yaw == 0) {
-    sensor_msg.orientation = 0;  // forward facing
-  } else if (roll == 0 && pitch == 90 && yaw == 90) {
-     sensor_msg.orientation = 6;  // left facing
-  } else if (roll == 0 && pitch == 90 && yaw == 270) {
-     sensor_msg.orientation = 2;  // right facing
-  } else {
-    sensor_msg.orientation = 100;  // custom orientation
-    sensor_msg.quaternion[0] = sonar_message->orientation().w();
-    sensor_msg.quaternion[1] = sonar_message->orientation().x();
-    sensor_msg.quaternion[2] = sonar_message->orientation().y();
-    sensor_msg.quaternion[3] = sonar_message->orientation().z();
-  }
+  setSensorOrientation(u_Xs, sensor_msg);
 
   sensor_msg.type = 1;
   sensor_msg.id = 1;
-  sensor_msg.orientation = sonar_message->rotation();
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = sonar_message->h_fov();
   sensor_msg.vertical_fov = sonar_message->v_fov();
+  sensor_msg.quaternion[0] = sonar_message->orientation().w();
+  sensor_msg.quaternion[1] = sonar_message->orientation().x();
+  sensor_msg.quaternion[2] = sonar_message->orientation().y();
+  sensor_msg.quaternion[3] = sonar_message->orientation().z();
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);

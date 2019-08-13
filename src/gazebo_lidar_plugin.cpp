@@ -170,23 +170,11 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   ignition::math::Quaterniond q_ls = parentSensor_->Pose().Rot(); // This is the rotation of the parent sensor WRT parent sensor link
   ignition::math::Quaterniond q_bs = (q_bl * q_ls).Inverse(); // This is the rotation of the parent sensor WRT `base_link`
 
-  const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
-  const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
-
-  // Current rotation types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
-  rotation_ = -1; // Invalid rotation
-  if(u_Xs.Dot(kDownwardRotation) > 0.99)
-    rotation_ = 25;
-  else if(u_Xs.Dot(kUpwardRotation) > 0.99)
-    rotation_ = 24;
-  else if(u_Xs.Dot(kBackwardRotation) > 0.99)
-    rotation_ = 12;
-  else if(u_Xs.Dot(kForwardRotation) > 0.99)
-    rotation_ = 0;
-  else if(u_Xs.Dot(kLeftRotation) > 0.99)
-    rotation_ = 6;
-  else if(u_Xs.Dot(kRightRotation) > 0.99)
-    rotation_ = 2;
+  // set the orientation
+  orientation_.set_x(q_bs.X());
+  orientation_.set_y(q_bs.Y());
+  orientation_.set_z(q_bs.Z());
+  orientation_.set_w(q_bs.W());
 }
 
 /////////////////////////////////////////////////
@@ -213,7 +201,9 @@ void RayPlugin::OnNewLaserScans()
   }
 
   lidar_message.set_current_distance(current_distance);
-  lidar_message.set_rotation(rotation_);
+  lidar_message.set_h_fov(0.0523598776);    // 3 degrees standard
+  lidar_message.set_v_fov(0.0523598776);    // 3 degrees standard
+  lidar_message.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
 
   lidar_pub_->Publish(lidar_message);
 }
