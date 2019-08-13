@@ -105,7 +105,6 @@ void SonarPlugin::OnNewScans()
   sonar_message.set_min_distance(parentSensor->RangeMin());
   sonar_message.set_max_distance(parentSensor->RangeMax());
   sonar_message.set_current_distance(parentSensor->Range());
-  sonar_message.set_rotation(rotation_);
 
   sonar_message.set_h_fov(2.0f * atan(parentSensor->Radius() / parentSensor->RangeMax()));
   sonar_message.set_v_fov(2.0f * atan(parentSensor->Radius() / parentSensor->RangeMax()));
