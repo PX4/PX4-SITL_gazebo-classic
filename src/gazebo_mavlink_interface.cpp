@@ -610,7 +610,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 template <class T>
-void GazeboMavlinkInterface::setSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg) {
+void GazeboMavlinkInterface::setMavlinkSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg) {
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
 
   // Current rotation types are described as https://mavlink.io/en/messages/common.html#MAV_SENSOR_ORIENTATION
@@ -889,7 +889,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
   const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
 
-  setSensorOrientation(u_Xs, sensor_msg);
+  setMavlinkSensorOrientation(u_Xs, sensor_msg);
 
   //distance needed for optical flow message
   optflow_distance = lidar_message->current_distance();  //[m]
@@ -945,7 +945,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
   const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
 
-  setSensorOrientation(u_Xs, sensor_msg);
+  setMavlinkSensorOrientation(u_Xs, sensor_msg);
 
   sensor_msg.type = 1;
   sensor_msg.id = 1;
