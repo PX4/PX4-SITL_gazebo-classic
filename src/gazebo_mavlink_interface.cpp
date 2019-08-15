@@ -610,7 +610,7 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
 }
 
 template <class T>
-void GazeboMavlinkInterface::setSensorOrientation(ignition::math::Vector3d u_Xs, T sensor_msg) {
+void GazeboMavlinkInterface::setSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg) {
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
 
   // Current rotation types are described as https://mavlink.io/en/messages/common.html#MAV_SENSOR_ORIENTATION
