@@ -25,6 +25,7 @@
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
 #include <ignition/math.hh>
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo {
 
@@ -205,6 +206,65 @@ inline ignition::math::Pose3d ignitionFromGazeboMath(const gazebo::math::Pose &p
                                 pose_gz.rot.w, pose_gz.rot.x, pose_gz.rot.y, pose_gz.rot.z);
 }
 #endif
+
+/**
+ * @brief Get a quaterion of the orientation of the sensor with respect to the `base_link`
+ *
+ * @param[in] rootModel The root model where the sensor is attached
+ * @param[in] parentSensorModelName The name of the sensor model
+ * @param[in] parentSensor_ The parent sensor
+ * @return    A ignition::math::Quaterniond representing the orientation of the sensor
+ */
+template <class T>
+const ignition::math::Quaterniond getSensorOrientation(const gazebo::physics::ModelPtr& rootModel,
+                                                       const std::string& parentSensorModelName,
+                                                       T& parentSensor)
+{
+  // Get the `base_link` rotation WRT world
+  gazebo::physics::LinkPtr baseLink = nullptr;
+  std::vector<gazebo::physics::LinkPtr> linkList = rootModel->GetLinks(); // Get list of all links in the root model
+  for(auto link : linkList) {
+    std::string linkName = link->GetName();
+    if(linkName.find("::base_link") != std::string::npos) {
+      baseLink = rootModel->GetLink(linkName); // Get the pointer to the `base_link`
+      break;
+    }
+  }
+  if (!baseLink)
+    gzthrow("Sensor plugin requires the `base_link` element to be defined");
+
+  // This is the rotation of the 'base_link` WRT world
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Quaterniond q_wb = baseLink->WorldPose().Rot();
+#else
+  ignition::math::Quaterniond q_wb = ignitionFromGazeboMath(baseLink->GetWorldPose()).Rot();
+#endif
+
+  // Get the parent sensor link rotation WRT world
+  gazebo::physics::LinkPtr parentSensorLink = nullptr;
+  for(auto link : linkList) {
+    std::string linkName = link->GetName();
+    if(linkName.find(parentSensorModelName) != std::string::npos) {
+      parentSensorLink = rootModel->GetLink(linkName); // Get the pointer to the parent sensor link
+      break;
+    }
+  }
+  if (!parentSensorLink)
+    gzthrow("Sensor plugin requires a `link` element for its parent sensor to be defined");
+
+  // This is the rotation of the parentSensorLink WRT world
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Quaterniond q_wl = parentSensorLink->WorldPose().Rot();
+#else
+  ignition::math::Quaterniond q_wl = ignitionFromGazeboMath(parentSensorLink->GetWorldPose()).Rot();
+#endif
+
+  // Calculate parent sensor rotation WRT `base_link`
+  ignition::math::Quaterniond q_bl = q_wb.Inverse() * q_wl; // This is the rotation of the parent sensor link WRT `base_link`
+  ignition::math::Quaterniond q_ls = parentSensor->Pose().Rot(); // This is the rotation of the parent sensor WRT parent sensor link
+
+  return (q_bl * q_ls).Inverse(); // Return the rotation of the parent sensor WRT `base_link`
+}
 
 /**
  * @note Frames of reference:
