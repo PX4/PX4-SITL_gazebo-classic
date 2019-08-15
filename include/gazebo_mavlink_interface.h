@@ -263,8 +263,15 @@ private:
   bool IsRunning();
   void onSigInt();
 
+  /**
+   * @brief Set the MAV_SENSOR_ORIENTATION enum value based on the sensor orientation
+   *
+   * @param[in] rootModel		The root model where the sensor is attached
+   * @param[in] u_Xs				Unit vector of X-axis sensor in `base_link` frame
+   * @param[in] sensor_msg	The Mavlink DISTANCE_SENSOR message struct
+   */
   template <class T>
-  void setSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg);
+  void setMavlinkSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg);
 
   // Serial interface
   void open();
