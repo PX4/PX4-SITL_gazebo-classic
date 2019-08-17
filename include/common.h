@@ -238,7 +238,7 @@ const ignition::math::Quaterniond getSensorOrientation(const gazebo::physics::Mo
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Quaterniond q_pl = parentSensorLink->RelativePose().Rot();
 #else
-  ignition::math::Quaterniond q_pl = ignitionFromGazeboMath(parentSensorLink->RelativePose()).Rot();
+  ignition::math::Quaterniond q_pl = ignitionFromGazeboMath(parentSensorLink->GetRelativePose()).Rot();
 #endif
 
   // Calculate parent sensor rotation WRT `base_link`
