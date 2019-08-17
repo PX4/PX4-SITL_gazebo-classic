@@ -43,26 +43,24 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-  this->newLaserScansConnection->~Connection();
-
-  this->newLaserScansConnection.reset();
-
-  this->parentSensor_.reset();
-  this->world.reset();
+  newLaserScansConnection_->~Connection();
+  newLaserScansConnection_.reset();
+  parentSensor_.reset();
+  world_.reset();
 }
 
 /////////////////////////////////////////////////
 void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
-  this->parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+  parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
-  if (!this->parentSensor_)
+  if (!parentSensor_)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor_->WorldName());
+  world_ = physics::get_world(parentSensor_->WorldName());
 
-  this->newLaserScansConnection = this->parentSensor_->LaserShape()->ConnectNewLaserScans(
+  newLaserScansConnection_ = parentSensor_->LaserShape()->ConnectNewLaserScans(
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
@@ -93,8 +91,8 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   }
 
   // get lidar topic name
-  if(_sdf->HasElement("lidarTopic")) {
-    lidar_topic_ = _sdf->GetElement("lidarTopic")->Get<std::string>();
+  if(_sdf->HasElement("topic")) {
+    lidar_topic_ = parentSensor_->Topic();
   } else {
     lidar_topic_ = kDefaultLidarTopic;
     gzwarn << "[gazebo_lidar_plugin] Using default lidar topic " << lidar_topic_ << "\n";
@@ -114,9 +112,9 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   // Get the pointer to the root model
 #if GAZEBO_MAJOR_VERSION >= 9
-  const physics::ModelPtr rootModel = this->world->ModelByName(rootModelName);
+  const physics::ModelPtr rootModel = world_->ModelByName(rootModelName);
 #else
-  const physics::ModelPtr rootModel = this->world->GetModel(rootModelName);
+  const physics::ModelPtr rootModel = world_->GetModel(rootModelName);
 #endif
 
   // the second to the last name is the model name
@@ -140,14 +138,14 @@ void RayPlugin::OnNewLaserScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
-  common::Time now = world->SimTime();
+  common::Time now = world_->SimTime();
 #else
-  common::Time now = world->GetSimTime();
+  common::Time now = world_->GetSimTime();
 #endif
 
-  lidar_message.set_time_usec(now.Double() * 1e6);
-  lidar_message.set_min_distance(min_distance_);
-  lidar_message.set_max_distance(max_distance_);
+  lidar_message_.set_time_usec(now.Double() * 1e6);
+  lidar_message_.set_min_distance(min_distance_);
+  lidar_message_.set_max_distance(max_distance_);
 
   double current_distance = parentSensor_->Range(0);
 
@@ -158,10 +156,10 @@ void RayPlugin::OnNewLaserScans()
     current_distance = max_distance_;
   }
 
-  lidar_message.set_current_distance(current_distance);
-  lidar_message.set_h_fov(kDefaultFOV);
-  lidar_message.set_v_fov(kDefaultFOV);
-  lidar_message.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
+  lidar_message_.set_current_distance(current_distance);
+  lidar_message_.set_h_fov(kDefaultFOV);
+  lidar_message_.set_v_fov(kDefaultFOV);
+  lidar_message_.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
 
-  lidar_pub_->Publish(lidar_message);
+  lidar_pub_->Publish(lidar_message_);
 }

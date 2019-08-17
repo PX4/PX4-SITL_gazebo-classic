@@ -1,5 +1,6 @@
+<?xml version="1.0" ?>
 <sdf version="1.4">
-  <model name="sonar_model">
+  <model name="sonar">
     <link name="link">
       <pose>0 0 0 0 0 0</pose>
       <inertial>
@@ -16,22 +17,26 @@
       </inertial>
       <visual name="visual">
         <geometry>
-          <box><size>0.005 0.015 0.005</size></box>
+          <box>
+            <size>0.005 0.015 0.005</size>
+          </box>
         </geometry>
         <material>
-	  <script>
-      	    <name>Gazebo/Black</name>
-      	  </script>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
         </material>
       </visual>
       <sensor name="sonar" type="sonar">
-        <pose>0 0 0 0 1.57 0 </pose>
-          <sonar>
-            <min>0.02</min>
-            <max>5.0</max>
-            <radius>1.33974388395</radius>
-          </sonar>
-        <plugin name="SonarPlugin" filename="libgazebo_sonar_plugin.so"/>
+        <pose>0 0 0 0 -1.57 0</pose>
+        <sonar>
+          <min>0.02</min>
+          <max>5.0</max>
+          <radius>1.33974388395</radius>
+        </sonar>
+        <plugin name="SonarPlugin" filename="libgazebo_sonar_plugin.so">
+          <robotNamespace></robotNamespace>
+        </plugin>
         <always_on>1</always_on>
         <update_rate>20</update_rate>
         <visualize>true</visualize>

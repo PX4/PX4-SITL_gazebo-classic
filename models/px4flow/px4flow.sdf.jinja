@@ -43,13 +43,14 @@
       </collision>
 
       <sensor name="px4flow" type="imu">
-        <pose>0 0 0 0 -1.5707963259 3.141592652</pose>
+        <pose>0 0 0 0 -{{ 90*deg2rad }} {{ 180*deg2rad }}</pose>
         <always_on>1</always_on>
         <update_rate>200</update_rate>
       </sensor>
 
       <!-- Sonar: HRLV EZ4-->
       <!--<sensor name="sonar" type="sonar">-->
+        <!--<pose>0 0 0 0 {{ -90*deg2rad }} 0</pose>-->
         <!--<sonar>-->
           <!--<min>0</min>-->
           <!--<max>5.00</max>-->
