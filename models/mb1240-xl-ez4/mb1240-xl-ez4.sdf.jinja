@@ -6,6 +6,7 @@
 {%- set ixx = m/12*(w**2 + h**2) -%}
 {%- set iyy = m/12*(l**2 + h**2) -%}
 {%- set izz = m/12*(l**2 + w**2) -%}
+{%- set deg2rad = 0.01745329251 -%}
 
 {%- macro box(l, w, h) -%}
 <geometry>
@@ -46,6 +47,7 @@
       </collision>
 
       <sensor name="sonar" type="sonar">
+        <pose>0 0 0 0 {{ -90*deg2rad }} 0</pose>
         <sonar>
           <min>0</min>
           <max>2.00</max>

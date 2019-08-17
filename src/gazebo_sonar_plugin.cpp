@@ -19,15 +19,7 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#include "gazebo/physics/physics.hh"
 #include "gazebo_sonar_plugin.h"
-
-#include <gazebo/common/common.hh>
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
-#include "gazebo/transport/transport.hh"
-#include "gazebo/msgs/msgs.hh"
 
 #include <chrono>
 #include <cmath>
@@ -50,71 +42,92 @@ SonarPlugin::SonarPlugin()
 /////////////////////////////////////////////////
 SonarPlugin::~SonarPlugin()
 {
-  this->parentSensor.reset();
-  this->world.reset();
+  newScansConnection_->~Connection();
+  newScansConnection_.reset();
+  parentSensor_.reset();
+  world_.reset();
 }
 
 /////////////////////////////////////////////////
 void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
-//  Get then name of the parent sensor
-  this->parentSensor = std::dynamic_pointer_cast<sensors::SonarSensor>(_parent);
+  //  Get then name of the parent sensor
+  parentSensor_ = std::dynamic_pointer_cast<sensors::SonarSensor>(_parent);
 
-  if (!this->parentSensor)
+  if (!parentSensor_)
     gzthrow("SonarPlugin requires a Sonar Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor->WorldName());
+  world_ = physics::get_world(parentSensor_->WorldName());
 
-  this->parentSensor->SetActive(false);
-  this->newScansConnection = this->parentSensor->ConnectUpdated(boost::bind(&SonarPlugin::OnNewScans, this));
-  this->parentSensor->SetActive(true);
+  parentSensor_->SetActive(false);
+  newScansConnection_ = parentSensor_->ConnectUpdated(boost::bind(&SonarPlugin::OnNewScans, this));
+  parentSensor_->SetActive(true);
 
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
     gzwarn << "[gazebo_sonar_plugin] Please specify a robotNamespace.\n";
 
-  // get rotation of the sensor according to https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
-  if (_sdf->HasElement("rotation")) {
-    rotation_ = _sdf->GetElement("rotation")->Get<int>();
+  // get sonar topic name
+  if(_sdf->HasElement("topic")) {
+    sonar_topic_ = parentSensor_->Topic();
   } else {
-    gzwarn << "[gazebo_sonar_plugin] Using default rotation: " << kDefaultRotation << "\n";
-    rotation_ = kDefaultRotation;
+    sonar_topic_ = kDefaultSonarTopic;
+    gzwarn << "[gazebo_sonar_plugin] Using default sonar topic " << sonar_topic_ << "\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
+  // Get the root model name
   const string scopedName = _parent->ParentName();
-  string topicName = "~/" + scopedName + "/sonar";
-  boost::replace_all(topicName, "::", "/");
+  vector<string> names_splitted;
+  boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+  names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                            [](const string& name)
+                            { return name.size() == 0; }), end(names_splitted));
+  std::string rootModelName = names_splitted.front(); // The first element is the name of the root model
 
-  sonar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>(topicName, 10);
+  // Get the pointer to the root model
+#if GAZEBO_MAJOR_VERSION >= 9
+  const physics::ModelPtr rootModel = world_->ModelByName(rootModelName);
+#else
+  const physics::ModelPtr rootModel = world_->GetModel(rootModelName);
+#endif
+
+  // the second to the last name is the model name
+  const std::string parentSensorModelName = names_splitted.rbegin()[1];
+
+  // Get the sensor orientation
+  const ignition::math::Quaterniond q_bs = getSensorOrientation(rootModel, parentSensorModelName, parentSensor_);
+
+  // set the orientation
+  orientation_.set_x(q_bs.X());
+  orientation_.set_y(q_bs.Y());
+  orientation_.set_z(q_bs.Z());
+  orientation_.set_w(q_bs.W());
+
+  // start sonar topic publishing
+  sonar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>("~/" + names_splitted[0] + "/link/" + sonar_topic_, 10);
 }
 
 void SonarPlugin::OnNewScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
-  common::Time now = world->SimTime();
+  common::Time now = world_->SimTime();
 #else
-  common::Time now = world->GetSimTime();
+  common::Time now = world_->GetSimTime();
 #endif
 
-  sonar_message.set_time_usec(now.Double() * 1e6);
-  sonar_message.set_min_distance(parentSensor->RangeMin());
-  sonar_message.set_max_distance(parentSensor->RangeMax());
-  sonar_message.set_current_distance(parentSensor->Range());
+  sonar_message_.set_time_usec(now.Double() * 1e6);
+  sonar_message_.set_min_distance(parentSensor_->RangeMin());
+  sonar_message_.set_max_distance(parentSensor_->RangeMax());
+  sonar_message_.set_current_distance(parentSensor_->Range());
 
-  sonar_message.set_h_fov(2.0f * atan(parentSensor->Radius() / parentSensor->RangeMax()));
-  sonar_message.set_v_fov(2.0f * atan(parentSensor->Radius() / parentSensor->RangeMax()));
-  ignition::math::Quaterniond pose_model_quaternion = parentSensor->Pose().Rot();
-  gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-  orientation->set_x(pose_model_quaternion.X());
-  orientation->set_y(pose_model_quaternion.Y());
-  orientation->set_z(pose_model_quaternion.Z());
-  orientation->set_w(pose_model_quaternion.W());
-  sonar_message.set_allocated_orientation(orientation);
+  sonar_message_.set_h_fov(2.0f * atan(parentSensor_->Radius() / parentSensor_->RangeMax()));
+  sonar_message_.set_v_fov(2.0f * atan(parentSensor_->Radius() / parentSensor_->RangeMax()));
+  sonar_message_.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
 
-  sonar_pub_->Publish(sonar_message);
+  sonar_pub_->Publish(sonar_message_);
 }

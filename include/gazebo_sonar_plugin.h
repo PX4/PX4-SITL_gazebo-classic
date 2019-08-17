@@ -22,16 +22,24 @@
 #ifndef _GAZEBO_SONAR_PLUGIN_HH_
 #define _GAZEBO_SONAR_PLUGIN_HH_
 
+#include <gazebo/gazebo.hh>
+#include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
+#include <gazebo/util/system.hh>
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
+
+#include "gazebo/msgs/msgs.hh"
 #include <gazebo/sensors/SensorTypes.hh>
 #include <gazebo/sensors/SonarSensor.hh>
-#include <gazebo/util/system.hh>
+
+#include <common.h>
 
 #include <Range.pb.h>
 
 namespace gazebo
 {
-  static constexpr uint8_t kDefaultRotation = 0; // current types are described as https://github.com/PX4/Firmware/blob/master/msg/distance_sensor.msg
+  static constexpr auto kDefaultSonarTopic = "sonar";
 
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE SonarPlugin : public SensorPlugin
@@ -50,20 +58,22 @@ namespace gazebo
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
+    protected: physics::WorldPtr world_;
 
     /// \brief The parent sensor
     private:
-      sensors::SonarSensorPtr parentSensor;
+      sensors::SonarSensorPtr parentSensor_;
+      std::string sonar_topic_;
       transport::NodePtr node_handle_;
       transport::PublisherPtr sonar_pub_;
       std::string namespace_;
-      int rotation_;
 
-    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+      gazebo::msgs::Quaternion orientation_;
+
+    /// \brief The connection tied to SonarPlugin::OnNewScans()
     private:
-      event::ConnectionPtr newScansConnection;
-      sensor_msgs::msgs::Range sonar_message;
+      event::ConnectionPtr newScansConnection_;
+      sensor_msgs::msgs::Range sonar_message_;
   };
 }
 #endif

@@ -63,7 +63,7 @@ namespace gazebo
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
+    protected: physics::WorldPtr world_;
 
     /// \brief The parent sensor
     private:
@@ -79,8 +79,8 @@ namespace gazebo
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:
-      event::ConnectionPtr newLaserScansConnection;
-      sensor_msgs::msgs::Range lidar_message;
+      event::ConnectionPtr newLaserScansConnection_;
+      sensor_msgs::msgs::Range lidar_message_;
   };
 }
 #endif

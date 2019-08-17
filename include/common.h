@@ -22,6 +22,7 @@
 
 
 #include <tinyxml.h>
+#include <typeinfo>
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
 #include <ignition/math.hh>
@@ -220,27 +221,10 @@ const ignition::math::Quaterniond getSensorOrientation(const gazebo::physics::Mo
                                                        const std::string& parentSensorModelName,
                                                        T& parentSensor)
 {
-  // Get the `base_link` rotation WRT world
-  gazebo::physics::LinkPtr baseLink = nullptr;
-  std::vector<gazebo::physics::LinkPtr> linkList = rootModel->GetLinks(); // Get list of all links in the root model
-  for(auto link : linkList) {
-    std::string linkName = link->GetName();
-    if(linkName.find("::base_link") != std::string::npos) {
-      baseLink = rootModel->GetLink(linkName); // Get the pointer to the `base_link`
-      break;
-    }
-  }
-  if (!baseLink)
-    gzthrow("Sensor plugin requires the `base_link` element to be defined");
+  // Get list of all links in the root model
+  std::vector<gazebo::physics::LinkPtr> linkList = rootModel->GetLinks();
 
-  // This is the rotation of the 'base_link` WRT world
-#if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Quaterniond q_wb = baseLink->WorldPose().Rot();
-#else
-  ignition::math::Quaterniond q_wb = ignitionFromGazeboMath(baseLink->GetWorldPose()).Rot();
-#endif
-
-  // Get the parent sensor link rotation WRT world
+  // Get the parent sensor link rotation WRT parent entity
   gazebo::physics::LinkPtr parentSensorLink = nullptr;
   for(auto link : linkList) {
     std::string linkName = link->GetName();
@@ -251,19 +235,70 @@ const ignition::math::Quaterniond getSensorOrientation(const gazebo::physics::Mo
   }
   if (!parentSensorLink)
     gzthrow("Sensor plugin requires a `link` element for its parent sensor to be defined");
-
-  // This is the rotation of the parentSensorLink WRT world
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Quaterniond q_wl = parentSensorLink->WorldPose().Rot();
+  ignition::math::Quaterniond q_pl = parentSensorLink->RelativePose().Rot();
 #else
-  ignition::math::Quaterniond q_wl = ignitionFromGazeboMath(parentSensorLink->GetWorldPose()).Rot();
+  ignition::math::Quaterniond q_pl = ignitionFromGazeboMath(parentSensorLink->RelativePose()).Rot();
 #endif
 
   // Calculate parent sensor rotation WRT `base_link`
-  ignition::math::Quaterniond q_bl = q_wb.Inverse() * q_wl; // This is the rotation of the parent sensor link WRT `base_link`
-  ignition::math::Quaterniond q_ls = parentSensor->Pose().Rot(); // This is the rotation of the parent sensor WRT parent sensor link
+  ignition::math::Quaterniond q_ls = parentSensor->Pose().Rot();
 
-  return (q_bl * q_ls).Inverse(); // Return the rotation of the parent sensor WRT `base_link`
+  /**
+   * @note Given a bug on the sonar sensor which doesn't allow to obtain the
+   * correct sensor to link rotation one must use the rotation of base_link WRT
+   * to the sensor link so to get the proper rotation.
+   *
+   * Also, it's assumed on the SDF of the sonar sensor a -90 degrees rotation in
+   * pitch so the sensor ray matches the X-axis of the link:
+   * <sensor name="sonar" type="sonar">
+   *   <pose>0 0 0 0 -1.57 0</pose>
+   *   <sonar>
+   *     ...
+   *   </sonar>
+   *   <plugin name="SonarPlugin" filename="libgazebo_sonar_plugin.so">
+   *     <robotNamespace></robotNamespace>
+   *   </plugin>
+   * </sensor>
+   *
+   * - Example of a forward facing sonar link:
+   * <include>
+   *   <uri>model://sonar</uri>
+   *   <pose frame="base_link">0 0 -0.05 0 0 0</pose>
+   * </include>
+   *
+   * - For a lidar sensor link however, the direction would depend on the sensor
+   * pose orientation, since all the transforms are taken into account.
+   *
+   * - Ex lidar sensor:
+   * <sensor name="laser" type="ray">
+   *   <pose>0 0 0 0 1.57 0</pose>
+   *   <ray>
+   *
+   *   </ray>
+   *   <plugin name="LaserPlugin" filename="libgazebo_lidar_plugin.so">
+   *     <robotNamespace></robotNamespace>
+   *   </plugin>
+   * </sensor>
+   *
+   * - For the above sensor to be poiting forward, then the link should have the
+   * following pose:
+   * <include>
+   *   <uri>model://lidar</uri>
+   *   <pose frame="base_link">0 0 -0.05 0 -1.57 0</pose>
+   * </include>
+   */
+
+  // Check if the sensor is of type SonarSensor
+  std::string sensorType = typeid(parentSensor).name();
+  if (sensorType.find("SonarSensor") != std::string::npos) {
+    return q_pl.Inverse();
+
+  } else {
+
+    ignition::math::Quaterniond q_bs = (q_pl * q_ls).Inverse();
+    return q_bs; // Return the rotation of the parent sensor WRT `base_link`
+  }
 }
 
 /**
