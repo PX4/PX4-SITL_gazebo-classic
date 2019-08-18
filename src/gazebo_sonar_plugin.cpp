@@ -68,14 +68,6 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   else
     gzwarn << "[gazebo_sonar_plugin] Please specify a robotNamespace.\n";
 
-  // get sonar topic name
-  if(_sdf->HasElement("topic")) {
-    sonar_topic_ = parentSensor_->Topic();
-  } else {
-    sonar_topic_ = kDefaultSonarTopic;
-    gzwarn << "[gazebo_sonar_plugin] Using default sonar topic " << sonar_topic_ << "\n";
-  }
-
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -97,6 +89,16 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   // the second to the last name is the model name
   const std::string parentSensorModelName = names_splitted.rbegin()[1];
+
+  // get sonar topic name
+  if(_sdf->HasElement("topic")) {
+    sonar_topic_ = parentSensor_->Topic();
+  } else {
+    // if not set by parameter, get the topic name from the model name
+    sonar_topic_ = parentSensorModelName;
+    gzwarn << "[gazebo_sonar_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
+      " using sonar topic \"" << parentSensorModelName << "\"\n";
+  }
 
   // Get the sensor orientation
   const ignition::math::Quaterniond q_bs = getSensorOrientation(rootModel, parentSensorModelName, parentSensor_);

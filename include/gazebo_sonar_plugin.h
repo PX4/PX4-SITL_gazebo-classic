@@ -39,8 +39,6 @@
 
 namespace gazebo
 {
-  static constexpr auto kDefaultSonarTopic = "sonar";
-
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE SonarPlugin : public SensorPlugin
   {

@@ -44,7 +44,6 @@ namespace gazebo
   static constexpr double kDefaultMinDistance = 0.2;
   static constexpr double kDefaultMaxDistance = 15.0;
   static constexpr double kDefaultFOV = 0.0523598776;   // standard 3 degrees
-  static constexpr auto kDefaultLidarTopic = "lidar";
 
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
