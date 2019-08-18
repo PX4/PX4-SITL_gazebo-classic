@@ -90,14 +90,6 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     max_distance_ = kDefaultMaxDistance;
   }
 
-  // get lidar topic name
-  if(_sdf->HasElement("topic")) {
-    lidar_topic_ = parentSensor_->Topic();
-  } else {
-    lidar_topic_ = kDefaultLidarTopic;
-    gzwarn << "[gazebo_lidar_plugin] Using default lidar topic " << lidar_topic_ << "\n";
-  }
-
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -119,6 +111,16 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   // the second to the last name is the model name
   const std::string parentSensorModelName = names_splitted.rbegin()[1];
+
+  // get lidar topic name
+  if(_sdf->HasElement("topic")) {
+    lidar_topic_ = parentSensor_->Topic();
+  } else {
+    // if not set by parameter, get the topic name from the model name
+    lidar_topic_ = parentSensorModelName;
+    gzwarn << "[gazebo_lidar_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
+      " using lidar topic \"" << parentSensorModelName << "\"\n";
+  }
 
   // Get the sensor orientation
   const ignition::math::Quaterniond q_bs = getSensorOrientation(rootModel, parentSensorModelName, parentSensor_);
