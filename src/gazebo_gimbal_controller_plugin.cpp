@@ -24,6 +24,70 @@ using namespace std;
 
 GZ_REGISTER_MODEL_PLUGIN(GimbalControllerPlugin)
 
+/* Keep these functions in the 'detail' namespace so that they
+ * can be called from unit tests. */
+namespace detail {
+/////////////////////////////////////////////////
+ignition::math::Vector3d ThreeAxisRot(
+  double r11, double r12, double r21, double r31, double r32)
+{
+  return ignition::math::Vector3d(
+    atan2( r31, r32 ),
+    asin ( r21 ),
+    atan2( r11, r12 ));
+}
+
+/////////////////////////////////////////////////
+/// \TODO something to move into Angle class
+/// \brief returns _angle1 normalized about
+/// (_reference - M_PI, _reference + M_PI]
+/// \param[in] _angle1 input angle
+/// \param[in] _reference reference input angle for normalization
+/// \return normalized _angle1 about _reference
+double NormalizeAbout(double _angle, double reference)
+{
+  double diff = _angle - reference;
+  // normalize diff about (-pi, pi], then add reference
+  while (diff <= -M_PI)
+  {
+    diff += 2.0*M_PI;
+  }
+  while (diff > M_PI)
+  {
+    diff -= 2.0*M_PI;
+  }
+  return diff + reference;
+}
+
+/////////////////////////////////////////////////
+/// \TODO something to move into Angle class
+/// \brief returns shortest angular distance from _from to _to
+/// \param[in] _from starting anglular position
+/// \param[in] _to end angular position
+/// \return distance traveled from starting to end angular positions
+double ShortestAngularDistance(double _from, double _to)
+{
+  return NormalizeAbout(_to, _from) - _from;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d QtoZXY(
+  const ignition::math::Quaterniond &_q)
+{
+  // taken from
+  // http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
+  // case zxy:
+  ignition::math::Vector3d result = detail::ThreeAxisRot(
+    -2*(_q.X()*_q.Y() - _q.W()*_q.Z()),
+    _q.W()*_q.W() - _q.X()*_q.X() + _q.Y()*_q.Y() - _q.Z()*_q.Z(),
+    2*(_q.Y()*_q.Z() + _q.W()*_q.X()),
+    -2*(_q.X()*_q.Z() - _q.W()*_q.Y()),
+    _q.W()*_q.W() - _q.X()*_q.X() - _q.Y()*_q.Y() + _q.Z()*_q.Z());
+  return result;
+}
+}
+
+
 /////////////////////////////////////////////////
 GimbalControllerPlugin::GimbalControllerPlugin()
   :status("closed")
@@ -389,32 +453,6 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 #endif
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d GimbalControllerPlugin::ThreeAxisRot(
-  double r11, double r12, double r21, double r31, double r32)
-{
-  return ignition::math::Vector3d(
-    atan2( r31, r32 ),
-    asin ( r21 ),
-    atan2( r11, r12 ));
-}
-
-/////////////////////////////////////////////////
-ignition::math::Vector3d GimbalControllerPlugin::QtoZXY(
-  const ignition::math::Quaterniond &_q)
-{
-  // taken from
-  // http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
-  // case zxy:
-  ignition::math::Vector3d result = this->ThreeAxisRot(
-    -2*(_q.X()*_q.Y() - _q.W()*_q.Z()),
-    _q.W()*_q.W() - _q.X()*_q.X() + _q.Y()*_q.Y() - _q.Z()*_q.Z(),
-    2*(_q.Y()*_q.Z() + _q.W()*_q.X()),
-    -2*(_q.X()*_q.Z() - _q.W()*_q.Y()),
-    _q.W()*_q.W() - _q.X()*_q.X() - _q.Y()*_q.Y() + _q.Z()*_q.Z());
-  return result;
-}
-
-/////////////////////////////////////////////////
 void GimbalControllerPlugin::OnUpdate()
 {
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
@@ -433,7 +471,7 @@ void GimbalControllerPlugin::OnUpdate()
   }
   else if (time > this->lastUpdateTime)
   {
-    double dt = (this->lastUpdateTime - time).Double();
+    double dt = (time - this->lastUpdateTime).Double();
 
     // We want yaw to control in body frame, not in global.
     this->yawCommand += this->lastImuYaw;
@@ -468,10 +506,10 @@ void GimbalControllerPlugin::OnUpdate()
 
 #if GAZEBO_MAJOR_VERSION >= 8
     ignition::math::Vector3d currentAnglePRYVariable(
-      this->QtoZXY(ignition::math::Quaterniond(currentAngleYPRVariable)));
+      detail::QtoZXY(ignition::math::Quaterniond(currentAngleYPRVariable)));
 #else
     ignition::math::Vector3d currentAnglePRYVariable(
-      this->QtoZXY(currentAngleYPRVariable));
+      detail::QtoZXY(currentAngleYPRVariable));
 #endif
 
     /// get joint limits (in sensor frame)
@@ -497,11 +535,11 @@ void GimbalControllerPlugin::OnUpdate()
 #endif
 
     // normalize errors
-    double pitchError = this->ShortestAngularDistance(
+    double pitchError = detail::ShortestAngularDistance(
       pitchLimited, currentAnglePRYVariable.X());
-    double rollError = this->ShortestAngularDistance(
+    double rollError = detail::ShortestAngularDistance(
       rollLimited, currentAnglePRYVariable.Y());
-    double yawError = this->ShortestAngularDistance(
+    double yawError = detail::ShortestAngularDistance(
       yawLimited, currentAnglePRYVariable.Z());
 
     // Clamp errors based on current angle and estimated errors from rotations:
@@ -609,24 +647,3 @@ void GimbalControllerPlugin::OnUpdate()
   }
 }
 
-/////////////////////////////////////////////////
-double GimbalControllerPlugin::NormalizeAbout(double _angle, double reference)
-{
-  double diff = _angle - reference;
-  // normalize diff about (-pi, pi], then add reference
-  while (diff <= -M_PI)
-  {
-    diff += 2.0*M_PI;
-  }
-  while (diff > M_PI)
-  {
-    diff -= 2.0*M_PI;
-  }
-  return diff + reference;
-}
-
-/////////////////////////////////////////////////
-double GimbalControllerPlugin::ShortestAngularDistance(double _from, double _to)
-{
-  return this->NormalizeAbout(_to, _from) - _from;
-}

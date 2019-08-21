@@ -84,6 +84,12 @@
             <distortionT1>0.0</distortionT1>
             <distortionT2>0.0</distortionT2>
           </plugin>
+          <!-- GStreamer camera plugin (needs a lot of CPU! Consider lowering the
+             camera image size) -->
+          <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
+            <robotNamespace></robotNamespace>
+            <udpPort>5600</udpPort>
+          </plugin>
         </sensor>
         <self_collide>0</self_collide>
         <kinematic>0</kinematic>

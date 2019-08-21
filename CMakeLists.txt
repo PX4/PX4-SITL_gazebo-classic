@@ -20,14 +20,17 @@ include(GNUInstallDirs)
 list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" OFF)
+option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
 option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
 option(SEND_ODOMETRY_DATA "Send Mavlink ODOMETRY msgs" OFF)
 
+# Set c++11 or higher
+include(EnableC++XX)
+
 ## System dependencies are found with CMake's conventions
-find_package(Boost 1.58 REQUIRED COMPONENTS system thread timer filesystem)
+find_package(Boost 1.58 REQUIRED COMPONENTS system thread filesystem)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_program(px4 REQUIRED)
@@ -35,6 +38,7 @@ find_package(PythonInterp REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
 if (BUILD_GSTREAMER_PLUGIN)
+  set(GStreamer_FIND_VERSION "1.0")
   find_package(GStreamer)
   if (GSTREAMER_FOUND)
     if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
@@ -121,8 +125,6 @@ endif()
 ###########
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations")
-
-include(EnableC++XX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
@@ -262,6 +264,8 @@ set(sensor_msgs
   msgs/Range.proto
   msgs/SITLGps.proto
   msgs/OpticalFlow.proto
+  msgs/MagneticField.proto
+  msgs/Pressure.proto
   )
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
@@ -294,10 +298,12 @@ add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
 add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/geo_mag_declination.cpp)
+add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp )
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
+add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
@@ -315,6 +321,8 @@ set(plugins
   gazebo_motor_model
   gazebo_multirotor_base_plugin
   gazebo_wind_plugin
+  gazebo_magnetometer_plugin
+  gazebo_barometer_plugin
   )
 
 foreach(plugin ${plugins})
@@ -379,6 +387,15 @@ if (catkin_FOUND)
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
     SHELLS sh)
 endif()
+
+
+################
+## Unit Tests ##
+################
+include(UnitTests)
+
+add_subdirectory(unit_tests)
+
 
 #############
 ## Install ##

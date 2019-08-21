@@ -2,6 +2,7 @@
 <sdf version="1.4">
   <model name="lidar">
     <link name="link">
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.01</mass>
@@ -25,7 +26,7 @@
         </material>
       </visual>
       <sensor name="laser" type="ray">
-        <pose>0 0 0 0 -1.570896 0</pose>
+        <pose>0 0 0 0 1.57079633 0</pose>
         <ray>
           <scan>
             <horizontal>

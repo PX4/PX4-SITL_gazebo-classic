@@ -22,9 +22,11 @@
 
 
 #include <tinyxml.h>
+#include <typeinfo>
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
 #include <ignition/math.hh>
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo {
 
@@ -65,7 +67,7 @@ void model_param(const std::string& world_name, const std::string& model_name, c
 
     TiXmlElement* e_model = h_root.FirstChild("model").Element();
 
-    for( e_model; e_model; e_model=e_model->NextSiblingElement("model") )
+    for( ; e_model != nullptr; e_model=e_model->NextSiblingElement("model") )
     {
       const char* attr_name = e_model->Attribute("name");
       if (attr_name)
@@ -207,6 +209,99 @@ inline ignition::math::Pose3d ignitionFromGazeboMath(const gazebo::math::Pose &p
 #endif
 
 /**
+ * @brief Get a quaterion of the orientation of the sensor with respect to the `base_link`
+ *
+ * @param[in] rootModel The root model where the sensor is attached
+ * @param[in] parentSensorModelName The name of the sensor model
+ * @param[in] parentSensor_ The parent sensor
+ * @return    A ignition::math::Quaterniond representing the orientation of the sensor
+ */
+template <class T>
+const ignition::math::Quaterniond getSensorOrientation(const gazebo::physics::ModelPtr& rootModel,
+                                                       const std::string& parentSensorModelName,
+                                                       T& parentSensor)
+{
+  // Get list of all links in the root model
+  std::vector<gazebo::physics::LinkPtr> linkList = rootModel->GetLinks();
+
+  // Get the parent sensor link rotation WRT parent entity
+  gazebo::physics::LinkPtr parentSensorLink = nullptr;
+  for(auto link : linkList) {
+    std::string linkName = link->GetName();
+    if(linkName.find(parentSensorModelName) != std::string::npos) {
+      parentSensorLink = rootModel->GetLink(linkName); // Get the pointer to the parent sensor link
+      break;
+    }
+  }
+  if (!parentSensorLink)
+    gzthrow("Sensor plugin requires a `link` element for its parent sensor to be defined");
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Quaterniond q_pl = parentSensorLink->RelativePose().Rot();
+#else
+  ignition::math::Quaterniond q_pl = ignitionFromGazeboMath(parentSensorLink->GetRelativePose()).Rot();
+#endif
+
+  // Calculate parent sensor rotation WRT `base_link`
+  ignition::math::Quaterniond q_ls = parentSensor->Pose().Rot();
+
+  /**
+   * @note Given a bug on the sonar sensor which doesn't allow to obtain the
+   * correct sensor to link rotation one must use the rotation of base_link WRT
+   * to the sensor link so to get the proper rotation.
+   *
+   * Also, it's assumed on the SDF of the sonar sensor a -90 degrees rotation in
+   * pitch so the sensor ray matches the X-axis of the link:
+   * <sensor name="sonar" type="sonar">
+   *   <pose>0 0 0 0 -1.57 0</pose>
+   *   <sonar>
+   *     ...
+   *   </sonar>
+   *   <plugin name="SonarPlugin" filename="libgazebo_sonar_plugin.so">
+   *     <robotNamespace></robotNamespace>
+   *   </plugin>
+   * </sensor>
+   *
+   * - Example of a forward facing sonar link:
+   * <include>
+   *   <uri>model://sonar</uri>
+   *   <pose frame="base_link">0 0 -0.05 0 0 0</pose>
+   * </include>
+   *
+   * - For a lidar sensor link however, the direction would depend on the sensor
+   * pose orientation, since all the transforms are taken into account.
+   *
+   * - Ex lidar sensor:
+   * <sensor name="laser" type="ray">
+   *   <pose>0 0 0 0 1.57 0</pose>
+   *   <ray>
+   *
+   *   </ray>
+   *   <plugin name="LaserPlugin" filename="libgazebo_lidar_plugin.so">
+   *     <robotNamespace></robotNamespace>
+   *   </plugin>
+   * </sensor>
+   *
+   * - For the above sensor to be poiting forward, then the link should have the
+   * following pose:
+   * <include>
+   *   <uri>model://lidar</uri>
+   *   <pose frame="base_link">0 0 -0.05 0 -1.57 0</pose>
+   * </include>
+   */
+
+  // Check if the sensor is of type SonarSensor
+  std::string sensorType = typeid(parentSensor).name();
+  if (sensorType.find("SonarSensor") != std::string::npos) {
+    return q_pl.Inverse();
+
+  } else {
+
+    ignition::math::Quaterniond q_bs = (q_pl * q_ls).Inverse();
+    return q_bs; // Return the rotation of the parent sensor WRT `base_link`
+  }
+}
+
+/**
  * @note Frames of reference:
  * g - gazebo (ENU), east, north, up
  * r - rotors imu frame (FLU), forward, left, up
@@ -229,5 +324,13 @@ static const auto q_ng = ignition::math::Quaterniond(0, 0.70711, 0.70711, 0);
  * to Forward, Left, Up (base_link) frames and vice-versa.
  */
 static const auto q_br = ignition::math::Quaterniond(0, 1, 0, 0);
+
+// sensor X-axis unit vector in `base_link` frame
+static const ignition::math::Vector3d kDownwardRotation = ignition::math::Vector3d(0, 0, -1);
+static const ignition::math::Vector3d kUpwardRotation = ignition::math::Vector3d(0, 0, 1);
+static const ignition::math::Vector3d kBackwardRotation = ignition::math::Vector3d(-1, 0, 0);
+static const ignition::math::Vector3d kForwardRotation = ignition::math::Vector3d(1, 0, 0);
+static const ignition::math::Vector3d kLeftRotation = ignition::math::Vector3d(0, 1, 0);
+static const ignition::math::Vector3d kRightRotation = ignition::math::Vector3d(0, -1, 0);
 
 #endif  // SITL_GAZEBO_COMMON_H_

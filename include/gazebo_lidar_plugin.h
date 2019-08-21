@@ -22,20 +22,29 @@
 #ifndef _GAZEBO_RAY_PLUGIN_HH_
 #define _GAZEBO_RAY_PLUGIN_HH_
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sensors/RaySensor.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/gazebo.hh>
+#include <gazebo/common/common.hh>
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/util/system.hh>
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "Range.pb.h"
+#include "gazebo/msgs/msgs.hh"
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/RaySensor.hh>
 
-#define SENSOR_MIN_DISTANCE   0.06 // values smaller than that cause issues
-#define SENSOR_MAX_DISTANCE  35.0 // values bigger than that cause issues
-#define DEFAULT_MIN_DISTANCE  0.2
-#define DEFAULT_MAX_DISTANCE 15.0
+#include <common.h>
+
+#include <Range.pb.h>
 
 namespace gazebo
 {
+  static constexpr double kSensorMinDistance = 0.06;    // values smaller than that cause issues
+  static constexpr double kSensorMaxDistance = 35.0;    // values bigger than that cause issues
+  static constexpr double kDefaultMinDistance = 0.2;
+  static constexpr double kDefaultMaxDistance = 15.0;
+  static constexpr double kDefaultFOV = 0.0523598776;   // standard 3 degrees
+
   /// \brief A Ray Sensor Plugin
   class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
   {
@@ -53,22 +62,24 @@ namespace gazebo
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
+    protected: physics::WorldPtr world_;
 
     /// \brief The parent sensor
     private:
       sensors::RaySensorPtr parentSensor_;
+      std::string lidar_topic_;
       transport::NodePtr node_handle_;
       transport::PublisherPtr lidar_pub_;
       std::string namespace_;
       double min_distance_;
       double max_distance_;
 
+      gazebo::msgs::Quaternion orientation_;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
     private:
-      event::ConnectionPtr newLaserScansConnection;
-      sensor_msgs::msgs::Range lidar_message;
+      event::ConnectionPtr newLaserScansConnection_;
+      sensor_msgs::msgs::Range lidar_message_;
   };
 }
 #endif

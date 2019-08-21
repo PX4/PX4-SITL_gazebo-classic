@@ -19,15 +19,7 @@
  * Author: Nate Koenig mod by John Hsu
  */
 
-#include "gazebo/physics/physics.hh"
 #include "gazebo_lidar_plugin.h"
-
-#include <gazebo/common/common.hh>
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
-#include "gazebo/transport/transport.hh"
-#include "gazebo/msgs/msgs.hh"
 
 #include <chrono>
 #include <cmath>
@@ -35,6 +27,7 @@
 #include <memory>
 #include <stdio.h>
 #include <boost/algorithm/string.hpp>
+#include <common.h>
 
 using namespace gazebo;
 using namespace std;
@@ -50,26 +43,24 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-  this->newLaserScansConnection->~Connection();
-
-  this->newLaserScansConnection.reset();
-
-  this->parentSensor_.reset();
-  this->world.reset();
+  newLaserScansConnection_->~Connection();
+  newLaserScansConnection_.reset();
+  parentSensor_.reset();
+  world_.reset();
 }
 
 /////////////////////////////////////////////////
 void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
-  this->parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
+  parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
-  if (!this->parentSensor_)
+  if (!parentSensor_)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor_->WorldName());
+  world_ = physics::get_world(parentSensor_->WorldName());
 
-  this->newLaserScansConnection = this->parentSensor_->LaserShape()->ConnectNewLaserScans(
+  newLaserScansConnection_ = parentSensor_->LaserShape()->ConnectNewLaserScans(
       boost::bind(&RayPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
@@ -80,34 +71,68 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   // get minimum distance
   if (_sdf->HasElement("min_distance")) {
     min_distance_ = _sdf->GetElement("min_distance")->Get<double>();
-    if (min_distance_ < SENSOR_MIN_DISTANCE) {
-      min_distance_ = SENSOR_MIN_DISTANCE;
+    if (min_distance_ < kSensorMinDistance) {
+      min_distance_ = kSensorMinDistance;
     }
   } else {
-    gzwarn << "[gazebo_lidar_plugin] Using default minimum distance: 0.3\n";
-    min_distance_ = DEFAULT_MIN_DISTANCE;
+    gzwarn << "[gazebo_lidar_plugin] Using default minimum distance: " << kDefaultMinDistance << "\n";
+    min_distance_ = kDefaultMinDistance;
   }
 
   // get maximum distance
   if (_sdf->HasElement("max_distance")) {
     max_distance_ = _sdf->GetElement("max_distance")->Get<double>();
-    if (max_distance_ > SENSOR_MAX_DISTANCE) {
-      max_distance_ = SENSOR_MAX_DISTANCE;
+    if (max_distance_ > kSensorMaxDistance) {
+      max_distance_ = kSensorMaxDistance;
     }
   } else {
-    gzwarn << "[gazebo_lidar_plugin] Using default maximum distance: 15\n";
-    max_distance_ = DEFAULT_MAX_DISTANCE;
+    gzwarn << "[gazebo_lidar_plugin] Using default maximum distance: " << kDefaultMaxDistance << "\n";
+    max_distance_ = kDefaultMaxDistance;
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
+  // Get the root model name
   const string scopedName = _parent->ParentName();
   vector<string> names_splitted;
-  boost::split(names_splitted,scopedName,boost::is_any_of("::"));
-  string topicName = "~/" + names_splitted[0] + "/link/lidar";
+  boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+  names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                            [](const string& name)
+                            { return name.size() == 0; }), end(names_splitted));
+  std::string rootModelName = names_splitted.front(); // The first element is the name of the root model
 
-  lidar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>(topicName, 10);
+  // Get the pointer to the root model
+#if GAZEBO_MAJOR_VERSION >= 9
+  const physics::ModelPtr rootModel = world_->ModelByName(rootModelName);
+#else
+  const physics::ModelPtr rootModel = world_->GetModel(rootModelName);
+#endif
+
+  // the second to the last name is the model name
+  const std::string parentSensorModelName = names_splitted.rbegin()[1];
+
+  // get lidar topic name
+  if(_sdf->HasElement("topic")) {
+    lidar_topic_ = parentSensor_->Topic();
+  } else {
+    // if not set by parameter, get the topic name from the model name
+    lidar_topic_ = parentSensorModelName;
+    gzwarn << "[gazebo_lidar_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
+      " using lidar topic \"" << parentSensorModelName << "\"\n";
+  }
+
+  // Get the sensor orientation
+  const ignition::math::Quaterniond q_bs = getSensorOrientation(rootModel, parentSensorModelName, parentSensor_);
+
+  // set the orientation
+  orientation_.set_x(q_bs.X());
+  orientation_.set_y(q_bs.Y());
+  orientation_.set_z(q_bs.Z());
+  orientation_.set_w(q_bs.W());
+
+  // start lidar topic publishing
+  lidar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>("~/" + names_splitted[0] + "/link/" + lidar_topic_, 10);
 }
 
 /////////////////////////////////////////////////
@@ -115,14 +140,14 @@ void RayPlugin::OnNewLaserScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
-  common::Time now = world->SimTime();
+  common::Time now = world_->SimTime();
 #else
-  common::Time now = world->GetSimTime();
+  common::Time now = world_->GetSimTime();
 #endif
 
-  lidar_message.set_time_usec(now.Double() * 1e6);
-  lidar_message.set_min_distance(min_distance_);
-  lidar_message.set_max_distance(max_distance_);
+  lidar_message_.set_time_usec(now.Double() * 1e6);
+  lidar_message_.set_min_distance(min_distance_);
+  lidar_message_.set_max_distance(max_distance_);
 
   double current_distance = parentSensor_->Range(0);
 
@@ -133,7 +158,10 @@ void RayPlugin::OnNewLaserScans()
     current_distance = max_distance_;
   }
 
-  lidar_message.set_current_distance(current_distance);
+  lidar_message_.set_current_distance(current_distance);
+  lidar_message_.set_h_fov(kDefaultFOV);
+  lidar_message_.set_v_fov(kDefaultFOV);
+  lidar_message_.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
 
-  lidar_pub_->Publish(lidar_message);
+  lidar_pub_->Publish(lidar_message_);
 }

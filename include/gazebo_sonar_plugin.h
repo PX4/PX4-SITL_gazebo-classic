@@ -22,12 +22,20 @@
 #ifndef _GAZEBO_SONAR_PLUGIN_HH_
 #define _GAZEBO_SONAR_PLUGIN_HH_
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sensors/SonarSensor.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/gazebo.hh>
+#include <gazebo/common/common.hh>
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/util/system.hh>
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "Range.pb.h"
+#include "gazebo/msgs/msgs.hh"
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/SonarSensor.hh>
+
+#include <common.h>
+
+#include <Range.pb.h>
 
 namespace gazebo
 {
@@ -48,20 +56,22 @@ namespace gazebo
     public: void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Pointer to parent
-    protected: physics::WorldPtr world;
+    protected: physics::WorldPtr world_;
 
     /// \brief The parent sensor
     private:
-      sensors::SonarSensorPtr parentSensor;
+      sensors::SonarSensorPtr parentSensor_;
+      std::string sonar_topic_;
       transport::NodePtr node_handle_;
       transport::PublisherPtr sonar_pub_;
       std::string namespace_;
 
+      gazebo::msgs::Quaternion orientation_;
 
-    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    /// \brief The connection tied to SonarPlugin::OnNewScans()
     private:
-      event::ConnectionPtr newScansConnection;
-      sensor_msgs::msgs::Range sonar_message;
+      event::ConnectionPtr newScansConnection_;
+      sensor_msgs::msgs::Range sonar_message_;
   };
 }
 #endif
