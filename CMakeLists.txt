@@ -59,8 +59,12 @@ set( OpticalFlow_LIBS "OpticalFlow" )
 # for ROS subscribers and publishers
 if (BUILD_ROS_INTERFACE)
   find_package(geometry_msgs REQUIRED)
+  find_package(mav_msgs REQUIRED)
+  find_package(message_generation REQUIRED)
+  find_package(nav_msgs REQUIRED)
   find_package(roscpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
+  find_package(std_msgs REQUIRED)
 endif()
 
 # find MAVLink
@@ -71,7 +75,12 @@ if (CATKIN_DEVEL_PREFIX)
   message(STATUS "catkin ENABLED")
   find_package(catkin REQUIRED)
   if (catkin_FOUND)
-    catkin_package()
+    # generate custom messages required for the ROS interface plugin
+    add_message_files(DIRECTORY msgs/ros
+      FILES
+      IRLock.msg)
+    generate_messages(DEPENDENCIES std_msgs)
+    catkin_package(CATKIN_DEPENDS message_runtime)
   else()
     message(FATAL_ERROR "catkin not found")
   endif()
@@ -103,7 +112,7 @@ endif()
 if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
 else()
-  message("Gazebo version: ${GAZEBO_VERSION}")
+  message(STATUS "Gazebo version: ${GAZEBO_VERSION}")
 endif()
 
 find_package(Eigen3 QUIET)
@@ -252,15 +261,16 @@ glob_generate(models_gen ${CMAKE_CURRENT_SOURCE_DIR}/models/*.jinja)
 set(mav_msgs
   msgs/CommandMotorSpeed.proto
   msgs/MotorSpeed.proto
-  )
-set(nav_msgs msgs/Odometry.proto)
+)
+set(nav_msgs
+  msgs/Groundtruth.proto
+  msgs/Odometry.proto)
 set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
   msgs/Imu.proto
   msgs/IRLock.proto
   msgs/Float.proto
-  msgs/Groundtruth.proto
   msgs/Range.proto
   msgs/SITLGps.proto
   msgs/OpticalFlow.proto
@@ -323,7 +333,7 @@ set(plugins
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
-  )
+)
 
 foreach(plugin ${plugins})
   target_link_libraries(${plugin} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
@@ -331,10 +341,10 @@ endforeach()
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
 # If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
-# Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
+# Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin, gazebo_ros_interface
 if (BUILD_ROS_INTERFACE)
+  # Add gazebo_motor_failure_plugin
   add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
-  target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
   list(APPEND plugins gazebo_motor_failure_plugin)
   message(STATUS "adding gazebo_motor_failure_plugin to build")
 
@@ -342,6 +352,7 @@ if (BUILD_ROS_INTERFACE)
     include
     ${geometry_msgs_INCLUDE_DIRS}
     ${sensor_msgs_INCLUDE_DIRS}
+    ${std_msgs_INCLUDE_DIRS}
   )
 
   target_link_libraries(gazebo_motor_failure_plugin
@@ -349,6 +360,19 @@ if (BUILD_ROS_INTERFACE)
     ${roscpp_LIBRARIES}
     ${GAZEBO_libraries}
   )
+
+  # Add gazebo_ros_interface plugin
+  add_library(gazebo_ros_interface SHARED src/gazebo_ros_interface.cpp)
+  list(APPEND plugins gazebo_ros_interface)
+  message(STATUS "adding gazebo_ros_interface to build")
+
+  target_link_libraries(gazebo_ros_interface
+    ${catkin_LIBRARIES}
+    ${roscpp_LIBRARIES}
+    ${GAZEBO_libraries}
+  )
+
+  add_dependencies(gazebo_ros_interface mavlink_sitl_gazebo_generate_messages_cpp)
 endif()
 
 if (GSTREAMER_FOUND)
@@ -381,13 +405,6 @@ foreach(plugin ${plugins})
   add_dependencies(${plugin} physics_msgs)
 endforeach()
 
-# Configure the setup script
-if (catkin_FOUND)
-  catkin_add_env_hooks(50_sitl_gazebo_setup
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-    SHELLS sh)
-endif()
-
 
 ################
 ## Unit Tests ##
@@ -415,8 +432,13 @@ install(TARGETS ${plugins} mav_msgs nav_msgs std_msgs sensor_msgs DESTINATION ${
 install(DIRECTORY ${models_list} DESTINATION ${MODEL_PATH})
 install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
 
-configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})
+if (CATKIN_DEVEL_PREFIX)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/catkin_setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/etc/catkin/profile.d/setup.sh DESTINATION ../${CMAKE_CURRENT_BINARY_DIR})
+else()
+  configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})
+endif()
 
 install(FILES ${PROJECT_SOURCE_DIR}/package.xml DESTINATION ${RESOURCE_PATH})
 

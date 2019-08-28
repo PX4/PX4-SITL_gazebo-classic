@@ -72,7 +72,7 @@ static constexpr auto kDefaultNoiseDensity = 0.4*1e-3; // [gauss / sqrt(hz)]
 static constexpr auto kDefaultRandomWalk = 6.4*1e-6; // [gauss * sqrt(hz)]
 static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2; // [s]
 
-typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
+typedef const boost::shared_ptr<const nav_msgs::msgs::Groundtruth> GtPtr;
 
 class MagnetometerPlugin : public ModelPlugin {
 public:

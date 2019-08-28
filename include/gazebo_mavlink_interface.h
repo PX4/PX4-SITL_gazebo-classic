@@ -87,7 +87,7 @@ namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 typedef const boost::shared_ptr<const nav_msgs::msgs::Odometry> OdomPtr;
-typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
+typedef const boost::shared_ptr<const nav_msgs::msgs::Groundtruth> GtPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::IRLock> IRLockPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::OpticalFlow> OpticalFlowPtr;

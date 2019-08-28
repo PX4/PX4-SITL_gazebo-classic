@@ -2,11 +2,14 @@
 #
 # Setup environment to make PX4 visible to Gazebo.
 #
+# Note, this is not necessary if using a ROS catkin workspace with the px4
+# package as the paths are exported.
+#
 # License: according to LICENSE.md in the root directory of the PX4 Firmware repository
 
 # setup Gazebo env and update package path
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/@PLUGIN_PATH@:@CMAKE_CURRENT_BINARY_DIR@
-export GAZEBO_PLUGIN_PATH=$GAZEBO_PLUGIN_PATH:@CMAKE_INSTALL_PREFIX@/@PLUGIN_PATH@:@CMAKE_CURRENT_BINARY_DIR@
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/@PLUGIN_PATH@:@CMAKE_CURRENT_BINARY_DIR@/devel/lib
+export GAZEBO_PLUGIN_PATH=$GAZEBO_PLUGIN_PATH:@CMAKE_INSTALL_PREFIX@/@PLUGIN_PATH@:@CMAKE_CURRENT_BINARY_DIR@/devel/lib
 export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:@CMAKE_INSTALL_PREFIX@/@MODEL_PATH@:@CMAKE_CURRENT_SOURCE_DIR@/models
 export GAZEBO_RESOURCE_PATH=/usr/share/gazebo-@gazebo_VERSION_MAJOR@:$GAZEBO_RESOURCE_PATH:@CMAKE_INSTALL_PREFIX@/@RESOURCE_PATH@:@CMAKE_CURRENT_SOURCE_DIR@/worlds
 
@@ -14,3 +17,9 @@ echo -e "GAZEBO_PLUGIN_PATH ${GAZEBO_PLUGIN_PATH}"
 echo -e "GAZEBO_MODEL_PATH ${GAZEBO_MODEL_PATH}"
 echo -e "LD_LIBRARY_PATH ${LD_LIBRARY_PATH}"
 echo -e "GAZEBO_RESOURCE_PATH ${GAZEBO_RESOURCE_PATH}"
+
+# Since we add new ROS messages, the workspace needs to be sourced as well
+source @CMAKE_CURRENT_BINARY_DIR@/devel/setup.bash
+
+# Start roscore in the background as soon as the sim starts
+roscore &

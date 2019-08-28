@@ -46,6 +46,9 @@
   <build_depend>mavlink</build_depend>
   <build_depend>mavros</build_depend>
   <build_depend>mavros_msgs</build_depend>
+  <build_depend>mav_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_depend>protobuf-dev</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
@@ -61,6 +64,7 @@
   <run_depend>mavlink</run_depend>
   <run_depend>mavros</run_depend>
   <run_depend>mavros_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>

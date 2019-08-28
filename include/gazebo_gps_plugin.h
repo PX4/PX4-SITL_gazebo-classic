@@ -79,7 +79,7 @@ private:
   transport::PublisherPtr gps_pub_;
 
   sensor_msgs::msgs::SITLGps gps_msg;
-  sensor_msgs::msgs::Groundtruth groundtruth_msg;
+  nav_msgs::msgs::Groundtruth groundtruth_msg;
 
   common::Time last_gps_time_;
   common::Time last_time_;
