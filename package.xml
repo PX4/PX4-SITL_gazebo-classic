@@ -46,7 +46,6 @@
   <build_depend>mavlink</build_depend>
   <build_depend>mavros</build_depend>
   <build_depend>mavros_msgs</build_depend>
-  <build_depend>mav_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>protobuf-dev</build_depend>

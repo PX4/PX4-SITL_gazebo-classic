@@ -59,7 +59,6 @@ set( OpticalFlow_LIBS "OpticalFlow" )
 # for ROS subscribers and publishers
 if (BUILD_ROS_INTERFACE)
   find_package(geometry_msgs REQUIRED)
-  find_package(mav_msgs REQUIRED)
   find_package(message_generation REQUIRED)
   find_package(nav_msgs REQUIRED)
   find_package(roscpp REQUIRED)

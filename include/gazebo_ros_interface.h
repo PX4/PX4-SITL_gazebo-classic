@@ -28,7 +28,6 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo_plugins/PubQueue.h>
 
-#include <mav_msgs/default_topics.h>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
