@@ -44,13 +44,18 @@ if (BUILD_GSTREAMER_PLUGIN)
     if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
       find_package (Qt4)
       include (${QT_USE_FILE})
+    else()
+      find_package(Qt5Widgets REQUIRED)
+      find_package(Qt5Core REQUIRED)
+      find_package(Protobuf REQUIRED)
+      find_package(gazebo REQUIRED)
     endif()
   endif()
 endif()
 
 pkg_check_modules(OGRE OGRE)
 
-include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
+include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
@@ -367,6 +372,20 @@ if (GSTREAMER_FOUND)
       gazebo_video_stream_widget
     )
     message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+  else()
+    QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
+    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
+    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES}
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
+    ${PROTOBUF_LIBRARIES}
+    ${Qt5Test_LIBRARIES})
+    set(plugins
+      ${plugins}
+      gazebo_video_stream_widget
+    )
+    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+    message("Gazebo version: ${GAZEBO_VERSION}")
   endif()
 endif()
 
