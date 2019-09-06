@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='boat'>
+    <pose>0 0 0.246 0 0 0</pose>
+    <link name='base_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <!-- From WAM-V spec sheet -->
+        <mass>180.0</mass>
+        <inertia>
+          <ixx>120</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>393</iyy>
+          <iyz>0</iyz>
+          <izz>446.0</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 -0.07 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.47 0.47 0.11</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <max_vel>10</max_vel>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+          <!--<friction>
+            <ode/>
+          </friction>-->
+        </surface>
+      </collision>
+      <collision name="left_float">
+        <pose>0.4 1.03 0.2 0 1.57 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.2</radius>
+            <length>4.0</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="right_float">
+        <pose>0.4 -1.03 0.2 0 1.57 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.2</radius>
+            <length>4.0</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="left_mid_float">
+        <pose>1.85 1.03 0.3 0 1.38 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.17</radius>
+            <length>0.5</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="right_mid_float">
+        <pose>1.85 -1.03 0.3 0 1.38 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.17</radius>
+            <length>0.5</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="left_front_float">
+        <pose>2.3 -1.03 0.4 0 1.3 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.12</radius>
+            <length>0.45</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name="right_front_float">
+        <pose>2.3 -1.03 0.4 0 1.3 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.12</radius>
+            <length>0.45</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0.07 0 -0.08 0 0.0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1.0 1.0 1.0</scale>
+            <uri>model://boat/meshes/body.dae</uri>
+          </mesh>
+        </geometry>
+       </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+    <link name='boat/imu_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='boat/imu_joint' type='revolute'>
+      <child>boat/imu_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <plugin name="usv_dynamic" filename="libusv_gazebo_dynamics_plugin.so">
+      <bodyName>base_link</bodyName>
+      <!-- Must be same as the ocean model!-->
+      <waterLevel>0</waterLevel>
+      <waterDensity>997.8</waterDensity>
+      <!-- Added mass -->
+      <xDotU>0.0</xDotU>
+      <yDotV>0.0</yDotV>
+      <nDotR>0.0</nDotR>
+      <!-- Linear and quadratic drag -->
+      <xU>51.3</xU>
+      <xUU>72.4</xUU>
+      <yV>40.0</yV>
+      <yVV>0.0</yVV>
+      <zW>500.0</zW>
+      <kP>50.0</kP>
+      <mQ>50.0</mQ>
+      <nR>400.0</nR>
+      <nRR>0.0</nRR>
+      <!-- General dimensions -->
+      <!--<boatArea>2.2</boatArea>-->
+      <hullRadius>0.213</hullRadius>
+      <boatWidth>2.4</boatWidth>
+      <boatLength>4.9</boatLength>
+      <!-- Length discretization, AKA, "N" -->
+      <length_n>2</length_n>
+      <!-- Wave model -->
+      <wave_model>ocean_waves</wave_model>
+    </plugin>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+      <robotNamespace></robotNamespace>
+      <linkName>boat/imu_link</linkName>
+      <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+        <robotNamespace></robotNamespace>
+        <gpsNoise>true</gpsNoise>
+    </plugin>
+    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>20</pubRate>
+      <noiseDensity>0.0004</noiseDensity>
+      <randomWalk>6.4e-06</randomWalk>
+      <biasCorrelationTime>600</biasCorrelationTime>
+      <magTopic>/mag</magTopic>
+    </plugin>
+    <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>10</pubRate>
+      <baroTopic>/baro</baroTopic>
+    </plugin>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace></robotNamespace>
+      <imuSubTopic>/imu</imuSubTopic>
+      <gpsSubTopic>/gps</gpsSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <sdk_addr>INADDR_ANY</sdk_addr>
+      <sdk_udp_port>14540</sdk_udp_port>
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+    </plugin>
+    <static>0</static>
+  </model>
+</sdf>
