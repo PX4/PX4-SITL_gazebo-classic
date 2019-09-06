@@ -47,8 +47,6 @@ if (BUILD_GSTREAMER_PLUGIN)
     else()
       find_package(Qt5Widgets REQUIRED)
       find_package(Qt5Core REQUIRED)
-      find_package(Protobuf REQUIRED)
-      find_package(gazebo REQUIRED)
     endif()
   endif()
 endif()
@@ -375,17 +373,12 @@ if (GSTREAMER_FOUND)
   else()
     QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
     add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES}
-    ${Qt5Core_LIBRARIES}
-    ${Qt5Widgets_LIBRARIES}
-    ${PROTOBUF_LIBRARIES}
-    ${Qt5Test_LIBRARIES})
+    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
     set(plugins
       ${plugins}
       gazebo_video_stream_widget
     )
     message(STATUS "Found GStreamer: adding gst_video_stream_widget")
-    message("Gazebo version: ${GAZEBO_VERSION}")
   endif()
 endif()
 
