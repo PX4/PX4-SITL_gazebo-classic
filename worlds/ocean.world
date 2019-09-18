@@ -5,6 +5,9 @@
     <include>
       <uri>model://sun</uri>
     </include>
+    <include>
+      <uri>model://ocean_waves</uri>
+    </include>
      <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
@@ -26,8 +29,5 @@
       <real_time_update_rate>250</real_time_update_rate>
       <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
     </physics>
-    <include>
-      <uri>model://ocean_waves</uri>
-    </include>
   </world>
 </sdf>
