@@ -49,18 +49,6 @@ PRIV_NAME = '~'
 REMAP = ":="
 ANYTYPE = '*'
 
-if sys.hexversion > 0x03000000: #Python3
-    def isstring(s):
-        return isinstance(s, str) #Python 3.x
-else:
-    def isstring(s):
-        """
-        Small helper version to check an object is a string in a way that works
-        for both Python 2 and 3
-        """
-        return isinstance(s, basestring) #Python 2.x
-
-
 
 def load_mappings(argv):
     """
