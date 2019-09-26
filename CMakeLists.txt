@@ -53,7 +53,12 @@ endif()
 
 pkg_check_modules(OGRE OGRE)
 
-include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS})
+if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+  include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
+else()
+  include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS})
+endif()
+
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
