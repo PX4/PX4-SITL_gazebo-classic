@@ -111,7 +111,7 @@ endif()
 if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
 else()
-  message("Gazebo version: ${GAZEBO_VERSION}")
+  message(STATUS "Gazebo version: ${GAZEBO_VERSION}")
 endif()
 
 find_package(Eigen3 QUIET)
