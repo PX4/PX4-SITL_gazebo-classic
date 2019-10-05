@@ -43,27 +43,15 @@ if (BUILD_GSTREAMER_PLUGIN)
       find_package (Qt4)
       include (${QT_USE_FILE})
     else()
-      if (APPLE)
-        # We need to find the path of the Qt libs and cmake config installed by brew,
-        # e.g. /usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5Core
-        execute_process(COMMAND /usr/local/opt/qt/bin/qtpaths --install-prefix
-          OUTPUT_VARIABLE qt_install_path
-          OUTPUT_STRIP_TRAILING_WHITESPACE)
-        message(STATUS "QT install path: ${qt_install_path}")
-        find_package(Qt5Core
-          CONFIG
-          PATHS "${qt_install_path}/lib/cmake/Qt5Core"
-          NO_DEFAULT_PATH
-          REQUIRED)
-        find_package(Qt5Widgets
-          CONFIG
-          PATHS ${qt_install_path}/lib/cmake/Qt5Widgets
-          NO_DEFAULT_PATH
-          REQUIRED)
-      else()
-        find_package(Qt5Core REQUIRED)
-        find_package(Qt5Widgets REQUIRED)
+      # In order to find Qt5 in macOS, the Qt5 path needs to be added to the CMake prefix path.
+      if(APPLE)
+        execute_process(COMMAND brew --prefix qt5
+                        ERROR_QUIET
+                        OUTPUT_VARIABLE QT5_PREFIX_PATH
+                       )
+        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}")
       endif()
+      find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
     endif()
   endif()
 endif()
