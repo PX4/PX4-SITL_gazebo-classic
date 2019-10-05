@@ -79,9 +79,9 @@ matrix:
           env:
             - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2019-10-04
             - BUILD="source ./scripts/validate_sdf.bash"
-        - name: MacOSX 10.13 build with Gazebo9
+        - name: MacOSX 10.14 (Xcode 11.0) build with Gazebo 9
           os: osx
-          osx_image: xcode10.1
+          osx_image: xcode11
           language: cpp
           cache:
             ccache: true
@@ -91,6 +91,8 @@ matrix:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update;
+    curl https://gstreamer.freedesktop.org/data/pkg/osx/1.0.10/gstreamer-1.0-1.0.10-universal.pkg -LO /tmp/gstreamer-1.0-1.0.10-universal.pkg;
+    curl https://gstreamer.freedesktop.org/data/pkg/osx/1.0.10/gstreamer-1.0-devel-1.0.10-universal.pkg -LO /tmp/gstreamer-1.0-devel-1.0.10-universal.pkg;
     git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0;
     rm -rf /usr/local/include/mavlink/v2.0/.git;
     git clone https://github.com/google/googletest;
@@ -106,9 +108,11 @@ before_install:
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    brew install gstreamer@1.0 gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav;
     brew tap PX4/px4;
-    brew install px4-dev;
+    brew install px4-dev pkg-config;
+    installer -allowUntrusted -verboseR -pkg /tmp/gstreamer-1.0-1.0.10-universal.pkg -target /;
+    installer -allowUntrusted -verboseR -pkg /tmp/gstreamer-1.0-devel-1.0.10-universal.pkg -target /;
+    export PKG_CONFIG_PATH="/Frameworks/GStreamer.framework/Versions/Current/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}";
     brew tap osrf/simulation;
     brew install opencv ${GAZEBO_VERSION};
     brew cask reinstall xquartz java;
