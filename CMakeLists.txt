@@ -45,17 +45,9 @@ if(BUILD_GSTREAMER_PLUGIN)
       find_package (Qt4)
       include (${QT_USE_FILE})
     else()
-      # In order to have Qt5 found in MacOS/MacOSX, the Qt5 path needs to be
-      # added to the CMake prefix path
-      if(APPLE)
-        execute_process(COMMAND export Qt5_DIR=$(brew --prefix qt5))
-        execute_process(COMMAND brew --prefix qt5
-                        ERROR_QUIET
-                        OUTPUT_VARIABLE QT5_PREFIX_PATH
-                       )
-        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}")
+      if(NOT APPLE)
+        find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
       endif()
-      find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
     endif()
   endif()
 endif()
