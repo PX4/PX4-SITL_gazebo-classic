@@ -41,11 +41,21 @@ if(BUILD_GSTREAMER_PLUGIN)
   set(GStreamer_FIND_VERSION "1.0")
   find_package(GStreamer REQUIRED)
   if(GSTREAMER_FOUND)
+    set(CMAKE_AUTOMOC ON)
     if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-      find_package (Qt4)
-      include (${QT_USE_FILE})
+      find_package(Qt4)
+      include(${QT_USE_FILE})
     else()
-      if(NOT APPLE)
+      # In order to have Qt5 found in MacOS/MacOSX, the Qt5 path needs to be
+      # added to the CMake prefix path
+      if(APPLE)
+        execute_process(COMMAND export Qt5_DIR=$(brew --prefix qt5))
+        execute_process(COMMAND brew --prefix qt5
+                        ERROR_QUIET
+                        OUTPUT_VARIABLE QT5_PREFIX_PATH
+                       )
+        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}")
+      else()
         find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
       endif()
     endif()
@@ -366,25 +376,23 @@ if (GSTREAMER_FOUND)
     ${plugins}
     gazebo_gst_camera_plugin
   )
-  message(STATUS "Found GStreamer: adding gst_camera_plugin")
+  message(STATUS "Adding gst_camera_plugin")
   if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-    QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
     add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
     target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
     set(plugins
       ${plugins}
       gazebo_video_stream_widget
     )
-    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+    message(STATUS "Adding gst_video_stream_widget")
   else()
-    QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
     add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
     target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
     set(plugins
       ${plugins}
       gazebo_video_stream_widget
     )
-    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+    message(STATUS "Adding gst_video_stream_widget")
   endif()
 endif()
 
