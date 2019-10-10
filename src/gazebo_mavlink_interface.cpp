@@ -270,9 +270,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // Subscribe to messages of other plugins.
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
-  lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
+  lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
-  sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
+  sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
   gps_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gps_sub_topic_, &GazeboMavlinkInterface::GpsCallback, this);
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
@@ -514,6 +514,26 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
 
   standard_normal_distribution_ = std::normal_distribution<float>(0.0f, 1.0f);
+
+  // Get the lidar link orientation with respect to the base_link
+  const auto lidar_link = model_->GetLink(lidar_sub_topic_ + "::link");
+  if (lidar_link != NULL) {
+#if GAZEBO_MAJOR_VERSION >= 9
+    lidar_orientation_ = lidar_link->RelativePose().Rot();
+#else
+    lidar_orientation_ = ignitionFromGazeboMath(lidar_link->GetRelativePose()).Rot();
+#endif
+  }
+
+  // Get the sonar link orientation with respect to the base_link
+  const auto sonar_link = model_->GetLink(sonar_sub_topic_ + "::link");
+  if (sonar_link != NULL) {
+#if GAZEBO_MAJOR_VERSION >= 9
+    sonar_orientation_ = sonar_link->RelativePose().Rot();
+#else
+    sonar_orientation_ = ignitionFromGazeboMath(sonar_link->GetRelativePose()).Rot();
+#endif
+  }
 }
 
 // This gets called by the world update start event.
@@ -875,16 +895,19 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = lidar_message->h_fov();
   sensor_msg.vertical_fov = lidar_message->v_fov();
-  sensor_msg.quaternion[0] = lidar_message->orientation().w();
-  sensor_msg.quaternion[1] = lidar_message->orientation().x();
-  sensor_msg.quaternion[2] = lidar_message->orientation().y();
-  sensor_msg.quaternion[3] = lidar_message->orientation().z();
 
-  ignition::math::Quaterniond q_bs = ignition::math::Quaterniond(
+  ignition::math::Quaterniond q_ls = ignition::math::Quaterniond(
     lidar_message->orientation().w(),
     lidar_message->orientation().x(),
     lidar_message->orientation().y(),
     lidar_message->orientation().z());
+
+  ignition::math::Quaterniond q_bs = (lidar_orientation_ * q_ls).Inverse();
+
+  sensor_msg.quaternion[0] = q_bs.W();
+  sensor_msg.quaternion[1] = q_bs.X();
+  sensor_msg.quaternion[2] = q_bs.Y();
+  sensor_msg.quaternion[3] = q_bs.Z();
 
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
   const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
@@ -936,14 +959,10 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
 
-  ignition::math::Quaterniond q_bs = ignition::math::Quaterniond(
-    sonar_message->orientation().w(),
-    sonar_message->orientation().x(),
-    sonar_message->orientation().y(),
-    sonar_message->orientation().z());
+  ignition::math::Quaterniond q_ls = sonar_orientation_.Inverse();
 
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
-  const ignition::math::Vector3d u_Xs = q_bs.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
+  const ignition::math::Vector3d u_Xs = q_ls.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
 
   setMavlinkSensorOrientation(u_Xs, sensor_msg);
 
@@ -952,10 +971,10 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = sonar_message->h_fov();
   sensor_msg.vertical_fov = sonar_message->v_fov();
-  sensor_msg.quaternion[0] = sonar_message->orientation().w();
-  sensor_msg.quaternion[1] = sonar_message->orientation().x();
-  sensor_msg.quaternion[2] = sonar_message->orientation().y();
-  sensor_msg.quaternion[3] = sonar_message->orientation().z();
+  sensor_msg.quaternion[0] = q_ls.W();
+  sensor_msg.quaternion[1] = q_ls.X();
+  sensor_msg.quaternion[2] = q_ls.Y();
+  sensor_msg.quaternion[3] = q_ls.Z();
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
