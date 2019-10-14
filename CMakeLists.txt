@@ -16,8 +16,6 @@ include(GNUInstallDirs)
 ## Find Dependencies ##
 #######################
 
-# Add search directory for CMake on OS X
-list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
@@ -39,14 +37,33 @@ find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
 if (BUILD_GSTREAMER_PLUGIN)
   set(GStreamer_FIND_VERSION "1.0")
-  find_package(GStreamer)
+  find_package(GStreamer REQUIRED)
   if (GSTREAMER_FOUND)
     if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
       find_package (Qt4)
       include (${QT_USE_FILE})
     else()
-      find_package(Qt5Widgets REQUIRED)
-      find_package(Qt5Core REQUIRED)
+      if (APPLE)
+        # We need to find the path of the Qt libs and cmake config installed by brew,
+        # e.g. /usr/local/Cellar/qt/5.13.1/lib/cmake/Qt5Core
+        execute_process(COMMAND /usr/local/opt/qt/bin/qtpaths --install-prefix
+          OUTPUT_VARIABLE qt_install_path
+          OUTPUT_STRIP_TRAILING_WHITESPACE)
+        message(STATUS "QT install path: ${qt_install_path}")
+        find_package(Qt5Core
+          CONFIG
+          PATHS "${qt_install_path}/lib/cmake/Qt5Core"
+          NO_DEFAULT_PATH
+          REQUIRED)
+        find_package(Qt5Widgets
+          CONFIG
+          PATHS ${qt_install_path}/lib/cmake/Qt5Widgets
+          NO_DEFAULT_PATH
+          REQUIRED)
+      else()
+        find_package(Qt5Core REQUIRED)
+        find_package(Qt5Widgets REQUIRED)
+      endif()
     endif()
   endif()
 endif()
