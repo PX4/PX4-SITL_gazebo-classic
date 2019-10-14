@@ -193,6 +193,8 @@ link_libraries(
 if (GSTREAMER_FOUND)
   link_libraries(
     ${GSTREAMER_LIBRARIES}
+    glib-2.0
+    gobject-2.0
   )
 endif()
 
