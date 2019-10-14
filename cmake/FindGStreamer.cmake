@@ -48,19 +48,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if (APPLE)
-    find_library(GSTREAMER NAMES GStreamer)
-    if (NOT GSTREAMER)
-        message(FATAL_ERROR "GStreamer not found")
-    else()
-        message(STATUS "GStreamer found")
-    endif()
-
-    SET(GSTREAMER_INCLUDE_DIRS ${GSTREAMER}/Headers)
-    SET(GSTREAMER_LIBRARIES "-framework GStreamer")
-    SET(GSTREAMER_FOUND true)
-
-else()
 find_package(PkgConfig)
 
 
@@ -143,5 +130,3 @@ mark_as_advanced(
     GSTREAMER_VIDEO_INCLUDE_DIRS
     GSTREAMER_VIDEO_LIBRARIES
 )
-
-endif()
