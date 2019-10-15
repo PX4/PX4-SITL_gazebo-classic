@@ -7,7 +7,7 @@
     <!--geotagged images camera-->
     <include>
       <uri>model://geotagged_cam</uri>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 -1.571 0</pose>
     </include>
     <joint name="geotagged_cam_joint" type="fixed">
       <parent>plane::base_link</parent>
