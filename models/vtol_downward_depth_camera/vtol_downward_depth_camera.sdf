@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='vtol_downward_depth_camera'>
+    <include>
+      <uri>model://standard_vtol</uri>
+    </include>
+
+    <include>
+      <uri>model://depth_camera</uri>
+      <pose>0.1 0 0.15 0 1.5708 0</pose>
+    </include>
+    <joint name="depth_camera_joint" type="revolute">
+      <child>depth_camera::link</child>
+      <parent>standard_vtol::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
+  </model>
+</sdf>
