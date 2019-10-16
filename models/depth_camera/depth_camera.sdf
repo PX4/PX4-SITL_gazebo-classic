@@ -19,7 +19,7 @@
         <pose>0 0 0 0 1.57 0</pose>
         <geometry>
           <mesh>
-            <uri>model://depth_camera/meshes/hokuyo.dae</uri>
+            <uri>model://realsense_camera/meshes/realsense.dae</uri>
           </mesh>
         </geometry>
       </visual>
