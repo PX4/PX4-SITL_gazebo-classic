@@ -16,7 +16,7 @@
         </inertia>
       </inertial>
       <visual name="visual">
-        <pose>0 0 0 0 1.57 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <uri>model://realsense_camera/meshes/realsense.dae</uri>
