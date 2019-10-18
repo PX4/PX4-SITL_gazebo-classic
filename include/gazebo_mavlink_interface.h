@@ -200,6 +200,7 @@ protected:
 
 private:
   bool received_first_actuator_;
+  bool received_actuator_ = false;
   Eigen::VectorXd input_reference_;
 
   float protocol_version_;
@@ -363,7 +364,14 @@ private:
   socklen_t local_sdk_addr_len_;
 
   unsigned char _buf[65535];
+  enum FD_TYPES {
+    LISTEN_FD,
+    CONNECTION_FD,
+    N_FDS
+  };
+  struct pollfd fds_[N_FDS];
   bool use_tcp_ = false;
+  bool close_conn_ = false;
 
   double optflow_distance;
   double sonar_distance;
