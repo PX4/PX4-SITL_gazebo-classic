@@ -1,39 +1,85 @@
 # Gazebo for MAVLink SITL and HITL [![Build Status](https://travis-ci.org/PX4/sitl_gazebo.svg?branch=master)](https://travis-ci.org/PX4/sitl_gazebo)
 
-This is a flight simulator for multirotors, VTOL and fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. This repository is in the process of being re-integrated into RotorS, which then will support ROS and MAVLink as transport options: https://github.com/ethz-asl/rotors_simulator
+This is a flight simulator for multirotors, VTOL and fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. This repository is in the process of being re-integrated into RotorS, which then will support ROS and MAVLink as transport options: https://github.com/ethz-asl/rotors_simulator.
 
 **If you use this simulator in academic work, please cite RotorS as per the README in the above link.**
 
-## Install Gazebo Simulator
+## Install (Gazebo 9)
 
-Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo. Mac OS and Linux users should install Gazebo 7.
+Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo.
 
-
-## Protobuf
-
-Install the protobuf library, which is used as interface to Gazebo.
-
-### Ubuntu Linux
+### Ubuntu
 
 ```bash
-sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev \
-			gazebo7 libgazebo7-dev libxml2-utils python-rospkg python-jinja2
+sudo apt-get install gazebo9 libgazebo9-dev
+```
+
+### Mac OS
+
+```bash
+brew tap osrf/simulation
+brew install gazebo9
+```
+
+### Arch Linux
+
+```bash
+sudo packer -S gazebo
+```
+or
+```bash
+yaourt -S gazebo
+```
+
+## *sitl_gazebo* plugin dependencies
+
+Some plugins on this packages require some specific dependencies:
+
+* Protobuf is required to generate custom protobuf messages to be published and subscribed between topics of different plugins;
+* Jinja 2 is used to generate some SDF models from templates;
+* Gstreamer is required for a plugin that streams video from a simulated camera.
+
+### Ubuntu 
+
+```bash
+sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev libxml2-utils python-rospkg python-jinja2
+```
+
+Gstreamer:
+```
+sudo apt-get install $(apt-cache --names-only search ^gstreamer1.0-* | awk '{ print $1 }' | grep -v gstreamer1.0-hybris) -y
 ```
 
 ### Mac OS
 
 ```bash
 pip install rospkg jinja2
-brew install graphviz libxml2 sdformat3 eigen opencv
-brew install gazebo7
-```
-
-An older version of protobuf (`< 3.0.0`) is required on Mac OS:
-
-```bash
 brew tap homebrew/versions
+brew install eigen graphviz libxml2 sdformat3 opencv
 brew install homebrew/versions/protobuf260
 ```
+
+Gstreamer:
+```
+curl https://gstreamer.freedesktop.org/data/pkg/osx/1.0.10/gstreamer-1.0-1.0.10-universal.pkg -vlo gstreamer-1.0-1.0.10-universal.pkg;
+curl https://gstreamer.freedesktop.org/data/pkg/osx/1.0.10/gstreamer-1.0-devel-1.0.10-universal.pkg -vlo gstreamer-1.0-devel-1.0.10-universal.pkg;
+sudo installer -allowUntrusted -verboseR -pkg gstreamer-1.0-1.0.10-universal.pkg -target /;
+sudo installer -allowUntrusted -verboseR -pkg gstreamer-1.0-devel-1.0.10-universal.pkg -target /;
+rm gstreamer-1.0-1.0.10-universal.pkg gstreamer-1.0-devel-1.0.10-universal.pkg;
+export PKG_CONFIG_PATH="/Frameworks/GStreamer.framework/Versions/Current/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}";
+```
+
+### Arch Linux
+
+```bash
+sudo pacman -S --noconfirm --needed eigen3 hdf5 opencv protobuf vtk yay python2-jinja
+```
+
+Gstreamer:
+```bash
+sudo pacman -S --needed $(pacman -Ssq gstreamer)
+```
+
 
 ## Build Gazebo Plugins (all operating systems)
 
@@ -81,13 +127,6 @@ Now build the gazebo plugins by typing:
 
 ```bash
 make
-```
-
-### GStreamer Support
-If you want support for the GStreamer camera plugin, make sure to install
-GStreamer before running `cmake`. Eg. on Ubuntu with:
-```
-sudo apt-get install gstreamer1.0-* libgstreamer1.0-*
 ```
 
 ### Geotagging Plugin
