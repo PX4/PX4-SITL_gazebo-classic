@@ -2,7 +2,7 @@
 <sdf version="1.6">
   <model name="realsense_camera">
     <plugin name="realsense_plugin" filename="libRealSensePlugin.so"/>
-    <pose frame="">0 0 0.015 0 0 0</pose>
+    <pose>0 0 0.015 0 0 0</pose>
     <link name="link">
       <inertial>
         <mass>0.0615752</mass>
@@ -14,10 +14,9 @@
           <iyz>0</iyz>
           <izz>8.931e-05</izz>
         </inertia>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
       </inertial>
       <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
       <gravity>1</gravity>
       <visual name="visual">
@@ -30,7 +29,7 @@
       <collision name='collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
             <size>0.0078 0.130 0.0192</size>
@@ -45,15 +44,6 @@
               <slip1>0</slip1>
               <slip2>0</slip2>
             </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
           </friction>
           <bounce>
             <restitution_coefficient>0</restitution_coefficient>
@@ -83,7 +73,7 @@
         </surface>
       </collision>
       <sensor name="color" type="camera">
-        <pose frame="">0 -0.046 0.004 0 0 0</pose>
+        <pose>0 -0.046 0.004 0 0 0</pose>
         <camera name="__default__">
           <horizontal_fov>1.047</horizontal_fov>
           <image>
@@ -106,7 +96,7 @@
         <visualize>1</visualize>
       </sensor>
       <sensor name="ired1" type="camera">
-        <pose frame="">0 -0.06 0.004 0 0 0</pose>
+        <pose>0 -0.06 0.004 0 0 0</pose>
         <camera name="__default__">
           <horizontal_fov>1.047</horizontal_fov>
           <image>
@@ -129,7 +119,7 @@
         <visualize>0</visualize>
       </sensor>
       <sensor name="ired2" type="camera">
-        <pose frame="">0 0.01 0.004 0 0 0</pose>
+        <pose>0 0.01 0.004 0 0 0</pose>
         <camera name="__default__">
           <horizontal_fov>1.047</horizontal_fov>
           <image>
@@ -152,7 +142,7 @@
         <visualize>0</visualize>
       </sensor>
       <sensor name="depth" type="depth">
-        <pose frame="">0 -0.03 0.004 0 0 0</pose>
+        <pose>0 -0.03 0.004 0 0 0</pose>
         <camera name="__default__">
           <horizontal_fov>1.047</horizontal_fov>
           <image>
