@@ -141,12 +141,12 @@ after_install:
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       mkdir build;
-      (cd build && cmake -DENABLE_UNIT_TESTS=On .. && \
-      make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu) && \
-      make test;
+      (cd build && cmake -DENABLE_UNIT_TESTS=On .. &&
+      make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu) &&
+      make test);
     else
-      docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}" \
-        --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw \
-        --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw \
+      docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}"
+        --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw
+        --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw
         ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
     fi
