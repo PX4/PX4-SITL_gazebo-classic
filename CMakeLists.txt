@@ -48,8 +48,9 @@ if (BUILD_GSTREAMER_PLUGIN)
         execute_process(COMMAND brew --prefix qt5
                         ERROR_QUIET
                         OUTPUT_VARIABLE QT5_PREFIX_PATH
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
                        )
-        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}")
+        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}/lib/cmake")
       endif()
       find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
     endif()
