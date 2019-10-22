@@ -82,30 +82,18 @@ matrix:
           env:
             - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2019-10-04
             - BUILD="source ./scripts/validate_sdf.bash"
-        - name: MacOSX Sierra (Xcode 9.2) build with Gazebo 7
-          os: osx
-          osx_image: xcode9.2
-          language: cpp
-          cache:
-            ccache: true
-          env:
-            - GAZEBO_VERSION="gazebo7"
-        - name: MacOSX High Sierra (Xcode 10.1) build with Gazebo 9
+        - name: macOS High Sierra (Xcode 10.1)
           os: osx
           osx_image: xcode10.1
           language: cpp
           cache:
             ccache: true
-          env:
-            - GAZEBO_VERSION="gazebo9"
-        - name: MacOSX Mojave (Xcode 11.2) build with Gazebo 9
+        - name: macOS Mojave (Xcode 11.2)
           os: osx
           osx_image: xcode11.2
           language: cpp
           cache:
             ccache: true
-          env:
-            - GAZEBO_VERSION="gazebo9"
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -128,7 +116,7 @@ install:
       brew tap PX4/px4;
       brew install px4-dev;
       brew tap osrf/simulation;
-      brew install opencv ${GAZEBO_VERSION};
+      brew install opencv gazebo9;
       sudo -H pip2 install --upgrade pip setuptools;
       sudo -H pip2 install rospkg pyserial empy toml numpy pandas jinja2;
     fi
