@@ -124,6 +124,7 @@ install:
       make install;
       popd;
       popd;
+      brew install gstreamer gst-plugins-base gst-plugins-good glib;
       brew tap PX4/px4;
       brew install px4-dev;
       brew tap osrf/simulation;
