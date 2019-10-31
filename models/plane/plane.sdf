@@ -404,9 +404,9 @@
       <frameId>base_link</frameId>
       <linkName>base_link</linkName>
       <robotNamespace/>
-      <xyzOffset>1 0 0</xyzOffset>
-      <windDirection>0 1 0</windDirection>
-      <windForceMean>0.7</windForceMean>
+      <xyzOffset>0 0 0</xyzOffset>
+      <windDirection>0 0 0</windDirection>
+      <windForceMean>0.0</windForceMean>
       <windGustDirection>0 0 0</windGustDirection>
       <windGustDuration>0</windGustDuration>
       <windGustStart>0</windGustStart>
