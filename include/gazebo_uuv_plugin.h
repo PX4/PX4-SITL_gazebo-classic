@@ -25,6 +25,11 @@
 #include "gazebo/msgs/msgs.hh"
 #include "CommandMotorSpeed.pb.h"
 
+namespace turning_direction {
+const static int CCW = 1;
+const static int CW = -1;
+}
+
 namespace gazebo {
 
 // Default values
@@ -51,26 +56,36 @@ class GazeboUUVPlugin : public ModelPlugin {
     void OnUpdate(const common::UpdateInfo&);
 
   private:
-    event::ConnectionPtr update_connection_;
-
-    std::string namespace_;
     std::string command_sub_topic_;
+    std::string joint_0_name_;
+    std::string joint_1_name_;
+    std::string joint_2_name_;
+    std::string joint_3_name_;
     std::string link_name_;
+    std::string namespace_;
 
     transport::NodePtr node_handle_;
     transport::SubscriberPtr command_sub_;
+    physics::ModelPtr model_;
 
+    physics::JointPtr joint_0_;
+    physics::JointPtr joint_1_;
+    physics::JointPtr joint_2_;
+    physics::JointPtr joint_3_;
+
+
+    event::ConnectionPtr updateConnection_;
     physics::LinkPtr link_;
-    physics::Link_V rotor_links_;
 
-    void CommandCallback(CommandMotorSpeedPtr &command);
     double command_[4];
-
+    double time_;
     double last_time_;
     double time_delta_;
-
     double motor_force_constant_;
     double motor_torque_constant_;
+    double direction_[4];
+    double ref_motor_rot_vel_;
+    double rotor_velocity_slowdown_sim_;
 
     double X_u_;
     double Y_v_;
@@ -86,9 +101,6 @@ class GazeboUUVPlugin : public ModelPlugin {
     double M_qdot_;
     double N_rdot_;
 
-    // variables for debugging
-    double time_;
-    double counter_;
+    void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
 };
-
 }
