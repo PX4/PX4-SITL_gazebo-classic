@@ -657,20 +657,37 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
-    ssize_t len;
-    if (use_tcp_) {
-      if (simulator_tcp_client_fd_ > 0) {
-        len = send(simulator_tcp_client_fd_, buffer, packetlen, 0);
-        if (len < 0) {
-          gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
-          close_conn_ = true;
-        }
+    if (fds_[CONNECTION_FD].fd > 0) {
+      int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
+      int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
+
+      if (ret < 0) {
+        gzerr << "poll error: " << strerror(errno) << "\n";
+        return;
       }
-    } else {
-      if (simulator_socket_fd_ > 0) {
-        len = sendto(simulator_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
-        if (len < 0) {
-          gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
+
+
+      if (ret == 0 && timeout_ms > 0) {
+        gzerr << "poll timeout\n";
+        return;
+      }
+
+
+      if (!(fds_[CONNECTION_FD].revents & POLLOUT)) {
+        gzerr << "invalid events at fd:" << fds_[CONNECTION_FD].revents << "\n";
+        return;
+      }
+
+      size_t len;
+      if (use_tcp_) {
+        len = send(fds_[CONNECTION_FD].fd, buffer, packetlen, 0);
+      } else {
+        len = sendto(fds_[CONNECTION_FD].fd, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
+      }
+      if (len < 0) {
+        gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
+        if (errno == ECONNRESET || errno == EPIPE) {
+          gzerr << "Closing connection." << "\n";
           close_conn_ = true;
         }
       }
