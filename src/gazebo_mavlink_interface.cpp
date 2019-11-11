@@ -514,7 +514,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         abort();
       }
 
-      memset(fds_, 0 , sizeof(fds_));
+      memset(fds_, 0, sizeof(fds_));
       fds_[CONNECTION_FD].fd = simulator_socket_fd_;
       fds_[CONNECTION_FD].events = POLLIN;
     }
@@ -593,6 +593,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 #endif
   double dt = (current_time - last_time_).Double();
 
+  close_conn_ = false;
   if (hil_mode_) {
     pollFromQgcAndSdk();
   } else {
@@ -1225,7 +1226,6 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
           fds_[CONNECTION_FD].events = POLLIN;
         } while (simulator_tcp_client_fd_ <= 0); // we only need one connection
       } else { // recv call
-        close_conn_ = false;
         int ret = recvfrom(fds_[i].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
         if (ret < 0) // disconnected from client
         {
