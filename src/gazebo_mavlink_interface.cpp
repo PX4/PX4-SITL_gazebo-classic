@@ -1226,29 +1226,27 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         acceptConnections();
       } else { // recv call
         int ret = recvfrom(fds_[i].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
-        if (ret < 0) // disconnected from client
-        {
-          if (errno != EWOULDBLOCK)
-          {
+        if (ret < 0) {
+          // all data is read if EWOULDBLOCK is raised
+          if (errno != EWOULDBLOCK) { // disconnected from client
             gzerr << "recvfrom error: " << strerror(errno) << "\n";
-            close_conn_ = true;
           }
-          return;
+          continue;
         }
 
-        if (ret == 0) { // client closed the connection
+        // client closed the connection orderly, only makes sense on tcp
+        if (use_tcp_ && ret == 0) { 
+          gzerr << "Connection closed by client." << "\n";
           close_conn_ = true;
-          return;
+          continue;
         }
 
         // data received
         int len = ret;
         mavlink_message_t msg;
         mavlink_status_t status;
-        for (unsigned i = 0; i < len; ++i)
-        {
-          if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status))
-          {
+        for (unsigned i = 0; i < len; ++i) {
+          if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status)) {
             if (hil_mode_) {
               send_mavlink_message(&msg);
             }
