@@ -516,7 +516,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
       memset(fds_, 0, sizeof(fds_));
       fds_[CONNECTION_FD].fd = simulator_socket_fd_;
-      fds_[CONNECTION_FD].events = POLLIN | POLLOUT;
+      fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
     }
   }
 
@@ -1275,7 +1275,7 @@ void GazeboMavlinkInterface::acceptConnections()
 
     // assign socket to connection descriptor on success
     fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-    fds_[CONNECTION_FD].events = POLLIN | POLLOUT;
+    fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
   } while (ret != -1);
 }
 
