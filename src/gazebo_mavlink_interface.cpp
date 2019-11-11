@@ -502,14 +502,21 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         abort();
       }
 
+      // set socket to non-blocking
+      int result = fcntl(simulator_socket_fd_, F_SETFL, O_NONBLOCK);
+      if (result == -1) {
+        gzerr << "setting socket to non-blocking failed: " << strerror(errno) << ", aborting\n";
+        abort();
+      }
+
       if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
         gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
         abort();
       }
 
       memset(fds_, 0 , sizeof(fds_));
-      fds_[LISTEN_FD].fd = simulator_socket_fd_;
-      fds_[LISTEN_FD].events = POLLIN;
+      fds_[CONNECTION_FD].fd = simulator_socket_fd_;
+      fds_[CONNECTION_FD].events = POLLIN;
     }
   }
 
