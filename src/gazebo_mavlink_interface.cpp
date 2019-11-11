@@ -451,6 +451,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         abort();
       }
 
+      // The socket reuse is necessary for reconnecting to the same address
+      // if the socket does not close but gets stuck in TIME_WAIT. This can happen 
+      // if the server is suddenly closed, for example, if the robot is deleted in gazebo.
       int socket_reuse = 1;
       result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEADDR, &socket_reuse, sizeof(socket_reuse));
       if (result != 0) {
@@ -458,12 +461,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         abort();
       }
 
+      // Same as above but for a given port
       result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEPORT, &socket_reuse, sizeof(socket_reuse));
       if (result != 0) {
         gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
         abort();
       }
 
+      // set socket to non-blocking
       result = fcntl(simulator_socket_fd_, F_SETFL, O_NONBLOCK);
       if (result == -1) {
         gzerr << "setting socket to non-blocking failed: " << strerror(errno) << ", aborting\n";
@@ -483,7 +488,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
       memset(fds_, 0, sizeof(fds_));
       fds_[LISTEN_FD].fd = simulator_socket_fd_;
-      fds_[LISTEN_FD].events = POLLIN;
+      fds_[LISTEN_FD].events = POLLIN; // only listens for new connections on tcp
 
     } else {
       remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;

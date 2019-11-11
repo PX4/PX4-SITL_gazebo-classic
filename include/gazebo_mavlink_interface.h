@@ -259,6 +259,7 @@ private:
   void send_mavlink_message(const mavlink_message_t *message);
   void forward_mavlink_message(const mavlink_message_t *message);
   void handle_message(mavlink_message_t *msg, bool &received_actuator);
+  void acceptConnections();
   void pollForMAVLinkMessages();
   void pollFromQgcAndSdk();
   void SendSensorMessages();
