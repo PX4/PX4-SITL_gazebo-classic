@@ -600,11 +600,11 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
     pollForMAVLinkMessages();
   }
 
-  if (close_conn_) {
+  SendSensorMessages();
+
+  if (close_conn_) { // close connection if required
     close();
   }
-
-  SendSensorMessages();
 
   handle_control(dt);
 
