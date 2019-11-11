@@ -666,12 +666,10 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
         return;
       }
 
-
       if (ret == 0 && timeout_ms > 0) {
         gzerr << "poll timeout\n";
         return;
       }
-
 
       if (!(fds_[CONNECTION_FD].revents & POLLOUT)) {
         gzerr << "invalid events at fd:" << fds_[CONNECTION_FD].revents << "\n";
@@ -1216,8 +1214,9 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
     }
 
     for (int i = 0; i < N_FDS; i++) {
-      if(fds_[i].revents == 0)
+      if(fds_[i].revents == 0) {
         continue;
+      }
 
       if(fds_[i].revents != POLLIN)
       {
@@ -1225,25 +1224,8 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         return;
       }
 
-      if (i == LISTEN_FD)
-      { // accept call
-        int ret;
-  do { // accepting all currently incoming connections
-    ret =
-      accept(simulator_socket_fd_, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
-
-    if (ret < 0) {
-      // all connections are accepted if EWOULDBLOCK is raised
-      if (errno != EWOULDBLOCK) {
-        gzerr << "accept error: " << strerror(errno) << "\n";
-      }
-      break;
-    }
-
-    // assign socket to connection descriptor on success
-    fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-    fds_[CONNECTION_FD].events = POLLIN | POLLOUT;
-  } while (ret != -1);
+      if (i == LISTEN_FD) { // if event is raised on the listening socket
+        acceptConnections();
       } else { // recv call
         int ret = recvfrom(fds_[i].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
         if (ret < 0) // disconnected from client
@@ -1278,6 +1260,27 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
       }
     }
   } while (received_first_actuator_ && !received_actuator_ && enable_lockstep_ && IsRunning() && !gotSigInt_);
+}
+
+void GazeboMavlinkInterface::acceptConnections()
+{
+  int ret;
+  do { // accepting all currently incoming connections
+    ret =
+      accept(simulator_socket_fd_, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
+
+    if (ret < 0) {
+      // all connections are accepted if EWOULDBLOCK is raised
+      if (errno != EWOULDBLOCK) {
+        gzerr << "accept error: " << strerror(errno) << "\n";
+      }
+      break;
+    }
+
+    // assign socket to connection descriptor on success
+    fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
+    fds_[CONNECTION_FD].events = POLLIN | POLLOUT;
+  } while (ret != -1);
 }
 
 void GazeboMavlinkInterface::pollFromQgcAndSdk()
