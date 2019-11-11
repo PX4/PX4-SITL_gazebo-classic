@@ -685,8 +685,10 @@ void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *messa
       if (len < 0) {
         gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
         if (errno == ECONNRESET || errno == EPIPE) {
-          gzerr << "Closing connection." << "\n";
-          close_conn_ = true;
+          if (use_tcp_) { // udp socket remains alive
+            gzerr << "Closing connection." << "\n";
+            close_conn_ = true;
+          }
         }
       }
     }
@@ -1260,23 +1262,24 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
 
 void GazeboMavlinkInterface::acceptConnections()
 {
-  int ret;
-  do { // accepting all currently incoming connections
-    ret =
-      accept(simulator_socket_fd_, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
+  if (fds_[CONNECTION_FD].fd > 0) {
+    return;
+  }
 
-    if (ret < 0) {
-      // all connections are accepted if EWOULDBLOCK is raised
-      if (errno != EWOULDBLOCK) {
-        gzerr << "accept error: " << strerror(errno) << "\n";
-      }
-      break;
+  // accepting incoming connections on listen fd
+  int ret =
+    accept(fds_[LISTEN_FD].fd, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
+
+  if (ret < 0) {
+    if (errno != EWOULDBLOCK) {
+      gzerr << "accept error: " << strerror(errno) << "\n";
     }
+    return;
+  }
 
-    // assign socket to connection descriptor on success
-    fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-    fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
-  } while (ret != -1);
+  // assign socket to connection descriptor on success
+  fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
+  fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
 }
 
 void GazeboMavlinkInterface::pollFromQgcAndSdk()
@@ -1465,9 +1468,9 @@ void GazeboMavlinkInterface::close()
 
   } else {
 
-    ::close(simulator_socket_fd_);
+    ::close(fds_[CONNECTION_FD].fd);
     fds_[CONNECTION_FD] = { 0, 0, 0 };
-    simulator_socket_fd_ = -1;
+    fds_[CONNECTION_FD].fd = -1;
 
     received_actuator_ = false;
     received_first_actuator_ = false;
