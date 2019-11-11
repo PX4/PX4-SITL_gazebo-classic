@@ -1218,10 +1218,8 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         continue;
       }
 
-      if(fds_[i].revents != POLLIN)
-      {
-        gzerr << "invalid events at fd:" << i << "\n";
-        return;
+      if (!(fds_[i].revents & POLLIN)) { 
+        continue;
       }
 
       if (i == LISTEN_FD) { // if event is raised on the listening socket
