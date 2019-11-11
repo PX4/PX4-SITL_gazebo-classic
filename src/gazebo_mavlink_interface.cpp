@@ -1224,7 +1224,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
 
       if (i == LISTEN_FD) { // if event is raised on the listening socket
         acceptConnections();
-      } else { // recv call
+      } else { // if event is raised on connection socket
         int ret = recvfrom(fds_[i].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
         if (ret < 0) {
           // all data is read if EWOULDBLOCK is raised
@@ -1473,7 +1473,6 @@ void GazeboMavlinkInterface::close()
     received_first_actuator_ = false;
 
   }
-  close_conn_ = false;
 }
 
 void GazeboMavlinkInterface::do_read(void)
