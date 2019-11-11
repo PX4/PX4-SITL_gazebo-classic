@@ -516,7 +516,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
       memset(fds_, 0, sizeof(fds_));
       fds_[CONNECTION_FD].fd = simulator_socket_fd_;
-      fds_[CONNECTION_FD].events = POLLIN;
+      fds_[CONNECTION_FD].events = POLLIN | POLLOUT;
     }
   }
 
@@ -1242,7 +1242,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
 
     // assign socket to connection descriptor on success
     fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-    fds_[CONNECTION_FD].events = POLLIN;
+    fds_[CONNECTION_FD].events = POLLIN | POLLOUT;
   } while (ret != -1);
       } else { // recv call
         int ret = recvfrom(fds_[i].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
