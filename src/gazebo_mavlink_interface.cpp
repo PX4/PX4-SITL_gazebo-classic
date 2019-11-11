@@ -1201,6 +1201,8 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
     return;
   }
 
+  bool received_actuator = false;
+
   do {
     int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
     int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
@@ -1252,12 +1254,12 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
             if (hil_mode_) {
               send_mavlink_message(&msg);
             }
-            handle_message(&msg, received_actuator_);
+            handle_message(&msg, received_actuator);
           }
         }
       }
     }
-  } while (received_first_actuator_ && !received_actuator_ && enable_lockstep_ && IsRunning() && !gotSigInt_);
+  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning() && !gotSigInt_);
 }
 
 void GazeboMavlinkInterface::acceptConnections()
@@ -1472,7 +1474,6 @@ void GazeboMavlinkInterface::close()
     fds_[CONNECTION_FD] = { 0, 0, 0 };
     fds_[CONNECTION_FD].fd = -1;
 
-    received_actuator_ = false;
     received_first_actuator_ = false;
 
   }

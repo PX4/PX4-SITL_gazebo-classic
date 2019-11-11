@@ -200,7 +200,6 @@ protected:
 
 private:
   bool received_first_actuator_;
-  bool received_actuator_ = false;
   Eigen::VectorXd input_reference_;
 
   float protocol_version_;
