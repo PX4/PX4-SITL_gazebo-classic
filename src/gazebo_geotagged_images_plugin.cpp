@@ -137,7 +137,14 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 
     _gpsSub = _node_handle->Subscribe("~/" + _namespace + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
 
-    _storageDir = "frames";
+    
+    const char *storage_path = std::getenv("PX4_STORAGE_PATH");
+    if ( storage_path ) {
+        gzmsg << "Image storage path is set to " << storage_path << ".\n";
+       _storageDir = std::string(storage_path);
+    } else {
+       _storageDir = "frames";
+    }
     boost::filesystem::remove_all(_storageDir); //clear existing images
     boost::filesystem::create_directory(_storageDir);
 
