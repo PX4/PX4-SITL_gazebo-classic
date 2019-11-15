@@ -49,6 +49,9 @@ GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     , _captureInterval(0.0)
     , _fd(-1)
     , _captureMode(CAPTURE_DISABLED)
+    , _hfov(0.3)
+    , _zoom(1.0)
+    , _maxZoom(8.0)
 {
 }
 
@@ -118,6 +121,9 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     _destHeight = _height;
     if (sdf->HasElement("height")) {
         _destHeight = sdf->GetElement("height")->Get<int>();
+    }
+    if (sdf->HasElement("maximum_zoom")) {
+        _maxZoom = sdf->GetElement("maximum_zoom")->Get<float>();
     }
 
     //check if exiftool exists
@@ -300,6 +306,10 @@ void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct socka
                 break;
             case MAV_CMD_REQUEST_CAMERA_SETTINGS:
                 _handle_request_camera_settings(msg, srcaddr);
+                break;
+            case MAV_CMD_SET_CAMERA_ZOOM:
+                //Control the Zoom of the camera
+                _handle_camera_zoom(msg, srcaddr);
                 break;
             case MAV_CMD_RESET_CAMERA_SETTINGS:
                 // Just ACK and ignore
@@ -510,7 +520,8 @@ void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, s
     static const char* vendor = "PX4.io";
     static const char* model  = "Gazebo";
     char uri[128] = {};
-    uint32_t camera_capabilities = CAMERA_CAP_FLAGS_CAPTURE_IMAGE;
+    uint32_t camera_capabilities = CAMERA_CAP_FLAGS_CAPTURE_IMAGE | CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM;
+
     mavlink_message_t msg;
     mavlink_msg_camera_information_pack_chan(
         1,
@@ -555,9 +566,23 @@ void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_messag
         &msg,
         0,                      // time_boot_ms
         CAMERA_MODE_IMAGE,      // Camera Mode
-        NAN,                    // Zoom level
+        100.0 *(_zoom - 1.0)/ (_maxZoom - 1.0),                    // Zoom level //TODO: Output zoom
         NAN);                   // Focus level
     _send_mavlink_message(&msg, srcaddr);
+}
+
+void GeotaggedImagesPlugin::_handle_camera_zoom(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                  MAV_CMD_SET_CAMERA_ZOOM, MAV_RESULT_ACCEPTED, srcaddr);
+
+    _zoom += 0.1 * cmd.param2;
+    _zoom = std::max(std::min(_zoom, _maxZoom), 1.0f);
+
+    ignition::math::Angle zoom_fov = _hfov / _zoom;
+    _camera->SetHFOV(zoom_fov);
 }
 
 void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
