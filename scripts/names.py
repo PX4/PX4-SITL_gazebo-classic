@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Library for manipulating ROS Names. See U{http://ros.org/wiki/Names}.
+"""
 
 # Software License Agreement (BSD License)
 #
@@ -34,16 +37,9 @@
 #
 # Revision $Id: names.py 14589 2011-08-07 18:30:21Z kwc $
 
-"""
-Library for manipulating ROS Names. See U{http://ros.org/wiki/Names}.
-"""
 
 import os
 import sys
-
-# TODO: why are these here?
-MSG_EXT = '.msg'
-SRV_EXT = '.srv'
 
 SEP = '/'
 GLOBALNS = '/'
@@ -51,8 +47,10 @@ PRIV_NAME = '~'
 REMAP = ":="
 ANYTYPE = '*'
 
+
 def isstring(s):
     return isinstance(s, str)
+
 
 def load_mappings(argv):
     """
