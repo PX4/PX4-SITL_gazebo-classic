@@ -99,7 +99,7 @@ private:
     event::ConnectionPtr        _newFrameConnection;
     std::string                 _storageDir;
     ignition::math::Vector3d    _lastGpsPosition;
-    ignition::math::Angle       _hfov;      // Horizontal fov
+    ignition::math::Angle       _hfov;      ///< Horizontal fov
     transport::NodePtr          _node_handle;
     std::string                 _namespace;
     transport::SubscriberPtr    _gpsSub;

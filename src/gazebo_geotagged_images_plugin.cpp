@@ -566,7 +566,7 @@ void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_messag
         &msg,
         0,                      // time_boot_ms
         CAMERA_MODE_IMAGE,      // Camera Mode
-        100.0 *(_zoom - 1.0)/ (_maxZoom - 1.0),                    // Zoom level //TODO: Output zoom
+        1.0E2 * (_zoom - 1.0)/ (_maxZoom - 1.0),                    // Zoom level
         NAN);                   // Focus level
     _send_mavlink_message(&msg, srcaddr);
 }
@@ -578,11 +578,8 @@ void GeotaggedImagesPlugin::_handle_camera_zoom(const mavlink_message_t *pMsg, s
     _send_cmd_ack(pMsg->sysid, pMsg->compid,
                   MAV_CMD_SET_CAMERA_ZOOM, MAV_RESULT_ACCEPTED, srcaddr);
 
-    _zoom += 0.1 * cmd.param2;
-    _zoom = std::max(std::min(_zoom, _maxZoom), 1.0f);
-
-    ignition::math::Angle zoom_fov = _hfov / _zoom;
-    _camera->SetHFOV(zoom_fov);
+    _zoom = std::max(std::min(float(_zoom + 0.1 * cmd.param2), _maxZoom), 1.0f);
+    _camera->SetHFOV(_hfov / _zoom);
 }
 
 void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
