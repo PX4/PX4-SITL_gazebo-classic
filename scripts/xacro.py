@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2013, Willow Garage, Inc.
 # Copyright (c) 2014, Open Source Robotics Foundation, Inc.
 # All rights reserved.
@@ -29,8 +31,6 @@
 
 # Author: Stuart Glaser
 # Maintainer: William Woodall <william@osrfoundation.org>
-
-from __future__ import print_function
 
 import getopt
 import glob

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Library for processing XML substitution args.
+"""
 
 # Software License Agreement (BSD License)
 #
@@ -34,13 +37,8 @@
 #
 # Revision $Id: substitution_args.py 15178 2011-10-10 21:22:53Z kwc $
 
-"""
-Library for processing XML substitution args.
-"""
-
 from io import StringIO
 import os
-
 
 
 class SubstitutionException(Exception):
