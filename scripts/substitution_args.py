@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2008, Willow Garage, Inc.
@@ -36,12 +38,9 @@
 Library for processing XML substitution args.
 """
 
+from io import StringIO
 import os
 
-try:
-    from cStringIO import StringIO # Python 2.x
-except ImportError:
-    from io import StringIO # Python 3.x
 
 
 class SubstitutionException(Exception):
@@ -49,11 +48,14 @@ class SubstitutionException(Exception):
     Base class for exceptions in substitution_args routines
     """
     pass
+
+
 class ArgException(SubstitutionException):
     """
     Exception for missing $(arg) values
     """
     pass
+
 
 def _split_command(resolved, command_with_args):
     cmd = '$(%s)' % command_with_args
@@ -80,15 +82,19 @@ def _sanitize_path(path):
 def _arg(resolved, a, args, context):
     """
     process $(arg) arg
-    
+
     :returns: updated resolved argument, ``str``
     :raises: :exc:`ArgException` If arg invalidly specified
     """
     if len(args) == 0:
-        raise SubstitutionException("$(arg var) must specify an environment variable [%s]"%(a))
+        raise SubstitutionException(
+            "$(arg var) must specify an environment variable [%s]" %
+            (a))
     elif len(args) > 1:
-        raise SubstitutionException("$(arg var) may only specify one arg [%s]"%(a))
-    
+        raise SubstitutionException(
+            "$(arg var) may only specify one arg [%s]" %
+            (a))
+
     if 'arg' not in context:
         context['arg'] = {}
     arg_context = context['arg']
@@ -96,7 +102,7 @@ def _arg(resolved, a, args, context):
     arg_name = args[0]
     if arg_name in arg_context:
         arg_value = arg_context[arg_name]
-        return resolved.replace("$(%s)"%a, arg_value)
+        return resolved.replace("$(%s)" % a, arg_value)
     else:
         raise ArgException(arg_name)
 
@@ -126,7 +132,7 @@ def resolve_args(arg_str, context=None, resolve_anon=True):
     """
     if context is None:
         context = {}
-    #parse found substitution args
+    # parse found substitution args
     if not arg_str:
         return arg_str
     # first resolve variables like 'env' and 'arg'
@@ -134,10 +140,12 @@ def resolve_args(arg_str, context=None, resolve_anon=True):
         'arg': _arg,
     }
     resolved = _resolve_args(arg_str, context, resolve_anon, commands)
-    # than resolve 'find' as it requires the subsequent path to be expanded already
+    # than resolve 'find' as it requires the subsequent path to be expanded
+    # already
 
     resolved = _resolve_args(resolved, context, resolve_anon, commands)
     return resolved
+
 
 def _resolve_args(arg_str, context, resolve_anon, commands):
     valid = ['arg']
@@ -145,22 +153,27 @@ def _resolve_args(arg_str, context, resolve_anon, commands):
     for a in _collect_args(arg_str):
         splits = [s for s in a.split(' ') if s]
         if not splits[0] in valid:
-            raise SubstitutionException("Unknown substitution command [%s]. Valid commands are %s"%(a, valid))
+            raise SubstitutionException(
+                "Unknown substitution command [%s]. Valid commands are %s" %
+                (a, valid))
         command = splits[0]
         args = splits[1:]
         if command in commands:
             resolved = commands[command](resolved, a, args, context)
     return resolved
 
-_OUT  = 0
+
+_OUT = 0
 _DOLLAR = 1
 _LP = 2
 _IN = 3
+
+
 def _collect_args(arg_str):
     """
     State-machine parser for resolve_args. Substitution args are of the form:
     $(find package_name)/scripts/foo.py $(export some/attribute blar) non-relevant stuff
-    
+
     @param arg_str: argument string to parse args from
     @type  arg_str: str
     @raise SubstitutionException: if args are invalidly specified
@@ -178,15 +191,18 @@ def _collect_args(arg_str):
             elif state == _DOLLAR:
                 pass
             else:
-                raise SubstitutionException("Dollar signs '$' cannot be inside of substitution args [%s]"%arg_str)
+                raise SubstitutionException(
+                    "Dollar signs '$' cannot be inside of substitution args [%s]" %
+                    arg_str)
         elif c == '(':
             if state == _DOLLAR:
                 state = _LP
             elif state != _OUT:
-                raise SubstitutionException("Invalid left parenthesis '(' in substitution args [%s]"%arg_str)
+                raise SubstitutionException(
+                    "Invalid left parenthesis '(' in substitution args [%s]" % arg_str)
         elif c == ')':
             if state == _IN:
-                #save contents of collected buffer
+                # save contents of collected buffer
                 args.append(buff.getvalue())
                 buff.truncate(0)
                 buff.seek(0)
@@ -202,5 +218,3 @@ def _collect_args(arg_str):
         if state == _IN:
             buff.write(c)
     return args
-
-
