@@ -427,7 +427,7 @@
             <interval>1</interval>
             <width>3840</width>
             <height>2160</height>
-            <maximum_zoom>8</maximum_zoom>
+            <maximum_zoom>8.0</maximum_zoom>
         </plugin>
       </sensor>
     </link>
