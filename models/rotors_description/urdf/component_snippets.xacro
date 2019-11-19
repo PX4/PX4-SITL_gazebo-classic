@@ -27,8 +27,8 @@
       <plugin filename="librotors_gazebo_bag_plugin.so" name="rosbag">
         <robotNamespace>${namespace}</robotNamespace>
         <bagFileName>${bag_file}</bagFileName>
-        <linkName>base_link</linkName>
-        <frameId>base_link</frameId>
+        <linkName>${namespace}_base_link</linkName>
+        <frameId>${namespace}_base_link</frameId>
         <commandAttitudeThrustSubTopic>command/attitude</commandAttitudeThrustSubTopic>
         <commandAttitudeThrustPubTopic>command/attitude</commandAttitudeThrustPubTopic>
         <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
