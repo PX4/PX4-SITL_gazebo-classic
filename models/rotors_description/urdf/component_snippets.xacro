@@ -116,6 +116,22 @@
       </sensor>
     </gazebo>
     </xacro:macro>
+
+  <xacro:macro name="joint_state_publisher_macro"
+    params="namespace">
+    <gazebo>
+      <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+        <joint_name>${namespace}::${namespace}/imugt_link</joint_name>
+        <joint_name>${namespace}::${namespace}/ground_truth/odometry_sensorgt_link</joint_name>
+        <joint_name>${namespace}::${namespace}_rotor_0_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_rotor_1_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_rotor_2_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_rotor_3_joint</joint_name>
+      <update_rate>100</update_rate>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
   <!-- Macro to add a camera. -->
   <xacro:macro name="camera_macro"
     params="namespace parent_link camera_suffix frame_rate
@@ -694,4 +710,9 @@
       <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
     </joint>
   </xacro:if>
+
+  <xacro:joint_state_publisher_macro
+    namespace="$(arg name)" >
+  </xacro:joint_state_publisher_macro>
+
 </robot>
