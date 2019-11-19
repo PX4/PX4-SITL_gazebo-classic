@@ -29,6 +29,7 @@
   <!-- The following causes segfault with multiple vehicles if defaults to true!!! -->
   <xacro:arg name='enable_ground_truth' default='false' />
   <xacro:arg name='enable_logging' default='false' />
+  <xacro:arg name='enable_camera' default='false' />
   <xacro:arg name='log_file' default='iris' />
 
   <!-- macros for gazebo plugins, sensors -->
