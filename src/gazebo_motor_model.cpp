@@ -20,11 +20,12 @@
 
 
 #include "gazebo_motor_model.h"
+#include <ignition/math.hh>
 
 namespace gazebo {
 
 GazeboMotorModel::~GazeboMotorModel() {
-  event::Events::DisconnectWorldUpdateBegin(updateConnection_);
+  updateConnection_->~Connection();
   use_pid_ = false;
 }
 
@@ -144,6 +145,8 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboMotorModel::OnUpdate, this, _1));
 
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
+  //std::cout << "[gazebo_motor_model]: Subscribe to gz topic: "<< motor_failure_sub_topic_ << std::endl;
+  motor_failure_sub_ = node_handle_->Subscribe<msgs::Int>(motor_failure_sub_topic_, &GazeboMotorModel::MotorFailureCallback, this);
   motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>("~/" + model_->GetName() + motor_speed_pub_topic_, 1);
 
   // Create the first order filter.
@@ -167,6 +170,7 @@ void GazeboMotorModel::OnUpdate(const common::UpdateInfo& _info) {
   sampling_time_ = _info.simTime.Double() - prev_sim_time_;
   prev_sim_time_ = _info.simTime.Double();
   UpdateForcesAndMoments();
+  UpdateMotorFail();
   Publish();
 }
 
@@ -175,6 +179,10 @@ void GazeboMotorModel::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
     std::cout  << "You tried to access index " << motor_number_
       << " of the MotorSpeed message array which is of size " << rot_velocities->motor_speed_size() << "." << std::endl;
   } else ref_motor_rot_vel_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), static_cast<double>(max_rot_velocity_));
+}
+
+void GazeboMotorModel::MotorFailureCallback(const boost::shared_ptr<const msgs::Int> &fail_msg) {
+  motor_Failure_Number_ = fail_msg->data();
 }
 
 void GazeboMotorModel::UpdateForcesAndMoments() {
@@ -187,34 +195,47 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 
   // scale down force linearly with forward speed
   // XXX this has to be modelled better
-  math::Vector3 body_velocity = link_->GetWorldLinearVel();
-  double vel = body_velocity.GetLength();
+  //
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
+#else
+  ignition::math::Vector3d body_velocity = ignitionFromGazeboMath(link_->GetWorldLinearVel());
+#endif
+  double vel = body_velocity.Length();
   double scalar = 1 - vel / 25.0; // at 50 m/s the rotor will not produce any force anymore
-  scalar = math::clamp(scalar, 0.0, 1.0);
+  scalar = ignition::math::clamp(scalar, 0.0, 1.0);
   // Apply a force to the link.
-  link_->AddRelativeForce(math::Vector3(0, 0, force * scalar));
+  link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force * scalar));
 
   // Forces from Philppe Martin's and Erwan Salaün's
   // 2010 IEEE Conference on Robotics and Automation paper
   // The True Role of Accelerometer Feedback in Quadrotor Control
   // - \omega * \lambda_1 * V_A^{\perp}
-  math::Vector3 joint_axis = joint_->GetGlobalAxis(0);
-  //math::Vector3 body_velocity = link_->GetWorldLinearVel();
-  math::Vector3 body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
-  math::Vector3 air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d joint_axis = joint_->GlobalAxis(0);
+#else
+  ignition::math::Vector3d joint_axis = ignitionFromGazeboMath(joint_->GetGlobalAxis(0));
+#endif
+  //ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
+  ignition::math::Vector3d body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
+  ignition::math::Vector3d air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
   // Apply air_drag to link.
   link_->AddForce(air_drag);
   // Moments
   // Getting the parent link, such that the resulting torques can be applied to it.
   physics::Link_V parent_links = link_->GetParentJointsLinks();
   // The tansformation from the parent_link to the link_.
-  math::Pose pose_difference = link_->GetWorldCoGPose() - parent_links.at(0)->GetWorldCoGPose();
-  math::Vector3 drag_torque(0, 0, -turning_direction_ * force * moment_constant_);
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Pose3d pose_difference = link_->WorldCoGPose() - parent_links.at(0)->WorldCoGPose();
+#else
+  ignition::math::Pose3d pose_difference = ignitionFromGazeboMath(link_->GetWorldCoGPose() - parent_links.at(0)->GetWorldCoGPose());
+#endif
+  ignition::math::Vector3d drag_torque(0, 0, -turning_direction_ * force * moment_constant_);
   // Transforming the drag torque into the parent frame to handle arbitrary rotor orientations.
-  math::Vector3 drag_torque_parent_frame = pose_difference.rot.RotateVector(drag_torque);
+  ignition::math::Vector3d drag_torque_parent_frame = pose_difference.Rot().RotateVector(drag_torque);
   parent_links.at(0)->AddRelativeTorque(drag_torque_parent_frame);
 
-  math::Vector3 rolling_moment;
+  ignition::math::Vector3d rolling_moment;
   // - \omega * \mu_1 * V_A^{\perp}
   rolling_moment = -std::abs(real_motor_velocity) * rolling_moment_coefficient_ * body_velocity_perpendicular;
   parent_links.at(0)->AddTorque(rolling_moment);
@@ -246,6 +267,25 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #else
   joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif /* if 0 */
+}
+
+void GazeboMotorModel::UpdateMotorFail() {
+  if (motor_number_ == motor_Failure_Number_ - 1){
+    // motor_constant_ = 0.0;
+    joint_->SetVelocity(0,0);
+    if (screen_msg_flag){
+      std::cout << "Motor number [" << motor_Failure_Number_ <<"] failed!  [Motor thrust = 0]" << std::endl;
+      tmp_motor_num = motor_Failure_Number_;
+
+      screen_msg_flag = 0;
+    }
+  }else if (motor_Failure_Number_ == 0 && motor_number_ ==  tmp_motor_num - 1){
+     if (!screen_msg_flag){
+       //motor_constant_ = kDefaultMotorConstant;
+       std::cout << "Motor number [" << tmp_motor_num <<"] running! [Motor thrust = (default)]" << std::endl;
+       screen_msg_flag = 1;
+     }
+  }
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);

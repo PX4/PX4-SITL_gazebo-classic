@@ -1,0 +1,141 @@
+env:
+  global:
+    - CCACHE_DIR=$HOME/.ccache
+    - CMAKE_BUILD="mkdir Build; cd Build; cmake ..; make -j$(nproc) -l$(nproc)"
+    - CMAKE_UNIT_TEST_BUILD="mkdir Build; cd Build; cmake -DENABLE_UNIT_TESTS=On ..;
+      make -j$(nproc) -l$(nproc); make -j$(nproc) test"
+    - CATKIN_BUILD="mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init;
+      ln -s ${TRAVIS_BUILD_DIR} src; catkin build -j$(nproc) -l$(nproc) -DBUILD_ROS_INTERFACE=ON;
+      cd build/mavlink_sitl_gazebo/; catkin run_tests"
+    - KINETIC="source /opt/ros/kinetic/setup.bash; ${CATKIN_BUILD}"
+    - MELODIC="source /opt/ros/melodic/setup.bash; ${CATKIN_BUILD}"
+
+matrix:
+    include:
+        - name: CMake build (Gazebo 7)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2019-10-04
+            - BUILD=${CMAKE_BUILD}
+        - name: CMake unit tests build and run (Gazebo 7)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2019-10-04
+            - BUILD=${CMAKE_UNIT_TEST_BUILD}
+        - name: CMake build (Gazebo 9)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2019-10-04
+            - BUILD=${CMAKE_BUILD}
+        - name: CMake unit tests build and run (Gazebo 9)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2019-10-04
+            - BUILD=${CMAKE_UNIT_TEST_BUILD}
+        - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2019-10-04
+            - BUILD=${KINETIC}
+        - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2019-10-04
+            - BUILD=${MELODIC}
+        - name: Validate SDF schemas
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2019-10-04
+            - BUILD="source ./scripts/validate_sdf.bash"
+        - name: macOS High Sierra (Xcode 10.1)
+          os: osx
+          osx_image: xcode10.1
+          language: cpp
+          cache:
+            ccache: true
+        - name: macOS Mojave (Xcode 11.2)
+          os: osx
+          osx_image: xcode11.2
+          language: cpp
+          cache:
+            ccache: true
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew update;
+      git clone https://github.com/google/googletest;
+      git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0;
+    fi
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      pushd googletest;
+      mkdir build;
+      pushd build;
+      cmake ..;
+      make;
+      make install;
+      popd;
+      popd;
+      brew install gstreamer gst-plugins-base gst-plugins-good glib;
+      brew tap PX4/px4;
+      brew install px4-dev;
+      brew tap osrf/simulation;
+      brew install opencv gazebo9;
+      sudo -H pip2 install --upgrade pip setuptools;
+      sudo -H pip2 install rospkg pyserial empy toml numpy pandas jinja2;
+    fi
+
+after_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew cleanup;
+      rm -rf /usr/local/include/mavlink/v2.0/.git googletest/.git;
+    fi
+
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      mkdir build;
+      (cd build && cmake -DENABLE_UNIT_TESTS=On .. &&
+      make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu) &&
+      make test);
+    else
+      docker run -it --rm -w ${TRAVIS_BUILD_DIR} --env=CCACHE_DIR="${CCACHE_DIR}"
+        --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw
+        --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw
+        ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
+    fi

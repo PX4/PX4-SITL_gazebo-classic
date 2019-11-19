@@ -1,0 +1,90 @@
+{%- set rad2deg = 57.2957795131 -%}
+{%- set deg2rad = 0.01745329251 -%}
+
+{%- set m = 0.050 -%}
+{%- set l = 0.010 -%}
+{%- set w = 0.005 -%}
+{%- set h = 0.005 -%}
+{%- set ixx = m/12*(w**2 + h**2) -%}
+{%- set iyy = m/12*(l**2 + h**2) -%}
+{%- set izz = m/12*(l**2 + w**2) -%}
+
+{%- macro box(l, w, h) -%}
+<geometry>
+  <box>
+    <size>{{l}} {{w}} {{h}}</size>
+  </box>
+</geometry>
+{%- endmacro -%}
+
+<?xml version="1.0" ?>
+<sdf version="1.5">
+
+  <model name="sf10a">
+
+    <link name="link">
+
+      <inertial>
+        <mass>{{m}}</mass>
+        <inertia>
+          <ixx>{{ixx}}</ixx>
+          <iyy>{{iyy}}</iyy>
+          <izz>{{izz}}</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="visual">
+        {{ box(l, w, h)|indent(8) }}
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+
+      <collision name="collision">
+        {{ box(l, w, h)|indent(8) }}
+      </collision>
+
+      <sensor name="sf10a" type="ray">
+        <visualize>true</visualize>
+        <always_on>1</always_on>
+        <update_rate>20</update_rate>
+        <pose>0 0 0 0 {{ 90*deg2rad }} 0</pose>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>-0</min_angle>
+              <max_angle>0</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.06</min> <!-- do not change: use min_distance (below) for realistic behavior (smaller values cause issues) -->
+            <max>35</max>   <!-- do not change: use min_distance (below) for realistic behavior (bigger values cause issues) -->
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+
+        <plugin name="LaserPlugin"
+          filename="libgazebo_lidar_plugin.so">
+          <robotNamespace></robotNamespace>
+          <min_distance>0.1</min_distance>
+          <max_distance>25.0</max_distance>
+        </plugin>
+
+      </sensor>
+    </link>
+  </model>
+
+</sdf>
+
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

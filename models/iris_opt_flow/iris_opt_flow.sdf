@@ -1,17 +1,18 @@
 <sdf version='1.5'>
   <model name='iris_opt_flow'>
-
     <include>
       <uri>model://iris</uri>
     </include>
 
+    <!--px4flow camera-->
     <include>
-      <uri>model://lidar</uri>
-      <pose>-0.12 0 0 0 3.1415 0</pose>
+      <uri>model://px4flow</uri>
+      <pose>0.05 0 -0.05 0 0 0</pose>
     </include>
-    <joint name="lidar_joint" type="revolute">
-      <child>lidar::link</child>
+
+    <joint name="px4flow_joint" type="revolute">
       <parent>iris::base_link</parent>
+      <child>px4flow::link</child>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -21,21 +22,18 @@
       </axis>
     </joint>
 
+    <!--lidar-->
     <include>
-      <uri>model://flow_cam</uri>
-      <pose>-0.12 0.05 0 0 1.5708 1.5708</pose>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 0 0 0</pose>
     </include>
-    <joint name="flow_joint" type="revolute">
-      <child>camera::link</child>
+
+    <joint name="lidar_joint" type="fixed">
       <parent>iris::base_link</parent>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <upper>0</upper>
-          <lower>0</lower>
-        </limit>
-      </axis>
+      <child>lidar::link</child>
     </joint>
 
   </model>
 </sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

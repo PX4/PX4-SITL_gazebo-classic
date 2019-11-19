@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="uneven ground">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+       <geometry>
+            <heightmap>
+              <uri>model://uneven_ground/materials/textures/terrain.png</uri>
+              <size>80 80 2</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+       </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <heightmap>
+             <use_terrain_paging>false</use_terrain_paging>
+              <texture>
+                <diffuse>model://uneven_ground/materials/textures/tarmac.png</diffuse>
+                <normal>model://uneven_ground/materials/textures/flat_normal.png</normal>
+                <size>1</size>
+              </texture>
+              <uri>model://uneven_ground/materials/textures/terrain.png</uri>
+              <size>80 80 2</size>
+              <pos>0 0 0</pos>
+           </heightmap>
+         </geometry>
+       </visual>
+    </link>
+  </model>
+</sdf>

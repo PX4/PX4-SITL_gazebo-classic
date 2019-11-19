@@ -91,7 +91,7 @@
                     </technique_common>
                 </source>
                 <source id="ID12">
-                    <float_array id="ID16" count="12">-1 -0 -0 -1 -0 -0 -1 -0 -0 -1 -0 -0</float_array>
+                    <float_array id="ID16" count="12">-1 0 0 -1 0 0 -1 0 0 -1 0 -0</float_array>
                     <technique_common>
                         <accessor count="4" source="#ID16" stride="3">
                             <param name="X" type="float" />

@@ -1,0 +1,320 @@
+{# general geometry #}
+{%- set motor_sep = 0.65 -%}
+{%- set motor_x_sep = 0.65/np.sqrt(2) -%}
+
+{# fuselage #}
+{%- set fuse_m = 2.0 -%}
+{%- set fuse_r = 0.2 -%}
+{%- set fuse_h = 0.1 -%}
+{%- set fuse_ixx = fuse_m/12*(3*fuse_r**2 + fuse_h**2) -%}
+{%- set fuse_iyy = fuse_ixx -%}
+{%- set fuse_izz = fuse_m*fuse_r**2/2 -%}
+
+{# rotors #}
+{%- set rtr_m = 0.019 -%}           {# mass, kg #}
+{%- set rtr_r = 0.165 -%}           {# radius, m #}
+{%- set rtr_w = 0.02 -%}            {# width, m #}
+{%- set rtr_h = 0.001 -%}           {# thickness, m #}
+{%- set rtr_ixx = rtr_m/12*(rtr_h**2 + rtr_w**2) -%}
+{%- set rtr_iyy = rtr_m/12*(rtr_r**2 + rtr_h**2) -%}
+{%- set rtr_izz = rtr_m/12*(rtr_w**2 + rtr_r**2) -%}
+{%- set rtr_a0 = 0.05984281113 -%}
+{%- set rtr_cla = 4.752798721 -%}
+{%- set rtr_cda = 0.6417112299 -%}
+{%- set rtr_cma = -1.8 -%}
+{%- set rtr_alpha_stall = 0.3391428111 -%}
+{%- set rtr_cla_stall = -3.85 -%}
+{%- set rtr_cda_stall = -0.9233984055 -%}
+{%- set rtr_cma_stall = 0 -%}
+{%- set rtr_blade_area = rtr_r*rtr_w -%}
+{%- set rtr_air_density = 1.2041 -%}
+{%- set rtr_arm_data_list = [
+  {'angle_deg': 45, 'dir': 'ccw', 'l': motor_sep/2},
+  {'angle_deg': -135, 'dir': 'ccw', 'l': motor_sep/2},
+  {'angle_deg': -45, 'dir': 'cw', 'l': motor_sep/2},
+  {'angle_deg': 135, 'dir': 'cw', 'l': motor_sep/2},
+  ]%}
+{%- macro cylinder(r, h) -%}
+<geometry>
+  <cylinder>
+    <radius>{{r}}</radius>
+    <length>{{h}}</length>
+  </cylinder>
+</geometry>
+{%- endmacro -%}
+
+{%- macro box(x, y, z) -%}
+<geometry>
+  <box>
+    <size>{{x}} {{y}} {{z}}</size>
+  </box>
+</geometry>
+{%- endmacro -%}
+
+{%- macro inertial(m, ixx, iyy, izz) -%}
+<inertial>
+  <mass>{{m}}</mass>
+  <inertia>
+    <ixx>{{ixx}}</ixx>
+    <iyy>{{iyy}}</iyy>
+    <izz>{{izz}}</izz>
+  </inertia>
+</inertial>
+{%- endmacro -%}
+
+{%- macro mesh_colored(uri, color) -%}
+<geometry>
+  <mesh>
+    <scale>1 1 1</scale>
+    <uri>{{ uri }}</uri>
+  </mesh>
+</geometry>
+<material>
+  <script>
+    <name>Gazebo/{{ color }}</name>
+    <uri>file://media/materials/scripts/gazebo.material</uri>
+  </script>
+</material>
+{%- endmacro -%}
+
+{%- macro surface_props() -%}
+<surface>
+  <contact>
+    <ode>
+      <min_depth>0.001</min_depth>
+      <max_vel>0</max_vel>
+    </ode>
+  </contact>
+  <friction>
+    <ode/>
+  </friction>
+</surface>
+{%- endmacro -%}
+
+<?xml version="1.0" ?>
+<!-- DO NOT EDIT: Generated from matrice_100.sdf.jinja -->
+<sdf version="1.5">
+
+  <model name="matrice_100">
+
+    <pose>0 0 0.2 0 0 0</pose>
+
+    <self_collide>false</self_collide>
+
+    <static>false</static>
+
+
+    <link name="fuselage">
+      {{ inertial(fuse_m, fuse_ixx, fuse_iyy, fuse_izz)|indent(6) }}
+
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay/>
+
+      <visual name="fuselage_visual">
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://matrice_100/meshes/Matrice_100.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <collision name="fuselage_collision">
+        <pose>0 0 -0.025 0 0 0</pose>
+        {{ box(motor_x_sep, motor_x_sep, 0.25)|indent(8) }}
+        {{ surface_props()|indent(8) }}
+      </collision>
+
+    </link>
+
+    {% for n in range(4) -%}
+
+      {% set l = rtr_arm_data_list[n]['l'] %}
+      {% set angle = np.deg2rad(rtr_arm_data_list[n]['angle_deg']) %}
+      {% set dir = rtr_arm_data_list[n]['dir'] %}
+      {% set pos = l*np.array([np.cos(angle), -np.sin(angle), 0]) %}
+      {% set rtr_pos = pos + np.array([0, 0, 0.06]) %}
+
+      {% if dir == 'ccw' %}
+        {% set rtr_fwd = [0, 1, 0]%}
+        {% set rtr_up = [0, 0, 1]%}
+        {% set rtr_dir = "ccw" %}
+      {% elif dir== 'cw' %}
+        {% set rtr_fwd = [0, -1, 0]%}
+        {% set rtr_up = [0, 0, 1]%}
+        {% set rtr_dir = "cw" %}
+      {% endif %}
+
+      {% set prop_uri = "model://matrice_100/meshes/dji_13455_prop_{:s}.dae".format(rtr_dir) %}
+
+
+
+    <!--Rotor {{n}} -->
+    <link name="rotor_{{n}}">
+
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay/>
+
+      <pose>{{ rtr_pos|join(' ') }} 0 0 0</pose>
+      {{ inertial(rtr_m, rtr_ixx, rtr_iyy, rtr_izz)| indent(8) }}
+      <visual name="rotor_{{n}}_visual">
+        <pose>0 0 0 0 0 0</pose>
+        {{ mesh_colored(prop_uri, "DarkGrey")|indent(8) }}
+      </visual>
+
+      <collision name="rotor_{{n}}_collision">
+        <pose>0 0 0 0 0 0 </pose>
+        {{ box(2*rtr_r, rtr_w, rtr_h) | indent(8) }}
+        {{ surface_props()|indent(8) }}
+      </collision>
+
+    </link>
+
+    <joint name="rotor_{{n}}_joint" type="revolute">
+      <parent>fuselage</parent>
+      <child>rotor_{{n}}</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+	<limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <!--<plugin name="rotor_{{n}}_top_blade" filename="libLiftDragPlugin.so">-->
+      <!--<a0>{{rtr_a0}}</a0>-->
+      <!--<cla>{{rtr_cla}}</cla>-->
+      <!--<cda>{{rtr_cda}}</cda>-->
+      <!--<cma>{{rtr_cma}}</cma>-->
+      <!--<alpha_stall>{{rtr_alpha_stall}}</alpha_stall>-->
+      <!--<cla_stall>{{rtr_cla_stall}}</cla_stall>-->
+      <!--<cda_stall>{{rtr_cda_stall}}</cda_stall>-->
+      <!--<cma_stall>{{rtr_cma_stall}}</cma_stall>-->
+      <!--<cp>{{rtr_r/2}} 0 0</cp>-->
+      <!--<area>{{rtr_blade_area}}</area>-->
+      <!--<air_density>{{rtr_air_density}}</air_density>-->
+      <!--<forward>{{rtr_fwd|join(' ')}}</forward>-->
+      <!--<upward>{{rtr_up|join(' ')}}</upward>-->
+      <!--<link_name>rotor_{{n}}</link_name>-->
+    <!--</plugin>-->
+
+    <!--<plugin name="rotor_{{n}}_bottom_blade" filename="libLiftDragPlugin.so">-->
+      <!--<a0>{{rtr_a0}}</a0>-->
+      <!--<cla>{{rtr_cla}}</cla>-->
+      <!--<cda>{{rtr_cda}}</cda>-->
+      <!--<cma>{{rtr_cma}}</cma>-->
+      <!--<alpha_stall>{{rtr_alpha_stall}}</alpha_stall>-->
+      <!--<cla_stall>{{rtr_cla_stall}}</cla_stall>-->
+      <!--<cda_stall>{{rtr_cda_stall}}</cda_stall>-->
+      <!--<cma_stall>{{rtr_cma_stall}}</cma_stall>-->
+      <!--<cp>{{-rtr_r/2}} 0 0</cp>-->
+      <!--<area>{{rtr_blade_area}}</area>-->
+      <!--<air_density>{{rtr_air_density}}</air_density>-->
+      <!--<forward>{{-rtr_fwd|join(' ')}}</forward>-->
+      <!--<upward>{{rtr_up|join(' ')}}</upward>-->
+      <!--<link_name>rotor_{{n}}</link_name>-->
+    <!--</plugin>-->
+
+    <plugin name='rotor_{{n}}_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace></robotNamespace>
+      <jointName>rotor_{{n}}_joint</jointName>
+      <linkName>rotor_{{n}}</linkName>
+      <turningDirection>{{rtr_dir}}</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1100</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.06</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>{{n}}</motorNumber>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/{{n}}</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+
+    {% endfor %}
+
+    <!--Pixhawk autopilot-->
+    <!--<include>-->
+      <!--<uri>model://pixhawk</uri>-->
+      <!--<pose>0 0 0.03 0 0 0</pose>-->
+    <!--</include>-->
+
+    <!--<joint name="pixhawk_joint" type="fixed">-->
+      <!--<parent>fuselage</parent>-->
+      <!--<child>pixhawk::link</child>-->
+    <!--</joint>-->
+
+    <!--3DR GPS and Magnetometer-->
+    <!--<include>-->
+      <!--<uri>model://3DR_gps_mag</uri>-->
+      <!--<pose> 0 0 0.07 0 0 0</pose>-->
+    <!--</include>-->
+
+    <!--<joint name="3DR_gps_mag_joint" type="fixed">-->
+      <!--<parent>fuselage</parent>-->
+      <!--<child>3DR_gps_mag::link</child>-->
+    <!--</joint>-->
+
+    <!--This is what plugin should look like if using standard sensors-->
+    <!--<plugin name="mavlink" filename="libgazebo_mavlink.so">-->
+      <!--<imu_topic>fuselage/pixhawk/link/mpu-6000/imu</imu_topic>-->
+      <!--<gps_topic>fuselage/3DR_gps_mag/link/ublox-neo-7</gps_topic>-->
+      <!--<mag_topic>fuselage/3DR_gps_mag/link/HMC5883L</mag_topic>-->
+      <!--<sonar_topic>fuselage/mb1240-xl-ez4/link/sonar</sonar_topic>-->
+    <!--</plugin>-->
+
+    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+        <robotNamespace></robotNamespace>
+        <gpsNoise>true</gpsNoise>
+    </plugin>
+
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace></robotNamespace>
+      <imuSubTopic>/imu</imuSubTopic>
+      <gpsSubTopic>/gps</gpsSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <opticalFlowSubTopic>/px4flow/link/opticalFlow</opticalFlowSubTopic>
+      <lidarSubTopic>/sf10a/link/lidar</lidarSubTopic>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+    </plugin>
+
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+      <robotNamespace></robotNamespace>
+      <linkName>fuselage</linkName>
+      <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+
+  </model>
+
+</sdf>
+
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

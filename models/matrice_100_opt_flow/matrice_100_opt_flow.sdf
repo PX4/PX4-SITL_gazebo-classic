@@ -1,0 +1,34 @@
+<sdf version='1.5'>
+  <model name='matrice_100_opt_flow'>
+
+    <include>
+      <uri>model://matrice_100</uri>
+    </include>
+
+    <!--px4flow camera-->
+    <include>
+      <uri>model://px4flow</uri>
+      <pose>0.05 0 -0.05 0 0 0</pose>
+    </include>
+
+    <joint name="px4flow_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>px4flow::link</child>
+    </joint>
+
+    <!--lidar-->
+    <include>
+      <uri>model://sf10a</uri>
+      <pose>0 0 -0.1 0 0 0</pose>
+      <name>lidar</name>
+    </include>
+
+    <joint name="lidar_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar::link</child>
+    </joint>
+
+  </model>
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

@@ -30,9 +30,44 @@
 #include <gazebo/transport/transport.hh>
 #include <gazebo/util/system.hh>
 #include <gazebo/sensors/sensors.hh>
+#include <ignition/math.hh>
+
+#include "Imu.pb.h"
 
 namespace gazebo
 {
+  // Default PID gains
+  static double kPIDPitchP = 5.0;
+  static double kPIDPitchI = 0.0;
+  static double kPIDPitchD = 0.0;
+  static double kPIDPitchIMax = 0.0;
+  static double kPIDPitchIMin = 0.0;
+  static double kPIDPitchCmdMax = 0.3;
+  static double kPIDPitchCmdMin = -0.3;
+
+  static double kPIDRollP = 5.0;
+  static double kPIDRollI = 0.0;
+  static double kPIDRollD = 0.0;
+  static double kPIDRollIMax = 0.0;
+  static double kPIDRollIMin = 0.0;
+  static double kPIDRollCmdMax = 0.3;
+  static double kPIDRollCmdMin = -0.3;
+
+  static double kPIDYawP = 1.0;
+  static double kPIDYawI = 0.0;
+  static double kPIDYawD = 0.0;
+  static double kPIDYawIMax = 0.0;
+  static double kPIDYawIMin = 0.0;
+  static double kPIDYawCmdMax = 1.0;
+  static double kPIDYawCmdMin = -1.0;
+
+  // Default rotation directions
+  static double kRollDir = -1.0;
+  static double kPitchDir = -1.0;
+  static double kYawDir = 1.0;
+
+  typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
+
   class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
   {
     /// \brief Constructor
@@ -43,6 +78,8 @@ namespace gazebo
     public: virtual void Init();
 
     private: void OnUpdate();
+
+    private: void ImuCallback(ImuPtr& imu_message);
 
 #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
     /// only gazebo 7.4 and above support Any
@@ -55,25 +92,11 @@ namespace gazebo
     private: void OnYawStringMsg(ConstGzStringPtr &_msg);
 #endif
 
-    /// \TODO something to move into Angle class
-    /// \brief returns _angle1 normalized about
-    /// (_reference - M_PI, _reference + M_PI]
-    /// \param[in] _angle1 input angle
-    /// \param[in] _reference reference input angle for normalization
-    /// \return normalized _angle1 about _reference
-    private: double NormalizeAbout(double _angle, double _reference);
-
-    /// \TODO something to move into Angle class
-    /// \brief returns shortest angular distance from _from to _to
-    /// \param[in] _from starting anglular position
-    /// \param[in] _to end angular position
-    /// \return distance traveled from starting to end angular positions
-    private: double ShortestAngularDistance(double _from, double _to);
-
     private: sdf::ElementPtr sdf;
 
     private: std::vector<event::ConnectionPtr> connections;
 
+    private: transport::SubscriberPtr imuSub;
     private: transport::SubscriberPtr pitchSub;
     private: transport::SubscriberPtr rollSub;
     private: transport::SubscriberPtr yawSub;
@@ -93,9 +116,14 @@ namespace gazebo
     /// \brief camera pitch joint
     private: physics::JointPtr pitchJoint;
 
-    private: sensors::ImuSensorPtr imuSensor;
+    private: sensors::ImuSensorPtr cameraImuSensor;
+    private: double lastImuYaw;
 
     private: std::string status;
+
+    private: double rDir;
+    private: double pDir;
+    private: double yDir;
 
     private: double pitchCommand;
     private: double yawCommand;

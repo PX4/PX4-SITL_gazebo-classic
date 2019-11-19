@@ -1,0 +1,25 @@
+<sdf version='1.6'>
+  <model name='iris_obs_avoid'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <!-- Only difference to regular iris is this sensor and a MAVLink stream -->
+    <include>
+      <uri>model://bumper_sensor</uri>
+    </include>
+
+    <joint name="bumper_joint" type="revolute">
+      <child>bumper_sensor::bumper_link</child>
+      <parent>iris::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
+</model>
+</sdf>

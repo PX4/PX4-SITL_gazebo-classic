@@ -1,3 +1,5 @@
+#ifndef SITL_GAZEBO_COMMON_H_
+#define SITL_GAZEBO_COMMON_H_
 /*
  * Copyright 2015 Fadri Furrer, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Michael Burri, ASL, ETH Zurich, Switzerland
@@ -19,8 +21,12 @@
  */
 
 
+#include <tinyxml.h>
+#include <typeinfo>
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
+#include <ignition/math.hh>
+#include "gazebo/physics/physics.hh"
 
 namespace gazebo {
 
@@ -47,9 +53,68 @@ bool getSdfParam(sdf::ElementPtr sdf, const std::string& name, T& param, const T
   return false;
 }
 
+template <typename T>
+void model_param(const std::string& world_name, const std::string& model_name, const std::string& param, T& param_value)
+{
+  TiXmlElement* e_param = nullptr;
+  TiXmlElement* e_param_tmp = nullptr;
+  std::string dbg_param;
+
+  TiXmlDocument doc(world_name + ".xml");
+  if (doc.LoadFile())
+  {
+    TiXmlHandle h_root(doc.RootElement());
+
+    TiXmlElement* e_model = h_root.FirstChild("model").Element();
+
+    for( ; e_model != nullptr; e_model=e_model->NextSiblingElement("model") )
+    {
+      const char* attr_name = e_model->Attribute("name");
+      if (attr_name)
+      {
+        //specific
+        if (model_name.compare(attr_name) == 0)
+        {
+          e_param_tmp = e_model->FirstChildElement(param);
+          if (e_param_tmp)
+          {
+            e_param = e_param_tmp;
+            dbg_param = "";
+          }
+          break;
+        }
+      }
+      else
+      {
+        //common
+        e_param = e_model->FirstChildElement(param);
+        dbg_param = "common ";
+      }
+    }
+
+    if (e_param)
+    {
+      std::istringstream iss(e_param->GetText());
+      iss >> param_value;
+
+      gzdbg << model_name << " model: " << dbg_param << "parameter " << param << " = " << param_value << " from " << doc.Value() << "\n";
+    }
+  }
+
+}
+
+/**
+ * \brief Get a math::Angle as an angle from [0, 360)
+ */
+inline double GetDegrees360(const ignition::math::Angle& angle) {
+  double degrees = angle.Degree();
+  while (degrees < 0.) degrees += 360.0;
+  while (degrees >= 360.0) degrees -= 360.0;
+  return degrees;
 }
 
 
+}  // namespace gazebo
 
 template <typename T>
 class FirstOrderFilter {
@@ -100,7 +165,11 @@ discretized system (ZoH):
     T previousState_;
 };
 
-
+/// Returns scalar value constrained by (min_val, max_val)
+template<typename Scalar>
+static inline constexpr const Scalar &constrain(const Scalar &val, const Scalar &min_val, const Scalar &max_val) {
+    return (val < min_val) ? min_val : ((val > max_val) ? max_val : val);
+}
 
 /// Computes a quaternion from the 3-element small angle approximation theta.
 template<class Derived>
@@ -126,3 +195,49 @@ void copyPosition(const In& in, Out* out) {
   out->y = in.y;
   out->z = in.z;
 }
+
+#if GAZEBO_MAJOR_VERSION < 9
+inline ignition::math::Vector3d ignitionFromGazeboMath(const gazebo::math::Vector3 &vec_gz) {
+  return ignition::math::Vector3d(vec_gz.x, vec_gz.y, vec_gz.z);
+}
+
+inline ignition::math::Pose3d ignitionFromGazeboMath(const gazebo::math::Pose &pose_gz) {
+
+  return ignition::math::Pose3d(pose_gz.pos.x, pose_gz.pos.y, pose_gz.pos.z,
+                                pose_gz.rot.w, pose_gz.rot.x, pose_gz.rot.y, pose_gz.rot.z);
+}
+#endif
+
+/**
+ * @note Frames of reference:
+ * g - gazebo (ENU), east, north, up
+ * r - rotors imu frame (FLU), forward, left, up
+ * b - px4 (FRD) forward, right down
+ * n - px4 (NED) north, east, down
+ */
+
+/**
+ * @brief Quaternion for rotation between ENU and NED frames
+ *
+ * NED to ENU: +PI/2 rotation about Z (Down) followed by a +PI rotation around X (old North/new East)
+ * ENU to NED: +PI/2 rotation about Z (Up) followed by a +PI rotation about X (old East/new North)
+ */
+static const auto q_ng = ignition::math::Quaterniond(0, 0.70711, 0.70711, 0);
+
+/**
+ * @brief Quaternion for rotation between body FLU and body FRD frames
+ *
+ * +PI rotation around X (Forward) axis rotates from Forward, Right, Down (aircraft)
+ * to Forward, Left, Up (base_link) frames and vice-versa.
+ */
+static const auto q_br = ignition::math::Quaterniond(0, 1, 0, 0);
+
+// sensor X-axis unit vector in `base_link` frame
+static const ignition::math::Vector3d kDownwardRotation = ignition::math::Vector3d(0, 0, -1);
+static const ignition::math::Vector3d kUpwardRotation = ignition::math::Vector3d(0, 0, 1);
+static const ignition::math::Vector3d kBackwardRotation = ignition::math::Vector3d(-1, 0, 0);
+static const ignition::math::Vector3d kForwardRotation = ignition::math::Vector3d(1, 0, 0);
+static const ignition::math::Vector3d kLeftRotation = ignition::math::Vector3d(0, 1, 0);
+static const ignition::math::Vector3d kRightRotation = ignition::math::Vector3d(0, -1, 0);
+
+#endif  // SITL_GAZEBO_COMMON_H_
