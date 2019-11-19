@@ -31,13 +31,27 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(LiftDragPlugin)
 
 /////////////////////////////////////////////////
-LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
+LiftDragPlugin::LiftDragPlugin()
 {
+  this->cl = -1;
+  this->cd = -1;
+  this->cm = -1;
+  this->cla = 0;
+  this->cl0 = 0;
+  this->clda = 0;
+  this->clde = 0;
+  this->cd_a = 0;
+  this->cd_b = 0;
+  this->cd_c = 0;
+  this->cma = 0;
+  this->cm0 = 0;
+  this->cmda = 0;
+  this->cmde = 0;
+  this->crda = 0;
   this->cp = ignition::math::Vector3d(0, 0, 0);
   this->forward = ignition::math::Vector3d(1, 0, 0);
   this->upward = ignition::math::Vector3d(0, 0, 1);
   this->area = 1.0;
-  this->alpha0 = 0.0;
   this->alpha = 0.0;
   this->sweep = 0.0;
   this->velocityStall = 0.0;
@@ -52,8 +66,6 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   this->cdaStall = 1.0;
   this->cmaStall = 0.0;
 
-  /// how much to change CL per every radian of the control joint value
-  this->controlJointRadToCL = 4.0;
 }
 
 /////////////////////////////////////////////////
@@ -85,17 +97,41 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("radial_symmetry"))
     this->radialSymmetry = _sdf->Get<bool>("radial_symmetry");
 
-  if (_sdf->HasElement("a0"))
-    this->alpha0 = _sdf->Get<double>("a0");
-
   if (_sdf->HasElement("cla"))
     this->cla = _sdf->Get<double>("cla");
 
-  if (_sdf->HasElement("cda"))
-    this->cda = _sdf->Get<double>("cda");
+  if (_sdf->HasElement("cl0"))
+    this->cl0 = _sdf->Get<double>("cl0");
+
+  if (_sdf->HasElement("clda"))
+    this->clda = _sdf->Get<double>("clda");
+
+  if (_sdf->HasElement("clde"))
+    this->clde = _sdf->Get<double>("clde");
+
+  if (_sdf->HasElement("cd_a"))
+    this->cd_a = _sdf->Get<double>("cd_a");
+
+  if (_sdf->HasElement("cd_b"))
+    this->cd_b = _sdf->Get<double>("cd_b");
+
+  if (_sdf->HasElement("cd_c"))
+    this->cd_c = _sdf->Get<double>("cd_c");
 
   if (_sdf->HasElement("cma"))
     this->cma = _sdf->Get<double>("cma");
+
+  if (_sdf->HasElement("cm0"))
+    this->cm0 = _sdf->Get<double>("cm0");
+
+  if (_sdf->HasElement("cmda"))
+    this->cmda = _sdf->Get<double>("cmda");
+
+  if (_sdf->HasElement("cmde"))
+    this->cmde = _sdf->Get<double>("cmde");
+
+  if (_sdf->HasElement("crda"))
+    this->crda = _sdf->Get<double>("crda");
 
   if (_sdf->HasElement("alpha_stall"))
     this->alphaStall = _sdf->Get<double>("alpha_stall");
@@ -148,18 +184,34 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     }
   }
 
-  if (_sdf->HasElement("control_joint_name"))
+  if (_sdf->HasElement("left_elevon_name"))
   {
-    std::string controlJointName = _sdf->Get<std::string>("control_joint_name");
-    this->controlJoint = this->model->GetJoint(controlJointName);
-    if (!this->controlJoint)
+    std::string lAileronJointName = _sdf->Get<std::string>("left_elevon_name");
+    this->lAileronJoint = this->model->GetJoint(lAileronJointName);
+    if (!this->lAileronJoint)
     {
-      gzerr << "Joint with name[" << controlJointName << "] does not exist.\n";
+      gzerr << "Joint with name[" << lAileronJointName << "] does not exist.\n";
     }
   }
 
-  if (_sdf->HasElement("control_joint_rad_to_cl"))
-    this->controlJointRadToCL = _sdf->Get<double>("control_joint_rad_to_cl");
+  if (_sdf->HasElement("right_elevon_name"))
+  {
+    std::string rAileronJointName = _sdf->Get<std::string>("right_elevon_name");
+    this->rAileronJoint = this->model->GetJoint(rAileronJointName);
+    if (!this->rAileronJoint)
+    {
+      gzerr << "Joint with name[" << rAileronJointName << "] does not exist.\n";
+    }
+  }
+  if (_sdf->HasElement("elevator_name"))
+  {
+    std::string elevatorJointName = _sdf->Get<std::string>("elevator_name");
+    this->elevatorJoint = this->model->GetJoint(elevatorJointName);
+    if (!this->elevatorJoint)
+    {
+      gzerr << "Joint with name[" << elevatorJoint << "] does not exist.\n";
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -245,6 +297,7 @@ void LiftDragPlugin::OnUpdate()
 
   // get direction of moment
   ignition::math::Vector3d momentDirection = spanwiseI;
+  ignition::math::Vector3d rollMomentDirection = forwardI;
 
   // compute angle between upwardI and liftI
   // in general, given vectors a and b:
@@ -258,9 +311,9 @@ void LiftDragPlugin::OnUpdate()
   // if forwardI is in the same direction as lift, alpha is positive.
   // liftI is in the same direction as forwardI?
   if (liftI.Dot(forwardI) >= 0.0)
-    this->alpha = this->alpha0 + acos(cosAlpha);
+    this->alpha = acos(cosAlpha);
   else
-    this->alpha = this->alpha0 - acos(cosAlpha);
+    this->alpha = 0 - acos(cosAlpha);
 
   // normalize to within +/-90 deg
   while (fabs(this->alpha) > 0.5 * M_PI)
@@ -271,28 +324,22 @@ void LiftDragPlugin::OnUpdate()
   double speedInLDPlane = velInLDPlane.Length();
   double q = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
 
+#if GAZEBO_MAJOR_VERSION >= 9
+    double dal = this->lAileronJoint->Position(0);
+    double dar = this->rAileronJoint->Position(0);
+    double de = this->elevatorJoint->Position(0);
+#else
+    double dal = this->lAileronJoint->GetAngle(0).Radian();
+    double dar = this->rAileronJoint->GetAngle(0).Radian();
+    double el = this->elevatorJoint->GetAngle(0).Radian();
+#endif
+
   // compute cl at cp, check for stall, correct for sweep
   double cl;
-  if (this->alpha > this->alphaStall)
-  {
-    cl = (this->cla * this->alphaStall +
-          this->claStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
-    // make sure cl is still great than 0
-    cl = std::max(0.0, cl);
-  }
-  else if (this->alpha < -this->alphaStall)
-  {
-    cl = (-this->cla * this->alphaStall +
-          this->claStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
-    // make sure cl is still less than 0
-    cl = std::min(0.0, cl);
-  }
-  else
-    cl = this->cla * this->alpha * cosSweepAngle;
+  cl = this->cla * this->alpha + this->cl0 + this->clda * (this->dal + this->dar) + this->clde * this->de;
 
   // modify cl per control joint value
+/*
   if (this->controlJoint)
   {
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -303,26 +350,14 @@ void LiftDragPlugin::OnUpdate()
     cl = cl + this->controlJointRadToCL * controlAngle;
     /// \TODO: also change cm and cd
   }
+*/
 
   // compute lift force at cp
   ignition::math::Vector3d lift = cl * q * this->area * liftI;
 
   // compute cd at cp, check for stall, correct for sweep
   double cd;
-  if (this->alpha > this->alphaStall)
-  {
-    cd = (this->cda * this->alphaStall +
-          this->cdaStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
-  }
-  else if (this->alpha < -this->alphaStall)
-  {
-    cd = (-this->cda * this->alphaStall +
-          this->cdaStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
-  }
-  else
-    cd = (this->cda * this->alpha) * cosSweepAngle;
+  cd = this->cd_a*this->cl*this->cl + this->cd_b*this->cl + this->cd_c;
 
   // make sure drag is positive
   cd = fabs(cd);
@@ -332,31 +367,14 @@ void LiftDragPlugin::OnUpdate()
 
   // compute cm at cp, check for stall, correct for sweep
   double cm;
-  if (this->alpha > this->alphaStall)
-  {
-    cm = (this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
-    // make sure cm is still great than 0
-    cm = std::max(0.0, cm);
-  }
-  else if (this->alpha < -this->alphaStall)
-  {
-    cm = (-this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
-    // make sure cm is still less than 0
-    cm = std::min(0.0, cm);
-  }
-  else
-    cm = this->cma * this->alpha * cosSweepAngle;
+  cm = this->cma * this->alpha + this->cm0 + this->cmda * (this->dal + this->dar) + this->cmde * this->de;
 
-  /// \TODO: implement cm
-  /// for now, reset cm to zero, as cm needs testing
-  cm = 0.0;
+  double cr;
+  cr = this->crda * (this->dal - this->dar);
 
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
+  ignition::math::Vector3d rollMoment = cr * q * this->area * rollMomentDirection;
 
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d cog = this->link->GetInertial()->CoG();
@@ -374,7 +392,7 @@ void LiftDragPlugin::OnUpdate()
   ignition::math::Vector3d force = lift + drag;
   // + moment.Cross(momentArm);
 
-  ignition::math::Vector3d torque = moment;
+  ignition::math::Vector3d torque = moment + rollMoment;
   // - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   // debug
@@ -402,7 +420,7 @@ void LiftDragPlugin::OnUpdate()
     gzdbg << "alpha: " << this->alpha << "\n";
     gzdbg << "lift: " << lift << "\n";
     gzdbg << "drag: " << drag << " cd: "
-          << cd << " cda: " << this->cda << "\n";
+          << cd << " cd_a: " << this->cd_a << "\n";
     gzdbg << "moment: " << moment << "\n";
     gzdbg << "cp momentArm: " << momentArm << "\n";
     gzdbg << "force: " << force << "\n";

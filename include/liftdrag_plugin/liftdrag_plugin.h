@@ -54,20 +54,47 @@ namespace gazebo
     /// \brief Pointer to model containing plugin.
     protected: physics::ModelPtr model;
 
+    protected: double cl;
+
+    protected: double cd;
+
+    protected: double cm;
+
     /// \brief Coefficient of Lift / alpha slope.
     /// Lift = C_L * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     protected: double cla;
 
-    /// \brief Coefficient of Drag / alpha slope.
-    /// Drag = C_D * q * S
-    /// where q (dynamic pressure) = 0.5 * rho * v^2
-    protected: double cda;
+    protected: double cl0;
+
+    protected: double clda;
+
+    protected: double clde;
+
+    protected: double cd_a;
+
+    protected: double cd_b;
+
+    protected: double cd_c;
 
     /// \brief Coefficient of Moment / alpha slope.
     /// Moment = C_M * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     protected: double cma;
+
+    protected: double cm0;
+
+    protected: double cmda;
+
+    protected: double cmde;
+
+    protected: double crda;
+
+    protected: double dal;
+
+    protected: double dar;
+
+    protected: double de;
 
     /// \brief angle of attach when airfoil stalls
     protected: double alphaStall;
@@ -127,11 +154,17 @@ namespace gazebo
 
     /// \brief Pointer to a joint that actuates a control surface for
     /// this lifting body
-    protected: physics::JointPtr controlJoint;
+    protected: std::string lAileronJointName;
 
-    /// \brief how much to change CL per radian of control surface joint
-    /// value.
-    protected: double controlJointRadToCL;
+    protected: std::string rAileronJointName;
+
+    protected: std::string elevatorJointName;
+
+    protected: physics::JointPtr lAileronJoint;
+
+    protected: physics::JointPtr rAileronJoint;
+
+    protected: physics::JointPtr elevatorJoint;
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
