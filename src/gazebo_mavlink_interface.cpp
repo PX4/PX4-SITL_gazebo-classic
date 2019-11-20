@@ -1259,7 +1259,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
-  } while (received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning() && !gotSigInt_);
+  } while (!close_conn_ && received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning() && !gotSigInt_);
 }
 
 void GazeboMavlinkInterface::acceptConnections()
