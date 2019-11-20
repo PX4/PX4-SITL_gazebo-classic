@@ -45,6 +45,9 @@
             scale="${mesh_scale}" />
           <!-- <box size="${body_width} ${body_width} ${body_height}"/> --> <!-- [m] [m] [m] -->
         </geometry>
+        <material name="Gazebo/${color}">
+          <color rgba="0. 0. 0. 1"/>
+        </material>
       </visual>
 
       <collision>
@@ -54,6 +57,10 @@
         </geometry>
       </collision>
     </link>
+
+    <gazebo reference="${robot_namespace}_base_link_inertia">
+      <material>Gazebo/${color}</material>
+    </gazebo>
 
     <!-- attach multirotor_base_plugin to the base_link -->
     <gazebo>
