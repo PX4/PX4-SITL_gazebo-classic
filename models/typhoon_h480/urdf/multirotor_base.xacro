@@ -41,80 +41,22 @@
     </gazebo>
 
     <gazebo reference="${robot_namespace}_left_leg">
-      <collision name="${robot_namespace}_collision">
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>1e+8</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0.001</min_depth>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
-      <collision name="${robot_namespace}_collision_bar">
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>1e+8</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0.001</min_depth>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
+      <mu1>1</mu1>
+      <mu2>1</mu2>
+      <kp>1e+8</kp>
+      <kd>1</kd>
+      <maxVel>0.01</maxVel>
+      <minDepth>0.001</minDepth>
+      <material>Gazebo/Grey</material>
     </gazebo>
     <gazebo reference="${robot_namespace}_right_leg">
-      <collision name="${robot_namespace}_collision">
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>1e+8</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0.001</min_depth>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
-      <collision name="${robot_namespace}_collision_bar">
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>1e+8</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0.001</min_depth>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
+      <mu1>1</mu1>
+      <mu2>1</mu2>
+      <kp>1e+8</kp>
+      <kd>1</kd>
+      <maxVel>0.01</maxVel>
+      <minDepth>0.001</minDepth>
+      <material>Gazebo/Grey</material>
     </gazebo>
 
     <link name="${robot_namespace}_left_leg">
@@ -123,19 +65,19 @@
         <origin rpy="0  0  0" xyz="0 -0.14313 -0.20725"/>
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
-      <collision name="${robot_namespace}_collision">
+      <collision>
         <origin rpy="0 1.56893  0" xyz="-0.00526 -0.10262 -0.15925"/>
         <geometry>
           <cylinder length="0.3" radius="0.012209"/>
         </geometry>
       </collision>
-      <collision name="${robot_namespace}_collision_bar">
+      <collision>
         <origin rpy="-0.501318 0 0" xyz="0.00025 -0.04451 -0.07318"/>
         <geometry>
           <cylinder length="0.176893" radius="0.00914984"/>
         </geometry>
       </collision>
-      <visual name="${robot_namespace}_base_link_left_leg">
+      <visual>
         <origin rpy="0 0 0" xyz="-0.00025  0.04051  0.048"/>
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg2_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
@@ -148,19 +90,19 @@
         <origin rpy="0 0 0" xyz="0 0.14314 -0.207252"/>
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
-      <collision name="${robot_namespace}_collision">
+      <collision>
         <origin rpy="0 1.56893 0" xyz="-0.00526  0.10262 -0.15925"/>
         <geometry>
           <cylinder length="0.3" radius="0.012209"/>
         </geometry>
       </collision>
-      <collision name="${robot_namespace}_collision_bar">
+      <collision>
         <origin rpy="0.501318 0 0" xyz="0.00025  0.04451 -0.07318"/>
         <geometry>
           <cylinder length="0.176893" radius="0.00914984"/>
         </geometry>
       </collision>
-      <visual name="${robot_namespace}_base_link_right_leg">
+      <visual>
         <origin rpy="0  0  0" xyz="-0.00025 -0.04051  0.048"/>
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg1_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
@@ -187,13 +129,13 @@
 
     <gazebo reference="${robot_namespace}_left_leg_joint">
       <implicitSpringDamper>1</implicitSpringDamper>
-      <springStiffness>100000000</springStiffness>
-      <preserveFixedJoint>false</preserveFixedJoint>
+      <stopErp>0</stopErp>
+      <stopCfm>0</stopCfm>
     </gazebo>
     <gazebo reference="${robot_namespace}_right_leg_joint">
       <implicitSpringDamper>1</implicitSpringDamper>
-      <springStiffness>100000000</springStiffness>
-      <preserveFixedJoint>false</preserveFixedJoint>
+      <stopErp>0</stopErp>
+      <stopCfm>0</stopCfm>
     </gazebo>
 
     <link name="${robot_namespace}_cgo3_mount_link">
@@ -202,13 +144,16 @@
         <origin rpy="0 0 0" xyz="-0.041  0 -0.162"/>
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
-      <visual name="typhoon_h480__cgo3_mount_visual">
+      <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_mount_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
       </visual>
     </link>
+    <gazebo reference="${robot_namespace}_cgo3_mount_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
     <joint name="${robot_namespace}_cgo3_mount_joint" type="fixed">
       <parent link="${robot_namespace}_base_link"/>
       <child link="${robot_namespace}_cgo3_mount_link"/>
@@ -227,13 +172,17 @@
         <origin rpy="0 0 0" xyz="-0.041 0 -0.162"/>
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
-      <visual name="typhoon_h480__cgo3_vertical_arm_visual">
+      <visual>
         <origin rpy="0 0 0" xyz="0.026 0 0.1"/>
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_vertical_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
       </visual>
     </link>
+    <gazebo reference="${robot_namespace}_cgo3_vertical_arm_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
     <joint name="${robot_namespace}_cgo3_vertical_arm_joint" type="revolute">
       <parent link="${robot_namespace}_cgo3_mount_link"/>
       <child link="${robot_namespace}_cgo3_vertical_arm_link"/>
@@ -254,13 +203,17 @@
         <origin rpy="0  0  0" xyz="-0.041  0    -0.081"/>
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
-      <visual name="typhoon_h480__cgo3_horizontal_arm_visual">
+      <visual>
         <origin rpy="0  0  0" xyz="-0.026  0     0.162"/>
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_horizontal_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
       </visual>
     </link>
+    <gazebo reference="${robot_namespace}_cgo3_horizontal_arm_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
     <joint name="${robot_namespace}_cgo3_horizontal_arm_joint" type="revolute">
       <parent link="${robot_namespace}_cgo3_vertical_arm_link"/>
       <child link="${robot_namespace}_cgo3_horizontal_arm_link"/>
@@ -275,20 +228,19 @@
       <stopErp>0.2</stopErp>
     </gazebo>
 
-
     <link name="${robot_namespace}_cgo3_camera_link">
       <inertial>
         <mass value="0.1"/>
         <origin rpy="0  0  0" xyz="-0.041  0    -0.162"/>
         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
       </inertial>
-      <collision name="${robot_namespace}_cgo3_camera_collision">
+      <collision>
         <origin rpy="0  0  0" xyz="0   -0.03  0"/>
         <geometry>
           <sphere radius="0.035"/>
         </geometry>
       </collision>
-      <visual name="${robot_namespace}_cgo3_camera_visual">
+      <visual>
         <origin rpy="0  0  0" xyz="0.041 -0.03   0.162"/>
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_camera_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
@@ -336,12 +288,19 @@
       <limit effort="100.0" lower="-1.05" upper="2.09" velocity="-1.0"/>
       <dynamics damping="0.1"/>
     </joint>
+    <gazebo reference="${robot_namespace}_cgo3_camera_link">
+      <mu1>1</mu1>
+      <mu2>1</mu2>
+      <kp>1e+8</kp>
+      <kd>1</kd>
+      <maxVel>0.01</maxVel>
+      <minDepth>0.001</minDepth>
+      <material>Gazebo/Black</material>
+    </gazebo>
     <gazebo reference="${robot_namespace}_cgo3_camera_joint">
       <implicitSpringDamper>1</implicitSpringDamper>
       <stopCfm>0.1</stopCfm>
       <stopErp>0.2</stopErp>
-      <mu1>1</mu1>
-      <mu2>1</mu2>
     </gazebo>
     <gazebo>
       <plugin name='gimbal_controller' filename='libgazebo_gimbal_controller_plugin.so'>
@@ -400,19 +359,8 @@
     </gazebo>
     <gazebo reference="${robot_namespace}_base_link">
       <material>Gazebo/${color}</material>
-      <collision name='base_link_inertia_collision'>
-        <surface>
-          <contact>
-            <ode>
-              <min_depth>0.001</min_depth>
-              <max_vel>0.0</max_vel>
-            </ode>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
+      <minDepth>0.001</minDepth>
+      <maxVel>0.0</maxVel>
    </gazebo>
   </xacro:macro>
 

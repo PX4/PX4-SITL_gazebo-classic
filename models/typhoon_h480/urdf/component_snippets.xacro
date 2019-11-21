@@ -291,7 +291,7 @@
             <zero_position_armed>0</zero_position_armed>
             <joint_control_type>position_gztopic</joint_control_type>
             <gztopic>/gimbal_yaw_cmd</gztopic>
-            <joint_name>${namespace}::${namespace}_cgo3_vertical_arm_joint</joint_name>
+            <joint_name>${namespace}_cgo3_vertical_arm_joint</joint_name>
           </channel>
           <channel name="left_leg">
             <input_index>9</input_index>
@@ -309,7 +309,7 @@
               <cmdMax>6</cmdMax>
               <cmdMin>-6</cmdMin>
             </joint_control_pid>
-            <joint_name>${namespace}::${namespace}_left_leg_joint</joint_name>
+            <joint_name>${namespace}_left_leg_joint</joint_name>
           </channel>
           <channel name="right_leg">
             <input_index>10</input_index>
