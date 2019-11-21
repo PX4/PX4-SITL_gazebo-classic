@@ -77,8 +77,8 @@
     rolling_moment_coefficient="${rolling_moment_coefficient}"
     mesh_scale="${mesh_scale_prop}"
     color="DarkGrey">
-    <origin xyz="0.20939 -0.12276  0.34221" rpy="0 0 -1.04719" />
-    <axis xyz="0.02558 -0.04272  0.99875"/>
+    <origin xyz="0.00187 -0.2427   0.34221" rpy="0 0 -3.14159" />
+    <axis xyz="-5.03300000e-02  -1.50000000e-04   9.98730000e-01"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -100,8 +100,8 @@
     rolling_moment_coefficient="${rolling_moment_coefficient}"
     mesh_scale="${mesh_scale_prop}"
     color="Blue">
-    <origin xyz="-0.21139  0.11976  0.34221" rpy="0 0 1.04719" />
-    <axis xyz="-4.97500000e-02   8.10000000e-04   9.98760000e-01"/>
+    <origin xyz="0.00187  0.2427   0.34221" rpy="0 0 1.04719" />
+    <axis xyz="-0.033996 -0.0006 0.68216"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -123,7 +123,7 @@
     mesh_scale="${mesh_scale_prop}"
     color="DarkGrey">
     <origin xyz="0.20939  0.12276  0.34221" rpy="0 0 -1.04719" />
-    <axis xyz="-0.05055  0.00463  0.99871"/>
+    <axis xyz="0.0404 -0.0876 1.8976"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -145,7 +145,7 @@
     mesh_scale="${mesh_scale_prop}"
     color="Blue">
     <origin xyz="-0.21139 -0.11976  0.34221" rpy="0 0 -3.14159" />
-    <axis xyz="0.02347 -0.04342  0.99878"/>
+    <axis xyz="0.0446 -0.0825 1.8977"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -166,8 +166,8 @@
     rolling_moment_coefficient="${rolling_moment_coefficient}"
     mesh_scale="${mesh_scale_prop}"
     color="Blue">
-    <origin rpy="0 0 -3.14159" xyz="0.00187 -0.2427 0.34221"/>
-    <axis xyz="-5.03300000e-02 -1.50000000e-04 9.98730000e-01"/>
+    <origin rpy="0 0 -1.04719" xyz="0.20939 -0.12276  0.34221"/>
+    <axis xyz="0.02558 -0.04272  0.99875"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -188,8 +188,8 @@
     rolling_moment_coefficient="${rolling_moment_coefficient}"
     mesh_scale="${mesh_scale_prop}"
     color="DarkGrey">
-    <origin rpy="0 0 1.04719" xyz="0.00187 0.2427 0.34221"/>
-    <axis xyz="0.02564 -0.04266 0.99876"/>
+    <origin rpy="0 0 1.04719" xyz="-0.21139  0.11976  0.34221"/>
+    <axis xyz="0.0486 0.0811 1.8976"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
