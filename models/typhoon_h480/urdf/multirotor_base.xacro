@@ -300,7 +300,7 @@
         <always_on>1</always_on>
       </sensor>
       <sensor name="camera" type="camera">
-        <pose>0 0 0 0 0 3.14159</pose>
+        <pose>0 -0.03 0 0 0 3.14159</pose>
         <camera>
           <horizontal_fov>2.0</horizontal_fov>
           <image>
