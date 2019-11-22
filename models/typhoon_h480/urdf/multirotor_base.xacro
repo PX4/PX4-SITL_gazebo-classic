@@ -272,12 +272,6 @@
             <robotNamespace></robotNamespace>
             <udpPort>5600</udpPort>
         </plugin>
-        <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
-            <robotNamespace>typhoon_h480</robotNamespace>
-            <interval>1</interval>
-            <width>3840</width>
-            <height>2160</height>
-        </plugin>
       </sensor>
     </gazebo>
     <joint name="${robot_namespace}_cgo3_camera_joint" type="revolute">

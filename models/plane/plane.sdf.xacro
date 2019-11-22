@@ -546,13 +546,6 @@
                 <robotNamespace></robotNamespace>
                 <udpPort>$(arg camera_udp_port)</udpPort>
             </plugin>
-            <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
-              <robotNamespace></robotNamespace>
-              <interval>1</interval>
-              <width>3840</width>
-              <height>2160</height>
-              <camera_control_udp_port>$(arg camera_control_udp_port)</camera_control_udp_port>
-            </plugin>
           </sensor>
         </link>
       </model>
