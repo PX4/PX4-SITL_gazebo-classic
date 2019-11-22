@@ -1,0 +1,391 @@
+<robot name="plane" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name='mavlink_udp_port' default='14560' />
+  <xacro:arg name='mavlink_tcp_port' default='4560' />
+  <xacro:arg name='qgc_udp_port' default='4560' />
+  <xacro:arg name='enable_camera' default='true' />
+  <xacro:arg name='camera_udp_port' default='5600' />
+  <xacro:arg name='camera_control_udp_port' default='14530' />
+  <xacro:arg name='rotors_description_dir' default='.'/>
+    <link name='$(arg vehicle_name)_base_link'>
+      <pose rpy="0  0  0" xyz="0  0  0"/>
+      <inertial>
+        <mass value="1.5"/>
+        <origin rpy="0  0  0" xyz="0  0  0"/>
+        <inertia ixx="0.197563" ixy="0" ixz="0" iyy="0.1458929" iyz="0" izz="0.1477"/>
+      </inertial>
+      <collision name="$(arg vehicle_name)_base_link_collision">
+        <origin rpy="0  0  0" xyz="0  0  0.176"/>
+        <geometry>
+          <box size="0.47 0.47 0.11"/>
+        </geometry>
+      </collision>
+      <visual name="$(arg vehicle_name)_base_link_visual">
+        <origin rpy="0  0  0" xyz="0.07 0 0.166"/>
+        <geometry>
+          <mesh filename="package://mavlink_sitl_gazebo/models/plane/meshes/body.dae" scale="0.1 0.1 0.1"/>
+        </geometry>
+        <material name="Gazebo/DarkGrey">
+          <color rgba=".175 .175 .175 1"/>
+        </material>
+      </visual>
+    </link>
+    <gazebo reference="$(arg vehicle_name)_base_link">
+      <material>Gazebo/DarkGrey</material>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </gazebo>
+
+    <link name='$(arg vehicle_name)_imu_link'>
+      <pose rpy="0  0  0" xyz="0  0  0"/>
+      <inertial>
+        <mass value="0.015"/>
+        <origin rpy="0  0  0" xyz="0  0  0"/>
+        <inertia ixx="1e-05" ixy="0" ixz="0" iyy="1e-05" iyz="0" izz="1e-05"/>
+      </inertial>
+    </link>
+    <joint name='$(arg vehicle_name)_imu_joint' type='revolute'>
+      <parent link="$(arg vehicle_name)_base_link"/>
+      <child link="$(arg vehicle_name)_imu_link"/>
+      <origin rpy="0  0  0" xyz="0  0  0"/>
+      <axis xyz="1  0  0"/>
+      <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
+    </joint>
+    <link name='$(arg vehicle_name)_rotor_puller'>
+      <pose rpy="0 0 0" xyz="0  0  0"/>
+      <inertial>
+        <mass value="0.005"/>
+        <origin rpy="0  0  0" xyz="0  0  0"/>
+        <inertia ixx="9.75e-07" ixy="0" ixz="0" iyy="0.000166704" iyz="0" izz="0.000167604"/>
+      </inertial>
+      <collision name="$(arg vehicle_name)_rotor_puller_collision">
+        <origin rpy="0  0  0" xyz="0  0  0"/>
+        <geometry>
+          <cylinder radius="0.1" length="0.005"/>
+        </geometry>
+      </collision>
+      <visual name="$(arg vehicle_name)_base_link_visual">
+        <origin rpy="0  0  0" xyz="0 0 -0.09"/>
+        <geometry>
+          <mesh filename="package://mavlink_sitl_gazebo/models/plane/meshes/iris_prop_ccw.dae" scale="1 1 1"/>
+        </geometry>
+        <material name="Gazebo/Blue">
+          <color rgba="0 0 1 1"/>
+        </material>
+      </visual>
+    </link>
+    <gazebo reference="$(arg vehicle_name)_rotor_puller">
+      <material>Gazebo/Blue</material>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </gazebo>
+    <link name="$(arg vehicle_name)_left_elevon">
+      <pose rpy="0  0  0" xyz="0  0  0"/>
+      <inertial>
+        <mass value="0.001"/>
+        <origin rpy="0  0  0" xyz="0   0.3  0"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+      </inertial>
+    </link>
+    <gazebo reference="$(arg vehicle_name)_left_elevon">
+      <material>Gazebo/Blue</material>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </gazebo>
+    <link name="$(arg vehicle_name)_right_elevon">
+      <inertial>
+        <mass value="0.001"/>
+        <origin rpy="0  0  0" xyz="0  -0.3  0"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+      </inertial>
+    </link>
+    <link name="$(arg vehicle_name)_elevator">
+      <inertial>
+        <mass value="0.001"/>
+        <origin rpy="0  0  0" xyz="-0.5  0   0"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+      </inertial>
+    </link>
+    <link name="$(arg vehicle_name)_rudder">
+      <inertial>
+        <mass value="0.001"/>
+        <origin rpy="0  0  0" xyz="-0.5   0    0.05"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+      </inertial>
+    </link>
+    <joint name="$(arg vehicle_name)_rotor_puller_joint" type="revolute">
+      <parent link="$(arg vehicle_name)_base_link"/>
+      <child link="$(arg vehicle_name)_rotor_puller"/>
+      <origin rpy="0    1.57  0" xyz="0.3    0     0.246"/>
+      <axis xyz="7.90000000e-04   0.00000000e+00   1.00000000e+00"/>
+      <limit effort="0.0" lower="-1e+16" upper="1e+16" velocity="0.0"/>
+    </joint>
+    <joint name="$(arg vehicle_name)_left_elevon_joint" type="revolute">
+      <parent link="$(arg vehicle_name)_base_link"/>
+      <child link="$(arg vehicle_name)_left_elevon"/>
+      <origin rpy="0  0  0" xyz="0     0.3    0.246"/>
+      <axis xyz="0  1  0"/>
+      <limit effort="0.0" lower="-0.53" upper="0.53" velocity="0.0"/>
+    </joint>
+    <gazebo reference="$(arg vehicle_name)_left_elevon_joint">
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </gazebo>
+    <joint name="$(arg vehicle_name)_right_elevon_joint" type="revolute">
+      <parent link="$(arg vehicle_name)_base_link"/>
+      <child link="$(arg vehicle_name)_right_elevon"/>
+      <origin rpy="0  0  0" xyz="0    -0.3    0.246"/>
+      <axis xyz="0  1  0"/>
+      <limit effort="0.0" lower="-0.53" upper="0.53" velocity="0.0"/>
+      <dynamics damping="1.0"/>
+    </joint>
+    <gazebo reference="$(arg vehicle_name)_right_elevon_joint">
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </gazebo>
+    <joint name="$(arg vehicle_name)_elevator_joint" type="revolute">
+      <parent link="$(arg vehicle_name)_base_link"/>
+      <child link="$(arg vehicle_name)_elevator"/>
+      <origin rpy="0  0  0" xyz="-0.5    0     0.246"/>
+      <axis xyz="0  1  0"/>
+      <limit effort="0.0" lower="-0.53" upper="0.53" velocity="0.0"/>
+      <dynamics damping="1.0"/>
+    </joint>
+    <gazebo reference="$(arg vehicle_name)_elevator_joint">
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </gazebo>
+    <joint name="$(arg vehicle_name)_rudder_joint" type="revolute">
+      <parent link="$(arg vehicle_name)_base_link"/>
+      <child link="$(arg vehicle_name)_rudder"/>
+      <origin rpy="0  0  0" xyz="-0.5    0     0.296"/>
+      <axis xyz="1  0  0"/>
+      <limit effort="0.0" lower="-0.01" upper="0.01" velocity="0.0"/>
+      <dynamics damping="1.0"/>
+    </joint>
+    <gazebo reference="$(arg vehicle_name)_rudder_joint">
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </gazebo>
+
+
+        <gazebo>
+        <plugin name="left_wing" filename="libLiftDragPlugin.so">
+          <a0>0.05984281113</a0>
+          <cla>4.752798721</cla>
+          <cda>0.6417112299</cda>
+          <cma>-1.8</cma>
+          <alpha_stall>0.3391428111</alpha_stall>
+          <cla_stall>-3.85</cla_stall>
+          <cda_stall>-0.9233984055</cda_stall>
+          <cma_stall>0</cma_stall>
+          <cp>-0.05 0.3 0.05</cp>
+          <area>0.12</area>
+          <air_density>1.2041</air_density>
+          <forward>1 0 0</forward>
+          <upward>0 0 1</upward>
+          <link_name>$(arg vehicle_name)_base_link</link_name>
+          <control_joint_name>
+            $(arg vehicle_name)::$(arg vehicle_name)_left_elevon_joint
+          </control_joint_name>
+          <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+        </plugin>
+        <plugin name="right_wing" filename="libLiftDragPlugin.so">
+          <a0>0.05984281113</a0>
+          <cla>4.752798721</cla>
+          <cda>0.6417112299</cda>
+          <cma>-1.8</cma>
+          <alpha_stall>0.3391428111</alpha_stall>
+          <cla_stall>-3.85</cla_stall>
+          <cda_stall>-0.9233984055</cda_stall>
+          <cma_stall>0</cma_stall>
+          <cp>-0.05 -0.3 0.05</cp>
+          <area>0.12</area>
+          <air_density>1.2041</air_density>
+          <forward>1 0 0</forward>
+          <upward>0 0 1</upward>
+          <link_name>$(arg vehicle_name)_base_link</link_name>
+          <control_joint_name>
+            $(arg vehicle_name)::$(arg vehicle_name)_right_elevon_joint
+          </control_joint_name>
+          <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+        </plugin>
+        <plugin name="$(arg vehicle_name)_elevator" filename="libLiftDragPlugin.so">
+          <a0>-0.2</a0>
+          <cla>4.752798721</cla>
+          <cda>0.6417112299</cda>
+          <cma>-1.8</cma>
+          <alpha_stall>0.3391428111</alpha_stall>
+          <cla_stall>-3.85</cla_stall>
+          <cda_stall>-0.9233984055</cda_stall>
+          <cma_stall>0</cma_stall>
+          <cp>-0.5 0 0</cp>
+          <area>0.01</area>
+          <air_density>1.2041</air_density>
+          <forward>1 0 0</forward>
+          <upward>0 0 1</upward>
+          <link_name>$(arg vehicle_name)_base_link</link_name>
+          <control_joint_name>
+            $(arg vehicle_name)::$(arg vehicle_name)_elevator_joint
+          </control_joint_name>
+          <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+        </plugin>
+        <plugin name="$(arg vehicle_name)_rudder" filename="libLiftDragPlugin.so">
+          <a0>0.0</a0>
+          <cla>4.752798721</cla>
+          <cda>0.6417112299</cda>
+          <cma>-1.8</cma>
+          <alpha_stall>0.3391428111</alpha_stall>
+          <cla_stall>-3.85</cla_stall>
+          <cda_stall>-0.9233984055</cda_stall>
+          <cma_stall>0</cma_stall>
+          <cp>-0.5 0 0.05</cp>
+          <area>0.02</area>
+          <air_density>1.2041</air_density>
+          <forward>1 0 0</forward>
+          <upward>0 1 0</upward>
+          <link_name>$(arg vehicle_name)_base_link</link_name>
+        </plugin>
+        <plugin name='puller' filename='libgazebo_motor_model.so'>
+          <robotNamespace></robotNamespace>
+          <jointName>$(arg vehicle_name)::$(arg vehicle_name)_rotor_puller_joint</jointName>
+          <linkName>$(arg vehicle_name)_rotor_puller</linkName>
+          <turningDirection>cw</turningDirection>
+          <timeConstantUp>0.0125</timeConstantUp>
+          <timeConstantDown>0.025</timeConstantDown>
+          <maxRotVelocity>3500</maxRotVelocity>
+          <motorConstant>8.54858e-06</motorConstant>
+          <momentConstant>0.01</momentConstant>
+          <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+          <motorNumber>4</motorNumber>
+          <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+          <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+          <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+          <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        </plugin>
+        <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+          <robotNamespace></robotNamespace>
+          <linkName>$(arg vehicle_name)_imu_link</linkName>
+          <imuTopic>/imu</imuTopic>
+          <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+          <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+          <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+          <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+          <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+          <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+          <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+          <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+        </plugin>
+        <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
+          <frameId>$(arg vehicle_name)_base_link</frameId>
+          <linkName>$(arg vehicle_name)_base_link</linkName>
+          <robotNamespace/>
+          <xyzOffset>1 0 0</xyzOffset>
+          <windDirection>0 1 0</windDirection>
+          <windForceMean>0.7</windForceMean>
+          <windGustDirection>0 0 0</windGustDirection>
+          <windGustDuration>0</windGustDuration>
+          <windGustStart>0</windGustStart>
+          <windGustForceMean>0</windGustForceMean>
+        </plugin>
+        <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+            <robotNamespace></robotNamespace>
+            <gpsNoise>true</gpsNoise>
+        </plugin>
+        <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+          <robotNamespace/>
+          <pubRate>20</pubRate>
+          <noiseDensity>0.0004</noiseDensity>
+          <randomWalk>6.4e-06</randomWalk>
+          <biasCorrelationTime>600</biasCorrelationTime>
+          <magTopic>/mag</magTopic>
+        </plugin>
+        <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+          <robotNamespace/>
+          <pubRate>10</pubRate>
+          <baroTopic>/baro</baroTopic>
+        </plugin>
+        <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+          <robotNamespace></robotNamespace>
+          <imuSubTopic>/imu</imuSubTopic>
+          <gpsSubTopic>/gps</gpsSubTopic>
+          <magSubTopic>/mag</magSubTopic>
+          <baroSubTopic>/baro</baroSubTopic>
+          <mavlink_addr>INADDR_ANY</mavlink_addr>
+          <mavlink_tcp_port>$(arg mavlink_tcp_port)</mavlink_tcp_port>
+          <mavlink_udp_port>$(arg mavlink_udp_port)</mavlink_udp_port>
+          <serialEnabled>false</serialEnabled>
+          <serialDevice>/dev/ttyACM0</serialDevice>
+          <baudRate>921600</baudRate>
+          <qgc_addr>INADDR_ANY</qgc_addr>
+          <qgc_udp_port>$(arg qgc_udp_port)</qgc_udp_port>
+          <hil_mode>false</hil_mode>
+          <hil_state_level>false</hil_state_level>
+          <enable_lockstep>true</enable_lockstep>
+          <use_tcp>true</use_tcp>
+          <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+          <control_channels>
+            <channel name="rotor4">
+              <input_index>4</input_index>
+              <input_offset>0</input_offset>
+              <input_scaling>3500</input_scaling>
+              <zero_position_disarmed>0</zero_position_disarmed>
+              <zero_position_armed>0</zero_position_armed>
+              <joint_control_type>velocity</joint_control_type>
+              <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_rotor_puller_joint</joint_name>
+            </channel>
+            <channel name="$(arg vehicle_name)_left_elevon">
+              <input_index>5</input_index>
+              <input_offset>0</input_offset>
+              <input_scaling>1</input_scaling>
+              <zero_position_disarmed>0</zero_position_disarmed>
+              <zero_position_armed>0</zero_position_armed>
+              <joint_control_type>position_kinematic</joint_control_type>
+              <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_left_elevon_joint</joint_name>
+            </channel>
+            <channel name="$(arg vehicle_name)_right_elevon">
+              <input_index>6</input_index>
+              <input_offset>0</input_offset>
+              <input_scaling>1</input_scaling>
+              <zero_position_disarmed>0</zero_position_disarmed>
+              <zero_position_armed>0</zero_position_armed>
+              <joint_control_type>position_kinematic</joint_control_type>
+              <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_right_elevon_joint</joint_name>
+            </channel>
+            <channel name="$(arg vehicle_name)_elevator">
+              <input_index>7</input_index>
+              <input_offset>0</input_offset>
+              <input_scaling>1</input_scaling>
+              <zero_position_disarmed>0</zero_position_disarmed>
+              <zero_position_armed>0</zero_position_armed>
+              <joint_control_type>position_kinematic</joint_control_type>
+              <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_elevator_joint</joint_name>
+            </channel>
+          </control_channels>
+        </plugin>
+        <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+          <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_imu_joint</joint_name>
+          <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_right_elevon_joint</joint_name>
+          <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_left_elevon_joint</joint_name>
+          <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_elevator_joint</joint_name>
+          <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_rudder_joint</joint_name>
+          <joint_name>$(arg vehicle_name)::$(arg vehicle_name)_rotor_puller_joint</joint_name>
+          <update_rate>100</update_rate>
+        </plugin>
+        <static>0</static>
+      </gazebo>
+</robot>

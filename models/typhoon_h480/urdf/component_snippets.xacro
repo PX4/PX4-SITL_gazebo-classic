@@ -36,87 +36,6 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:arg name='camera_udp_port' default='5600' />
-  <xacro:macro name="fpv_cam">
-    <link name='camera_link'>
-      <pose rpy="0  0  0" xyz="0  0  0"/>
-      <inertial>
-        <mass value="0.015"/>
-        <origin rpy="0  0  0" xyz="0  0  0"/>
-        <inertia ixx="4.15e-6" ixy="0" ixz="0" iyy="2.407e-6" iyz="0" izz="2.407e-6"/>
-      </inertial>
-      <collision name="camera_link_inertia_collision">
-        <origin rpy="0  0  0" xyz="0  0  0"/>
-        <geometry>
-          <box size="0.01 0.01 0.01"/>
-        </geometry>
-      </collision>
-      <visual name="camera_link_inertia_visual">
-        <origin rpy="0  0  0" xyz="0  0  0"/>
-        <geometry>
-          <box size="0.01 0.01 0.01"/>
-        </geometry>
-      </visual>
-    </link>
-    <gazebo reference="camera_link">
-      <self_collide>0</self_collide>
-      <kinematic>0</kinematic>
-      <sensor name='camera' type='camera'>
-        <camera name='__default__'>
-          <horizontal_fov>1.047</horizontal_fov>
-          <image>
-            <width>320</width>
-            <height>240</height>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>15000</far>
-          </clip>
-          <lens>
-            <type>custom</type>
-            <custom_function>
-              <c1>1.05</c1>
-              <c2>4</c2>
-              <f>1</f>
-              <fun>tan</fun>
-            </custom_function>
-            <scale_to_hfov>1</scale_to_hfov>
-            <cutoff_angle>3.1415</cutoff_angle>
-            <env_texture_size>1080</env_texture_size>
-          </lens>
-        </camera>
-        <always_on>1</always_on>
-        <update_rate>30</update_rate>
-        <visualize>1</visualize>
-        <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
-            <robotNamespace></robotNamespace>
-          <alwaysOn>true</alwaysOn>
-          <imageTopicName>image_raw</imageTopicName>
-          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-          <updateRate>30.0</updateRate>
-          <cameraName>usb_cam</cameraName>
-          <frameName>/robot_camera_link</frameName>
-          <CxPrime>320.5</CxPrime>
-          <Cx>320.5</Cx>
-          <Cy>240.5</Cy>
-          <hackBaseline>0</hackBaseline>
-          <focalLength>277.191356</focalLength>
-          <distortionK1>0.0</distortionK1>
-          <distortionK2>0.0</distortionK2>
-          <distortionK3>0.0</distortionK3>
-          <distortionT1>0.0</distortionT1>
-          <distortionT2>0.0</distortionT2>
-        </plugin>
-        <!-- GStreamer camera plugin (needs a lot of CPU! Consider lowering the
-           camera image size) -->
-        <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
-          <robotNamespace></robotNamespace>
-          <udpPort>$(arg camera_udp_port)</udpPort>
-        </plugin>
-      </sensor>
-    </gazebo>
-    </xacro:macro>
-
   <xacro:macro name="joint_state_publisher_macro"
     params="namespace">
     <gazebo>
@@ -128,7 +47,13 @@
         <joint_name>${namespace}::${namespace}_rotor_1_joint</joint_name>
         <joint_name>${namespace}::${namespace}_rotor_2_joint</joint_name>
         <joint_name>${namespace}::${namespace}_rotor_3_joint</joint_name>
-      <update_rate>100</update_rate>
+        <joint_name>${namespace}::${namespace}_rotor_4_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_rotor_5_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_right_leg_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_left_leg_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_cgo3_mount_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_cgo3_vertical_arm_joint</joint_name>
+        <update_rate>100</update_rate>
       </plugin>
     </gazebo>
   </xacro:macro>
@@ -284,101 +209,125 @@
         <use_tcp>$(arg use_tcp)</use_tcp>
         <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
         <control_channels>
-          <channel name="rotor1">
+          <channel name="rotor0">
             <input_index>0</input_index>
             <input_offset>0</input_offset>
-            <input_scaling>1000</input_scaling>
+            <input_scaling>1500</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
             <zero_position_armed>100</zero_position_armed>
             <joint_control_type>velocity</joint_control_type>
+            <joint_name>${namespace}::${namespace}_rotor_4_joint</joint_name>
           </channel>
-          <channel name="rotor2">
+          <channel name="rotor1">
             <input_index>1</input_index>
             <input_offset>0</input_offset>
-            <input_scaling>1000</input_scaling>
+            <input_scaling>1500</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
             <zero_position_armed>100</zero_position_armed>
             <joint_control_type>velocity</joint_control_type>
+            <joint_name>${namespace}::${namespace}_rotor_5_joint</joint_name>
           </channel>
-          <channel name="rotor3">
+          <channel name="rotor2">
             <input_index>2</input_index>
             <input_offset>0</input_offset>
-            <input_scaling>1000</input_scaling>
+            <input_scaling>1500</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
             <zero_position_armed>100</zero_position_armed>
             <joint_control_type>velocity</joint_control_type>
+            <joint_name>${namespace}::${namespace}_rotor_2_joint</joint_name>
           </channel>
-          <channel name="rotor4">
+          <channel name="rotor3">
             <input_index>3</input_index>
             <input_offset>0</input_offset>
-            <input_scaling>1000</input_scaling>
+            <input_scaling>1500</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
             <zero_position_armed>100</zero_position_armed>
             <joint_control_type>velocity</joint_control_type>
+            <joint_name>${namespace}::${namespace}_rotor_3_joint</joint_name>
+          </channel>
+          <channel name="rotor4">
+            <input_index>4</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1500</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+            <joint_name>${namespace}::${namespace}_rotor_0_joint</joint_name>
           </channel>
           <channel name="rotor5">
-            <input_index>4</input_index>
-            <input_offset>1</input_offset>
-            <input_scaling>324.6</input_scaling>
-            <zero_position_disarmed>0</zero_position_disarmed>
-            <zero_position_armed>0</zero_position_armed>
-            <joint_control_type>velocity</joint_control_type>
-            <joint_control_pid>
-              <p>0.1</p>
-              <i>0</i>
-              <d>0</d>
-              <iMax>0.0</iMax>
-              <iMin>0.0</iMin>
-              <cmdMax>2</cmdMax>
-              <cmdMin>-2</cmdMin>
-            </joint_control_pid>
-            <joint_name>zephyr_delta_wing::propeller_joint</joint_name>
-          </channel>
-          <channel name="rotor6">
             <input_index>5</input_index>
             <input_offset>0</input_offset>
-            <!-- joint limits [-0.524, 0.524] -->
-            <input_scaling>0.524</input_scaling>
+            <input_scaling>1500</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
-            <zero_position_armed>0</zero_position_armed>
-            <joint_control_type>position</joint_control_type>
-            <joint_name>zephyr_delta_wing::flap_left_joint</joint_name>
-            <joint_control_pid>
-              <p>10.0</p>
-              <i>0</i>
-              <d>0</d>
-              <iMax>0</iMax>
-              <iMin>0</iMin>
-              <cmdMax>20</cmdMax>
-              <cmdMin>-20</cmdMin>
-            </joint_control_pid>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+            <joint_name>${namespace}::${namespace}_rotor_1_joint</joint_name>
           </channel>
-          <channel name="rotor7">
+          <channel name="gimbal_roll">
             <input_index>6</input_index>
             <input_offset>0</input_offset>
-            <!-- joint limits [-0.524, 0.524] -->
-            <input_scaling>0.524</input_scaling>
+            <input_scaling>-3.1415</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
             <zero_position_armed>0</zero_position_armed>
-            <joint_control_type>position</joint_control_type>
-            <joint_name>zephyr_delta_wing::flap_right_joint</joint_name>
-            <joint_control_pid>
-              <p>10.0</p>
-              <i>0</i>
-              <d>0</d>
-              <iMax>0</iMax>
-              <iMin>0</iMin>
-              <cmdMax>20</cmdMax>
-              <cmdMin>-20</cmdMin>
-            </joint_control_pid>
+            <joint_control_type>position_gztopic</joint_control_type>
+            <gztopic>/gimbal_roll_cmd</gztopic>
+            <joint_name>${namespace}::${namespace}_cgo3_horizontal_arm_joint</joint_name>
           </channel>
-          <channel name="rotor8">
+          <channel name="gimbal_pitch">
             <input_index>7</input_index>
             <input_offset>0</input_offset>
-            <input_scaling>0.524</input_scaling>
+            <input_scaling>3.1415</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_gztopic</joint_control_type>
+            <gztopic>/gimbal_pitch_cmd</gztopic>
+            <joint_name>${namespace}::${namespace}_cgo3_camera_joint</joint_name>
+          </channel>
+          <channel name="gimbal_yaw">
+            <input_index>8</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>-3.1415</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_gztopic</joint_control_type>
+            <gztopic>/gimbal_yaw_cmd</gztopic>
+            <joint_name>${namespace}_cgo3_vertical_arm_joint</joint_name>
+          </channel>
+          <channel name="left_leg">
+            <input_index>9</input_index>
+            <input_offset>1</input_offset>
+            <input_scaling>0.5</input_scaling>
             <zero_position_disarmed>0</zero_position_disarmed>
             <zero_position_armed>0</zero_position_armed>
             <joint_control_type>position</joint_control_type>
+            <joint_control_pid>
+              <p>3.5</p>
+              <i>0.5</i>
+              <d>0</d>
+              <iMax>4</iMax>
+              <iMin>-4</iMin>
+              <cmdMax>6</cmdMax>
+              <cmdMin>-6</cmdMin>
+            </joint_control_pid>
+            <joint_name>${namespace}_left_leg_joint</joint_name>
+          </channel>
+          <channel name="right_leg">
+            <input_index>10</input_index>
+            <input_offset>1</input_offset>
+            <input_scaling>0.5</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position</joint_control_type>
+            <joint_control_pid>
+              <p>3.5</p>
+              <i>0.5</i>
+              <d>0</d>
+              <iMax>4</iMax>
+              <iMin>-4</iMin>
+              <cmdMax>6</cmdMax>
+              <cmdMin>-6</cmdMin>
+            </joint_control_pid>
+            <joint_name>${namespace}::${namespace}_right_leg_joint</joint_name>
           </channel>
         </control_channels>
       </plugin>
@@ -700,17 +649,6 @@
       <origin xyz="0.015 0 0.0113" rpy="0 0 0" />
     </xacro:imu_plugin_macro>
   </xacro:macro>
-
-  <xacro:if value="$(arg enable_camera)">
-    <xacro:fpv_cam/>
-    <joint name="fpv_joint" type="fixed">
-      <parent link="$(arg name)_base_link"/>
-      <child link="camera_link"/>
-      <origin rpy="0  0  0" xyz="0  0  0"/>
-      <axis xyz="0  0  1"/>
-      <limit effort="0.0" lower="0.0" upper="0.0" velocity="0.0"/>
-    </joint>
-  </xacro:if>
 
   <xacro:joint_state_publisher_macro
     namespace="$(arg name)" >

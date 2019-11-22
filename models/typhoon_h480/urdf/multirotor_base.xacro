@@ -1,0 +1,423 @@
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Main multirotor link -->
+  <xacro:macro name="multirotor_base_macro"
+    params="robot_namespace mass body_width body_height mesh_file mesh_scale color *inertia">
+    <link name="${robot_namespace}_base_link"></link>
+
+    <joint name="${robot_namespace}_base_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${robot_namespace}_base_link" />
+      <child link="${robot_namespace}_base_link_inertia" />
+    </joint>
+
+    <link name="${robot_namespace}_base_link_inertia">
+      <inertial>
+        <mass value="${mass}" />  <!-- [kg] -->
+        <origin rpy="0 0 0" xyz="0.001005 0 -0.0090035"/>
+        <xacro:insert_block name="inertia" />
+      </inertial>
+      <visual>
+        <origin rpy="0 0 3.14159" xyz="0 0 0.26"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/${mesh_file}"
+            scale="${mesh_scale}" />
+          <!-- <box size="${body_width} ${body_width} ${body_height}"/> --> <!-- [m] [m] [m] -->
+        </geometry>
+        <material name="Gazebo/${color}">
+          <color rgba="0. 0. 0. 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 -3.14159" xyz="0 0 0.26"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${body_width} ${body_width} ${body_height}" /> <!-- [m] [m] [m] -->
+        </geometry>
+      </collision>
+    </link>
+    <gazebo reference="${robot_namespace}_base_link_inertia">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+
+    <gazebo reference="${robot_namespace}_left_leg">
+      <mu1>1</mu1>
+      <mu2>1</mu2>
+      <kp>1e+8</kp>
+      <kd>1</kd>
+      <maxVel>0.01</maxVel>
+      <minDepth>0.001</minDepth>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    <gazebo reference="${robot_namespace}_right_leg">
+      <mu1>1</mu1>
+      <mu2>1</mu2>
+      <kp>1e+8</kp>
+      <kd>1</kd>
+      <maxVel>0.01</maxVel>
+      <minDepth>0.001</minDepth>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <link name="${robot_namespace}_left_leg">
+      <inertial>
+        <mass value="0.1"/>
+        <origin rpy="0  0  0" xyz="0 -0.14313 -0.20725"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <collision>
+        <origin rpy="0 1.56893  0" xyz="-0.00526 -0.10262 -0.15925"/>
+        <geometry>
+          <cylinder length="0.3" radius="0.012209"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin rpy="-0.501318 0 0" xyz="0.00025 -0.04451 -0.07318"/>
+        <geometry>
+          <cylinder length="0.176893" radius="0.00914984"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin rpy="0 0 0" xyz="-0.00025  0.04051  0.048"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg2_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+    <link name="${robot_namespace}_right_leg">
+      <inertial>
+        <mass value="0.1"/>
+        <origin rpy="0 0 0" xyz="0 0.14314 -0.207252"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <collision>
+        <origin rpy="0 1.56893 0" xyz="-0.00526  0.10262 -0.15925"/>
+        <geometry>
+          <cylinder length="0.3" radius="0.012209"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin rpy="0.501318 0 0" xyz="0.00025  0.04451 -0.07318"/>
+        <geometry>
+          <cylinder length="0.176893" radius="0.00914984"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin rpy="0  0  0" xyz="-0.00025 -0.04051  0.048"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg1_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${robot_namespace}_left_leg_joint" type="revolute">
+      <parent link="${robot_namespace}_base_link"/>
+      <child link="${robot_namespace}_left_leg"/>
+      <origin rpy="0 0 -3.14159" xyz="-0.00025  0.04051  0.212"/>
+      <axis xyz="-1 0 0"/>
+      <limit effort="100.0" lower="0.0" upper="1.0" velocity="-1.0"/>
+      <dynamics damping="1"/>
+    </joint>
+    <joint name="${robot_namespace}_right_leg_joint" type="revolute">
+      <parent link="${robot_namespace}_base_link"/>
+      <child link="${robot_namespace}_right_leg"/>
+      <origin rpy="0 0 -3.14159" xyz="-0.00025 -0.04051  0.212"/>
+      <axis xyz="1 0 0"/>
+      <limit effort="100.0" lower="0.0" upper="1.0" velocity="-1.0"/>
+      <dynamics damping="1"/>
+    </joint>
+
+    <gazebo reference="${robot_namespace}_left_leg_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+      <stopErp>0</stopErp>
+      <stopCfm>0</stopCfm>
+    </gazebo>
+    <gazebo reference="${robot_namespace}_right_leg_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+      <stopErp>0</stopErp>
+      <stopCfm>0</stopCfm>
+    </gazebo>
+
+    <link name="${robot_namespace}_cgo3_mount_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin rpy="0 0 0" xyz="-0.041  0 -0.162"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_mount_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+    <gazebo reference="${robot_namespace}_cgo3_mount_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+    <joint name="${robot_namespace}_cgo3_mount_joint" type="fixed">
+      <parent link="${robot_namespace}_base_link"/>
+      <child link="${robot_namespace}_cgo3_mount_link"/>
+      <origin rpy="0 0 -3.14159" xyz="0 0 0.26"/>
+      <axis xyz="0  0  1"/>
+      <limit effort="100.0" lower="0.0" upper="0.0" velocity="-1.0"/>
+      <dynamics damping="1"/>
+    </joint>
+    <gazebo reference="${robot_namespace}_cgo3_mount_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+    </gazebo>
+
+    <link name="${robot_namespace}_cgo3_vertical_arm_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin rpy="0 0 0" xyz="-0.041 0 -0.162"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0.026 0 0.1"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_vertical_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+    <gazebo reference="${robot_namespace}_cgo3_vertical_arm_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <joint name="${robot_namespace}_cgo3_vertical_arm_joint" type="revolute">
+      <parent link="${robot_namespace}_cgo3_mount_link"/>
+      <child link="${robot_namespace}_cgo3_vertical_arm_link"/>
+      <origin rpy="0 0 0" xyz="-0.026 0 -0.1"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="100.0" lower="-1e+16" upper="1e+16" velocity="-1.0"/>
+      <dynamics damping="0.1"/>
+    </joint>
+    <gazebo reference="${robot_namespace}_cgo3_vertical_arm_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+      <stopCfm>0.1</stopCfm>
+      <stopErp>0.2</stopErp>
+    </gazebo>
+
+    <link name="${robot_namespace}_cgo3_horizontal_arm_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin rpy="0  0  0" xyz="-0.041  0    -0.081"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <visual>
+        <origin rpy="0  0  0" xyz="-0.026  0     0.162"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_horizontal_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+    <gazebo reference="${robot_namespace}_cgo3_horizontal_arm_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <joint name="${robot_namespace}_cgo3_horizontal_arm_joint" type="revolute">
+      <parent link="${robot_namespace}_cgo3_vertical_arm_link"/>
+      <child link="${robot_namespace}_cgo3_horizontal_arm_link"/>
+      <origin rpy="0  0  0" xyz="0.052  0    -0.062"/>
+      <axis xyz="-1  0  0"/>
+      <limit effort="100.0" lower="-0.785398" upper="0.785398" velocity="-1.0"/>
+      <dynamics damping="0.1"/>
+    </joint>
+    <gazebo reference="${robot_namespace}_cgo3_horizontal_arm_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+      <stopCfm>0.1</stopCfm>
+      <stopErp>0.2</stopErp>
+    </gazebo>
+
+    <link name="${robot_namespace}_cgo3_camera_link">
+      <inertial>
+        <mass value="0.1"/>
+        <origin rpy="0  0  0" xyz="-0.041  0    -0.162"/>
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <collision>
+        <origin rpy="0  0  0" xyz="0   -0.03  0"/>
+        <geometry>
+          <sphere radius="0.035"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin rpy="0  0  0" xyz="0.041 -0.03   0.162"/>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_camera_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+    <gazebo reference="${robot_namespace}_cgo3_camera_link">
+      <sensor name="camera_imu" type="imu">
+        <always_on>1</always_on>
+      </sensor>
+      <sensor name="camera" type="camera">
+        <pose>0 -0.03 0 0 0 3.14159</pose>
+        <camera>
+          <horizontal_fov>2.0</horizontal_fov>
+          <image>
+            <format>R8G8B8</format>
+            <width>640</width>
+            <height>360</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>15000</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>true</visualize>
+        <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
+            <robotNamespace></robotNamespace>
+            <udpPort>5600</udpPort>
+        </plugin>
+        <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
+            <robotNamespace>typhoon_h480</robotNamespace>
+            <interval>1</interval>
+            <width>3840</width>
+            <height>2160</height>
+        </plugin>
+      </sensor>
+    </gazebo>
+    <joint name="${robot_namespace}_cgo3_camera_joint" type="revolute">
+      <parent link="${robot_namespace}_cgo3_horizontal_arm_link"/>
+      <child link="${robot_namespace}_cgo3_camera_link"/>
+      <origin rpy="0  0  0" xyz="-0.067  0.03   0"/>
+      <axis xyz="0 -1  0"/>
+      <limit effort="100.0" lower="-1.05" upper="2.09" velocity="-1.0"/>
+      <dynamics damping="0.1"/>
+    </joint>
+    <gazebo reference="${robot_namespace}_cgo3_camera_link">
+      <mu1>1</mu1>
+      <mu2>1</mu2>
+      <kp>1e+8</kp>
+      <kd>1</kd>
+      <maxVel>0.01</maxVel>
+      <minDepth>0.001</minDepth>
+      <material>Gazebo/Black</material>
+    </gazebo>
+    <gazebo reference="${robot_namespace}_cgo3_camera_joint">
+      <implicitSpringDamper>1</implicitSpringDamper>
+      <stopCfm>0.1</stopCfm>
+      <stopErp>0.2</stopErp>
+    </gazebo>
+    <gazebo>
+      <plugin name='gimbal_controller' filename='libgazebo_gimbal_controller_plugin.so'>
+        <joint_yaw>${namespace}::${namespace}_cgo3_vertical_arm_joint</joint_yaw>
+        <joint_roll>${namespace}::${namespace}_cgo3_camera_joint</joint_roll>
+        <joint_pitch>${namespace}::${namespace}_cgo3_horizontal_arm_joint</joint_pitch>
+        <control_gimbal_channels>
+          <channel>
+            <joint_control_pid>
+              <p>0.8</p>
+              <i>0.1</i>
+              <d>0.02</d>
+              <iMax>0</iMax>
+              <iMin>0</iMin>
+              <cmdMax>1.0</cmdMax>
+              <cmdMin>-1.0</cmdMin>
+            </joint_control_pid>
+            <joint_axis>joint_yaw</joint_axis>
+          </channel>
+          <channel>
+            <joint_control_pid>
+              <p>0.8</p>
+              <i>0.035</i>
+              <d>0.02</d>
+              <iMax>0</iMax>
+              <iMin>0</iMin>
+              <cmdMax>0.3</cmdMax>
+              <cmdMin>-0.3</cmdMin>
+            </joint_control_pid>
+            <joint_axis>joint_roll</joint_axis>
+          </channel>
+          <channel>
+            <joint_control_pid>
+              <p>2.068</p>
+              <i>0.01245</i>
+              <d>0.01</d>
+              <iMax>0</iMax>
+              <iMin>0</iMin>
+              <cmdMax>0.3</cmdMax>
+              <cmdMin>-0.3</cmdMin>
+            </joint_control_pid>
+            <joint_axis>joint_pitch</joint_axis>
+          </channel>
+        </control_gimbal_channels>
+        <gimbal_imu>camera_imu</gimbal_imu>
+      </plugin>
+    </gazebo>
+
+    <!-- attach multirotor_base_plugin to the base_link -->
+    <gazebo>
+      <plugin filename="libgazebo_multirotor_base_plugin.so" name="rosbag">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+        <linkName>${robot_namespace}_base_link</linkName>
+        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
+      </plugin>
+    </gazebo>
+    <gazebo reference="${robot_namespace}_base_link">
+      <material>Gazebo/${color}</material>
+      <minDepth>0.001</minDepth>
+      <maxVel>0.0</maxVel>
+   </gazebo>
+  </xacro:macro>
+
+  <!-- Rotor joint and link -->
+  <xacro:macro name="vertical_rotor"
+    params="robot_namespace suffix direction motor_constant moment_constant parent mass_rotor radius_rotor time_constant_up time_constant_down max_rot_velocity rotor_number motor_number rotor_drag_coefficient rolling_moment_coefficient color mesh_scale *origin *axis *inertia">
+    <joint name="${robot_namespace}_rotor_${rotor_number}_joint" type="continuous">
+      <xacro:insert_block name="origin" />
+      <xacro:insert_block name="axis" />
+      <!-- TODO(ff): not currently set because it's not yet supported -->
+      <!-- <limit effort="2000" velocity="${max_rot_velocity}" /> -->
+      <parent link="${parent}" />
+      <child link="${robot_namespace}_rotor_${rotor_number}" />
+      <limit effort="10.0" lower="-1e+16" upper="1e+16" velocity="-1.0"/>
+    </joint>
+    <!-- TODO(ff): not currently set because it's not yet supported -->
+    <!-- <gazebo reference="rotor_${motor_number}_joint"> <axis> <xyz>0 0 1</xyz>
+      <limit> <velocity> ${max_rot_velocity} </velocity> </limit> </axis> </gazebo> -->
+    <link name="${robot_namespace}_rotor_${rotor_number}">
+      <inertial>
+        <mass value="${mass_rotor}" /> <!-- [kg] -->
+        <xacro:insert_block name="inertia" />
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/prop_${direction}_assembly_remeshed_v3.stl"
+            scale="${mesh_scale}" />
+        </geometry>
+        <xacro:if value="${direction == 'ccw'}">
+          <origin rpy="0  0  0" xyz="-0.21139 -0.11976 -0.08221"/>
+        </xacro:if>
+        <xacro:if value="${direction == 'cw'}">
+          <origin rpy="0  0  0" xyz="0.00187 -0.2427  -0.08221"/>
+        </xacro:if>
+      </visual>
+    </link>
+    <gazebo>
+      <plugin name="${suffix}_motor_model" filename="libgazebo_motor_model.so">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+        <jointName>${robot_namespace}_rotor_${rotor_number}_joint</jointName>
+        <linkName>${robot_namespace}_rotor_${rotor_number}</linkName>
+        <turningDirection>${direction}</turningDirection>
+        <timeConstantUp>${time_constant_up}</timeConstantUp>
+        <timeConstantDown>${time_constant_down}</timeConstantDown>
+        <maxRotVelocity>${max_rot_velocity}</maxRotVelocity>
+        <motorConstant>${motor_constant}</motorConstant>
+        <momentConstant>${moment_constant}</momentConstant>
+        <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+        <motorNumber>${motor_number}</motorNumber>
+        <rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
+        <rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
+        <motorSpeedPubTopic>/motor_speed/${motor_number}</motorSpeedPubTopic>
+        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
+      </plugin>
+    </gazebo>
+    <gazebo reference="${robot_namespace}_rotor_${rotor_number}">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+  </xacro:macro>
+</robot>

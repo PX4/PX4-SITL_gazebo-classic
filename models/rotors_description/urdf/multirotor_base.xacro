@@ -23,15 +23,15 @@
   <!-- Main multirotor link -->
   <xacro:macro name="multirotor_base_macro"
     params="robot_namespace mass body_width body_height mesh_file mesh_scale color *inertia">
-    <link name="base_link"></link>
+    <link name="${robot_namespace}_base_link"></link>
 
-    <joint name="base_joint" type="fixed">
+    <joint name="${robot_namespace}_base_joint" type="fixed">
       <origin xyz="0 0 0" rpy="0 0 0" />
-      <parent link="base_link" />
-      <child link="base_link_inertia" />
+      <parent link="${robot_namespace}_base_link" />
+      <child link="${robot_namespace}_base_link_inertia" />
     </joint>
 
-    <link name="base_link_inertia">
+    <link name="${robot_namespace}_base_link_inertia">
       <inertial>
         <mass value="${mass}" />  <!-- [kg] -->
         <origin xyz="0 0 0" />
@@ -41,10 +41,13 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rotors_description/meshes/${mesh_file}"
+          <mesh filename="package://$(arg ros_package)rotors_description/meshes/${mesh_file}"
             scale="${mesh_scale}" />
           <!-- <box size="${body_width} ${body_width} ${body_height}"/> --> <!-- [m] [m] [m] -->
         </geometry>
+        <material name="Gazebo/${color}">
+          <color rgba="0. 0. 0. 1"/>
+        </material>
       </visual>
 
       <collision>
@@ -55,15 +58,19 @@
       </collision>
     </link>
 
+    <gazebo reference="${robot_namespace}_base_link_inertia">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+
     <!-- attach multirotor_base_plugin to the base_link -->
     <gazebo>
       <plugin filename="libgazebo_multirotor_base_plugin.so" name="rosbag">
         <robotNamespace>${robot_namespace}</robotNamespace>
-        <linkName>base_link</linkName>
+        <linkName>${robot_namespace}_base_link</linkName>
         <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
       </plugin>
     </gazebo>
-    <gazebo reference="base_link">
+    <gazebo reference="${robot_namespace}_base_link">
       <material>Gazebo/${color}</material>
       <collision name='base_link_inertia_collision'>
         <surface>
@@ -84,19 +91,19 @@
   <!-- Rotor joint and link -->
   <xacro:macro name="vertical_rotor"
     params="robot_namespace suffix direction motor_constant moment_constant parent mass_rotor radius_rotor time_constant_up time_constant_down max_rot_velocity motor_number rotor_drag_coefficient rolling_moment_coefficient color mesh mesh_scale *origin *inertia">
-    <joint name="rotor_${motor_number}_joint" type="continuous">
+    <joint name="${robot_namespace}_rotor_${motor_number}_joint" type="continuous">
       <xacro:insert_block name="origin" />
       <axis xyz="0 0 1" />
       <!-- TODO(ff): not currently set because it's not yet supported -->
       <!-- <limit effort="2000" velocity="${max_rot_velocity}" /> -->
       <parent link="${parent}" />
-      <child link="rotor_${motor_number}" />
+      <child link="${robot_namespace}_rotor_${motor_number}" />
 
     </joint>
     <!-- TODO(ff): not currently set because it's not yet supported -->
     <!-- <gazebo reference="rotor_${motor_number}_joint"> <axis> <xyz>0 0 1</xyz>
       <limit> <velocity> ${max_rot_velocity} </velocity> </limit> </axis> </gazebo> -->
-    <link name="rotor_${motor_number}">
+    <link name="${robot_namespace}_rotor_${motor_number}">
       <inertial>
         <mass value="${mass_rotor}" /> <!-- [kg] -->
         <xacro:insert_block name="inertia" />
@@ -105,7 +112,7 @@
         <geometry>
           <!-- <cylinder length="0.005" radius="${radius_rotor}"/> --> <!-- [m] -->
           <!-- <mesh filename="package://rotors_description/meshes/propeller_${direction}.dae" -->
-          <mesh filename="package://rotors_description/meshes/${mesh}_${direction}.dae"
+          <mesh filename="package://$(arg ros_package)rotors_description/meshes/${mesh}_${direction}.dae"
             scale="${mesh_scale}" />
           <!-- <box size="${2*radius_rotor} 0.01 0.005"/> -->
         </geometry>
@@ -119,8 +126,8 @@
     <gazebo>
       <plugin name="${suffix}_motor_model" filename="libgazebo_motor_model.so">
         <robotNamespace>${robot_namespace}</robotNamespace>
-        <jointName>rotor_${motor_number}_joint</jointName>
-        <linkName>rotor_${motor_number}</linkName>
+        <jointName>${robot_namespace}_rotor_${motor_number}_joint</jointName>
+        <linkName>${robot_namespace}_rotor_${motor_number}</linkName>
         <turningDirection>${direction}</turningDirection>
         <timeConstantUp>${time_constant_up}</timeConstantUp>
         <timeConstantDown>${time_constant_down}</timeConstantDown>
@@ -146,7 +153,7 @@
       -->
       </plugin>
     </gazebo>
-    <gazebo reference="rotor_${motor_number}">
+    <gazebo reference="${robot_namespace}_rotor_${motor_number}">
       <material>Gazebo/${color}</material>
     </gazebo>
   </xacro:macro>

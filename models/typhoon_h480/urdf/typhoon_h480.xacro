@@ -4,24 +4,19 @@
   <!-- Properties -->
   <xacro:property name="namespace" value="$(arg name)" />
   <xacro:property name="rotor_velocity_slowdown_sim" value="10" />
-  <xacro:property name="mesh_file" value="iris.stl" />
-  <xacro:property name="mesh_scale" value="1 1 1"/>
-  <xacro:property name="mesh_scale_prop" value="1 1 1"/>
-  <xacro:property name="mass" value="1.5" /> <!-- [kg] -->
-  <xacro:property name="body_width" value="0.47" /> <!-- [m] -->
-  <xacro:property name="body_height" value="0.11" /> <!-- [m] -->
+  <xacro:property name="mesh_file" value="main_body_remeshed_v3.stl" />
+  <xacro:property name="mesh_scale" value="0.001 0.001 0.001"/>
+  <xacro:property name="mesh_scale_prop" value="0.001 0.001 0.001"/>
+  <xacro:property name="mass" value="2.02" /> <!-- [kg] -->
+  <xacro:property name="body_width" value="0.67" /> <!-- [m] -->
+  <xacro:property name="body_height" value="0.15" /> <!-- [m] -->
   <xacro:property name="mass_rotor" value="0.005" /> <!-- [kg] -->
-  <xacro:property name="arm_length_front_x" value="0.13" /> <!-- [m] -->
-  <xacro:property name="arm_length_back_x" value="0.13" /> <!-- [m] -->
-  <xacro:property name="arm_length_front_y" value="0.22" /> <!-- [m] -->
-  <xacro:property name="arm_length_back_y" value="0.2" /> <!-- [m] -->
-  <xacro:property name="rotor_offset_top" value="0.023" /> <!-- [m] -->
   <xacro:property name="radius_rotor" value="0.128" /> <!-- [m] -->
   <xacro:property name="motor_constant" value="8.54858e-06" /> <!-- [kg.m/s^2] -->
   <xacro:property name="moment_constant" value="0.06" /> <!-- [m] -->
   <xacro:property name="time_constant_up" value="0.0125" /> <!-- [s] -->
   <xacro:property name="time_constant_down" value="0.025" /> <!-- [s] -->
-  <xacro:property name="max_rot_velocity" value="1100" /> <!-- [rad/s] -->
+  <xacro:property name="max_rot_velocity" value="1500" /> <!-- [rad/s] -->
   <xacro:property name="sin30" value="0.5" />
   <xacro:property name="cos30" value="0.866025403784" />
   <xacro:property name="sqrt2" value="1.4142135623730951" />
@@ -31,10 +26,10 @@
 
   <!-- Property Blocks -->
   <xacro:property name="body_inertia">
-    <inertia 
+    <inertia
     ixx="${1/12 * mass * (body_height * body_height + body_width * body_width)}"
     iyy="${1/12 * mass * (body_height * body_height + body_width * body_width)}"
-    izz="${1/12 * mass * (body_width * body_width + body_width * body_width)}"    
+    izz="${1/12 * mass * (body_width * body_width + body_width * body_width)}"
     ixy="0.0" ixz="0.0" iyz="0.0" /> <!-- [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] -->
   </xacro:property>
 
@@ -48,7 +43,7 @@
   </xacro:property>
 
   <!-- Included URDF Files -->
-  <xacro:include filename="$(arg rotors_description_dir)/urdf/multirotor_base.xacro" />
+  <xacro:include filename="$(arg typhoon_dir)/urdf/multirotor_base.xacro" />
 
   <!-- Instantiate multirotor_base_macro once -->
   <xacro:multirotor_base_macro
@@ -66,8 +61,8 @@
   <!-- Instantiate rotors -->
   <xacro:vertical_rotor
     robot_namespace="${namespace}"
-    suffix="front_right"
-    direction="ccw"
+    suffix="back_left"
+    direction="cw"
     motor_constant="${motor_constant}"
     moment_constant="${moment_constant}"
     parent="${namespace}_base_link"
@@ -77,18 +72,19 @@
     time_constant_down="${time_constant_down}"
     max_rot_velocity="${max_rot_velocity}"
     motor_number="0"
+    rotor_number="4"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    mesh="iris_prop"
     mesh_scale="${mesh_scale_prop}"
-    color="Blue">
-    <origin xyz="${arm_length_front_x} -${arm_length_front_y} ${rotor_offset_top}" rpy="0 0 0" />
+    color="DarkGrey">
+    <origin xyz="0.00187 -0.2427   0.34221" rpy="0 0 -3.14159" />
+    <axis xyz="-5.03300000e-02  -1.50000000e-04   9.98730000e-01"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
   <xacro:vertical_rotor
     robot_namespace="${namespace}"
-    suffix="back_left"
+    suffix="front_left"
     direction="ccw"
     motor_constant="${motor_constant}"
     moment_constant="${moment_constant}"
@@ -99,12 +95,13 @@
     time_constant_down="${time_constant_down}"
     max_rot_velocity="${max_rot_velocity}"
     motor_number="1"
+    rotor_number="5"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    mesh="iris_prop"
     mesh_scale="${mesh_scale_prop}"
-    color="DarkGrey">
-    <origin xyz="-${arm_length_back_x} ${arm_length_back_y} ${rotor_offset_top}" rpy="0 0 0" />
+    color="Blue">
+    <origin xyz="0.00187  0.2427   0.34221" rpy="0 0 1.04719" />
+    <axis xyz="-0.033996 -0.0006 0.68216"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -120,18 +117,19 @@
     time_constant_down="${time_constant_down}"
     max_rot_velocity="${max_rot_velocity}"
     motor_number="2"
+    rotor_number="2"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    mesh="iris_prop"
     mesh_scale="${mesh_scale_prop}"
-    color="Blue">
-    <origin xyz="${arm_length_front_x} ${arm_length_front_y} ${rotor_offset_top}" rpy="0 0 0" />
+    color="DarkGrey">
+    <origin xyz="0.20939  0.12276  0.34221" rpy="0 0 -1.04719" />
+    <axis xyz="0.0404 -0.0876 1.8976"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
   <xacro:vertical_rotor robot_namespace="${namespace}"
     suffix="back_right"
-    direction="cw"
+    direction="ccw"
     motor_constant="${motor_constant}"
     moment_constant="${moment_constant}"
     parent="${namespace}_base_link"
@@ -141,12 +139,57 @@
     time_constant_down="${time_constant_down}"
     max_rot_velocity="${max_rot_velocity}"
     motor_number="3"
+    rotor_number="3"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    mesh="iris_prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="Blue">
+    <origin xyz="-0.21139 -0.11976  0.34221" rpy="0 0 -3.14159" />
+    <axis xyz="0.0446 -0.0825 1.8977"/>
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <xacro:vertical_rotor robot_namespace="${namespace}"
+    suffix="front_right"
+    direction="ccw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="${namespace}_base_link"
+    mass_rotor="${mass_rotor}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="4"
+    rotor_number="0"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh_scale="${mesh_scale_prop}"
+    color="Blue">
+    <origin rpy="0 0 -1.04719" xyz="0.20939 -0.12276  0.34221"/>
+    <axis xyz="0.02558 -0.04272  0.99875"/>
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <xacro:vertical_rotor robot_namespace="${namespace}"
+    suffix="back_left"
+    direction="cw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="${namespace}_base_link"
+    mass_rotor="${mass_rotor}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="5"
+    rotor_number="1"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
     mesh_scale="${mesh_scale_prop}"
     color="DarkGrey">
-    <origin xyz="-${arm_length_back_x} -${arm_length_back_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <origin rpy="0 0 1.04719" xyz="-0.21139  0.11976  0.34221"/>
+    <axis xyz="0.0486 0.0811 1.8976"/>
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
