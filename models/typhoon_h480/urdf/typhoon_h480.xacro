@@ -54,6 +54,7 @@
     mesh_file="${mesh_file}"
     mesh_scale="${mesh_scale}"
     color="${color}"
+    camera_udp_port="$(arg camera_udp_port)"
     >
     <xacro:insert_block name="body_inertia" />
   </xacro:multirotor_base_macro>

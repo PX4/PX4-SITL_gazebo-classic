@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Main multirotor link -->
   <xacro:macro name="multirotor_base_macro"
-    params="robot_namespace mass body_width body_height mesh_file mesh_scale color *inertia">
+    params="robot_namespace mass body_width body_height camera_udp_port mesh_file mesh_scale color *inertia">
     <link name="${robot_namespace}_base_link"></link>
 
     <joint name="${robot_namespace}_base_joint" type="fixed">
@@ -82,6 +82,9 @@
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg2_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
         </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
     </link>
     <link name="${robot_namespace}_right_leg">
@@ -107,6 +110,9 @@
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg1_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
         </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
     </link>
 
@@ -149,6 +155,9 @@
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_mount_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
     </link>
     <gazebo reference="${robot_namespace}_cgo3_mount_link">
@@ -177,6 +186,9 @@
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_vertical_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
     </link>
     <gazebo reference="${robot_namespace}_cgo3_vertical_arm_link">
@@ -208,6 +220,9 @@
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_horizontal_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
+        <material name="Gazebo/Grey">
+          <color rgba="0.5 0.5 0.5 1"/>
+        </material>
       </visual>
     </link>
     <gazebo reference="${robot_namespace}_cgo3_horizontal_arm_link">
@@ -245,6 +260,9 @@
         <geometry>
           <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_camera_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
+        <material name="Gazebo/Black">
+          <color rgba="0. 0. 0. 1"/>
+        </material>
       </visual>
     </link>
     <gazebo reference="${robot_namespace}_cgo3_camera_link">
@@ -253,7 +271,7 @@
       </sensor>
       <sensor name="camera" type="camera">
         <pose>0 -0.03 0 0 0 3.14159</pose>
-        <camera>
+        <camera name='__default__'>>
           <horizontal_fov>2.0</horizontal_fov>
           <image>
             <format>R8G8B8</format>
@@ -266,11 +284,11 @@
           </clip>
         </camera>
         <always_on>1</always_on>
-        <update_rate>10</update_rate>
+        <update_rate>30</update_rate>
         <visualize>true</visualize>
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
-            <udpPort>5600</udpPort>
+            <udpPort>$(arg camera_udp_port)</udpPort>
         </plugin>
       </sensor>
     </gazebo>
@@ -385,9 +403,15 @@
         </geometry>
         <xacro:if value="${direction == 'ccw'}">
           <origin rpy="0  0  0" xyz="-0.21139 -0.11976 -0.08221"/>
+          <material name="Gazebo/Blue">
+            <color rgba="0. 0. 1. 1"/>
+          </material>
         </xacro:if>
         <xacro:if value="${direction == 'cw'}">
           <origin rpy="0  0  0" xyz="0.00187 -0.2427  -0.08221"/>
+          <material name="Gazebo/Grey">
+            <color rgba="0. 0. 0. 1"/>
+          </material>
         </xacro:if>
       </visual>
     </link>
