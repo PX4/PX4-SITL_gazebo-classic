@@ -53,6 +53,8 @@
         <joint_name>${namespace}::${namespace}_left_leg_joint</joint_name>
         <joint_name>${namespace}::${namespace}_cgo3_mount_joint</joint_name>
         <joint_name>${namespace}::${namespace}_cgo3_vertical_arm_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_cgo3_horizontal_arm_joint</joint_name>
+        <joint_name>${namespace}::${namespace}_cgo3_camera_joint</joint_name>
         <update_rate>100</update_rate>
       </plugin>
     </gazebo>
