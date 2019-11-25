@@ -36,7 +36,6 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:arg name='camera_udp_port' default='5600' />
   <xacro:macro name="fpv_cam">
     <link name='camera_link'>
       <pose rpy="0  0  0" xyz="0  0  0"/>
@@ -89,7 +88,7 @@
         <update_rate>30</update_rate>
         <visualize>1</visualize>
         <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
-            <robotNamespace></robotNamespace>
+          <robotNamespace></robotNamespace>
           <alwaysOn>true</alwaysOn>
           <imageTopicName>image_raw</imageTopicName>
           <cameraInfoTopicName>camera_info</cameraInfoTopicName>

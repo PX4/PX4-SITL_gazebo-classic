@@ -31,10 +31,10 @@
 
   <!-- Property Blocks -->
   <xacro:property name="body_inertia">
-    <inertia 
+    <inertia
     ixx="${1/12 * mass * (body_height * body_height + body_width * body_width)}"
     iyy="${1/12 * mass * (body_height * body_height + body_width * body_width)}"
-    izz="${1/12 * mass * (body_width * body_width + body_width * body_width)}"    
+    izz="${1/12 * mass * (body_width * body_width + body_width * body_width)}"
     ixy="0.0" ixz="0.0" iyz="0.0" /> <!-- [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] -->
   </xacro:property>
 
@@ -59,6 +59,7 @@
     mesh_file="${mesh_file}"
     mesh_scale="${mesh_scale}"
     color="${color}"
+    camera_udp_port="$(arg camera_udp_port)"
     >
     <xacro:insert_block name="body_inertia" />
   </xacro:multirotor_base_macro>
