@@ -20,7 +20,7 @@
       <visual>
         <origin rpy="0 0 3.14159" xyz="0 0 0.26"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/${mesh_file}"
+          <mesh filename="package://typhoon_h480/meshes/${mesh_file}"
             scale="${mesh_scale}" />
           <!-- <box size="${body_width} ${body_width} ${body_height}"/> --> <!-- [m] [m] [m] -->
         </geometry>
@@ -80,7 +80,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="-0.00025  0.04051  0.048"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg2_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://typhoon_h480/meshes/leg2_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="Gazebo/Grey">
           <color rgba="0.5 0.5 0.5 1"/>
@@ -108,7 +108,7 @@
       <visual>
         <origin rpy="0  0  0" xyz="-0.00025 -0.04051  0.048"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/leg1_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://typhoon_h480/meshes/leg1_remeshed_v3.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="Gazebo/Grey">
           <color rgba="0.5 0.5 0.5 1"/>
@@ -153,7 +153,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_mount_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://typhoon_h480/meshes/cgo3_mount_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="Gazebo/Grey">
           <color rgba="0.5 0.5 0.5 1"/>
@@ -184,7 +184,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0.026 0 0.1"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_vertical_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://typhoon_h480/meshes/cgo3_vertical_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="Gazebo/Grey">
           <color rgba="0.5 0.5 0.5 1"/>
@@ -218,7 +218,7 @@
       <visual>
         <origin rpy="0  0  0" xyz="-0.026  0     0.162"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_horizontal_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://typhoon_h480/meshes/cgo3_horizontal_arm_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="Gazebo/Grey">
           <color rgba="0.5 0.5 0.5 1"/>
@@ -258,7 +258,7 @@
       <visual>
         <origin rpy="0  0  0" xyz="0.041 -0.03   0.162"/>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/cgo3_camera_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://typhoon_h480/meshes/cgo3_camera_remeshed_v1.stl" scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="Gazebo/Black">
           <color rgba="0. 0. 0. 1"/>
@@ -398,7 +398,7 @@
       </inertial>
       <visual>
         <geometry>
-          <mesh filename="package://$(arg ros_package)typhoon_h480/meshes/prop_${direction}_assembly_remeshed_v3.stl"
+          <mesh filename="package://typhoon_h480/meshes/prop_${direction}_assembly_remeshed_v3.stl"
             scale="${mesh_scale}" />
         </geometry>
         <xacro:if value="${direction == 'ccw'}">
