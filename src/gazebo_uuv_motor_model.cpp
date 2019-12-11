@@ -23,7 +23,6 @@
 #include <ignition/math.hh>
 #include <iostream>
 #include <iomanip>
-
 namespace gazebo {
 
 GazeboUUVMotorModel::~GazeboUUVMotorModel() {
@@ -131,7 +130,7 @@ void GazeboUUVMotorModel::VelocityCallback(CommandMotorSpeedPtr &rot_velocities)
   motor_commands_[2] = static_cast<double>(rot_velocities->motor_speed(2));
   motor_commands_[3] = static_cast<double>(rot_velocities->motor_speed(3));
   //Print commands
-  std::cout << std::setprecision(4)<< motor_commands_[0] << ", "<< motor_commands_[1] << ", " << motor_commands_[2] << ", " << motor_commands_[3] << "\n ";
+  //std::cout << std::setprecision(4)<< motor_commands_[0] << ", "<< motor_commands_[1] << ", " << motor_commands_[2] << ", " << motor_commands_[3] << "\n ";
 }
 
 void GazeboUUVMotorModel::UpdateForcesAndMoments() {
@@ -143,7 +142,9 @@ void GazeboUUVMotorModel::UpdateForcesAndMoments() {
         if(std::abs(motor_commands_[i]) < dead_zone_){
             forces[i] = 0.0;
         } else {
-        forces[i] = motor_force_constant_ * motor_commands_[i] * std::abs(motor_commands_[i]);
+            forces[i] = motor_force_constant_ * motor_commands_[i] * std::abs(motor_commands_[i]);
+            //std::cout << "Force:" << i <<" , "<<  forces[i] << "\n ";
+            //std::cout << "Motor Speed:" << i <<" , "<<  motor_commands_[i] << "\n ";
         }
         torques[i] = -turning_directions_[i] * forces[i] * motor_torque_constant_;
         totalTorque = totalTorque + torques[i];

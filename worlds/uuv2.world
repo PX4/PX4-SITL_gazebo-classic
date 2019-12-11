@@ -9,19 +9,48 @@
 
   <world name="default">
     <!-- A global light source -->
-    <!--include>
-      <uri>model://sun</uri>
-    </include-->
+    <light type="directional" name="sun">
+        <cast_shadows>true</cast_shadows>
+        <pose>0 0 2 0 0 0</pose>
+        <diffuse>0.8 0.8 0.8 1</diffuse>
+        <specular>0.2 0.2 0.2 1</specular>
+        <attenuation>
+          <range>1000</range>
+          <constant>0.9</constant>
+          <linear>0.01</linear>
+          <quadratic>0.001</quadratic>
+        </attenuation>
+        <direction>-0.001 0.001 -0.9</direction>
+    </light>
 
     <!--
         Include the model of the Hippocampus from TUHH.
         The pose is chosen that the hippocampus starts at position (0,0,0) with its own coordinate frame equal to the
         NED World frame.
     -->
+     <!--
     <include>
       <uri>model://uuv2</uri>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0.5 0.5 0 0 0 3.1415</pose>
     </include>
+    -->
+
+    <include>
+      <uri>model://uuv2</uri>
+      <pose>2.5 0.5 -1 0 0 1.5707</pose>
+    </include>
+
+    <!--
+    <include>
+      <uri>model://uuv2_april_world</uri>
+      <pose>1 1.335 -1.5 0 0 3.1415</pose>
+    </include>
+    -->
+    <include>
+      <uri>model://uuv2_net_world</uri>
+      <pose>0 0 -1.5 0 0 3.1415</pose>
+    </include>
+
     <!-- Add World Coordinate Frame -->
     <scene>
      <origin_visual>false</origin_visual>
@@ -31,7 +60,7 @@
       <pose>0 0 0 0 0 0</pose>
       <link name="world_frame">
         <visual name='coordinate_x'>
-        <pose frame=''>10 0 0 0 1.570796 0</pose>
+        <pose frame=''>0 10 0 1.570796 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
@@ -46,7 +75,7 @@
         </material>
       </visual>
       <visual name='coordinate_y'>
-        <pose frame=''>0 -10 0 1.570796 0 0</pose>
+        <pose frame=''>10 0 0 0 1.570796 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
@@ -63,7 +92,7 @@
       <visual name='coordinate_z'>
         <pose frame=''>0 0 -10 0 0 0</pose>
         <geometry>
-          <cylinder> 
+          <cylinder>
             <radius>0.0025</radius>
             <length>20</length>
           </cylinder>
