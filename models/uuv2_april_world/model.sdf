@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="april_ground">
+    <static>true</static>
+    <link name="link">
+      <visual name="visual">
+       <geometry>
+            <mesh><uri>model://uuv2_april_world/meshes/ground_plane.dae</uri></mesh>
+       </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
