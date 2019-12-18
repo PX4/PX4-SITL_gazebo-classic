@@ -20,7 +20,7 @@ namespace gazebo
 
   void ResetPlugin::OnMsg(reset_model_msgs::msg &_msg)
   {
-    if (_msg->ResetModel) == 1){
+    if (_msg->ResetModel){
       this->model->Reset();
       this->model->ResetPhysicsStates();
     }
