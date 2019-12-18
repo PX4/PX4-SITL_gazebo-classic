@@ -18,9 +18,9 @@ namespace gazebo
                                       &ResetPlugin::OnMsg, this);
   }
 
-  void ResetPlugin::OnMsg(ConstVector2dPtr &_msg)
+  void ResetPlugin::OnMsg(reset_model_msgs::msg &_msg)
   {
-    if (_msg->x() == 1){
+    if (_msg->ResetModel) == 1){
       this->model->Reset();
       this->model->ResetPhysicsStates();
     }

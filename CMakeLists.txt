@@ -269,6 +269,7 @@ set(mav_msgs
   msgs/CommandMotorSpeed.proto
   msgs/MotorSpeed.proto
   )
+set(reset_model_msgs msgs/ResetModel.proto)
 set(nav_msgs msgs/Odometry.proto)
 set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
@@ -295,12 +296,12 @@ add_library(nav_msgs SHARED ${NAV_PROTO_SRCS})
 add_library(physics_msgs SHARED ${PHY_PROTO_SRCS})
 add_library(std_msgs SHARED ${STD_PROTO_SRCS})
 add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
-
+add_library(reset_model_msgs SHARED ${RES_PROTO_SRCS})
 #---------#
 # Plugins #
 #---------#
 
-link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
+link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs reset_model_msgs)
 link_libraries(physics_msgs)
 
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
