@@ -327,12 +327,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
   model_param(worldName, model_->GetName(), "mavlink_tcp_port", mavlink_tcp_port_);
 
-  local_qgc_addr_.sin_port = htonl(INADDR_ANY);
+  local_qgc_addr_.sin_port = 0;
   if (_sdf->HasElement("qgc_addr")) {
     std::string qgc_addr = _sdf->GetElement("qgc_addr")->Get<std::string>();
     if (qgc_addr != "INADDR_ANY") {
       local_qgc_addr_.sin_port = inet_addr(qgc_addr.c_str());
-      if (local_qgc_addr_.sin_port == INADDR_NONE) {
+      if (local_qgc_addr_.sin_port == 0) {
         gzerr << "Invalid qgc_addr: " << qgc_addr << ", aborting\n";
         abort();
       }
@@ -342,12 +342,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     qgc_udp_port_ = _sdf->GetElement("qgc_udp_port")->Get<int>();
   }
 
-  local_sdk_addr_.sin_port = htonl(INADDR_ANY);
+  local_sdk_addr_.sin_port = 0;
   if (_sdf->HasElement("sdk_addr")) {
     std::string sdk_addr = _sdf->GetElement("sdk_addr")->Get<std::string>();
     if (sdk_addr != "INADDR_ANY") {
       local_sdk_addr_.sin_port = inet_addr(sdk_addr.c_str());
-      if (local_sdk_addr_.sin_port == INADDR_NONE) {
+      if (local_sdk_addr_.sin_port == 0) {
         gzerr << "Invalid sdk_addr: " << sdk_addr << ", aborting\n";
         abort();
       }
