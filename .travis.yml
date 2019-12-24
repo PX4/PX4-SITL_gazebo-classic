@@ -10,6 +10,10 @@ env:
     - KINETIC="source /opt/ros/kinetic/setup.bash; ${CATKIN_BUILD}"
     - MELODIC="source /opt/ros/melodic/setup.bash; ${CATKIN_BUILD}"
 
+branches:
+  only:
+    - master
+
 matrix:
     include:
         - name: CMake build (Gazebo 7)
