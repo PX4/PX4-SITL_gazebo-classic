@@ -341,8 +341,8 @@
         <xyz>0 0 1</xyz>
         <limit>
           <!-- -30/+30 deg. -->
-          <lower>-0.01</lower>
-          <upper>0.01</upper>
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
         </limit>
         <dynamics>
           <damping>1.000</damping>
