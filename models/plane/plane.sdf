@@ -338,7 +338,7 @@
       <child>rudder</child>
       <pose>-0.5 0 0.05 0.00 0 0.0</pose>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>0 0 1</xyz>
         <limit>
           <!-- -30/+30 deg. -->
           <lower>-0.01</lower>
@@ -510,6 +510,15 @@
       <use_tcp>true</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
+        <channel name="rudder">
+          <input_index>2</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>rudder_joint</joint_name>
+        </channel>
         <channel name="rotor4">
           <input_index>4</input_index>
           <input_offset>0</input_offset>
