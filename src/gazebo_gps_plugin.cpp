@@ -77,7 +77,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     lon_home = std::stod(env_lon) * M_PI / 180.0;
   } else if(_sdf->HasElement("homeLongitude")) {
     double longitude;
-    getSdfParam<double>(_sdf, "homeLongitude", lon_home, 8.545594);
+    getSdfParam<double>(_sdf, "homeLongitude", longitude, 8.545594);
     lon_home = longitude * M_PI / 180.0;
   }
   if (env_alt) {
