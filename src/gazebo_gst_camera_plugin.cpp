@@ -132,7 +132,7 @@ void GstCameraPlugin::startGstThread() {
   g_object_set(G_OBJECT(payload), "config-interval", 1, NULL);
 
   // Config udpsink
-  g_object_set(G_OBJECT(sink), "host", this->udpDstIP.c_str(), NULL);
+  g_object_set(G_OBJECT(sink), "host", this->udpHost.c_str(), NULL);
   g_object_set(G_OBJECT(sink), "port", this->udpPort, NULL);
   //g_object_set(G_OBJECT(sink), "sync", false, NULL);
   //g_object_set(G_OBJECT(sink), "async", false, NULL);
@@ -251,9 +251,9 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   else
     gzwarn << "[gazebo_gst_camera_plugin] Please specify a robotNamespace.\n";
 
-  this->udpDstIP = "127.0.0.1";
-  if (sdf->HasElement("udpDstIP")) {
-	this->udpDstIP = sdf->GetElement("udpDstIP")->Get<string>();
+  this->udpHost = "127.0.0.1";
+  if (sdf->HasElement("udpHost")) {
+	this->udpHost = sdf->GetElement("udpHost")->Get<string>();
   }
 	
   this->udpPort = 5600;
