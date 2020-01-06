@@ -420,7 +420,7 @@
              camera image size) -->
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
-            <udpDstIP>5600</udpDstIP>
+            <udpDstIP>127.0.0.1</udpDstIP>
             <udpPort>5600</udpPort>
         </plugin>
         <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
