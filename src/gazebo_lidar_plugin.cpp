@@ -33,15 +33,15 @@ using namespace gazebo;
 using namespace std;
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(LidarPlugin)
 
 /////////////////////////////////////////////////
-RayPlugin::RayPlugin()
+LidarPlugin::LidarPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-RayPlugin::~RayPlugin()
+LidarPlugin::~LidarPlugin()
 {
   newLaserScansConnection_->~Connection();
   newLaserScansConnection_.reset();
@@ -50,18 +50,18 @@ RayPlugin::~RayPlugin()
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
+void LidarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!parentSensor_)
-    gzthrow("RayPlugin requires a Ray Sensor as its parent");
+    gzthrow("LidarPlugin requires a Ray Sensor as its parent");
 
   world_ = physics::get_world(parentSensor_->WorldName());
 
   newLaserScansConnection_ = parentSensor_->LaserShape()->ConnectNewLaserScans(
-      boost::bind(&RayPlugin::OnNewLaserScans, this));
+      boost::bind(&LidarPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -129,7 +129,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::OnNewLaserScans()
+void LidarPlugin::OnNewLaserScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
