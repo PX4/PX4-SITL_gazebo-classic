@@ -204,9 +204,9 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     odom_msg.set_allocated_orientation(orientation);
 
     gazebo::msgs::Vector3d* linear_velocity = new gazebo::msgs::Vector3d();
-    linear_velocity->set_x(velocity_model_world.X() + noise_linvel.X() + _bias.X());
-    linear_velocity->set_y(velocity_model_world.Y() + noise_linvel.Y() + _bias.Y());
-    linear_velocity->set_z(velocity_model_world.Z() + noise_linvel.Z() + _bias.Z());
+    linear_velocity->set_x(velocity_model_world.X() + noise_linvel.X());
+    linear_velocity->set_y(velocity_model_world.Y() + noise_linvel.Y());
+    linear_velocity->set_z(velocity_model_world.Z() + noise_linvel.Z());
     odom_msg.set_allocated_linear_velocity(linear_velocity);
 
     gazebo::msgs::Vector3d* angular_velocity = new gazebo::msgs::Vector3d();

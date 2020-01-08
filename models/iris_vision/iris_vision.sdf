@@ -3,7 +3,7 @@
     <plugin name="vision_plugin" filename="libgazebo_vision_plugin.so">
         <robotNamespace></robotNamespace>
         <pubRate>30</pubRate>
-        <randomWalk>1.0</randomWalk>
+        <randomWalk>0.1</randomWalk>
         <noiseDensity>5e-04</noiseDensity>
         <corellationTime>60.0</corellationTime>
     </plugin>
