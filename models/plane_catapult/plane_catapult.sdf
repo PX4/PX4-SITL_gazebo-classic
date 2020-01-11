@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='plane_catapult'>
+    <include>
+      <uri>model://plane</uri>
+    </include>
+    <!--fixedwing catapult-->
+    <plugin name='catapult_plugin' filename='libgazebo_catapult_plugin.so'>
+      <robotNamespace/>
+      <link_name>plane::base_link</link_name>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>4</motorNumber>
+      <force>50.0</force>
+      <duration>0.5</duration>
+    </plugin>
+  </model>
+</sdf>
