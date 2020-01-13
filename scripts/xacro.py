@@ -32,6 +32,7 @@
 # Author: Stuart Glaser
 # Maintainer: William Woodall <william@osrfoundation.org>
 
+from __future__ import print_function
 import getopt
 import glob
 import os
