@@ -116,13 +116,13 @@ install:
       make install;
       popd;
       popd;
-      brew unlink python@2
+      brew unlink python@2;
       brew install gstreamer gst-plugins-base gst-plugins-good glib python;
       brew tap PX4/px4;
       brew install px4-dev;
       brew install px4-sim;
-      sudo -H pip3 install --upgrade pip setuptools;
-      sudo -H pip3 install rospkg pyserial empy toml numpy pandas jinja2;
+      pip3 install --user --upgrade setuptools;
+      pip3 install --user --upgrade rospkg pyserial empy toml numpy pandas jinja2;
     fi
 
 after_install:
@@ -133,6 +133,15 @@ after_install:
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      echo $PYTHONPATH;
+      which python;
+      python --version;
+      which pip;
+      pip --version;
+      which python3;
+      python3 --version;
+      which pip3;
+      pip3 --version;
       mkdir build;
       (cd build && cmake -DENABLE_UNIT_TESTS=On .. &&
       make -j$(sysctl -n hw.physicalcpu) -l$(sysctl -n hw.physicalcpu) &&
