@@ -86,12 +86,6 @@ matrix:
           env:
             - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-01-13
             - BUILD="source ./scripts/validate_sdf.bash"
-        - name: macOS High Sierra (Xcode 10.1)
-          os: osx
-          osx_image: xcode10.1
-          language: cpp
-          cache:
-            ccache: true
         - name: macOS Mojave (Xcode 11.3)
           os: osx
           osx_image: xcode11.3
