@@ -181,4 +181,57 @@
         <implicitSpringDamper>True</implicitSpringDamper>
     </gazebo>
   </xacro:macro>
+
+  <xacro:macro name="hidden_control_surface"
+    params="robot_namespace link_name parent color area joint_limit control_joint_rad_to_cl a0 cpx cpy cpz upx upy upz *origin *joint_origin *axis">
+    <joint name="${link_name}_joint" type="revolute">
+      <parent link="${parent}" />
+      <child link="${link_name}" />
+      <xacro:insert_block name="joint_origin" />
+      <!-- <axis xyz="0 0 1" /> -->
+      <xacro:insert_block name="axis" />
+      <limit effort="1000" velocity="1000.0" lower="-${joint_limit}" upper="${joint_limit}" />
+      <!-- <dynamics damping="1.0"/> -->
+    </joint>
+    <link name="${link_name}">
+      <inertial>
+        <mass value="0.00001" /> <!-- [kg] -->
+        <inertia
+        ixx="0.000001"
+        iyy="0.000001"
+        izz="0.000001"
+        ixy="0.0" ixz="0.0"  iyz="0.0" /> <!-- [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] -->
+        <xacro:insert_block name="origin" />
+      </inertial>
+    </link>
+    <gazebo>
+         <plugin name="${link_name}_plugin" filename="libLiftDragPlugin.so">
+            <a0>${a0}</a0>
+            <cla>4.752798721</cla>
+            <cda>0.6417112299</cda>
+            <cma>-1.8</cma>
+            <alpha_stall>0.3391428111</alpha_stall>
+            <cla_stall>-3.85</cla_stall>
+            <cda_stall>-0.9233984055</cda_stall>
+            <cma_stall>0</cma_stall>
+            <cp>${cpx} ${cpy} ${cpz}</cp>
+            <area>${area}</area>
+            <air_density>1.2041</air_density>
+            <forward>1 0 0</forward>
+            <upward>${upx} ${upy} ${upz}</upward>
+            <link_name>${parent}</link_name>
+            <control_joint_name>
+               ${link_name}_joint
+            </control_joint_name>
+            <control_joint_rad_to_cl>${control_joint_rad_to_cl}</control_joint_rad_to_cl>
+         </plugin>
+    </gazebo>
+    <gazebo reference="${link_name}">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <gazebo reference="${link_name}_joint">
+        <implicitSpringDamper>True</implicitSpringDamper>
+    </gazebo>
+  </xacro:macro>
+
 </robot>
