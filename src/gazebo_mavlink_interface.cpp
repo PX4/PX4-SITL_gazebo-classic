@@ -452,7 +452,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       }
 
       // The socket reuse is necessary for reconnecting to the same address
-      // if the socket does not close but gets stuck in TIME_WAIT. This can happen 
+      // if the socket does not close but gets stuck in TIME_WAIT. This can happen
       // if the server is suddenly closed, for example, if the robot is deleted in gazebo.
       int socket_reuse = 1;
       result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEADDR, &socket_reuse, sizeof(socket_reuse));
@@ -1083,17 +1083,17 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   // transform the vehicle orientation from the ENU to the NED frame
   // q_nb is the quaternion that represents the orientation of the vehicle
   // the NED earth/local
-  ignition::math::Quaterniond q_nb = q_ng * q_gr * q_ng.Inverse();
+  ignition::math::Quaterniond q_nb = q_ng * q_gr * q_br.Inverse();
 
   // transform linear velocity from local ENU to body FRD frame
-  ignition::math::Vector3d linear_velocity = q_ng.RotateVector(
-    q_br.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d linear_velocity = q_br.Inverse().RotateVector(
+    q_gr.Inverse().RotateVector(ignition::math::Vector3d(
       odom_message->linear_velocity().x(),
       odom_message->linear_velocity().y(),
       odom_message->linear_velocity().z())));
 
   // transform angular velocity from body FLU to body FRD frame
-  ignition::math::Vector3d angular_velocity = q_br.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d angular_velocity = q_br.Inverse().RotateVector(ignition::math::Vector3d(
     odom_message->angular_velocity().x(),
     odom_message->angular_velocity().y(),
     odom_message->angular_velocity().z()));
@@ -1222,7 +1222,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         continue;
       }
 
-      if (!(fds_[i].revents & POLLIN)) { 
+      if (!(fds_[i].revents & POLLIN)) {
         continue;
       }
 
@@ -1239,7 +1239,7 @@ void GazeboMavlinkInterface::pollForMAVLinkMessages()
         }
 
         // client closed the connection orderly, only makes sense on tcp
-        if (use_tcp_ && ret == 0) { 
+        if (use_tcp_ && ret == 0) {
           gzerr << "Connection closed by client." << "\n";
           close_conn_ = true;
           continue;
