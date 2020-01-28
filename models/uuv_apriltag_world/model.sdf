@@ -5,7 +5,7 @@
     <link name="link">
       <visual name="visual">
        <geometry>
-            <mesh><uri>model://uuv2_april_world/meshes/ground_plane.dae</uri></mesh>
+            <mesh><uri>model://uuv_apriltag_world/meshes/ground_plane.dae</uri></mesh>
        </geometry>
       </visual>
     </link>
