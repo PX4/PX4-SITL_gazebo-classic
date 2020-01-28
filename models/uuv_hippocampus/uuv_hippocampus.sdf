@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version='1.6'>
-  <model name='uuv2'>
+  <model name='uuv_hippocampus'>
     <link name='base_link'>
     <!--
       <self_collide>0</self_collide>
@@ -44,7 +44,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://uuv2/meshes/uuv2.stl</uri>
+            <uri>model://uuv_hippocampus/meshes/uuv_hippocampus.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -114,7 +114,7 @@
         East-Down) coordinate frame whereas Gazebo uses a ENU (East-North-Up) coordinate frame.
     -->
 <!-- IMU link -->
-    <link name='uuv2/imu_link'>
+    <link name='uuv_hippocampus/imu_link'>
       <pose frame=''>0 0 0 0 0 0</pose>
       <!--<pose frame=''>0 0 0 3.1415 0 0</pose>-->
       <inertial>
@@ -138,8 +138,8 @@
     </link>
 
 <!-- IMU joint -->
-    <joint name='uuv2/imu_joint' type='revolute'>
-      <child>uuv2/imu_link</child>
+    <joint name='uuv_hippocampus/imu_joint' type='revolute'>
+      <child>uuv_hippocampus/imu_link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>   
@@ -157,7 +157,7 @@
       </axis>
     </joint>
 
-<!-- Camera link 1 -->
+<!-- Camera link 1
      <link name="camera_link1">
         <inertial>
             <mass>0.01</mass>
@@ -210,7 +210,7 @@
                 <imageTopicName>image_raw</imageTopicName>
                 <cameraInfoTopicName>camera_info</cameraInfoTopicName>
                 <frameName>left_camera_optical_frame</frameName>
-                <!--<rightFrameName>right_camera_optical_frame</rightFrameName>-->
+                
                 <hackBaseline>0.07</hackBaseline>
                 <distortionK1>0.0</distortionK1>
                 <distortionK2>0.0</distortionK2>
@@ -225,7 +225,7 @@
         <child>camera_link1</child>
         <parent>base_link</parent>
     </joint>
-
+-->
 
 <!-- CCW 1-->
 <!-- rotor_0 link -->
@@ -265,7 +265,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://uuv2/meshes/uuv2_prop.stl</uri>
+            <uri>model://uuv_hippocampus/meshes/uuv_hippocampus_prop.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -335,7 +335,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://uuv2/meshes/uuv2_prop.stl</uri>
+            <uri>model://uuv_hippocampus/meshes/uuv_hippocampus_prop.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -405,7 +405,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://uuv2/meshes/uuv2_prop.stl</uri>
+            <uri>model://uuv_hippocampus/meshes/uuv_hippocampus_prop.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -475,7 +475,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://uuv2/meshes/uuv2_prop.stl</uri>
+            <uri>model://uuv_hippocampus/meshes/uuv_hippocampus_prop.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -691,7 +691,7 @@
 <static>0</static>
 <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
 <robotNamespace/>
-<linkName>uuv2/imu_link</linkName>
+<linkName>uuv_hippocampus/imu_link</linkName>
 <imuTopic>/imu</imuTopic>
 <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
 <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
