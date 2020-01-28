@@ -24,48 +24,41 @@
 
 #include "gazebo_uuv_plugin.h"
 #include <ignition/math.hh>
+#include <iostream>
+#include <iomanip>
 
 namespace gazebo {
 
 GazeboUUVPlugin::~GazeboUUVPlugin() {
-  update_connection_->~Connection();
+  updateConnection_->~Connection();
 }
 
 // Load necessary data from the .sdf file
 void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+  model_ = _model;
   namespace_.clear();
-  getSdfParam<std::string>(
-    _sdf, "robotNamespace", namespace_, namespace_, true);
 
+  namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  getSdfParam<std::string>(_sdf, "linkName", link_name_, link_name_, true);
+  joint_0_name_ = _sdf->GetElement("joint_0_name")->Get<std::string>();
+  joint_0_ = model_->GetJoint(joint_0_name_);
+  joint_1_name_ = _sdf->GetElement("joint_1_name")->Get<std::string>();
+  joint_1_ = model_->GetJoint(joint_1_name_);
+  joint_2_name_ = _sdf->GetElement("joint_2_name")->Get<std::string>();
+  joint_2_ = model_->GetJoint(joint_2_name_);
+  joint_3_name_ = _sdf->GetElement("joint_3_name")->Get<std::string>();
+  joint_3_ = model_->GetJoint(joint_3_name_);
 
-  // get the base link, thus the base hippocampus model
-  link_ = _model->GetLink(link_name_);
-  // get the child links, these are the links which represents the rotors of the hippocampus
-  rotor_links_ = link_->GetChildJointsLinks();
-  for(int i = 0; i < rotor_links_.size(); i++) {
-    std::cout << "Rotor Link:" << rotor_links_[i]->GetScopedName() << "\n";
-    command_[i] = 0.0;
-  }
+  link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
+  link_ = model_->GetLink(link_name_);
 
-  getSdfParam<std::string>(
-    _sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
-
-  // subscribe to the commands (actuator outputs from the mixer from PX4)
-  command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>(
-    "~/" + _model->GetName() + command_sub_topic_, &GazeboUUVPlugin::CommandCallback, this);
-
-  update_connection_ = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&GazeboUUVPlugin::OnUpdate, this, _1));
+  getSdfParam<std::string>(_sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
 
   // get force and torque parameters for force and torque calculations of the rotors from motor_speed
-  getSdfParam<double>(
-    _sdf, "motorForceConstant", motor_force_constant_, motor_force_constant_);
-  getSdfParam<double>(
-    _sdf, "motorTorqueConstant", motor_torque_constant_, motor_torque_constant_);
+  getSdfParam<double>(_sdf, "motorForceConstant", motor_force_constant_, motor_force_constant_);
+  getSdfParam<double>(_sdf, "motorTorqueConstant", motor_torque_constant_, motor_torque_constant_);
 
   // parameters for added mass and damping
   ignition::math::Vector3d added_mass_linear(0,0,0);
@@ -96,23 +89,42 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   M_q_ = damping_angular[1];
   N_r_ = damping_angular[2];
 
-  // variables for debugging
-  time_ = 0.0;
-  counter_ = 0.0;
+  //Get rotor turning directions
+  std::string direction_rotor_0 = _sdf->GetElement("direction_rotor_0")->Get<std::string>();
+  if (direction_rotor_0 == "cw") direction_[0] = turning_direction::CW;
+  else if (direction_rotor_0 == "ccw") direction_[0] = turning_direction::CCW;
+  else gzerr << "Please only use 'cw' or 'ccw' as turningDirection.\n";
 
+  std::string direction_rotor_1 = _sdf->GetElement("direction_rotor_1")->Get<std::string>();
+  if (direction_rotor_1 == "cw") direction_[1] = turning_direction::CW;
+  else if (direction_rotor_1 == "ccw") direction_[1] = turning_direction::CCW;
+  else gzerr << "Please only use 'cw' or 'ccw' as turningDirection.\n";
+
+  std::string direction_rotor_2 = _sdf->GetElement("direction_rotor_2")->Get<std::string>();
+  if (direction_rotor_2 == "cw") direction_[2] = turning_direction::CW;
+  else if (direction_rotor_2 == "ccw") direction_[2] = turning_direction::CCW;
+  else gzerr << "Please only use 'cw' or 'ccw' as turningDirection.\n";
+
+  std::string direction_rotor_3 = _sdf->GetElement("direction_rotor_3")->Get<std::string>();
+  if (direction_rotor_3 == "cw") direction_[3] = turning_direction::CW;
+  else if (direction_rotor_3 == "ccw") direction_[3] = turning_direction::CCW;
+  else gzerr << "Please only use 'cw' or 'ccw' as turningDirection.\n";
+
+  getSdfParam<double>(_sdf, "rotorVelocitySlowdownSim", rotor_velocity_slowdown_sim_, 10);
+  updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboUUVPlugin::OnUpdate, this, _1));
+  command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboUUVPlugin::VelocityCallback, this);
 }
 
 // function to get the motor speed
-void GazeboUUVPlugin::CommandCallback(CommandMotorSpeedPtr &command) {
+void GazeboUUVPlugin::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
   for (int i = 0; i < 4; i++) {
-    command_[i] = command->motor_speed(i);
+    command_[i] = static_cast<double>(rot_velocities->motor_speed(i));
   }
-  /*std::cout << "UUV Command Callback:"
+  /**std::cout << std::setprecision(4)<<"UUV Command Callback:"
     << command_[0] << ","
     << command_[1] << ","
     << command_[2] << ","
-    << command_[3] << ","
-    << "\n"; */
+    << command_[3] << "\n";*/
 
 }
 
@@ -123,58 +135,51 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
   last_time_ = now;
   time_ = time_ + time_delta_;
 
+  std::cout << std::setprecision(4)<<"UUV Command Callback:"
+      << command_[0] << ","
+      << command_[1] << ","
+      << command_[2] << ","
+      << command_[3] << "\n";
+
+   /**
   //std::cout << "UUV Update at " << now << ", delta " << time_delta_ << "\n";
 
   double forces[4];
   double torques[4];
 
-  // Apply forces and torques at rotor joints
-  for(int i = 0; i < 4; i++) {
+  double real_motor_velocity[4];
 
-    // Currently a rotor index hack to get over IMU link being first, since rotor_links_[0] would be the IMU
-    ignition::math::Vector3d rotor_force(motor_force_constant_ * command_[i] * std::abs(command_[i]), 0, 0);
-    rotor_links_[i+1]->AddRelativeForce(rotor_force);
+  command_[0] = joint_0_->GetVelocity(0);
+  command_[1] = joint_1_->GetVelocity(0);
+  command_[2] = joint_2_->GetVelocity(0);
+  command_[3] = joint_3_->GetVelocity(0);
 
-    forces[i] = rotor_force[0];
-    //std::cout << "Applying force " << rotor_force[2] << " to rotor " << i << "\n";
+  //std::cout << std::showpos << std::fixed << std::setprecision(4) << "Velocities: " << command_[0] << ", " << command_[1] << ", " << command_[2] << ", " << command_[3] << "\n";
 
-    // CCW 1, CW 2, CCW 3 and CW 4. Apply drag torque
-    // directly to main body X axis
-    int propeller_direction = ((i+1)%2==0)?1:-1;            // ternary operator:  (condition) ? (if_true) : (if_false)
-    ignition::math::Vector3d rotor_torque(
-      propeller_direction * motor_torque_constant_ * command_[i] * std::abs(command_[i]), 0, 0);
-    link_->AddRelativeTorque(rotor_torque);
-
-    //std::cout << "Applying torque " << rotor_torque[2] << " to rotor " << i << "\n";
-    torques[i] = rotor_torque[0];
+  for(int i = 0; i < 4; i++){
+      //real_motor_velocity[i] = command_[i] * rotor_velocity_slowdown_sim_;
+      real_motor_velocity[i] = command_[i];
+      //real_motor_velocity[i] = command_[i]*500* rotor_velocity_slowdown_sim_;
   }
+    //std::cout << std::showpos << std::fixed << std::setprecision(4) << "Real Velocities: " << real_motor_velocity[0] << ", " << real_motor_velocity[1] << ", " << real_motor_velocity[2] << ", " << real_motor_velocity[3] << "\n";
 
-  // for debugging
-  /*if (counter_ < time_) {
+    for(int i = 0; i < 4; i++) {
+      // Currently a rotor index hack to get over IMU link being first, since rotor_links_[0] would be the IMU
+      //ignition::math::Vector3d rotor_force(direction_[i] * motor_force_constant_ * real_motor_velocity[i] * std::abs(real_motor_velocity[i]), 0, 0);
+      ignition::math::Vector3d rotor_force(motor_force_constant_ * real_motor_velocity[i] * std::abs(real_motor_velocity[i]), 0, 0);
+      rotor_links_[i+1]->AddRelativeForce(rotor_force);
+      forces[i] = rotor_force[0];
 
-        counter_ = counter_ + 1.0;
+      // CCW 1, CW 2, CCW 3 and CW 4. Apply drag torque
+      // directly to main body X axis
+      //ignition::math::Vector3d rotor_torque(-direction_[i] * motor_torque_constant_ * real_motor_velocity[i] * std::abs(real_motor_velocity[i]), 0, 0);
+      ignition::math::Vector3d rotor_torque(-direction_[i] * motor_torque_constant_ * forces[i], 0, 0);
 
-        std::cout << "UUV Command Callback:"
-        << command_[0] << ","
-        << command_[1] << ","
-        << command_[2] << ","
-        << command_[3] << ","
-        << "\n";
-
-        double thrust = 0;
-        for(int i = 0; i<4; i++) thrust = thrust + forces[i];
-        std::cout << "Thrust:";
-        std::cout << thrust;
-        std::cout << "\n";
-
-        double L = 0.0481;
-        double roll = -torques[0] + torques[1] - torques[2] + torques[3];
-        double pitch = (-forces[0] - forces[1] + forces[2] + forces[3])*L;
-        double yaw = (forces[0] - forces[1] - forces[2] + forces[3])*L;
-        std::cout << "Torques:";
-        std::cout << roll << "," << pitch << "," << yaw;
-        std::cout << "\n";
-  } */
+      link_->AddRelativeTorque(rotor_torque);
+      //rotor_links_[i+1]->AddRelativeTorque(rotor_torque);
+      torques[i] = rotor_torque[0];
+    }
+    //std::cout << std::showpos << std::fixed << std::setprecision(4) << "Force:" << forces[0] << "\n";
 
   // Calculate and apply body Coriolis and Drag forces and torques
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -242,6 +247,7 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
   link_->AddRelativeForce(damping_force + coriolis_force);
   link_->AddRelativeTorque(damping_torque + coriolis_torque);
+ */
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboUUVPlugin)
