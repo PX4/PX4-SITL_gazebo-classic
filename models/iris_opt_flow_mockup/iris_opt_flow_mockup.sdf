@@ -1,0 +1,26 @@
+<sdf version='1.5'>
+  <model name='iris_opt_flow_mockup'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+
+    <plugin name="opticalflow_mockup_plugin" filename="libgazebo_opticalflow_mockup_plugin.so">
+        <robotNamespace></robotNamespace>
+        <pubRate>20</pubRate>
+    </plugin>
+
+    <!--lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 0 0 0</pose>
+    </include>
+
+    <joint name="lidar_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar::link</child>
+    </joint>
+
+  </model>
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->
