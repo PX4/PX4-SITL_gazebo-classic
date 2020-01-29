@@ -129,8 +129,8 @@ void GazeboUUVMotorModel::VelocityCallback(CommandMotorSpeedPtr &rot_velocities)
   motor_commands_[1] = static_cast<double>(rot_velocities->motor_speed(1));
   motor_commands_[2] = static_cast<double>(rot_velocities->motor_speed(2));
   motor_commands_[3] = static_cast<double>(rot_velocities->motor_speed(3));
-  //Print commands
-  //std::cout << std::setprecision(4)<< motor_commands_[0] << ", "<< motor_commands_[1] << ", " << motor_commands_[2] << ", " << motor_commands_[3] << "\n ";
+  // Print commands
+  // std::cout << std::setprecision(4)<< motor_commands_[0] << ", "<< motor_commands_[1] << ", " << motor_commands_[2] << ", " << motor_commands_[3] << "\n ";
 }
 
 void GazeboUUVMotorModel::UpdateForcesAndMoments() {
@@ -143,12 +143,14 @@ void GazeboUUVMotorModel::UpdateForcesAndMoments() {
             forces[i] = 0.0;
         } else {
             forces[i] = motor_force_constant_ * motor_commands_[i] * std::abs(motor_commands_[i]);
-            //std::cout << "Force:" << i <<" , "<<  forces[i] << "\n ";
-            //std::cout << "Motor Speed:" << i <<" , "<<  motor_commands_[i] << "\n ";
+  //          std::cout << "Force:" << i <<" , "<<  forces[i] << ", ";
+  //          std::cout << "Motor Speed:" <<  motor_commands_[i] << "\n";
         }
+        
         torques[i] = -turning_directions_[i] * forces[i] * motor_torque_constant_;
         totalTorque = totalTorque + torques[i];
     }
+    //std::cout << "\n";
     prop0Link_->AddRelativeForce(ignition::math::Vector3d(forces[0], 0, 0));
     prop1Link_->AddRelativeForce(ignition::math::Vector3d(forces[1], 0, 0));
     prop2Link_->AddRelativeForce(ignition::math::Vector3d(forces[2], 0, 0));

@@ -30,27 +30,10 @@
     -->
 
     <include>
-      <uri>model://uuv2</uri>
+      <uri>model://uuv_hippocampus</uri>
       <pose>0.5 0.5 0 0 0 3.1415</pose>
     </include>
-    <!--
-    <include>
-      <uri>model://uuv2</uri>
-      <pose>2.5 0.5 -1 0 0 1.5707</pose>
-    </include>
-    -->
 
-
-    <include>
-      <uri>model://uuv2_april_world</uri>
-      <pose>1 1.335 -1.5 0 0 3.1415</pose>
-    </include>
-    <!--
-    <include>
-      <uri>model://uuv2_net_world</uri>
-      <pose>0 0 -1.5 0 0 3.1415</pose>
-    </include>
-    -->
     <!-- Add World Coordinate Frame -->
     <scene>
      <origin_visual>false</origin_visual>
