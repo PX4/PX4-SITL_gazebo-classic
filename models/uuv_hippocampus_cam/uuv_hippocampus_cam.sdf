@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name='uuv_hippocampus_cam'>
+
+    <include>
+      <uri>model://uuv_hippocampus</uri>
+    </include>
+
+    <link name="camera_link">
+      <inertial>
+        <mass>0.01</mass>
+      </inertial>
+      <gravity>0</gravity>
+      <pose>0.1 0 -0.05 0 1.5708 0</pose>
+      <sensor name="uuv_camera" type="camera">
+        <camera name="head">
+          <horizontal_fov>2.094</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+            <clip>
+            <near>0.02</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+          <distortion>
+            <k1>0.0</k1>
+            <k2>0.0</k2>
+            <p1>0.0</p1>
+            <p2>0.0</p2>
+            <k3>0</k3>
+            </distortion>
+
+          <lens>
+            <type>equidistant</type>
+            <scale_to_hfov>false</scale_to_hfov>
+          </lens>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>1</visualize>
+
+        <plugin name="camera_controller"
+        filename="libgazebo_ros_camera.so">
+          <alwaysOn>1</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>uuv_camera</cameraName>
+          <imageTopicName>image</imageTopicName>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+      </sensor>
+    </link>
+
+    <joint type="fixed" name="camera_joint">
+      <child>camera_link</child>
+      <parent>base_link</parent>
+    </joint>
+
+  </model>
+</sdf>
