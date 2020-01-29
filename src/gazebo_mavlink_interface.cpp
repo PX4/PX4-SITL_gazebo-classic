@@ -839,9 +839,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
     const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
     float rho = 1.225f / density_ratio;
 
-    // Let's use a rough guess of 0.05 hPa as the standard devitiation which roughly yields
+    // Let's use a rough guess of 0.01 hPa as the standard devitiation which roughly yields
     // about +/- 1 m/s noise.
-    const float diff_pressure_stddev = 0.05f;
+    const float diff_pressure_stddev = 0.01f;
     const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev;
 
     // calculate differential pressure in hPa
