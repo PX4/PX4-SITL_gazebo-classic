@@ -30,7 +30,7 @@
     -->
 
     <include>
-      <uri>model://uuv_hippocampus</uri>
+      <uri>model://uuv_hippocampus_cam</uri>
       <pose>0.5 0.5 0 0 0 3.1415</pose>
     </include>
 
