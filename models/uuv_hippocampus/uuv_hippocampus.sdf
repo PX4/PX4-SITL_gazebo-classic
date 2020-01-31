@@ -8,9 +8,9 @@
   <model name='uuv_hippocampus'>
     <link name='base_link'>
 
-      <pose frame=''>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <!--
           These values are a compromise between the dry mass and added mass
           values used to correct for hydrodynamic effects.
@@ -30,7 +30,7 @@
         </inertia>
       </inertial>
       <collision name='base_link_inertia_collision'>
-        <pose frame=''>0 0 0 0 1.570796 0</pose>
+        <pose>0 0 0 0 1.570796 0</pose>
         <geometry>
           <cylinder>
             <radius>0.03</radius>
@@ -50,7 +50,7 @@
         </surface>
       </collision>
       <visual name='base_link_inertia_visual'>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -69,7 +69,7 @@
       <!-- Body Frame Visualization -->
       <!--
       <visual name='coordinate_x'>
-        <pose frame=''>0.15 0 0 0 1.570796 0</pose>
+        <pose>0.15 0 0 0 1.570796 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
@@ -84,7 +84,7 @@
         </material>
       </visual>
       <visual name='coordinate_y'>
-        <pose frame=''>0 -0.075 0 1.570796 0 0</pose>
+        <pose>0 -0.075 0 1.570796 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
@@ -99,7 +99,7 @@
         </material>
       </visual>
       <visual name='coordinate_z'>
-        <pose frame=''>0 0 -0.075 0 0 0</pose>
+        <pose>0 0 -0.075 0 0 0</pose>
         <geometry>
           <cylinder> 
             <radius>0.0025</radius>
@@ -125,10 +125,10 @@
     -->
 <!-- IMU link -->
     <link name='uuv_hippocampus/imu_link'>
-      <pose frame=''>0 0 0 0 0 0</pose>
-      <!--<pose frame=''>0 0 0 3.1415 0 0</pose>-->
+      <pose>0 0 0 0 0 0</pose>
+      <!--<pose>0 0 0 3.1415 0 0</pose>-->
       <inertial>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.015</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -169,9 +169,9 @@
 <!-- CCW 1-->
 <!-- rotor_0 link -->
     <link name='rotor_0'>
-      <pose frame=''>-0.05 0.0481 0.0481 0 0 0</pose>
+      <pose>-0.05 0.0481 0.0481 0 0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -183,7 +183,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_0_collision'>
-        <pose frame=''>0 0 0.02 0 0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -200,7 +200,7 @@
         </surface>
       </collision>
       <visual name='rotor_0_visual'>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -239,9 +239,9 @@
 <!-- CW 2 -->
 <!-- rotor_1 link -->
     <link name='rotor_1'>
-      <pose frame=''>-0.05 -0.0481 0.0481 0 0 0</pose>
+      <pose>-0.05 -0.0481 0.0481 0 0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -253,7 +253,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_1_collision'>
-        <pose frame=''>0 0 0.02 0 0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -270,7 +270,7 @@
         </surface>
       </collision>
       <visual name='rotor_1_visual'>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -309,9 +309,9 @@
 <!-- CCW 3 -->
 <!-- rotor_2 link -->
     <link name='rotor_2'>
-      <pose frame=''>-0.05 -0.0481 -0.0481 0 0 0</pose>
+      <pose>-0.05 -0.0481 -0.0481 0 0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -323,7 +323,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_2_collision'>
-        <pose frame=''>0 0 0.02 0 0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -340,7 +340,7 @@
         </surface>
       </collision>
       <visual name='rotor_2_visual'>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
@@ -379,9 +379,9 @@
 <!-- CW 4 -->
 <!-- rotor_3 link -->
     <link name='rotor_3'>
-      <pose frame=''>-0.05 0.0481 -0.0481 0 0 0</pose>
+      <pose>-0.05 0.0481 -0.0481 0 0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -393,7 +393,7 @@
         </inertia>
       </inertial>
       <collision name='rotor_3_collision'>
-        <pose frame=''>0 0 0.02 0 0 0</pose>
+        <pose>0 0 0.02 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.02</radius>
@@ -410,7 +410,7 @@
         </surface>
       </collision>
       <visual name='rotor_3_visual'>
-        <pose frame=''>0 0 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>

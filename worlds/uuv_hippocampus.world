@@ -43,7 +43,7 @@
       <pose>0 0 0 0 0 0</pose>
       <link name="world_frame">
         <visual name='coordinate_x'>
-        <pose frame=''>0 10 0 1.570796 0 0</pose>
+        <pose>0 10 0 1.570796 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
@@ -58,7 +58,7 @@
         </material>
       </visual>
       <visual name='coordinate_y'>
-        <pose frame=''>10 0 0 0 1.570796 0</pose>
+        <pose>10 0 0 0 1.570796 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
@@ -73,7 +73,7 @@
         </material>
       </visual>
       <visual name='coordinate_z'>
-        <pose frame=''>0 0 -10 0 0 0</pose>
+        <pose>0 0 -10 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>0.0025</radius>
