@@ -1105,7 +1105,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
 
     odom.time_usec = odom_message->time_usec();
 
-    odom.frame_id = MAV_FRAME_LOCAL_FRD;
+    odom.frame_id = MAV_FRAME_LOCAL_NED;
     odom.child_frame_id = MAV_FRAME_BODY_FRD;
 
     odom.x = position.X();
