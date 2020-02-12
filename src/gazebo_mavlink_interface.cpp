@@ -38,7 +38,7 @@ struct SensorHelperStorage {
   GazeboMavlinkInterface* ptr;
 
   /// \brief    Function pointer to the subscriber callback with additional parameters.
-  void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, uint8_t);
+  void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const uint8_t&);
 
   /// \brief    The sensor ID.
   uint8_t sensor_id;
@@ -53,7 +53,7 @@ struct SensorHelperStorage {
 
 template <typename GazeboMsgT>
 void GazeboMavlinkInterface::CreateSensorSubscription(
-    void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, uint8_t),
+    void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const uint8_t&),
     GazeboMavlinkInterface* ptr) {
 
   // Adjust regex according to the function pointer
@@ -1025,7 +1025,7 @@ void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
   // the FCU
 }
 
-void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, uint8_t id) {
+void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, const uint8_t& id) {
   mavlink_distance_sensor_t sensor_msg;
   sensor_msg.time_boot_ms = lidar_message->time_usec() / 1e3;   // [ms]
   sensor_msg.min_distance = lidar_message->min_distance() * 100.0;  // [cm]
@@ -1100,7 +1100,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   send_mavlink_message(&msg);
 }
 
-void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, uint8_t id) {
+void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const uint8_t& id) {
   mavlink_distance_sensor_t sensor_msg = {};
   sensor_msg.time_boot_ms = sonar_message->time_usec() / 1e3;
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
