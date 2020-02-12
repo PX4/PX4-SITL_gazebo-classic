@@ -19,6 +19,7 @@
  * limitations under the License.
  */
 #include <vector>
+#include <regex>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -162,7 +163,7 @@ public:
     groundtruth_lat_rad(0.0),
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
-    lidar_orientation_ {},
+    lidar_orientations_ {},
     sonar_orientation_ {},
     mavlink_udp_port_(kDefaultMavlinkUdpPort),
     mavlink_tcp_port_(kDefaultMavlinkTcpPort),
@@ -248,7 +249,7 @@ private:
   void ImuCallback(ImuPtr& imu_msg);
   void GpsCallback(GpsPtr& gps_msg);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
-  void LidarCallback(LidarPtr& lidar_msg);
+  void LidarCallback(LidarPtr& lidar_msg, uint8_t id);
   void SonarCallback(SonarPtr& sonar_msg);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
@@ -298,7 +299,6 @@ private:
   transport::PublisherPtr joint_control_pub_[n_out_max];
 
   transport::SubscriberPtr imu_sub_;
-  transport::SubscriberPtr lidar_sub_;
   transport::SubscriberPtr sonar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
@@ -307,6 +307,9 @@ private:
   transport::SubscriberPtr vision_sub_;
   transport::SubscriberPtr mag_sub_;
   transport::SubscriberPtr baro_sub_;
+
+  // array of SubscriberPtrs to multiple lidar subscriptions
+  std::vector<transport::SubscriberPtr> lidar_subs_;
 
   std::string imu_sub_topic_;
   std::string lidar_sub_topic_;
@@ -332,8 +335,10 @@ private:
 
   double imu_update_interval_ = 0.004; ///< Used for non-lockstep
 
-  ignition::math::Quaterniond lidar_orientation_;	///< Lidar link orientation with respect to the base_link
-  ignition::math::Quaterniond sonar_orientation_;	///< Sonar link orientation with respect to the base_link
+  std::vector<ignition::math::Quaterniond> lidar_orientations_;	///< Lidars link orientations with respect to the base_link
+  ignition::math::Quaterniond sonar_orientation_;		///< Sonar link orientation with respect to the base_link
+
+  std::vector<uint8_t> lidar_ids_;
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;

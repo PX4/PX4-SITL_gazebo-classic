@@ -30,6 +30,27 @@ GazeboMavlinkInterface::~GazeboMavlinkInterface() {
   updateConnection_->~Connection();
 }
 
+/// \brief      A helper class that provides storage for additional parameters that are inserted into the callback.
+/// \details    GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
+template <typename GazeboMsgT>
+struct SensorHelperStorage {
+  /// \brief    Pointer to the ROS interface plugin class.
+  GazeboMavlinkInterface* ptr;
+
+  /// \brief    Function pointer to the subscriber callback with additional parameters.
+  void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, uint8_t);
+
+  /// \brief    The sensor ID.
+  uint8_t sensor_id;
+
+  /// \brief    This is what gets passed into the Gazebo Subscribe method as a callback,
+  ///           and hence can onlyhave one parameter (note boost::bind() does not work with the
+  ///           current Gazebo Subscribe() definitions).
+  void callback(const boost::shared_ptr<GazeboMsgT const>& msg_ptr) {
+    (ptr->*fp)(msg_ptr, sensor_id);
+  }
+};
+
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
   model_ = _model;
@@ -268,9 +289,65 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   sigIntConnection_ = event::Events::ConnectSigInt(
       boost::bind(&GazeboMavlinkInterface::onSigInt, this));
 
+  // Get model joints in order to check for sensors
+  auto joints = model_->GetJoints();
+  std::vector<std::string> joint_names;
+  for (size_t y = 0; y < joints.size(); y ++) {
+    joint_names.push_back(joints[y]->GetName());
+  }
+
+  const std::regex lidar_model("(lidar|sf10a)(.*_joint)");
+  const std::regex sonar_model("(sonar|mb1240-xl-ez4)(.*_joint)");
+
+  // Verify if the Lidar (or model specific) sensor joint exists
+  for (std::vector<std::string>::iterator it = joint_names.begin(); it != joint_names.end(); ++it) {
+    if (std::regex_match (*it, lidar_model)) {
+        // Get sensor link name
+        const std::string link_name = (*it).substr(0, (*it).size() - 6);
+
+        // Get sensor ID from link name
+        uint8_t lidar_id = 0;
+        try {
+          lidar_id = std::stoi(link_name.substr(link_name.find_last_not_of("0123456789") + 1));
+        } catch(...) {
+          gzwarn << "No identifier on Lidar link. Using 0 as default sensor ID" << std::endl;
+        }
+
+        // Get the lidar link orientation with respect to the base_link
+        const auto lidar_link = model_->GetLink(link_name + "::link");
+        if (lidar_link != NULL) {
+#if GAZEBO_MAJOR_VERSION >= 9
+          lidar_orientations_.push_back(lidar_link->RelativePose().Rot());
+#else
+          lidar_orientations_.push_back(ignitionFromGazeboMath(lidar_link->GetRelativePose()).Rot());
+#endif
+          lidar_ids_.push_back(lidar_id);
+        }
+
+        // One map will be created for each Gazebo message type
+        static std::map<std::string, SensorHelperStorage<sensor_msgs::msgs::Range> > callback_map;
+
+        // Store the callback entries
+        auto callback_entry = callback_map.emplace(
+            "~/" + model_->GetName() + "/link/" + link_name,
+            SensorHelperStorage<sensor_msgs::msgs::Range>{this, &GazeboMavlinkInterface::LidarCallback, lidar_id});
+
+        // Check if element was already present
+        if (!callback_entry.second)
+          gzerr << "Tried to add element to map but the gazebo topic name was already present in map."
+                << std::endl;
+
+        // Create the subscriber for the lidar sensors
+        auto subscriberPtr = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + link_name,
+                                                     &SensorHelperStorage<sensor_msgs::msgs::Range>::callback,
+                                                     &callback_entry.first->second);
+
+        lidar_subs_.push_back(subscriberPtr);
+    }
+  }
+
   // Subscribe to messages of other plugins.
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
-  lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
@@ -551,16 +628,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   }
 
   standard_normal_distribution_ = std::normal_distribution<float>(0.0f, 1.0f);
-
-  // Get the lidar link orientation with respect to the base_link
-  const auto lidar_link = model_->GetLink(lidar_sub_topic_ + "::link");
-  if (lidar_link != NULL) {
-#if GAZEBO_MAJOR_VERSION >= 9
-    lidar_orientation_ = lidar_link->RelativePose().Rot();
-#else
-    lidar_orientation_ = ignitionFromGazeboMath(lidar_link->GetRelativePose()).Rot();
-#endif
-  }
 
   // Get the sonar link orientation with respect to the base_link
   const auto sonar_link = model_->GetLink(sonar_sub_topic_ + "::link");
@@ -950,14 +1017,14 @@ void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
   // the FCU
 }
 
-void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
+void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, uint8_t id) {
   mavlink_distance_sensor_t sensor_msg;
-  sensor_msg.time_boot_ms = lidar_message->time_usec() / 1e3;
-  sensor_msg.min_distance = lidar_message->min_distance() * 100.0;
-  sensor_msg.max_distance = lidar_message->max_distance() * 100.0;
-  sensor_msg.current_distance = lidar_message->current_distance() * 100.0;
+  sensor_msg.time_boot_ms = lidar_message->time_usec() / 1e3;   // [ms]
+  sensor_msg.min_distance = lidar_message->min_distance() * 100.0;  // [cm]
+  sensor_msg.max_distance = lidar_message->max_distance() * 100.0;  // [cm]
+  sensor_msg.current_distance = lidar_message->current_distance() * 100.0;  // [cm]
   sensor_msg.type = 0;
-  sensor_msg.id = 0;
+  sensor_msg.id = id;
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = lidar_message->h_fov();
   sensor_msg.vertical_fov = lidar_message->v_fov();
@@ -968,7 +1035,12 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
     lidar_message->orientation().y(),
     lidar_message->orientation().z());
 
-  ignition::math::Quaterniond q_bs = (lidar_orientation_ * q_ls).Inverse();
+  ignition::math::Quaterniond q_bs;
+  for(std::vector<uint8_t>::size_type i = 0; i != lidar_ids_.size(); i++) {
+    if (lidar_ids_[i] == id) {
+      q_bs = (lidar_orientations_[i] * q_ls).Inverse();
+    }
+  }
 
   sensor_msg.quaternion[0] = q_bs.W();
   sensor_msg.quaternion[1] = q_bs.X();
@@ -980,8 +1052,10 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 
   setMavlinkSensorOrientation(u_Xs, sensor_msg);
 
-  //distance needed for optical flow message
-  optflow_distance = lidar_message->current_distance();  //[m]
+  // distance needed for optical flow message
+  if (sensor_msg.orientation == MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270) {
+    optflow_distance = lidar_message->current_distance();  // [m]
+  }
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
@@ -1041,6 +1115,11 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   sensor_msg.quaternion[1] = q_ls.X();
   sensor_msg.quaternion[2] = q_ls.Y();
   sensor_msg.quaternion[3] = q_ls.Z();
+
+  // distance needed for optical flow message
+  if (sensor_msg.orientation == MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270) {
+    optflow_distance = sonar_message->current_distance();  // [m]
+  }
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
