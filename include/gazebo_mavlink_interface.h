@@ -248,8 +248,8 @@ private:
   void ImuCallback(ImuPtr& imu_msg);
   void GpsCallback(GpsPtr& gps_msg);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
-  void LidarCallback(LidarPtr& lidar_msg, uint8_t id);
-  void SonarCallback(SonarPtr& sonar_msg, uint8_t id);
+  void LidarCallback(LidarPtr& lidar_msg, const uint8_t& id);
+  void SonarCallback(SonarPtr& sonar_msg, const uint8_t& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
@@ -285,7 +285,7 @@ private:
    */
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
-      void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, uint8_t),
+      void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const uint8_t&),
       GazeboMavlinkInterface* ptr);
 
   // Serial interface
