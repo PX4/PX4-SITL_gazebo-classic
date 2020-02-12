@@ -84,6 +84,10 @@ static constexpr auto kDefaultBaudRate = 921600;
 static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
+//! Default distance sensor model joint naming
+static const std::regex kDefaultLidarModelJointNaming("(lidar|sf10a)(.*_joint)");
+static const std::regex kDefaultSonarModelJointNaming("(sonar|mb1240-xl-ez4)(.*_joint)");
+
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
@@ -106,9 +110,7 @@ static const std::string kDefaultNamespace = "";
 static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
 
 static const std::string kDefaultImuTopic = "/imu";
-static const std::string kDefaultLidarTopic = "lidar";
 static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
-static const std::string kDefaultSonarTopic = "sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
@@ -139,8 +141,6 @@ public:
     send_odometry_(false),
     imu_sub_topic_(kDefaultImuTopic),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
-    lidar_sub_topic_(kDefaultLidarTopic),
-    sonar_sub_topic_(kDefaultSonarTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
     gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
@@ -163,8 +163,7 @@ public:
     groundtruth_lat_rad(0.0),
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
-    lidar_orientations_ {},
-    sonar_orientation_ {},
+    sensor_orientations_ {},
     mavlink_udp_port_(kDefaultMavlinkUdpPort),
     mavlink_tcp_port_(kDefaultMavlinkTcpPort),
     simulator_socket_fd_(0),
@@ -250,7 +249,7 @@ private:
   void GpsCallback(GpsPtr& gps_msg);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg, uint8_t id);
-  void SonarCallback(SonarPtr& sonar_msg);
+  void SonarCallback(SonarPtr& sonar_msg, uint8_t id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
@@ -277,6 +276,18 @@ private:
   template <class T>
   void setMavlinkSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg);
 
+  /**
+   * @brief A helper class that allows the creation of multiple subscriptions to sensors.
+   *	    It gets the sensor link/joint and creates the subscriptions based on those.
+   *	    It also allows to set the initial rotation of the sensor, to allow computing
+   *	    the sensor orientation quaternion.
+   * @details GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
+   */
+  template <typename GazeboMsgT>
+  void CreateSensorSubscription(
+      void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, uint8_t),
+      GazeboMavlinkInterface* ptr);
+
   // Serial interface
   void open();
   void close();
@@ -299,7 +310,6 @@ private:
   transport::PublisherPtr joint_control_pub_[n_out_max];
 
   transport::SubscriberPtr imu_sub_;
-  transport::SubscriberPtr sonar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
   transport::SubscriberPtr gps_sub_;
@@ -308,13 +318,10 @@ private:
   transport::SubscriberPtr mag_sub_;
   transport::SubscriberPtr baro_sub_;
 
-  // array of SubscriberPtrs to multiple lidar subscriptions
-  std::vector<transport::SubscriberPtr> lidar_subs_;
+  std::vector<transport::SubscriberPtr> sensor_subs_;	///< array of SubscriberPtrs to multiple sensor subscriptions
 
   std::string imu_sub_topic_;
-  std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
-  std::string sonar_sub_topic_;
   std::string irlock_sub_topic_;
   std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
@@ -335,10 +342,8 @@ private:
 
   double imu_update_interval_ = 0.004; ///< Used for non-lockstep
 
-  std::vector<ignition::math::Quaterniond> lidar_orientations_;	///< Lidars link orientations with respect to the base_link
-  ignition::math::Quaterniond sonar_orientation_;		///< Sonar link orientation with respect to the base_link
-
-  std::vector<uint8_t> lidar_ids_;
+  std::vector<ignition::math::Quaterniond> sensor_orientations_;	///< Sensor link orientations with respect to the base_link
+  std::vector<uint8_t> sensor_ids_;					///< Sensor IDs
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
