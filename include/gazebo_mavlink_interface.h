@@ -85,8 +85,8 @@ static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
 //! Default distance sensor model joint naming
-static const std::regex kDefaultLidarModelJointNaming("(lidar|sf10a)(.*_joint)");
-static const std::regex kDefaultSonarModelJointNaming("(sonar|mb1240-xl-ez4)(.*_joint)");
+static const std::regex kDefaultLidarModelLinkNaming("(lidar|sf10a)(.*::link)");
+static const std::regex kDefaultSonarModelLinkNaming("(sonar|mb1240-xl-ez4)(.*::link)");
 
 namespace gazebo {
 
@@ -101,6 +101,9 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::MagneticField> MagnetometerPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Pressure> BarometerPtr;
+
+typedef std::pair<const int, const ignition::math::Quaterniond> SensorIdRot_P;
+typedef std::map<transport::SubscriberPtr, SensorIdRot_P > Sensor_M;
 
 // Default values
 static const std::string kDefaultNamespace = "";
@@ -146,6 +149,7 @@ public:
     vision_sub_topic_(kDefaultVisionTopic),
     mag_sub_topic_(kDefaultMagTopic),
     baro_sub_topic_(kDefaultBarometerTopic),
+    sensor_map_ {},
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -163,7 +167,6 @@ public:
     groundtruth_lat_rad(0.0),
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
-    sensor_orientations_ {},
     mavlink_udp_port_(kDefaultMavlinkUdpPort),
     mavlink_tcp_port_(kDefaultMavlinkTcpPort),
     simulator_socket_fd_(0),
@@ -248,8 +251,8 @@ private:
   void ImuCallback(ImuPtr& imu_msg);
   void GpsCallback(GpsPtr& gps_msg);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
-  void LidarCallback(LidarPtr& lidar_msg, const uint8_t& id);
-  void SonarCallback(SonarPtr& sonar_msg, const uint8_t& id);
+  void LidarCallback(LidarPtr& lidar_msg, const int& id);
+  void SonarCallback(SonarPtr& sonar_msg, const int& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
@@ -285,8 +288,8 @@ private:
    */
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
-      void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const uint8_t&),
-      GazeboMavlinkInterface* ptr);
+      void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
+      GazeboMavlinkInterface* ptr, const physics::Link_V& links);
 
   // Serial interface
   void open();
@@ -318,7 +321,7 @@ private:
   transport::SubscriberPtr mag_sub_;
   transport::SubscriberPtr baro_sub_;
 
-  std::vector<transport::SubscriberPtr> sensor_subs_;	///< array of SubscriberPtrs to multiple sensor subscriptions
+  Sensor_M sensor_map_; // Map of sensor SubscriberPtr, IDs and orientations
 
   std::string imu_sub_topic_;
   std::string opticalFlow_sub_topic_;
@@ -341,9 +344,6 @@ private:
   double groundtruth_altitude;
 
   double imu_update_interval_ = 0.004; ///< Used for non-lockstep
-
-  std::vector<ignition::math::Quaterniond> sensor_orientations_;	///< Sensor link orientations with respect to the base_link
-  std::vector<uint8_t> sensor_ids_;					///< Sensor IDs
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
