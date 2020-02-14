@@ -96,7 +96,7 @@ matrix:
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew update;
-      git clone https://github.com/google/googletest;
+      git clone -b release-1.10.0 https://github.com/google/googletest;
       git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0;
     fi
 
