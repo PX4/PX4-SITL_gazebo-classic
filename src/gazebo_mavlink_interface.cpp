@@ -318,29 +318,32 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 #endif
     presetManager->CurrentProfile("default_physics");
 
-    // We currently need to have the max_step_size pinned at 4 ms and the
-    // real_time_update_rate set to 250 Hz for lockstep.
-    // Therefore it makes sense to check these params.
+    // We currently need to have the real_time_update_rate at a multiple of 250 Hz for lockstep.
+    // Also, the max_step_size needs to match this (e.g. 0.004 s at 250 Hz or 0.002 s at 500 Hz).
+    // Therefore we check these params and abort if they won't work.
 
     presetManager->GetCurrentProfileParam("real_time_update_rate", param);
     double real_time_update_rate = boost::any_cast<double>(param);
-    const double correct_real_time_update_rate = 250.0;
-    if (real_time_update_rate != correct_real_time_update_rate)
+    const int real_time_update_rate_int = static_cast<int>(real_time_update_rate + 0.5);
+
+    if (real_time_update_rate_int % 250 != 0)
     {
-      gzerr << "real_time_update_rate is set to " << real_time_update_rate
-            << " instead of " << correct_real_time_update_rate << ", aborting.\n";
+      gzerr << "real_time_update_rate is " << real_time_update_rate_int
+            << " but needs to be multiple of 250 Hz, aborting.\n";
       abort();
     }
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
     const double max_step_size = boost::any_cast<double>(param);
-    const double correct_max_step_size = 0.004;
-    if (max_step_size != correct_max_step_size)
+    if (1.0 / real_time_update_rate != max_step_size)
     {
-      gzerr << "max_step_size is set to " << max_step_size
-            << " instead of " << correct_max_step_size << ", aborting.\n";
+      gzerr << "max_step_size of " << max_step_size
+            << " s does not match real_time_update_rate of "
+            << real_time_update_rate << ", aborting.\n";
       abort();
     }
+
+    update_skip_factor_ = real_time_update_rate_int / 250;
 
     // Adapt the real_time_update_rate according to the speed
     // that we ask for in the env variable.
@@ -659,6 +662,11 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   }
 
   previous_imu_seq_ = last_imu_message_.seq();
+
+  // Always run at 250 Hz. At 500 Hz, the skip factor should be 2, at 1000 Hz 4.
+  if (!(previous_imu_seq_ % update_skip_factor_ == 0)) {
+    return;
+  }
 
 #if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
