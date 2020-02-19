@@ -399,6 +399,7 @@ private:
   bool enable_lockstep_ = false;
   double speed_factor_ = 1.0;
   int64_t previous_imu_seq_ = 0;
+  unsigned update_skip_factor_ = 1;
 
   // Serial interface
   mavlink_status_t m_status;
