@@ -264,7 +264,7 @@ private:
   void acceptConnections();
   void pollForMAVLinkMessages();
   void pollFromQgcAndSdk();
-  void SendSensorMessages();
+  void SendSensorMessages(const std::bitset<32> sensor_mask);
   void handle_control(double _dt);
   bool IsRunning();
   void onSigInt();
@@ -338,6 +338,16 @@ private:
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
+
+  ///! Enumeration to use on the bitmask in HIL_SENSOR
+  enum SensorSource
+  {
+    ACCEL	= 0x0007,
+    GYRO	= 0x0038,
+    MAG	= 0x01C0,
+    BARO	= 0x1A00,
+    DIFF_PRESS	= 0x0400
+  };
 
   double groundtruth_lat_rad;
   double groundtruth_lon_rad;
