@@ -682,7 +682,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
     pollForMAVLinkMessages();
   }
 
-  SendSensorMessages();
+  SendSensorMessages(std::bitset<32>(SensorSource::ACCEL | SensorSource::GYRO));
 
   if (close_conn_) { // close connection if required
     close();
@@ -842,7 +842,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
   last_imu_message_cond_.notify_one();
 }
 
-void GazeboMavlinkInterface::SendSensorMessages()
+void GazeboMavlinkInterface::SendSensorMessages(const std::bitset<32> sensor_mask)
 {
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
     last_imu_message_.orientation().w(),
@@ -895,23 +895,22 @@ void GazeboMavlinkInterface::SendSensorMessages()
     }
   }
 
-  if (enable_lockstep_ || should_send_imu) {
-    mavlink_hil_sensor_t sensor_msg;
+  mavlink_hil_sensor_t sensor_msg;
 #if GAZEBO_MAJOR_VERSION >= 9
-    sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+  sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
 #else
-    sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
 #endif
-    sensor_msg.xacc = accel_b.X();
-    sensor_msg.yacc = accel_b.Y();
-    sensor_msg.zacc = accel_b.Z();
-    sensor_msg.xgyro = gyro_b.X();
-    sensor_msg.ygyro = gyro_b.Y();
-    sensor_msg.zgyro = gyro_b.Z();
+  sensor_msg.fields_updated = sensor_mask.to_ulong();
+
+  // send only mag data
+  if (sensor_mask == 448) {
     sensor_msg.xmag = mag_b.X();
     sensor_msg.ymag = mag_b.Y();
     sensor_msg.zmag = mag_b.Z();
 
+  // send only baro and diff pressure data
+  } else if (sensor_mask == 7680) {
     sensor_msg.temperature = temperature_;
     sensor_msg.abs_pressure = abs_pressure_;
     sensor_msg.pressure_alt = pressure_alt_;
@@ -929,18 +928,25 @@ void GazeboMavlinkInterface::SendSensorMessages()
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
     if (vehicle_is_tailsitter_) {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.Z()*vel_b.Z() + diff_pressure_noise;
+      sensor_msg.diff_pressure = 0.005f * rho * vel_b.Z() * vel_b.Z() + diff_pressure_noise;
     } else {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.X()*vel_b.X() + diff_pressure_noise;
+      sensor_msg.diff_pressure = 0.005f * rho * vel_b.X() * vel_b.X() + diff_pressure_noise;
     }
 
-    sensor_msg.fields_updated = 4095;
+  // send only accel and gyro data
+  } else if ((sensor_mask == 63) && (enable_lockstep_ || should_send_imu)) {
+    sensor_msg.xacc = accel_b.X();
+    sensor_msg.yacc = accel_b.Y();
+    sensor_msg.zacc = accel_b.Z();
+    sensor_msg.xgyro = gyro_b.X();
+    sensor_msg.ygyro = gyro_b.Y();
+    sensor_msg.zgyro = gyro_b.Z();
+  }
 
-    if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
-      mavlink_message_t msg;
-      mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-      send_mavlink_message(&msg);
-    }
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+    send_mavlink_message(&msg);
   }
 
   // ground truth
@@ -1288,12 +1294,18 @@ void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
     mag_msg->magnetic_field().x(),
     mag_msg->magnetic_field().y(),
     mag_msg->magnetic_field().z());
+
+  SendSensorMessages(std::bitset<32>(SensorSource::MAG));
 }
 
 void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
   temperature_ = baro_msg->temperature();
   pressure_alt_ = baro_msg->pressure_altitude();
   abs_pressure_ = baro_msg->absolute_pressure();
+
+  // Note: Both baro and diff pressure sources need to be set as there's no specific
+  // diff pressure sensor plugin yet
+  SendSensorMessages(std::bitset<32>(SensorSource::BARO | SensorSource::DIFF_PRESS));
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
