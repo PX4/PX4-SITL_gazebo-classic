@@ -6,7 +6,7 @@
 
     <plugin name="opticalflow_mockup_plugin" filename="libgazebo_opticalflow_mockup_plugin.so">
         <robotNamespace></robotNamespace>
-        <pubRate>20</pubRate>
+        <pubRate>100</pubRate>
     </plugin>
 
     <!--lidar-->
