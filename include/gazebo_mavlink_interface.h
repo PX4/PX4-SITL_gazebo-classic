@@ -265,6 +265,7 @@ private:
   void pollForMAVLinkMessages();
   void pollFromQgcAndSdk();
   void SendSensorMessages(const std::bitset<32> sensor_mask);
+  void SendGroundTruth();
   void handle_control(double _dt);
   bool IsRunning();
   void onSigInt();
@@ -346,7 +347,7 @@ private:
     GYRO	= 0x0038,
     MAG	= 0x01C0,
     BARO	= 0x1A00,
-    DIFF_PRESS	= 0x0400
+    DIFF_PRESS= 0x0400
   };
 
   double groundtruth_lat_rad;
