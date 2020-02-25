@@ -437,7 +437,7 @@
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>10</pubRate>
+      <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>

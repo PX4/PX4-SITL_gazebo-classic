@@ -71,7 +71,7 @@
   <!-- Instantiate barometer plugin. -->
   <xacro:barometer_plugin_macro
     namespace="${namespace}"
-    pub_rate="10"
+    pub_rate="50"
     baro_topic="/baro"
     >
   </xacro:barometer_plugin_macro>
