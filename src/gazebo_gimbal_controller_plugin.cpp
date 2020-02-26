@@ -407,7 +407,7 @@ void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
 						 imu_message->orientation().z()).Euler()[2];
 }
 
-#if GAZEBO_MAJOR_VERSION >7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
+#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
 /// only gazebo 7.4 and above support Any
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
