@@ -682,8 +682,8 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
     pollForMAVLinkMessages();
   }
 
-  // Send Gyro and Accel data at full rate
-  SendSensorMessages(std::bitset<32>(SensorSource::ACCEL | SensorSource::GYRO));
+  // Always send Gyro and Accel data at full rate (= sim update rate)
+  SendSensorMessages();
 
   // Send groudntruth at full rate
   SendGroundTruth();
@@ -846,7 +846,7 @@ void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
   last_imu_message_cond_.notify_one();
 }
 
-void GazeboMavlinkInterface::SendSensorMessages(const std::bitset<32> sensor_mask)
+void GazeboMavlinkInterface::SendSensorMessages()
 {
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
     last_imu_message_.orientation().w(),
@@ -875,10 +875,31 @@ void GazeboMavlinkInterface::SendSensorMessages(const std::bitset<32> sensor_mas
 #else
   sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
 #endif
-  sensor_msg.fields_updated = sensor_mask.to_ulong();
+
+  // send always accel and gyro data (not dependent of the bitmask)
+  // required so to keep the timestamps on sync and the lockstep can
+  // work properly
+  ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
+    last_imu_message_.linear_acceleration().x(),
+    last_imu_message_.linear_acceleration().y(),
+    last_imu_message_.linear_acceleration().z()));
+
+  ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
+    last_imu_message_.angular_velocity().x(),
+    last_imu_message_.angular_velocity().y(),
+    last_imu_message_.angular_velocity().z()));
+
+  sensor_msg.xacc = accel_b.X();
+  sensor_msg.yacc = accel_b.Y();
+  sensor_msg.zacc = accel_b.Z();
+  sensor_msg.xgyro = gyro_b.X();
+  sensor_msg.ygyro = gyro_b.Y();
+  sensor_msg.zgyro = gyro_b.Z();
+
+  sensor_msg.fields_updated = std::bitset<32>(SensorSource::ACCEL | SensorSource::GYRO).to_ulong();
 
   // send only mag data
-  if (sensor_mask == SensorSource::MAG) {
+  if (mag_updated_) {
     ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
     ignition::math::Quaterniond q_nb = q_ng*q_gb;
 
@@ -887,13 +908,23 @@ void GazeboMavlinkInterface::SendSensorMessages(const std::bitset<32> sensor_mas
     sensor_msg.xmag = mag_b.X();
     sensor_msg.ymag = mag_b.Y();
     sensor_msg.zmag = mag_b.Z();
+    sensor_msg.fields_updated = (std::bitset<32>(sensor_msg.fields_updated)| std::bitset<32>(SensorSource::MAG)).to_ulong();
 
-  // send only baro and diff pressure data
-  } else if (sensor_mask == (SensorSource::BARO | SensorSource::DIFF_PRESS)) {
+    mag_updated_ = false;
+  }
+
+  // send only baro data
+  if (baro_updated_) {
     sensor_msg.temperature = temperature_;
     sensor_msg.abs_pressure = abs_pressure_;
     sensor_msg.pressure_alt = pressure_alt_;
+    sensor_msg.fields_updated = (std::bitset<32>(sensor_msg.fields_updated) | std::bitset<32>(SensorSource::BARO)).to_ulong();
 
+    baro_updated_ = false;
+  }
+
+  // send only diff pressure data
+  if (diff_press_updated_) {
     const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
     float temperature_local = sensor_msg.temperature + 273.0f;
     const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
@@ -917,25 +948,9 @@ void GazeboMavlinkInterface::SendSensorMessages(const std::bitset<32> sensor_mas
     } else {
       sensor_msg.diff_pressure = 0.005f * rho * vel_b.X() * vel_b.X() + diff_pressure_noise;
     }
+    sensor_msg.fields_updated = (std::bitset<32>(sensor_msg.fields_updated) | std::bitset<32>(SensorSource::DIFF_PRESS)).to_ulong();
 
-  // send only accel and gyro data
-  } else if ((sensor_mask == (SensorSource::ACCEL | SensorSource::GYRO)) && (enable_lockstep_ || should_send_imu)) {
-    ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
-      last_imu_message_.linear_acceleration().x(),
-      last_imu_message_.linear_acceleration().y(),
-      last_imu_message_.linear_acceleration().z()));
-
-    ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
-      last_imu_message_.angular_velocity().x(),
-      last_imu_message_.angular_velocity().y(),
-      last_imu_message_.angular_velocity().z()));
-
-    sensor_msg.xacc = accel_b.X();
-    sensor_msg.yacc = accel_b.Y();
-    sensor_msg.zacc = accel_b.Z();
-    sensor_msg.xgyro = gyro_b.X();
-    sensor_msg.ygyro = gyro_b.Y();
-    sensor_msg.zgyro = gyro_b.Z();
+    diff_press_updated_ = false;
   }
 
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
@@ -943,7 +958,6 @@ void GazeboMavlinkInterface::SendSensorMessages(const std::bitset<32> sensor_mas
     mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
     send_mavlink_message(&msg);
   }
-
 }
 
 void GazeboMavlinkInterface::SendGroundTruth()
@@ -1312,7 +1326,7 @@ void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
     mag_msg->magnetic_field().y(),
     mag_msg->magnetic_field().z());
 
-  SendSensorMessages(std::bitset<32>(SensorSource::MAG));
+  mag_updated_ = true;
 }
 
 void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
@@ -1320,9 +1334,10 @@ void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
   pressure_alt_ = baro_msg->pressure_altitude();
   abs_pressure_ = baro_msg->absolute_pressure();
 
-  // Note: Both baro and diff pressure sources need to be set as there's no specific
-  // diff pressure sensor plugin yet
-  SendSensorMessages(std::bitset<32>(SensorSource::BARO | SensorSource::DIFF_PRESS));
+  // Note: Both baro and diff pressure sources need to be as updated as there's
+  // no specific diff pressure sensor plugin yet
+  baro_updated_ = true;
+  diff_press_updated_ = true;
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
