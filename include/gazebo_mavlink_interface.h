@@ -164,6 +164,9 @@ public:
     zero_position_disarmed_ {},
     zero_position_armed_ {},
     input_index_ {},
+    mag_updated_(false),
+    baro_updated_(false),
+    diff_press_updated_(false),
     groundtruth_lat_rad(0.0),
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
@@ -264,7 +267,7 @@ private:
   void acceptConnections();
   void pollForMAVLinkMessages();
   void pollFromQgcAndSdk();
-  void SendSensorMessages(const std::bitset<32> sensor_mask);
+  void SendSensorMessages();
   void SendGroundTruth();
   void handle_control(double _dt);
   bool IsRunning();
@@ -349,6 +352,10 @@ private:
     BARO	= 0x1A00,
     DIFF_PRESS= 0x0400
   };
+
+  bool mag_updated_;
+  bool baro_updated_;
+  bool diff_press_updated_;
 
   double groundtruth_lat_rad;
   double groundtruth_lon_rad;
