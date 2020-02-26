@@ -128,6 +128,31 @@ enum class Framing : uint8_t {
 	bad_signature = MAVLINK_FRAMING_BAD_SIGNATURE,
 };
 
+
+//! Enumeration to use on the bitmask in HIL_SENSOR
+enum class SensorSource {
+  ACCEL		= 0b111,
+  GYRO		= 0b111000,
+  MAG		= 0b111000000,
+  BARO		= 0b1101000000000,
+  DIFF_PRESS	= 0b10000000000,
+};
+
+//! OR operation for the enumeration and unsigned types that returns the bitmask
+template<typename A, typename B>
+static inline uint32_t operator |(A lhs, B rhs) {
+  // make it type safe
+  static_assert((std::is_same<A, uint32_t>::value || std::is_same<A, SensorSource>::value),
+		"first argument is not uint32_t or SensorSource enum type");
+  static_assert((std::is_same<B, uint32_t>::value || std::is_same<B, SensorSource>::value),
+		"second argument is not uint32_t or SensorSource enum type");
+
+  return static_cast<uint32_t> (
+    static_cast<std::underlying_type<SensorSource>::type>(lhs) |
+    static_cast<std::underlying_type<SensorSource>::type>(rhs)
+  );
+}
+
 class GazeboMavlinkInterface : public ModelPlugin {
 public:
   GazeboMavlinkInterface() : ModelPlugin(),
@@ -342,16 +367,6 @@ private:
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
-
-  ///! Enumeration to use on the bitmask in HIL_SENSOR
-  enum SensorSource
-  {
-    ACCEL	= 0x0007,
-    GYRO	= 0x0038,
-    MAG	= 0x01C0,
-    BARO	= 0x1A00,
-    DIFF_PRESS= 0x0400
-  };
 
   bool mag_updated_;
   bool baro_updated_;

@@ -896,7 +896,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
   sensor_msg.ygyro = gyro_b.Y();
   sensor_msg.zgyro = gyro_b.Z();
 
-  sensor_msg.fields_updated = std::bitset<32>(SensorSource::ACCEL | SensorSource::GYRO).to_ulong();
+  sensor_msg.fields_updated = SensorSource::ACCEL | SensorSource::GYRO;
 
   // send only mag data
   if (mag_updated_) {
@@ -908,7 +908,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     sensor_msg.xmag = mag_b.X();
     sensor_msg.ymag = mag_b.Y();
     sensor_msg.zmag = mag_b.Z();
-    sensor_msg.fields_updated = (std::bitset<32>(sensor_msg.fields_updated)| std::bitset<32>(SensorSource::MAG)).to_ulong();
+    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::MAG;
 
     mag_updated_ = false;
   }
@@ -918,7 +918,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     sensor_msg.temperature = temperature_;
     sensor_msg.abs_pressure = abs_pressure_;
     sensor_msg.pressure_alt = pressure_alt_;
-    sensor_msg.fields_updated = (std::bitset<32>(sensor_msg.fields_updated) | std::bitset<32>(SensorSource::BARO)).to_ulong();
+    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::BARO;
 
     baro_updated_ = false;
   }
@@ -948,7 +948,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     } else {
       sensor_msg.diff_pressure = 0.005f * rho * vel_b.X() * vel_b.X() + diff_pressure_noise;
     }
-    sensor_msg.fields_updated = (std::bitset<32>(sensor_msg.fields_updated) | std::bitset<32>(SensorSource::DIFF_PRESS)).to_ulong();
+    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::DIFF_PRESS;
 
     diff_press_updated_ = false;
   }
