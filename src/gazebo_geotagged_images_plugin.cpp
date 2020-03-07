@@ -21,6 +21,7 @@
 #include <string>
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
@@ -138,10 +139,22 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 
     _parentSensor->SetActive(true);
 
+    // Get the root model name
+    const string scopedName = _parentSensor->ParentName();
+    vector<string> names_splitted;
+    boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+    names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                                [](const string& name)
+                                { return name.size() == 0; }), end(names_splitted));
+    std::string rootModelName = names_splitted.front(); // The first element is the name of the root model
+
+    // the second to the last name is the model name
+    const std::string parentSensorModelName = names_splitted.rbegin()[1];
+
     _newFrameConnection = _camera->ConnectNewImageFrame(
                               boost::bind(&GeotaggedImagesPlugin::OnNewFrame, this, _1));
 
-    _gpsSub = _node_handle->Subscribe("~/" + _namespace + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
+    _gpsSub = _node_handle->Subscribe("~/" + rootModelName + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
 
     _storageDir = "frames";
     boost::filesystem::remove_all(_storageDir); //clear existing images
