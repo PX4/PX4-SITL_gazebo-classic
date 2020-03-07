@@ -35,30 +35,30 @@ ParachutePlugin::ParachutePlugin() : ModelPlugin()
 
 ParachutePlugin::~ParachutePlugin()
 {
-  _updateConnection->~Connection();
+  update_connection_->~Connection();
 }
 
-void ParachutePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void ParachutePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
 {
-  model_ = _model;
+  model_ = model;
   world_ = model_->GetWorld();
 
   namespace_.clear();
-  if (_sdf->HasElement("robotNamespace")) {
-    namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
+  if (sdf->HasElement("robotNamespace")) {
+    namespace_ = sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
     gzerr << "[gazebo_parachute_plugin] Please specify a robotNamespace.\n";
   }
 
-  if (_sdf->HasElement("motorNumber"))
-    motor_number_ = _sdf->GetElement("motorNumber")->Get<int>();
+  if (sdf->HasElement("motorNumber"))
+    motor_number_ = sdf->GetElement("motorNumber")->Get<int>();
   else
     gzerr << "[gazebo_motor_model] Please specify a motorNumber.\n";
 
-  getSdfParam<std::string>(_sdf, "commandSubTopic", trigger_sub_topic_, trigger_sub_topic_);
+  getSdfParam<std::string>(sdf, "commandSubTopic", trigger_sub_topic_, trigger_sub_topic_);
 
   // Listen to the update event. This event is broadcast every simulation iteration.
-  _updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&ParachutePlugin::OnUpdate, this, _1));
+  update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&ParachutePlugin::OnUpdate, this, _1));
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
@@ -67,18 +67,15 @@ void ParachutePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 }
 
 void ParachutePlugin::OnUpdate(const common::UpdateInfo&){
-  #if GAZEBO_MAJOR_VERSION >= 9
-    physics::ModelPtr parachute_model = world_->ModelByName("parachute_small");
-  #else
-    physics::ModelPtr parachute_model = world_->GetModel("parachute_small");
-  #endif
-    //Trigger parachute if flight termination
-    if(ref_motor_rot_vel_ <= terminate_rot_vel_ ) LoadParachute();
 
-    if(!attached_parachute_ && parachute_model){
-      AttachParachute(parachute_model); //Attach parachute to model
-      attached_parachute_ = true;
-    }
+  physics::ModelPtr parachute_model = GetModelPtr("parachute_small");
+  //Trigger parachute if flight termination
+  if(ref_motor_rot_vel_ <= terminate_rot_vel_ ) LoadParachute();
+
+  if(!attached_parachute_ && parachute_model){
+    AttachParachute(parachute_model); //Attach parachute to model
+    attached_parachute_ = true;
+  }
 }
 
 void ParachutePlugin::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
@@ -90,17 +87,27 @@ void ParachutePlugin::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
 
 void ParachutePlugin::LoadParachute(){
   // Don't create duplicate paracutes
-  #if GAZEBO_MAJOR_VERSION >= 9
-    if(physics::ModelPtr parachute_model = world_->ModelByName("parachute_small")) return;
-  #else
-    if(physics::ModelPtr parachute_model = world_->GetModel("parachute_small")) return;
-  #endif
+  physics::ModelPtr parachute_model = GetModelPtr("parachute_small");
+  if(parachute_model) return;
+
   // Insert parachute model
   world_->InsertModelFile("model://parachute_small");
 
   msgs::Int request;
   request.set_data(0);
   
+}
+
+physics::ModelPtr ParachutePlugin::GetModelPtr(std::string model_name){
+  physics::ModelPtr model;
+
+  #if GAZEBO_MAJOR_VERSION >= 9
+    model = world_->ModelByName(model_name);
+  #else
+    model = world_->GetModel(model_name);
+  #endif
+  return model;
+
 }
 
 void ParachutePlugin::AttachParachute(physics::ModelPtr &parachute_model){
