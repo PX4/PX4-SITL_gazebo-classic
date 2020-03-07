@@ -56,9 +56,9 @@ public:
   ParachutePlugin();
   virtual ~ParachutePlugin();
 
-protected:
-  virtual void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
-  virtual void OnUpdate(const common::UpdateInfo&);
+  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void OnUpdate(const common::UpdateInfo&);
+  physics::ModelPtr GetModelPtr(std::string model_name);
 
 private:
   /// \brief Loads parachute model
@@ -76,7 +76,7 @@ private:
   std::string namespace_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
-  event::ConnectionPtr _updateConnection;
+  event::ConnectionPtr update_connection_;
 
   bool attached_parachute_ = false;  ///< Check if the parachute has already been attached to the model
   double max_rot_velocity_ = 3500;   ///< Clip maximum motor velocity
