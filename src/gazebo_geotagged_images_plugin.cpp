@@ -49,6 +49,7 @@ GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     , _captureCount(0)
     , _captureInterval(0.0)
     , _fd(-1)
+    , _mode(CAMERA_MODE_VIDEO)
     , _captureMode(CAPTURE_DISABLED)
     , _hfov(0.3)
     , _zoom(1.0)
@@ -326,6 +327,9 @@ void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct socka
             case MAV_CMD_REQUEST_VIDEO_STREAM_STATUS:
                 _handle_request_video_stream_status(msg, srcaddr);
                 break;
+            case MAV_CMD_SET_CAMERA_MODE:
+                _handle_set_camera_mode(msg, srcaddr);
+                break;
             case MAV_CMD_SET_CAMERA_ZOOM:
                 //Control the Zoom of the camera
                 _handle_camera_zoom(msg, srcaddr);
@@ -586,7 +590,7 @@ void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_messag
         MAVLINK_COMM_1,
         &msg,
         0,                      // time_boot_ms
-        CAMERA_MODE_IMAGE,      // Camera Mode
+        _mode,                  // Camera Mode
         1.0E2 * (_zoom - 1.0)/ (_maxZoom - 1.0),                    // Zoom level
         NAN);                   // Focus level
     _send_mavlink_message(&msg, srcaddr);
@@ -662,6 +666,20 @@ void GeotaggedImagesPlugin::_handle_request_video_stream_information(const mavli
         uri.c_str()
     );
     _send_mavlink_message(&msg, srcaddr);
+}
+
+void GeotaggedImagesPlugin::_handle_set_camera_mode(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                  MAV_CMD_SET_CAMERA_MODE, MAV_RESULT_ACCEPTED, srcaddr);
+    if (_mode == CAMERA_MODE_VIDEO) {
+        _mode = CAMERA_MODE_IMAGE;
+    } else {
+        _mode = CAMERA_MODE_VIDEO;
+    }
+
 }
 
 void GeotaggedImagesPlugin::_handle_camera_zoom(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
