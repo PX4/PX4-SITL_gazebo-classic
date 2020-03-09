@@ -13,9 +13,6 @@
       <uri>model://ground_plane</uri>
     </include>
     <include>
-      <uri>model://typhoon_h480</uri>
-    </include>
-    <include>
       <uri>model://asphalt_plane</uri>
     </include>
     <physics name='default_physics' default='0' type='ode'>
