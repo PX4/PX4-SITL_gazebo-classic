@@ -79,6 +79,7 @@ sudo pacman -S --noconfirm --needed eigen3 hdf5 opencv protobuf vtk yay python2-
 sudo pacman -S --needed gstreamer gst-plugins-bad gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-ugly
 ```
 
+
 ## Build *sitl_gazebo*
 
 Clone the repository to your computer.
