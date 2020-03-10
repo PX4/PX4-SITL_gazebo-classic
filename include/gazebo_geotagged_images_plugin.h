@@ -62,6 +62,10 @@ private:
     void _handle_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_stop_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_request_camera_settings(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_request_video_stream_information(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_request_video_stream_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_set_camera_mode(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_camera_zoom(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _send_capture_status(struct sockaddr* srcaddr = NULL);
     void _send_cmd_ack(uint8_t target_sysid, uint8_t target_compid, uint16_t cmd, unsigned char result, struct sockaddr* srcaddr);
     void _send_heartbeat();
@@ -70,11 +74,14 @@ private:
 private:
 
     int         _imageCounter;
+    uint8_t     _mode;
     uint32_t    _width;
     uint32_t    _height;
     uint32_t    _depth;
     uint32_t    _destWidth;     ///< output size
     uint32_t    _destHeight;
+    float       _maxZoom;
+    float       _zoom;
     int         _captureCount;
     double      _captureInterval;
     int         _fd;
@@ -96,6 +103,7 @@ private:
     event::ConnectionPtr        _newFrameConnection;
     std::string                 _storageDir;
     ignition::math::Vector3d    _lastGpsPosition;
+    ignition::math::Angle       _hfov;      ///< Horizontal fov
     transport::NodePtr          _node_handle;
     std::string                 _namespace;
     transport::SubscriberPtr    _gpsSub;

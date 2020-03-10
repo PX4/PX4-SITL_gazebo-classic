@@ -16,8 +16,6 @@ include(GNUInstallDirs)
 ## Find Dependencies ##
 #######################
 
-# Add search directory for CMake on OS X
-list(APPEND CMAKE_MODULE_PATH /usr/local/share/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
@@ -34,26 +32,45 @@ find_package(Boost 1.58 REQUIRED COMPONENTS system thread filesystem)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_program(px4 REQUIRED)
-find_package(PythonInterp REQUIRED)
+# Note: If using catkin, Python 2 is found since it points
+# to the Python libs installed with the ROS distro
+if (NOT CATKIN_DEVEL_PREFIX)
+	find_package(PythonInterp 3 REQUIRED)
+else()
+	find_package(PythonInterp REQUIRED)
+endif()
 find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
 if (BUILD_GSTREAMER_PLUGIN)
   set(GStreamer_FIND_VERSION "1.0")
-  find_package(GStreamer)
+  find_package(GStreamer REQUIRED)
   if (GSTREAMER_FOUND)
     if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
       find_package (Qt4)
       include (${QT_USE_FILE})
     else()
-      find_package(Qt5Widgets REQUIRED)
-      find_package(Qt5Core REQUIRED)
+      # In order to find Qt5 in macOS, the Qt5 path needs to be added to the CMake prefix path.
+      if(APPLE)
+        execute_process(COMMAND brew --prefix qt5
+                        ERROR_QUIET
+                        OUTPUT_VARIABLE QT5_PREFIX_PATH
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                       )
+        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}/lib/cmake")
+      endif()
+      find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
     endif()
   endif()
 endif()
 
 pkg_check_modules(OGRE OGRE)
 
-include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS})
+if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+  include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS})
+else()
+  include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS})
+endif()
+
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
@@ -106,7 +123,7 @@ endif()
 if("${GAZEBO_VERSION}" VERSION_LESS "6.0")
   message(FATAL_ERROR "You need at least Gazebo 6.0. Your version: ${GAZEBO_VERSION}")
 else()
-  message("Gazebo version: ${GAZEBO_VERSION}")
+  message(STATUS "Gazebo version: ${GAZEBO_VERSION}")
 endif()
 
 find_package(Eigen3 QUIET)
@@ -127,8 +144,8 @@ endif()
 ## Build ##
 ###########
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations -Wno-address-of-packed-member")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-address-of-packed-member")
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
@@ -171,6 +188,8 @@ link_libraries(
 if (GSTREAMER_FOUND)
   link_libraries(
     ${GSTREAMER_LIBRARIES}
+    glib-2.0
+    gobject-2.0
   )
 endif()
 
@@ -294,6 +313,7 @@ add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_pl
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
+add_library(gazebo_opticalflow_mockup_plugin SHARED src/gazebo_opticalflow_mockup_plugin.cpp)
 add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
@@ -307,12 +327,16 @@ add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plug
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
+add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
+add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
+add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
   gazebo_gps_plugin
   gazebo_irlock_plugin
   gazebo_lidar_plugin
+  gazebo_opticalflow_mockup_plugin
   gazebo_opticalflow_plugin
   gazebo_sonar_plugin
   gazebo_uuv_plugin
@@ -326,6 +350,9 @@ set(plugins
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
+  gazebo_catapult_plugin
+  gazebo_usv_dynamics_plugin
+  gazebo_parachute_plugin
   )
 
 foreach(plugin ${plugins})

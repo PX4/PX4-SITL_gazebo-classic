@@ -21,6 +21,7 @@
 #include <string>
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
@@ -48,7 +49,11 @@ GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     , _captureCount(0)
     , _captureInterval(0.0)
     , _fd(-1)
+    , _mode(CAMERA_MODE_VIDEO)
     , _captureMode(CAPTURE_DISABLED)
+    , _hfov(0.3)
+    , _zoom(1.0)
+    , _maxZoom(8.0)
 {
 }
 
@@ -119,6 +124,9 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     if (sdf->HasElement("height")) {
         _destHeight = sdf->GetElement("height")->Get<int>();
     }
+    if (sdf->HasElement("maximum_zoom")) {
+        _maxZoom = sdf->GetElement("maximum_zoom")->Get<float>();
+    }
 
     //check if exiftool exists
     if (system("exiftool -ver &>/dev/null") != 0) {
@@ -132,10 +140,22 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 
     _parentSensor->SetActive(true);
 
+    // Get the root model name
+    const string scopedName = _parentSensor->ParentName();
+    vector<string> names_splitted;
+    boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+    names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                                [](const string& name)
+                                { return name.size() == 0; }), end(names_splitted));
+    std::string rootModelName = names_splitted.front(); // The first element is the name of the root model
+
+    // the second to the last name is the model name
+    const std::string parentSensorModelName = names_splitted.rbegin()[1];
+
     _newFrameConnection = _camera->ConnectNewImageFrame(
                               boost::bind(&GeotaggedImagesPlugin::OnNewFrame, this, _1));
 
-    _gpsSub = _node_handle->Subscribe("~/" + _namespace + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
+    _gpsSub = _node_handle->Subscribe("~/" + rootModelName + "/gps", &GeotaggedImagesPlugin::OnNewGpsPosition, this);
 
     _storageDir = "frames";
     boost::filesystem::remove_all(_storageDir); //clear existing images
@@ -300,6 +320,19 @@ void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct socka
                 break;
             case MAV_CMD_REQUEST_CAMERA_SETTINGS:
                 _handle_request_camera_settings(msg, srcaddr);
+                break;
+            case MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION:
+                _handle_request_video_stream_information(msg, srcaddr);
+                break;
+            case MAV_CMD_REQUEST_VIDEO_STREAM_STATUS:
+                _handle_request_video_stream_status(msg, srcaddr);
+                break;
+            case MAV_CMD_SET_CAMERA_MODE:
+                _handle_set_camera_mode(msg, srcaddr);
+                break;
+            case MAV_CMD_SET_CAMERA_ZOOM:
+                //Control the Zoom of the camera
+                _handle_camera_zoom(msg, srcaddr);
                 break;
             case MAV_CMD_RESET_CAMERA_SETTINGS:
                 // Just ACK and ignore
@@ -510,7 +543,10 @@ void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, s
     static const char* vendor = "PX4.io";
     static const char* model  = "Gazebo";
     char uri[128] = {};
-    uint32_t camera_capabilities = CAMERA_CAP_FLAGS_CAPTURE_IMAGE;
+    uint32_t camera_capabilities = CAMERA_CAP_FLAGS_CAPTURE_IMAGE | CAMERA_CAP_FLAGS_CAPTURE_VIDEO |
+            CAMERA_CAP_FLAGS_HAS_MODES | CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM |
+            CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM;
+
     mavlink_message_t msg;
     mavlink_msg_camera_information_pack_chan(
         1,
@@ -554,10 +590,107 @@ void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_messag
         MAVLINK_COMM_1,
         &msg,
         0,                      // time_boot_ms
-        CAMERA_MODE_IMAGE,      // Camera Mode
-        NAN,                    // Zoom level
+        _mode,                  // Camera Mode
+        1.0E2 * (_zoom - 1.0)/ (_maxZoom - 1.0),                    // Zoom level
         NAN);                   // Focus level
     _send_mavlink_message(&msg, srcaddr);
+}
+
+void GeotaggedImagesPlugin::_handle_request_video_stream_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    gzdbg << "Send videostream status" << endl;
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    int sid = static_cast<int>(cmd.param1);
+    //-- Should we execute the command
+    if ((int)cmd.param1 != 1)
+    {
+        gzwarn << "Request ignored" << endl;
+        return;
+    }
+    // ACK command received and accepted
+    _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_STATUS, MAV_RESULT_ACCEPTED, srcaddr);
+    mavlink_message_t msg;
+    mavlink_msg_video_stream_status_pack_chan(
+        1,
+        MAV_COMP_ID_CAMERA,                                     // Component ID
+        MAVLINK_COMM_1,
+        &msg,
+        static_cast<uint8_t>(sid),                              // Stream ID
+        VIDEO_STREAM_STATUS_FLAGS_RUNNING,                      // Flags (It's always running)
+        30,                                                     // Frame rate
+        _width,                                                  // Horizontal resolution
+        _height,                                                // Vertical resolution
+        2048,                                                   // Bit rate (made up)
+        0,                                                      // Rotation (none)
+        90                                                      // FOV (made up)
+    );
+    _send_mavlink_message(&msg, srcaddr);
+}
+
+void GeotaggedImagesPlugin::_handle_request_video_stream_information(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    gzdbg << "Send videostream information" << endl;
+    char name[MAVLINK_MSG_VIDEO_STREAM_INFORMATION_FIELD_NAME_LEN] = {};
+    snprintf(name, MAVLINK_MSG_VIDEO_STREAM_INFORMATION_FIELD_NAME_LEN, "Visual Spectrum");
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    //-- Should we execute the command
+    if ((int)cmd.param1 != 1)
+    {
+        gzwarn << "Request ignored" << endl;
+        return;
+    }
+
+    // ACK command received and accepted
+    _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
+    std::string uri = "5600";
+
+    mavlink_message_t msg;
+    mavlink_msg_video_stream_information_pack_chan(
+        1,
+        MAV_COMP_ID_CAMERA,                         // Component ID
+        MAVLINK_COMM_1,
+        &msg,
+        1,                                          // Stream ID
+        1,                                          // Stream count
+        VIDEO_STREAM_TYPE_RTPUDP,                   // Stream type
+        VIDEO_STREAM_STATUS_FLAGS_RUNNING,          // Flags (It's always running)
+        30,                                         // Frame rate
+        _width,                                     // Horizontal resolution
+        _height,                                    // Vertical resolution
+        2048,                                       // Bit rate
+        0,                                          // Rotation (none)
+        90,                                         // FOV (made up)
+        name,
+        uri.c_str()
+    );
+    _send_mavlink_message(&msg, srcaddr);
+}
+
+void GeotaggedImagesPlugin::_handle_set_camera_mode(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                  MAV_CMD_SET_CAMERA_MODE, MAV_RESULT_ACCEPTED, srcaddr);
+    if (_mode == CAMERA_MODE_VIDEO) {
+        _mode = CAMERA_MODE_IMAGE;
+    } else {
+        _mode = CAMERA_MODE_VIDEO;
+    }
+
+}
+
+void GeotaggedImagesPlugin::_handle_camera_zoom(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
+{
+    mavlink_command_long_t cmd;
+    mavlink_msg_command_long_decode(pMsg, &cmd);
+    _send_cmd_ack(pMsg->sysid, pMsg->compid,
+                  MAV_CMD_SET_CAMERA_ZOOM, MAV_RESULT_ACCEPTED, srcaddr);
+
+    _zoom = std::max(std::min(float(_zoom + 0.1 * cmd.param2), _maxZoom), 1.0f);
+    _camera->SetHFOV(_hfov / _zoom);
 }
 
 void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)

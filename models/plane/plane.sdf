@@ -167,6 +167,21 @@
         </inertia>
         <pose>0 0.3 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='left_elevon_visual'>
+        <pose>0.07 0.0 -0.08 0.00 0 0.0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.1 0.1 0.1</scale>
+            <uri>model://plane/meshes/left_aileron.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="right_elevon">
       <inertial>
@@ -181,6 +196,21 @@
         </inertia>
         <pose>0 -0.3 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='right_elevon_visual'>
+        <pose>0.07 0.0 -0.08 0.00 0 0.0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.1 0.1 0.1</scale>
+            <uri>model://plane/meshes/right_aileron.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="elevator">
       <inertial>
@@ -195,6 +225,21 @@
         </inertia>
         <pose> -0.5 0 0 0.00 0 0.0</pose>
       </inertial>
+      <visual name='elevator_visual'>
+        <pose>0.07 0.0 -0.08 0.00 0 0.0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.1 0.1 0.1</scale>
+            <uri>model://plane/meshes/elevators.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <link name="rudder">
       <inertial>
@@ -209,11 +254,26 @@
         </inertia>
         <pose>-0.5 0 0.05 0 0 0 </pose>
       </inertial>
+      <visual name='rudder_visual'>
+        <pose>0.07 0.0 -0.08 0.00 0 0.0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.1 0.1 0.1</scale>
+            <uri>model://plane/meshes/rudder.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
     </link>
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>left_elevon</child>
-      <pose>0 0.3 0 0.00 0 0.0</pose>
+      <pose>-0.07 0.4 0.08 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
@@ -234,7 +294,7 @@
     <joint name='right_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>right_elevon</child>
-      <pose>0 -0.3 0 0.00 0 0.0</pose>
+      <pose>-0.07 -0.4 0.08 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
@@ -418,7 +478,7 @@
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>20</pubRate>
+      <pubRate>100</pubRate>
       <noiseDensity>0.0004</noiseDensity>
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
@@ -426,7 +486,7 @@
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>10</pubRate>
+      <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>

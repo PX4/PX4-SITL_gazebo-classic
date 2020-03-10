@@ -1,0 +1,8 @@
+<sdf version='1.6'>
+  <model name='iris_rtps'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+  </model>
+  <!-- This model will include in the future a RTPS/DDS interface plugin -->
+</sdf>

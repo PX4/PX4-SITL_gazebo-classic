@@ -1009,7 +1009,7 @@
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>20</pubRate>
+      <pubRate>100</pubRate>
       <noiseDensity>0.0004</noiseDensity>
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
@@ -1017,7 +1017,7 @@
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>10</pubRate>
+      <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
@@ -1086,7 +1086,7 @@
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_0_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>80</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
@@ -1104,7 +1104,7 @@
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_1_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>80</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
@@ -1122,7 +1122,7 @@
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_2_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>80</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
@@ -1140,7 +1140,7 @@
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_3_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>80</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>

@@ -21,5 +21,80 @@
       </axis>
     </joint>
 
-</model>
+    <!--downward-facing lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 0 0 0</pose>
+      <name>lidar0</name>
+    </include>
+
+    <joint name="lidar0_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar0::link</child>
+    </joint>
+
+    <!--forward-facing lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 0 -1.57079633 0</pose>
+      <name>lidar1</name>
+    </include>
+
+    <joint name="lidar1_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar1::link</child>
+    </joint>
+
+    <!--right-facing lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 -1.57079633 0 0</pose>
+      <name>lidar2</name>
+    </include>
+
+    <joint name="lidar2_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar2::link</child>
+    </joint>
+
+    <!--left-facing lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 1.57079633 0 0</pose>
+      <name>lidar3</name>
+    </include>
+
+    <joint name="lidar3_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar3::link</child>
+    </joint>
+
+    <!-- NOTE: PX4 uORB is currently limited to a max of 4 instances per topic
+         which doesn't allow to add more sensor data stream -->
+
+    <!--backward-facing lidar-->
+    <!-- <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 0 1.57079633 0</pose>
+      <name>lidar4</name>
+    </include>
+
+    <joint name="lidar4_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar4::link</child>
+    </joint> -->
+
+    <!--upward-facing lidar-->
+    <!-- <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.05 3.14159265 0 0</pose>
+      <name>lidar5</name>
+    </include>
+
+    <joint name="lidar5_joint" type="fixed">
+      <parent>iris::base_link</parent>
+      <child>lidar5::link</child>
+    </joint> -->
+
+  </model>
 </sdf>

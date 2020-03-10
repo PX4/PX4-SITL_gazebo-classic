@@ -390,8 +390,8 @@ void GimbalControllerPlugin::Init()
 
   // publish yaw status via gz transport
   yawTopic = std::string("~/") +  this->model->GetName()
-    + "/gimbal_yaw_status";	
-  // Although gazebo above 7.4 support Any, still use GzString instead	
+    + "/gimbal_yaw_status";
+  // Although gazebo above 7.4 support Any, still use GzString instead
   this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
 
   imuSub = node->Subscribe("~/" + model->GetName() + "/imu", &GimbalControllerPlugin::ImuCallback, this);
@@ -407,7 +407,7 @@ void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
 						 imu_message->orientation().z()).Euler()[2];
 }
 
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
 /// only gazebo 7.4 and above support Any
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
@@ -642,8 +642,8 @@ void GimbalControllerPlugin::OnUpdate()
 
     ss << this->yawJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
-    this->yawPub->Publish(m);	  
-#endif	  
+    this->yawPub->Publish(m);
+#endif
   }
 }
 

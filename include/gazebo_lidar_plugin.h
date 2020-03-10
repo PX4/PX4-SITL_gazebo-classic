@@ -15,12 +15,12 @@
  *
 */
 /*
- * Desc: Ray Plugin
+ * Desc: Lidar Plugin
  * Author: Nate Koenig mod by John Hsu
  */
 
-#ifndef _GAZEBO_RAY_PLUGIN_HH_
-#define _GAZEBO_RAY_PLUGIN_HH_
+#ifndef _GAZEBO_LIDAR_PLUGIN_HH_
+#define _GAZEBO_LIDAR_PLUGIN_HH_
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/common/common.hh>
@@ -46,13 +46,13 @@ namespace gazebo
   static constexpr double kDefaultFOV = 0.0523598776;   // standard 3 degrees
 
   /// \brief A Ray Sensor Plugin
-  class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE LidarPlugin : public SensorPlugin
   {
     /// \brief Constructor
-    public: RayPlugin();
+    public: LidarPlugin();
 
     /// \brief Destructor
-    public: virtual ~RayPlugin();
+    public: virtual ~LidarPlugin();
 
     /// \brief Update callback
     public: virtual void OnNewLaserScans();
@@ -76,7 +76,7 @@ namespace gazebo
 
       gazebo::msgs::Quaternion orientation_;
 
-    /// \brief The connection tied to RayPlugin::OnNewLaserScans()
+    /// \brief The connection tied to LidarPlugin::OnNewLaserScans()
     private:
       event::ConnectionPtr newLaserScansConnection_;
       sensor_msgs::msgs::Range lidar_message_;

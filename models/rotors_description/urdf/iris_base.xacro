@@ -60,7 +60,7 @@
   <!-- Instantiate magnetometer plugin. -->
   <xacro:magnetometer_plugin_macro
     namespace="${namespace}"
-    pub_rate="20"
+    pub_rate="100"
     noise_density="0.0004"
     random_walk="0.0000064"
     bias_correlation_time="600"
@@ -71,7 +71,7 @@
   <!-- Instantiate barometer plugin. -->
   <xacro:barometer_plugin_macro
     namespace="${namespace}"
-    pub_rate="10"
+    pub_rate="50"
     baro_topic="/baro"
     >
   </xacro:barometer_plugin_macro>
@@ -112,11 +112,11 @@
     parent_link="base_link"
     imu_topic="/imu"
     mass_imu_sensor="0.015"
-    gyroscope_noise_density="0.0003394"
+    gyroscope_noise_density="0.00018665"
     gyroscopoe_random_walk="0.000038785"
     gyroscope_bias_correlation_time="1000.0"
     gyroscope_turn_on_bias_sigma="0.0087"
-    accelerometer_noise_density="0.004"
+    accelerometer_noise_density="0.00186"
     accelerometer_random_walk="0.006"
     accelerometer_bias_correlation_time="300.0"
     accelerometer_turn_on_bias_sigma="0.1960"

@@ -19,6 +19,7 @@
  * limitations under the License.
  */
 #include <vector>
+#include <regex>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -83,6 +84,10 @@ static constexpr auto kDefaultBaudRate = 921600;
 static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
+//! Default distance sensor model joint naming
+static const std::regex kDefaultLidarModelLinkNaming("(lidar|sf10a)(.*::link)");
+static const std::regex kDefaultSonarModelLinkNaming("(sonar|mb1240-xl-ez4)(.*::link)");
+
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
@@ -97,6 +102,9 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::MagneticField> MagnetometerPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Pressure> BarometerPtr;
 
+typedef std::pair<const int, const ignition::math::Quaterniond> SensorIdRot_P;
+typedef std::map<transport::SubscriberPtr, SensorIdRot_P > Sensor_M;
+
 // Default values
 static const std::string kDefaultNamespace = "";
 
@@ -105,9 +113,7 @@ static const std::string kDefaultNamespace = "";
 static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
 
 static const std::string kDefaultImuTopic = "/imu";
-static const std::string kDefaultLidarTopic = "/link/lidar";
 static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
-static const std::string kDefaultSonarTopic = "/link/sonar";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
@@ -121,6 +127,31 @@ enum class Framing : uint8_t {
 	bad_crc = MAVLINK_FRAMING_BAD_CRC,
 	bad_signature = MAVLINK_FRAMING_BAD_SIGNATURE,
 };
+
+
+//! Enumeration to use on the bitmask in HIL_SENSOR
+enum class SensorSource {
+  ACCEL		= 0b111,
+  GYRO		= 0b111000,
+  MAG		= 0b111000000,
+  BARO		= 0b1101000000000,
+  DIFF_PRESS	= 0b10000000000,
+};
+
+//! OR operation for the enumeration and unsigned types that returns the bitmask
+template<typename A, typename B>
+static inline uint32_t operator |(A lhs, B rhs) {
+  // make it type safe
+  static_assert((std::is_same<A, uint32_t>::value || std::is_same<A, SensorSource>::value),
+		"first argument is not uint32_t or SensorSource enum type");
+  static_assert((std::is_same<B, uint32_t>::value || std::is_same<B, SensorSource>::value),
+		"second argument is not uint32_t or SensorSource enum type");
+
+  return static_cast<uint32_t> (
+    static_cast<std::underlying_type<SensorSource>::type>(lhs) |
+    static_cast<std::underlying_type<SensorSource>::type>(rhs)
+  );
+}
 
 class GazeboMavlinkInterface : public ModelPlugin {
 public:
@@ -138,13 +169,12 @@ public:
     send_odometry_(false),
     imu_sub_topic_(kDefaultImuTopic),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
-    lidar_sub_topic_(kDefaultLidarTopic),
-    sonar_sub_topic_(kDefaultSonarTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
     gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
     mag_sub_topic_(kDefaultMagTopic),
     baro_sub_topic_(kDefaultBarometerTopic),
+    sensor_map_ {},
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -159,6 +189,9 @@ public:
     zero_position_disarmed_ {},
     zero_position_armed_ {},
     input_index_ {},
+    mag_updated_(false),
+    baro_updated_(false),
+    diff_press_updated_(false),
     groundtruth_lat_rad(0.0),
     groundtruth_lon_rad(0.0),
     groundtruth_altitude(0.0),
@@ -246,8 +279,8 @@ private:
   void ImuCallback(ImuPtr& imu_msg);
   void GpsCallback(GpsPtr& gps_msg);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
-  void LidarCallback(LidarPtr& lidar_msg);
-  void SonarCallback(SonarPtr& sonar_msg);
+  void LidarCallback(LidarPtr& lidar_msg, const int& id);
+  void SonarCallback(SonarPtr& sonar_msg, const int& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
@@ -256,9 +289,11 @@ private:
   void send_mavlink_message(const mavlink_message_t *message);
   void forward_mavlink_message(const mavlink_message_t *message);
   void handle_message(mavlink_message_t *msg, bool &received_actuator);
+  void acceptConnections();
   void pollForMAVLinkMessages();
   void pollFromQgcAndSdk();
   void SendSensorMessages();
+  void SendGroundTruth();
   void handle_control(double _dt);
   bool IsRunning();
   void onSigInt();
@@ -272,6 +307,18 @@ private:
    */
   template <class T>
   void setMavlinkSensorOrientation(const ignition::math::Vector3d& u_Xs, T& sensor_msg);
+
+  /**
+   * @brief A helper class that allows the creation of multiple subscriptions to sensors.
+   *	    It gets the sensor link/joint and creates the subscriptions based on those.
+   *	    It also allows to set the initial rotation of the sensor, to allow computing
+   *	    the sensor orientation quaternion.
+   * @details GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
+   */
+  template <typename GazeboMsgT>
+  void CreateSensorSubscription(
+      void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
+      GazeboMavlinkInterface* ptr, const physics::Link_V& links);
 
   // Serial interface
   void open();
@@ -295,8 +342,6 @@ private:
   transport::PublisherPtr joint_control_pub_[n_out_max];
 
   transport::SubscriberPtr imu_sub_;
-  transport::SubscriberPtr lidar_sub_;
-  transport::SubscriberPtr sonar_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
   transport::SubscriberPtr gps_sub_;
@@ -305,10 +350,10 @@ private:
   transport::SubscriberPtr mag_sub_;
   transport::SubscriberPtr baro_sub_;
 
+  Sensor_M sensor_map_; // Map of sensor SubscriberPtr, IDs and orientations
+
   std::string imu_sub_topic_;
-  std::string lidar_sub_topic_;
   std::string opticalFlow_sub_topic_;
-  std::string sonar_sub_topic_;
   std::string irlock_sub_topic_;
   std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
@@ -322,6 +367,10 @@ private:
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
+
+  bool mag_updated_;
+  bool baro_updated_;
+  bool diff_press_updated_;
 
   double groundtruth_lat_rad;
   double groundtruth_lon_rad;
@@ -358,7 +407,14 @@ private:
   socklen_t local_sdk_addr_len_;
 
   unsigned char _buf[65535];
+  enum FD_TYPES {
+    LISTEN_FD,
+    CONNECTION_FD,
+    N_FDS
+  };
+  struct pollfd fds_[N_FDS];
   bool use_tcp_ = false;
+  bool close_conn_ = false;
 
   double optflow_distance;
   double sonar_distance;
@@ -376,6 +432,7 @@ private:
   bool enable_lockstep_ = false;
   double speed_factor_ = 1.0;
   int64_t previous_imu_seq_ = 0;
+  unsigned update_skip_factor_ = 1;
 
   // Serial interface
   mavlink_status_t m_status;

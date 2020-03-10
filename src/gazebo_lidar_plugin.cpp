@@ -33,35 +33,35 @@ using namespace gazebo;
 using namespace std;
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(LidarPlugin)
 
 /////////////////////////////////////////////////
-RayPlugin::RayPlugin()
+LidarPlugin::LidarPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-RayPlugin::~RayPlugin()
+LidarPlugin::~LidarPlugin()
 {
   newLaserScansConnection_->~Connection();
   newLaserScansConnection_.reset();
   parentSensor_.reset();
-  world_.reset();
+  world_->Reset();
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
+void LidarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!parentSensor_)
-    gzthrow("RayPlugin requires a Ray Sensor as its parent");
+    gzthrow("LidarPlugin requires a Ray Sensor as its parent");
 
   world_ = physics::get_world(parentSensor_->WorldName());
 
   newLaserScansConnection_ = parentSensor_->LaserShape()->ConnectNewLaserScans(
-      boost::bind(&RayPlugin::OnNewLaserScans, this));
+      boost::bind(&LidarPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -102,13 +102,6 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
                             { return name.size() == 0; }), end(names_splitted));
   std::string rootModelName = names_splitted.front(); // The first element is the name of the root model
 
-  // Get the pointer to the root model
-#if GAZEBO_MAJOR_VERSION >= 9
-  const physics::ModelPtr rootModel = world_->ModelByName(rootModelName);
-#else
-  const physics::ModelPtr rootModel = world_->GetModel(rootModelName);
-#endif
-
   // the second to the last name is the model name
   const std::string parentSensorModelName = names_splitted.rbegin()[1];
 
@@ -122,21 +115,21 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
       " using lidar topic \"" << parentSensorModelName << "\"\n";
   }
 
-  // Get the sensor orientation
-  const ignition::math::Quaterniond q_bs = getSensorOrientation(rootModel, parentSensorModelName, parentSensor_);
+  // Calculate parent sensor rotation WRT `base_link`
+  const ignition::math::Quaterniond q_ls = parentSensor_->Pose().Rot();
 
-  // set the orientation
-  orientation_.set_x(q_bs.X());
-  orientation_.set_y(q_bs.Y());
-  orientation_.set_z(q_bs.Z());
-  orientation_.set_w(q_bs.W());
+  // Set the orientation
+  orientation_.set_x(q_ls.X());
+  orientation_.set_y(q_ls.Y());
+  orientation_.set_z(q_ls.Z());
+  orientation_.set_w(q_ls.W());
 
   // start lidar topic publishing
   lidar_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Range>("~/" + names_splitted[0] + "/link/" + lidar_topic_, 10);
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::OnNewLaserScans()
+void LidarPlugin::OnNewLaserScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
