@@ -47,11 +47,6 @@ PRIV_NAME = '~'
 REMAP = ":="
 ANYTYPE = '*'
 
-
-def isstring(s):
-    return isinstance(s, str)
-
-
 def load_mappings(argv):
     """
     Load name mappings encoded in command-line arguments. This will filter
