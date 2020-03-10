@@ -175,11 +175,6 @@ void LiftDragPlugin::OnUpdate()
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
 
-  // smoothing
-  // double e = 0.8;
-  // this->velSmooth = e*vel + (1.0 - e)*velSmooth;
-  // vel = this->velSmooth;
-
   if (vel.Length() <= 0.01)
     return;
 
@@ -215,14 +210,14 @@ void LiftDragPlugin::OnUpdate()
   double sinSweepAngle = ignition::math::clamp(
       spanwiseI.Dot(velI), minRatio, maxRatio);
 
-  // get cos from trig identity
-  double cosSweepAngle = 1.0 - sinSweepAngle * sinSweepAngle;
   this->sweep = asin(sinSweepAngle);
 
   // truncate sweep to within +/-90 deg
   while (fabs(this->sweep) > 0.5 * M_PI)
     this->sweep = this->sweep > 0 ? this->sweep - M_PI
                                   : this->sweep + M_PI;
+  // get cos from trig identity
+  double cosSweepAngle = sqrt(1.0 - sin(this->sweep) * sin(this->sweep));
 
   // angle of attack is the angle between
   // velI projected into lift-drag plane
