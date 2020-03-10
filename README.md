@@ -50,7 +50,7 @@ sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-d
 
 #### Gstreamer:
 ```
-sudo apt-get install $(apt-cache --names-only search ^gstreamer1.0-* | awk '{ print $1 }' | grep -v gstreamer1.0-hybris) -y
+sudo apt-get install libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly -y
 ```
 
 
@@ -76,9 +76,8 @@ sudo pacman -S --noconfirm --needed eigen3 hdf5 opencv protobuf vtk yay python2-
 
 #### Gstreamer:
 ```bash
-sudo pacman -S --needed $(pacman -Ssq gstreamer)
+sudo pacman -S --needed gstreamer gst-plugins-bad gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-ugly
 ```
-
 
 ## Build *sitl_gazebo*
 
