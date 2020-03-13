@@ -512,28 +512,6 @@
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='usv_dynamics_wamv_dynamics_plugin' filename='libgazebo_usv_dynamics_plugin.so'>
-      <bodyName>base_link</bodyName>
-      <waterLevel>0</waterLevel>
-      <waterDensity>997.8</waterDensity>
-      <xDotU>0.0</xDotU>
-      <yDotV>0.0</yDotV>
-      <nDotR>0.0</nDotR>
-      <xU>51.3</xU>
-      <xUU>72.4</xUU>
-      <yV>40.0</yV>
-      <yVV>0.0</yVV>
-      <zW>500.0</zW>
-      <kP>50.0</kP>
-      <mQ>50.0</mQ>
-      <nR>400.0</nR>
-      <nRR>0.0</nRR>
-      <hullRadius>0.213</hullRadius>
-      <boatWidth>2.4</boatWidth>
-      <boatLength>4.9</boatLength>
-      <length_n>2</length_n>
-      <wave_model>ocean_waves</wave_model>
-    </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>

@@ -328,7 +328,6 @@ add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
-add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 
 set(plugins
@@ -351,7 +350,6 @@ set(plugins
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
   gazebo_catapult_plugin
-  gazebo_usv_dynamics_plugin
   gazebo_parachute_plugin
   )
 

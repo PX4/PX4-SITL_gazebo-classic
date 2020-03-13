@@ -6,7 +6,7 @@
       <uri>model://sun</uri>
     </include>
     <include>
-      <uri>model://water_level</uri>
+      <uri>model://ground_plane</uri>
     </include>
     <include>
       <uri>model://boat</uri>
