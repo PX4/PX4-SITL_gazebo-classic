@@ -115,9 +115,9 @@ install:
       brew tap PX4/px4;
       brew install px4-dev;
       brew install px4-sim;
-      brew remove tinyxml2;
-      brew install osrf/simulation/tinyxml2@6.2.0;
-      brew link --force tinyxml2@6.2.0;
+      brew uninstall --force tinyxml2;
+      brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/58ff03657eba8e510d63ad28e0ccb982fc9d06c8/Formula/tinyxml2.rb;
+      brew pin tinyxml2;
       pip3 install --user --upgrade setuptools;
       pip3 install --user --upgrade rospkg pyserial empy toml numpy pandas jinja2;
     fi
