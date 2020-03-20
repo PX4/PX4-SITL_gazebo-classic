@@ -105,6 +105,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
   gt_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Groundtruth>("~/" + model_->GetName() + "/groundtruth", 10);
+  gps_origin_sub_ = node_handle_->Subscribe("~/gps_origin", &GpsPlugin::GpsOriginCb, this);
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
@@ -247,5 +248,24 @@ std::pair<double, double> GpsPlugin::reproject(ignition::math::Vector3d& pos)
   }
 
   return std::make_pair (lat_rad, lon_rad);
+}
+
+void GpsPlugin::GpsOriginCb(const boost::shared_ptr<const sensor_msgs::msgs::SITLGps>& msg)
+{
+  // Update the GPS origin only once the first time this message has been received
+  // to prevent oscillating origins
+  if( !gps_origin_initialized_ ) {
+    //Don't overwrite if environment variables are set
+    if ( !std::getenv("PX4_HOME_LAT") ) {
+      lat_home = msg->latitude_deg() * M_PI / 180.0;    // rad
+    }
+    if ( !std::getenv("PX4_HOME_LON") ) {
+      lon_home = msg->longitude_deg() * M_PI / 180.0;   // rad
+    }
+    if ( !std::getenv("PX4_HOME_ALT") ) {
+      alt_home = msg->altitude() * M_PI / 180.0;        // meters
+    }
+    gps_origin_initialized_ = true;
+  }
 }
 } // namespace gazebo

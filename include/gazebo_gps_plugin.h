@@ -64,6 +64,8 @@ protected:
   std::pair<double, double> reproject(ignition::math::Vector3d& pos);
 
 private:
+  void GpsOriginCb(const boost::shared_ptr<const sensor_msgs::msgs::SITLGps>& msg);
+
   std::string namespace_;
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
@@ -77,6 +79,7 @@ private:
   transport::NodePtr node_handle_;
   transport::PublisherPtr gt_pub_;
   transport::PublisherPtr gps_pub_;
+  transport::SubscriberPtr gps_origin_sub_;
 
   sensor_msgs::msgs::SITLGps gps_msg;
   sensor_msgs::msgs::Groundtruth groundtruth_msg;
@@ -92,6 +95,7 @@ private:
   // The home position can be specified using the environment variables:
   // PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
 
+  bool gps_origin_initialized_ = false;
   // Zurich Irchel Park
   double lat_home = 47.397742 * M_PI / 180.0;  // rad
   double lon_home = 8.545594 * M_PI / 180.0;   // rad
