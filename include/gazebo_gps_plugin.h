@@ -64,6 +64,8 @@ protected:
   std::pair<double, double> reproject(ignition::math::Vector3d& pos);
 
 private:
+  bool checkWorldHomePosition(physics::WorldPtr world);
+
   std::string namespace_;
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
