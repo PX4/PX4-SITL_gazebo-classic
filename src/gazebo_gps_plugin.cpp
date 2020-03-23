@@ -38,6 +38,20 @@ GpsPlugin::~GpsPlugin()
       updateConnection_->~Connection();
 }
 
+bool GpsPlugin::checkWorldHomePosition(physics::WorldPtr world) {
+  if(!world_->SphericalCoords()) {
+    return false;
+  }
+  double latitude = world_->SphericalCoords()->LatitudeReference().Degree();
+  double longitude = world_->SphericalCoords()->LongitudeReference().Degree();
+  double altitude = world_->SphericalCoords()->GetElevationReference();
+  if(latitude || longitude || altitude ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   // Store the pointer to the model.
@@ -64,9 +78,13 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gps_noise_ = false;
   }
 
+  bool world_has_origin = checkWorldHomePosition(world_);
+
   if (env_lat) {
     gzmsg << "Home latitude is set to " << env_lat << ".\n";
     lat_home = std::stod(env_lat) * M_PI / 180.0;
+  } else if ( world_has_origin ) {
+    lat_home = world_->SphericalCoords()->LatitudeReference().Degree() * M_PI / 180.0;
   } else if(_sdf->HasElement("homeLatitude")) {
     double latitude;
     getSdfParam<double>(_sdf, "homeLatitude", latitude, 47.397742);
@@ -75,6 +93,8 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (env_lon) {
     gzmsg << "Home longitude is set to " << env_lon << ".\n";
     lon_home = std::stod(env_lon) * M_PI / 180.0;
+  } else if ( world_has_origin ) {
+    lon_home = world_->SphericalCoords()->LongitudeReference().Degree() * M_PI / 180.0;
   } else if(_sdf->HasElement("homeLongitude")) {
     double longitude;
     getSdfParam<double>(_sdf, "homeLongitude", longitude, 8.545594);
@@ -83,6 +103,8 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (env_alt) {
     gzmsg << "Home altitude is set to " << env_alt << ".\n";
     alt_home = std::stod(env_alt);
+  } else if (world_has_origin) {
+    alt_home = world_->SphericalCoords()->GetElevationReference();
   } else if(_sdf->HasElement("homeAltitude")) {
     getSdfParam<double>(_sdf, "homeAltitude", alt_home, alt_home);
   }
