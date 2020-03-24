@@ -39,17 +39,21 @@ GpsPlugin::~GpsPlugin()
 }
 
 bool GpsPlugin::checkWorldHomePosition(physics::WorldPtr world) {
-  if(!world_->SphericalCoords()) {
+#if GAZEBO_MAJOR_VERSION >= 9
+  common::SphericalCoordinatesPtr spherical_coords = world_->SphericalCoords();
+#else
+  common::SphericalCoordinatesPtr spherical_coords = world_->GetSphericalCoordinates();
+#endif
+
+  if (!spherical_coords) {
     return false;
   }
-  double latitude = world_->SphericalCoords()->LatitudeReference().Degree();
-  double longitude = world_->SphericalCoords()->LongitudeReference().Degree();
-  double altitude = world_->SphericalCoords()->GetElevationReference();
-  if(latitude || longitude || altitude ) {
-    return true;
-  } else {
-    return false;
-  }
+  world_latitude_ = spherical_coords->LatitudeReference().Degree() * M_PI / 180.0;
+  world_longitude_ = spherical_coords->LongitudeReference().Degree() * M_PI / 180.0;
+  world_altitude_ = spherical_coords->GetElevationReference();
+  // This logic is required given that the spherical coordinates reference call 
+  // return 0 if the spherical coordnates are not defined in the world file
+  return (world_latitude_ && world_longitude_ && world_altitude_) ? true : false;
 }
 
 void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
@@ -81,33 +85,35 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   bool world_has_origin = checkWorldHomePosition(world_);
 
   if (env_lat) {
-    gzmsg << "Home latitude is set to " << env_lat << ".\n";
     lat_home = std::stod(env_lat) * M_PI / 180.0;
-  } else if ( world_has_origin ) {
-    lat_home = world_->SphericalCoords()->LatitudeReference().Degree() * M_PI / 180.0;
+  } else if (world_has_origin) {
+    lat_home = world_latitude_;
   } else if(_sdf->HasElement("homeLatitude")) {
     double latitude;
     getSdfParam<double>(_sdf, "homeLatitude", latitude, 47.397742);
     lat_home = latitude * M_PI / 180.0;
   }
+  gzmsg << "Home latitude is set to " << lat_home << ".\n";
+
   if (env_lon) {
-    gzmsg << "Home longitude is set to " << env_lon << ".\n";
     lon_home = std::stod(env_lon) * M_PI / 180.0;
-  } else if ( world_has_origin ) {
-    lon_home = world_->SphericalCoords()->LongitudeReference().Degree() * M_PI / 180.0;
+  } else if (world_has_origin) {
+    lon_home = world_longitude_;
   } else if(_sdf->HasElement("homeLongitude")) {
     double longitude;
     getSdfParam<double>(_sdf, "homeLongitude", longitude, 8.545594);
     lon_home = longitude * M_PI / 180.0;
   }
+  gzmsg << "Home longitude is set to " << lon_home << ".\n";
+
   if (env_alt) {
-    gzmsg << "Home altitude is set to " << env_alt << ".\n";
     alt_home = std::stod(env_alt);
   } else if (world_has_origin) {
-    alt_home = world_->SphericalCoords()->GetElevationReference();
+    alt_home = world_altitude_;
   } else if(_sdf->HasElement("homeAltitude")) {
     getSdfParam<double>(_sdf, "homeAltitude", alt_home, alt_home);
   }
+  gzmsg << "Home altitude is set to " << alt_home << ".\n";
 
   namespace_.clear();
   if (_sdf->HasElement("robotNamespace")) {

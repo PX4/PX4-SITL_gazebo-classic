@@ -64,6 +64,11 @@ protected:
   std::pair<double, double> reproject(ignition::math::Vector3d& pos);
 
 private:
+  /**
+   * @brief     Check if the <sperical_coordinates> tag was defined in the world file
+   * @param     world pointer to gazebo world
+   * @returns   whether if <sperical_coordinates> tag exists in the world file
+   **/
   bool checkWorldHomePosition(physics::WorldPtr world);
 
   std::string namespace_;
@@ -98,6 +103,9 @@ private:
   double lat_home = 47.397742 * M_PI / 180.0;  // rad
   double lon_home = 8.545594 * M_PI / 180.0;   // rad
   double alt_home = 488.0;                     // meters
+  double world_latitude_ = 0.0;
+  double world_longitude_ = 0.0;
+  double world_altitude_ = 0.0;
   // Seattle downtown (15 deg declination): 47.592182, -122.316031
   // static const double lat_home = 47.592182 * M_PI / 180;    // rad
   // static const double lon_home = -122.316031 * M_PI / 180;  // rad
