@@ -13,9 +13,6 @@
       <uri>model://sun</uri>
     </include>
     <include>
-      <uri>model://asphalt_plane</uri>
-    </include>
-    <include>
       <uri>model://mcmillan_airfield</uri>
     </include>
     <spherical_coordinates>
