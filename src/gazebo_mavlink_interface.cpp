@@ -208,21 +208,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
           {
             std::string joint_name = channel->Get<std::string>("joint_name");
             joints_[index] = model_->GetJoint(joint_name);
-            if (joints_[index] == nullptr)
-            {
-              gzwarn << "joint [" << joint_name << "] not found for channel["
-                     << index << "] no joint control for this channel.\n";
-            }
-            else
-            {
-              gzdbg << "joint [" << joint_name << "] found for channel["
-                    << index << "] joint control active for this channel.\n";
-            }
-          }
-          else
-          {
-            gzdbg << "<joint_name> not found for channel[" << index
-                  << "] no joint control will be performed for this channel.\n";
           }
 
           // setup joint control pid to control joint

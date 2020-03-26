@@ -59,11 +59,10 @@ void BarometerPlugin::getSdfParams(sdf::ElementPtr sdf)
 {
   const char *env_alt = std::getenv("PX4_HOME_ALT");
   if (env_alt) {
-    gzmsg << "Home altitude is set to " << env_alt << ".\n";
     alt_home_ = std::stod(env_alt);
+    gzmsg << "Home altitude is set to " << alt_home_ << ".\n";
   } else {
     alt_home_ = kDefaultAltHome;
-    gzwarn << "[gazebo_barometer_plugin] Using default home altitude of " << alt_home_ << " m\n";
   }
 
   namespace_.clear();
