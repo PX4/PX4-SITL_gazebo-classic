@@ -51,7 +51,7 @@ bool GpsPlugin::checkWorldHomePosition(physics::WorldPtr world) {
   world_latitude_ = spherical_coords->LatitudeReference().Degree() * M_PI / 180.0;
   world_longitude_ = spherical_coords->LongitudeReference().Degree() * M_PI / 180.0;
   world_altitude_ = spherical_coords->GetElevationReference();
-  // This logic is required given that the spherical coordinates reference call 
+  // This logic is required given that the spherical coordinates reference call
   // return 0 if the spherical coordnates are not defined in the world file
   return (world_latitude_ && world_longitude_ && world_altitude_) ? true : false;
 }
@@ -89,6 +89,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gzmsg << "Home latitude is set to " << lat_home << ".\n";
   } else if (world_has_origin) {
     lat_home = world_latitude_;
+    gzmsg << "Home latitude is set to " << lat_home << ".\n";
   } else if(_sdf->HasElement("homeLatitude")) {
     double latitude;
     getSdfParam<double>(_sdf, "homeLatitude", latitude, 47.397742);
@@ -100,6 +101,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gzmsg << "Home longitude is set to " << lon_home << ".\n";
   } else if (world_has_origin) {
     lon_home = world_longitude_;
+    gzmsg << "Home longitude is set to " << lon_home << ".\n";
   } else if(_sdf->HasElement("homeLongitude")) {
     double longitude;
     getSdfParam<double>(_sdf, "homeLongitude", longitude, 8.545594);
@@ -111,6 +113,7 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gzmsg << "Home altitude is set to " << alt_home << ".\n";
   } else if (world_has_origin) {
     alt_home = world_altitude_;
+    gzmsg << "Home altitude is set to " << alt_home << ".\n";
   } else if(_sdf->HasElement("homeAltitude")) {
     getSdfParam<double>(_sdf, "homeAltitude", alt_home, alt_home);
   }
