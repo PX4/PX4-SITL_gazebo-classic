@@ -24,7 +24,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-03-29
             - BUILD=${CMAKE_BUILD}
         - name: CMake unit tests build and run (Gazebo 7)
           os: linux
@@ -34,7 +34,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-03-29
             - BUILD=${CMAKE_UNIT_TEST_BUILD}
         - name: CMake build (Gazebo 9)
           os: linux
@@ -44,7 +44,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-03-29
             - BUILD=${CMAKE_BUILD}
         - name: CMake unit tests build and run (Gazebo 9)
           os: linux
@@ -54,7 +54,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-03-29
             - BUILD=${CMAKE_UNIT_TEST_BUILD}
         - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
           os: linux
@@ -64,7 +64,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2020-03-29
             - BUILD=${KINETIC}
         - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
           os: linux
@@ -74,7 +74,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-03-29
             - BUILD=${MELODIC}
         - name: Validate SDF schemas
           os: linux
@@ -84,7 +84,7 @@ matrix:
           cache:
             ccache: true
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-01-13
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-03-29
             - BUILD="source ./scripts/validate_sdf.bash"
         - name: macOS Mojave (Xcode 11.3)
           os: osx
