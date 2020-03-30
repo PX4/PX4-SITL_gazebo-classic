@@ -1,0 +1,18 @@
+<sdf version='1.6'>
+  <model name='plane_lidar'>
+    <include>
+      <uri>model://plane</uri>
+    </include>
+
+    <!--lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 0.15 0 0 0</pose>
+    </include>
+
+    <joint name="lidar_joint" type="fixed">
+      <parent>plane::base_link</parent>
+      <child>lidar::link</child>
+    </joint>
+  </model>
+</sdf>
