@@ -25,7 +25,7 @@
   <xacro:property name="sin30" value="0.5" />
   <xacro:property name="cos30" value="0.866025403784" />
   <xacro:property name="sqrt2" value="1.4142135623730951" />
-  <xacro:property name="rotor_drag_coefficient" value="8.06428e-04" />
+  <xacro:property name="rotor_drag_coefficient" value="1.75e-04" />
   <xacro:property name="rolling_moment_coefficient" value="0.000001" />
   <xacro:property name="color" value="$(arg visual_material)" />
 
