@@ -401,6 +401,7 @@ void GimbalControllerPlugin::Init()
 
 void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
   this->lastImuYaw = ignition::math::Quaterniond(imu_message->orientation().w(),
 						 imu_message->orientation().x(),
 						 imu_message->orientation().y(),
@@ -412,6 +413,7 @@ void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "pitch command received " << _msg->double_value() << std::endl;
   this->pitchCommand = _msg->double_value();
 }
@@ -419,6 +421,7 @@ void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "roll command received " << _msg->double_value() << std::endl;
   this->rollCommand = _msg->double_value();
 }
@@ -426,6 +429,7 @@ void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "yaw command received " << _msg->double_value() << std::endl;
   this->yawCommand = _msg->double_value();
 }
@@ -433,6 +437,7 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "pitch command received " << _msg->data() << std::endl;
   this->pitchCommand = atof(_msg->data().c_str());
 }
@@ -440,6 +445,7 @@ void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "roll command received " << _msg->data() << std::endl;
   this->rollCommand = atof(_msg->data().c_str());
 }
@@ -447,6 +453,7 @@ void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "yaw command received " << _msg->data() << std::endl;
   this->yawCommand = atof(_msg->data().c_str());
 }
@@ -455,6 +462,8 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnUpdate()
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
+
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;
 
