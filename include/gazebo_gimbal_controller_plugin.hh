@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
@@ -91,6 +92,7 @@ namespace gazebo
     private: void OnRollStringMsg(ConstGzStringPtr &_msg);
     private: void OnYawStringMsg(ConstGzStringPtr &_msg);
 #endif
+    private: std::mutex cmd_mutex;
 
     private: sdf::ElementPtr sdf;
 
