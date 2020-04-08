@@ -8,9 +8,6 @@
     <include>
       <uri>model://water_level</uri>
     </include>
-    <include>
-      <uri>model://boat</uri>
-    </include>
      <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
