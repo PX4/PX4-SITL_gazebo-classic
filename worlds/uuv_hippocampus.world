@@ -23,13 +23,6 @@
         <direction>-0.001 0.001 -0.9</direction>
     </light>
 
-    <!--
-        Include the model of the Hippocampus from TUHH.
-        The pose is chosen that the hippocampus starts at position (0,0,0) with its own coordinate frame equal to the
-        NED World frame.
-        Above is currently broken.
-    -->
-
     <!-- Add World Coordinate Frame -->
     <scene>
      <origin_visual>false</origin_visual>
