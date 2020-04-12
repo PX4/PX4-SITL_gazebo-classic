@@ -354,7 +354,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
   baro_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + baro_sub_topic_, &GazeboMavlinkInterface::BarometerCallback, this);
-
+  wind_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + wind_sub_topic_, &GazeboMavlinkInterface::WindVelocityCallback, this);
   // Get the model links
   auto links = model_->GetLinks();
 
@@ -920,18 +920,18 @@ void GazeboMavlinkInterface::SendSensorMessages()
     const float diff_pressure_stddev = 0.01f;
     const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev;
 
+    ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
 #if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
+    ignition::math::Vector3d vel_a = q_gb.RotateVector(model_->WorldLinearVel() - wind_vel_);
 #else
-    ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
+    ignition::math::Vector3d vel_a = q_gb.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel() -  wind_vel_));
 #endif
-
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
     if (vehicle_is_tailsitter_) {
-      sensor_msg.diff_pressure = 0.005f * rho * vel_b.Z() * vel_b.Z() + diff_pressure_noise;
+      sensor_msg.diff_pressure = 0.005f * rho * vel_a.Z() * vel_a.Z() + diff_pressure_noise;
     } else {
-      sensor_msg.diff_pressure = 0.005f * rho * vel_b.X() * vel_b.X() + diff_pressure_noise;
+      sensor_msg.diff_pressure = 0.005f * rho * vel_a.X() * vel_a.X() + diff_pressure_noise;
     }
     sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::DIFF_PRESS;
 
@@ -1001,9 +1001,9 @@ void GazeboMavlinkInterface::SendGroundTruth()
   hil_state_quat.ind_airspeed = vel_b.X();
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  hil_state_quat.true_airspeed = model_->WorldLinearVel().Length() * 100;  //no wind simulated
+  hil_state_quat.true_airspeed = (model_->WorldLinearVel() -  wind_vel_).Length() * 100;
 #else
-  hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
+  hil_state_quat.true_airspeed = (model_->GetWorldLinearVel() -  wind_vel_).GetLength() * 100;
 #endif
 
   hil_state_quat.xacc = accel_true_b.X() * 1000;
@@ -1323,6 +1323,12 @@ void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
   // no specific diff pressure sensor plugin yet
   baro_updated_ = true;
   diff_press_updated_ = true;
+}
+
+void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
+  wind_vel_ = ignition::math::Vector3d(msg->velocity().x(),
+            msg->velocity().y(),
+            msg->velocity().z());
 }
 
 void GazeboMavlinkInterface::pollForMAVLinkMessages()
