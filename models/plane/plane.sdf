@@ -373,6 +373,8 @@
         left_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -393,6 +395,8 @@
         right_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>
@@ -413,6 +417,8 @@
         elevator_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
@@ -429,6 +435,8 @@
       <forward>1 0 0</forward>
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name='puller' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -446,6 +454,8 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
@@ -466,11 +476,12 @@
       <robotNamespace/>
       <xyzOffset>1 0 0</xyzOffset>
       <windDirection>0 1 0</windDirection>
-      <windForceMean>0.7</windForceMean>
+      <windVelocityMean>0.7</windVelocityMean>
       <windGustDirection>0 0 0</windGustDirection>
       <windGustDuration>0</windGustDuration>
       <windGustStart>0</windGustStart>
       <windGustForceMean>0</windGustForceMean>
+      <windPubTopic>/wind</windPubTopic>
     </plugin>
     <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
         <robotNamespace></robotNamespace>

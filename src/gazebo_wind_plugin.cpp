@@ -36,10 +36,12 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   double wind_gust_start = kDefaultWindGustStart;
   double wind_gust_duration = kDefaultWindGustDuration;
 
-  if (_sdf->HasElement("robotNamespace"))
+  if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
-  else
+  } else {
     gzerr << "[gazebo_wind_plugin] Please specify a robotNamespace.\n";
+  }
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -48,13 +50,13 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   else
     gzerr << "[gazebo_wind_plugin] Please specify a xyzOffset.\n";
 
-  getSdfParam<std::string>(_sdf, "windPubTopic", wind_pub_topic_, "/" + namespace_ + wind_pub_topic_);
+  getSdfParam<std::string>(_sdf, "windPubTopic", wind_pub_topic_, "~/" + wind_pub_topic_);
   getSdfParam<std::string>(_sdf, "frameId", frame_id_, frame_id_);
   getSdfParam<std::string>(_sdf, "linkName", link_name_, link_name_);
   // Get the wind params from SDF.
-  getSdfParam<double>(_sdf, "windForceMean", wind_force_mean_, wind_force_mean_);
-  getSdfParam<double>(_sdf, "windForceMax", wind_force_max_, wind_force_max_);
-  getSdfParam<double>(_sdf, "windForceVariance", wind_force_variance_, wind_force_variance_);
+  getSdfParam<double>(_sdf, "windVelocityMean", wind_velocity_mean_, wind_velocity_mean_);
+  getSdfParam<double>(_sdf, "windVelocityMax", wind_velocity_max_, wind_velocity_max_);
+  getSdfParam<double>(_sdf, "windVelocityVariance", wind_velocity_variance_, wind_velocity_variance_);
   getSdfParam<ignition::math::Vector3d>(_sdf, "windDirectionMean", wind_direction_mean_, wind_direction_mean_);
   getSdfParam<double>(_sdf, "windDirectionVariance", wind_direction_variance_, wind_direction_variance_);
   // Get the wind gust params from SDF.
@@ -71,7 +73,7 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   wind_gust_start_ = common::Time(wind_gust_start);
   wind_gust_end_ = common::Time(wind_gust_start + wind_gust_duration);
   // Set random wind force mean and standard deviation
-  wind_force_distribution_.param(std::normal_distribution<double>::param_type(wind_force_mean_, sqrt(wind_force_variance_)));
+  wind_velocity_distribution_.param(std::normal_distribution<double>::param_type(wind_velocity_mean_, sqrt(wind_velocity_variance_)));
   // Set random wind direction mean and standard deviation
   wind_direction_distribution_X_.param(std::normal_distribution<double>::param_type(wind_direction_mean_.X(), sqrt(wind_direction_variance_)));
   wind_direction_distribution_Y_.param(std::normal_distribution<double>::param_type(wind_direction_mean_.Y(), sqrt(wind_direction_variance_)));
@@ -91,8 +93,7 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // simulation iteration.
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboWindPlugin::OnUpdate, this, _1));
 
-  // FIXME: Commented out to prevent warnings about queue limit reached.
-  //wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>(wind_pub_topic_, 1);
+  wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>("~/" + model_->GetName() + "/wind", 10);
 }
 
 // This gets called by the world update start event.
@@ -106,17 +107,15 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
   // Calculate the wind force.
   // Get normal distribution wind strength
-  double wind_strength = wind_force_distribution_(wind_force_generator_);
-  wind_strength = (wind_strength > wind_force_max_) ? wind_force_max_ : wind_strength;
+  double wind_strength = wind_velocity_distribution_(wind_velocity_generator_);
+  wind_strength = (wind_strength > wind_velocity_max_) ? wind_velocity_max_ : wind_strength;
   // Get normal distribution wind direction
   ignition::math::Vector3d wind_direction;
   wind_direction.X() = wind_direction_distribution_X_(wind_direction_generator_);
   wind_direction.Y() = wind_direction_distribution_Y_(wind_direction_generator_);
   wind_direction.Z() = wind_direction_distribution_Z_(wind_direction_generator_);
-  // Calculate total wind force
+  // Calculate total wind velocity
   ignition::math::Vector3d wind = wind_strength * wind_direction;
-  // Apply a force from the constant wind to the link.
-  link_->AddForceAtRelativePosition(wind, xyz_offset_);
 
   ignition::math::Vector3d wind_gust(0, 0, 0);
   // Calculate the wind gust force.
@@ -135,16 +134,22 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
   }
 
   gazebo::msgs::Vector3d* force = new gazebo::msgs::Vector3d();
-  force->set_x(wind.X() + wind_gust.X());
-  force->set_y(wind.Y() + wind_gust.Y());
-  force->set_z(wind.Z() + wind_gust.Z());
+
+  force->set_x(wind_gust.X());
+  force->set_y(wind_gust.Y());
+  force->set_z(wind_gust.Z());
+
+  gazebo::msgs::Vector3d* wind_v = new gazebo::msgs::Vector3d();
+  wind_v->set_x(wind.X());
+  wind_v->set_y(wind.Y());
+  wind_v->set_z(wind.Z());
 
   wind_msg.set_frame_id(frame_id_);
   wind_msg.set_time_usec(now.Double() * 1e6);
   wind_msg.set_allocated_force(force);
+  wind_msg.set_allocated_velocity(wind_v);
 
-  // FIXME: Commented out to prevent warnings about queue limit reached.
-  //wind_pub_->Publish(wind_msg);
+  wind_pub_->Publish(wind_msg);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboWindPlugin);

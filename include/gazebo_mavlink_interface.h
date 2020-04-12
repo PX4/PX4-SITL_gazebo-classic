@@ -67,6 +67,7 @@
 #include <Odometry.pb.h>
 #include <MagneticField.pb.h>
 #include <Pressure.pb.h>
+#include <Wind.pb.h>
 
 #include <mavlink/v2.0/common/mavlink.h>
 #include "msgbuffer.h"
@@ -101,6 +102,7 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::MagneticField> MagnetometerPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Pressure> BarometerPtr;
+typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
 typedef std::pair<const int, const ignition::math::Quaterniond> SensorIdRot_P;
 typedef std::map<transport::SubscriberPtr, SensorIdRot_P > Sensor_M;
@@ -119,6 +121,7 @@ static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
 static const std::string kDefaultMagTopic = "/mag";
 static const std::string kDefaultBarometerTopic = "/baro";
+static const std::string kDefaultWindTopic = "/wind";
 
 //! Rx packer framing status. (same as @p mavlink::mavlink_framing_t)
 enum class Framing : uint8_t {
@@ -175,6 +178,7 @@ public:
     mag_sub_topic_(kDefaultMagTopic),
     baro_sub_topic_(kDefaultBarometerTopic),
     sensor_map_ {},
+    wind_sub_topic_(kDefaultWindTopic),
     model_ {},
     world_(nullptr),
     left_elevon_joint_(nullptr),
@@ -286,6 +290,7 @@ private:
   void VisionCallback(OdomPtr& odom_msg);
   void MagnetometerCallback(MagnetometerPtr& mag_msg);
   void BarometerCallback(BarometerPtr& baro_msg);
+  void WindVelocityCallback(WindPtr& msg);
   void send_mavlink_message(const mavlink_message_t *message);
   void forward_mavlink_message(const mavlink_message_t *message);
   void handle_message(mavlink_message_t *msg, bool &received_actuator);
@@ -349,6 +354,7 @@ private:
   transport::SubscriberPtr vision_sub_;
   transport::SubscriberPtr mag_sub_;
   transport::SubscriberPtr baro_sub_;
+  transport::SubscriberPtr wind_sub_;
 
   Sensor_M sensor_map_; // Map of sensor SubscriberPtr, IDs and orientations
 
@@ -360,6 +366,7 @@ private:
   std::string vision_sub_topic_;
   std::string mag_sub_topic_;
   std::string baro_sub_topic_;
+  std::string wind_sub_topic_;
 
   std::mutex last_imu_message_mutex_ {};
   std::condition_variable last_imu_message_cond_ {};
@@ -381,6 +388,7 @@ private:
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
   ignition::math::Vector3d mag_n_;
+  ignition::math::Vector3d wind_vel_;
 
   double temperature_;
   double pressure_alt_;

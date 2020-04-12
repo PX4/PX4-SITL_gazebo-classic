@@ -38,9 +38,9 @@ static const std::string kDefaultNamespace = "";
 static const std::string kDefaultFrameId = "world";
 static const std::string kDefaultLinkName = "base_link";
 
-static constexpr double kDefaultWindForceMean = 0.0;
-static constexpr double kDefaultWindForceMax = 100.0;
-static constexpr double kDefaultWindForceVariance = 0.0;
+static constexpr double kDefaultWindVelocityMean = 0.0;
+static constexpr double kDefaultWindVelocityMax = 100.0;
+static constexpr double kDefaultWindVelocityVariance = 0.0;
 static constexpr double kDefaultWindGustForceMean = 0.0;
 static constexpr double kDefaultWindGustForceMax = 100.0;
 static constexpr double kDefaultWindGustForceVariance = 0.0;
@@ -60,9 +60,9 @@ class GazeboWindPlugin : public ModelPlugin {
       : ModelPlugin(),
         namespace_(kDefaultNamespace),
         wind_pub_topic_("wind"),
-        wind_force_mean_(kDefaultWindForceMean),
-        wind_force_max_(kDefaultWindForceMax),
-        wind_force_variance_(kDefaultWindForceVariance),
+        wind_velocity_mean_(kDefaultWindVelocityMean),
+        wind_velocity_max_(kDefaultWindVelocityMax),
+        wind_velocity_variance_(kDefaultWindVelocityVariance),
         wind_gust_force_mean_(kDefaultWindGustForceMean),
         wind_gust_force_max_(kDefaultWindGustForceMax),
         wind_gust_force_variance_(kDefaultWindGustForceVariance),
@@ -100,14 +100,14 @@ class GazeboWindPlugin : public ModelPlugin {
   std::string link_name_;
   std::string wind_pub_topic_;
 
-  double wind_force_mean_;
-  double wind_force_max_;
-  double wind_force_variance_;
+  double wind_velocity_mean_;
+  double wind_velocity_max_;
+  double wind_velocity_variance_;
   double wind_gust_force_mean_;
   double wind_gust_force_max_;
   double wind_gust_force_variance_;
-  std::default_random_engine wind_force_generator_;
-  std::normal_distribution<double> wind_force_distribution_;
+  std::default_random_engine wind_velocity_generator_;
+  std::normal_distribution<double> wind_velocity_distribution_;
   std::default_random_engine wind_gust_force_generator_;
   std::normal_distribution<double> wind_gust_force_distribution_;
 

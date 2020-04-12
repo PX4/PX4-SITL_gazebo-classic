@@ -36,6 +36,7 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   this->cp = ignition::math::Vector3d(0, 0, 0);
   this->forward = ignition::math::Vector3d(1, 0, 0);
   this->upward = ignition::math::Vector3d(0, 0, 1);
+  this->wind_vel_ = ignition::math::Vector3d(0.0, 0.0, 0.0);
   this->area = 1.0;
   this->alpha0 = 0.0;
   this->alpha = 0.0;
@@ -146,6 +147,22 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&LiftDragPlugin::OnUpdate, this));
     }
+
+    
+  }
+  
+  if (_sdf->HasElement("robotNamespace"))
+  {
+    namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
+  } else {
+    gzerr << "[gazebo_wind_plugin] Please specify a robotNamespace.\n";
+  }
+  node_handle_ = transport::NodePtr(new transport::Node());
+  node_handle_->Init(namespace_);
+
+  if (_sdf->HasElement("windSubTopic")){
+    this->wind_sub_topic_ = _sdf->Get<std::string>("windSubTopic");
+    wind_sub_ = node_handle_->Subscribe("~/" + _model->GetName() + wind_sub_topic_, &LiftDragPlugin::WindVelocityCallback, this);
   }
 
   if (_sdf->HasElement("control_joint_name"))
@@ -168,9 +185,9 @@ void LiftDragPlugin::OnUpdate()
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp);
+  ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp) - wind_vel_;
 #else
-  ignition::math::Vector3d vel = ignitionFromGazeboMath(this->link->GetWorldLinearVel(this->cp));
+  ignition::math::Vector3d vel = ignitionFromGazeboMath(this->link->GetWorldLinearVel(this->cp)) - wind_vel_;
 #endif
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
@@ -187,6 +204,11 @@ void LiftDragPlugin::OnUpdate()
 
   // rotate forward and upward vectors into inertial frame
   ignition::math::Vector3d forwardI = pose.Rot().RotateVector(this->forward);
+
+  if (forwardI.Dot(vel) <= 0.0){
+    // Only calculate lift or drag if the wind relative velocity is in the same direction
+    return;
+  }
 
   ignition::math::Vector3d upwardI;
   if (this->radialSymmetry)
@@ -412,4 +434,10 @@ void LiftDragPlugin::OnUpdate()
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
   this->link->AddTorque(torque);
+}
+
+void LiftDragPlugin::WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg) {
+  wind_vel_ = ignition::math::Vector3d(msg->velocity().x(),
+            msg->velocity().y(),
+            msg->velocity().z());
 }
