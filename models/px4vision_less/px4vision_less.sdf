@@ -1,0 +1,7 @@
+<sdf version='1.6'>
+  <model name='px4vision_less'>
+    <include>
+      <uri>model://px4vision</uri>
+    </include>
+  </model>
+</sdf>
