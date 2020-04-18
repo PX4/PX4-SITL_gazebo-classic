@@ -588,11 +588,11 @@
         <robotNamespace>${namespace}</robotNamespace>
         <xyzOffset>${xyz_offset}</xyzOffset> <!-- [m] [m] [m] -->
         <windDirection>${wind_direction}</windDirection>
-        <windForceMean>${wind_force_mean}</windForceMean> <!-- [N] -->
+        <windVelocityMean>${wind_force_mean}</windVelocityMean> <!-- [N] -->
         <windGustDirection>${wind_gust_direction}</windGustDirection>
         <windGustDuration>${wind_gust_duration}</windGustDuration> <!-- [s] -->
         <windGustStart>${wind_gust_start}</windGustStart> <!-- [s] -->
-        <windGustForceMean>${wind_gust_force_mean}</windGustForceMean> <!-- [N] -->
+        <windGustVelocityMean>${wind_gust_force_mean}</windGustVelocityMean> <!-- [N] -->
       </plugin>
     </gazebo>
   </xacro:macro>
