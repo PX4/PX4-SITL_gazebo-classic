@@ -107,7 +107,7 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
   // Calculate the wind force.
   // Get normal distribution wind strength
-  double wind_strength = wind_velocity_distribution_(wind_velocity_generator_);
+  double wind_strength = std::abs(wind_velocity_distribution_(wind_velocity_generator_));
   wind_strength = (wind_strength > wind_velocity_max_) ? wind_velocity_max_ : wind_strength;
   // Get normal distribution wind direction
   ignition::math::Vector3d wind_direction;
@@ -121,7 +121,7 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
   // Calculate the wind gust velocity.
   if (now >= wind_gust_start_ && now < wind_gust_end_) {
     // Get normal distribution wind gust strength
-    double wind_gust_strength = wind_gust_velocity_distribution_(wind_gust_velocity_generator_);
+    double wind_gust_strength = std::abs(wind_gust_velocity_distribution_(wind_gust_velocity_generator_));
     wind_gust_strength = (wind_gust_strength > wind_gust_velocity_max_) ? wind_gust_velocity_max_ : wind_gust_strength;
     // Get normal distribution wind gust direction
     ignition::math::Vector3d wind_gust_direction;
