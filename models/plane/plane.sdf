@@ -475,7 +475,7 @@
       <linkName>base_link</linkName>
       <robotNamespace/>
       <xyzOffset>1 0 0</xyzOffset>
-      <windDirection>0 1 0</windDirection>
+      <windDirectionMean>0 1 0</windDirectionMean>
       <windVelocityMean>0.7</windVelocityMean>
       <windGustDirection>0 0 0</windGustDirection>
       <windGustDuration>0</windGustDuration>
