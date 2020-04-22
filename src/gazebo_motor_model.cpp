@@ -191,7 +191,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
     gzerr << "Aliasing on motor [" << motor_number_ << "] might occur. Consider making smaller simulation time steps or raising the rotor_velocity_slowdown_sim_ param.\n";
   }
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
-  double force = real_motor_velocity * real_motor_velocity * motor_constant_;
+  double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_; // TODO: remove std::abs for multicopter.
 
   // scale down force linearly with forward speed
   // XXX this has to be modelled better
@@ -204,8 +204,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   double vel = body_velocity.Length();
   double scalar = 1 - vel / 25.0; // at 50 m/s the rotor will not produce any force anymore
   scalar = ignition::math::clamp(scalar, 0.0, 1.0);
-  // Apply a force to the link.
-  link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force * scalar));
+  // Apply a force to the link. TODO: Remove turning_direction_ for multicopter.
+  link_->AddRelativeForce(ignition::math::Vector3d(0, 0, turning_direction_ * force * scalar));
 
   // Forces from Philppe Martin's and Erwan Salaün's
   // 2010 IEEE Conference on Robotics and Automation paper

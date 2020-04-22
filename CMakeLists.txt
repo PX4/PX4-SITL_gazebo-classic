@@ -320,6 +320,8 @@ add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plug
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
+add_library(gazebo_buoyancy_plugin SHARED src/gazebo_buoyancy_plugin.cpp)
+add_library(gazebo_lta_aerodynamics_plugin SHARED src/gazebo_lta_aerodynamics_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
@@ -339,6 +341,8 @@ set(plugins
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
+  gazebo_buoyancy_plugin
+  gazebo_lta_aerodynamics_plugin
   )
 
 foreach(plugin ${plugins})
