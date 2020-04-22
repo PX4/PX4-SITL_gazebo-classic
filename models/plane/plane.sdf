@@ -480,7 +480,7 @@
       <windGustDirection>0 0 0</windGustDirection>
       <windGustDuration>0</windGustDuration>
       <windGustStart>0</windGustStart>
-      <windGustForceMean>0</windGustForceMean>
+      <windGustVelocityMean>0</windGustVelocityMean>
       <windPubTopic>/wind</windPubTopic>
     </plugin>
     <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
