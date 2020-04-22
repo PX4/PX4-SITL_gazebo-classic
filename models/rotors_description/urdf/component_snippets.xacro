@@ -587,7 +587,7 @@
         <linkName>base_link</linkName>
         <robotNamespace>${namespace}</robotNamespace>
         <xyzOffset>${xyz_offset}</xyzOffset> <!-- [m] [m] [m] -->
-        <windDirection>${wind_direction}</windDirection>
+        <windDirectionMean>${wind_direction}</windDirectionMean>
         <windVelocityMean>${wind_force_mean}</windVelocityMean> <!-- [N] -->
         <windGustDirection>${wind_gust_direction}</windGustDirection>
         <windGustDuration>${wind_gust_duration}</windGustDuration> <!-- [s] -->
