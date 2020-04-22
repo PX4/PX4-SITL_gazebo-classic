@@ -34,6 +34,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "MotorSpeed.pb.h"
 #include "Float.pb.h"
+#include "Wind.pb.h"
 
 #include "common.h"
 
@@ -49,8 +50,10 @@ static const std::string kDefaultNamespace = "";
 static const std::string kDefaultCommandSubTopic = "/gazebo/command/motor_speed";
 static const std::string kDefaultMotorFailureNumSubTopic = "/gazebo/motor_failure_num";
 static const std::string kDefaultMotorVelocityPubTopic = "/motor_speed";
+std::string wind_sub_topic_ = "/wind";
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
+typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
 /*
 // Protobuf test
@@ -137,6 +140,9 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   transport::PublisherPtr motor_velocity_pub_;
   transport::SubscriberPtr command_sub_;
   transport::SubscriberPtr motor_failure_sub_; /*!< Subscribing to motor_failure_sub_topic_; receiving motor number to fail, as an integer */
+  transport::SubscriberPtr wind_sub_;
+
+  ignition::math::Vector3d wind_vel_;
 
   physics::ModelPtr model_;
   physics::JointPtr joint_;
@@ -151,6 +157,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   std_msgs::msgs::Float turning_velocity_msg_;
   void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
   void MotorFailureCallback(const boost::shared_ptr<const msgs::Int> &fail_msg);  /*!< Callback for the motor_failure_sub_ subscriber */
+  void WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg);
+
   std::unique_ptr<FirstOrderFilter<double>>  rotor_velocity_filter_;
 /*
   // Protobuf test
