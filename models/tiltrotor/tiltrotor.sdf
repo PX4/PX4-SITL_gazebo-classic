@@ -1066,7 +1066,7 @@
         <channel name="motor0_tilt">
           <input_index>4</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_scaling>3.141592</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
@@ -1084,7 +1084,7 @@
         <channel name="motor1_tilt">
           <input_index>5</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_scaling>3.141592</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
@@ -1102,7 +1102,7 @@
         <channel name="motor2_tilt">
           <input_index>6</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_scaling>3.141592</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
@@ -1120,7 +1120,7 @@
         <channel name="motor3_tilt">
           <input_index>7</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_scaling>3.141592</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
