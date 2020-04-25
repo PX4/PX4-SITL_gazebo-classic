@@ -1229,7 +1229,11 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.time_usec = odom_message->time_usec();
 
     odom.frame_id = MAV_FRAME_LOCAL_NED;
-    odom.child_frame_id = MAV_FRAME_BODY_FRD;
+    //TODO: This is a interim fix to get the code to compile
+    //      This needs to eventually be changed to MAV_FRAME_BODY_OFFSET_NED
+    //      This is due to a update on the mavlink: https://github.com/mavlink/mavlink/pull/1112
+    //      where MAV_FRAME_BODY_FRD has been deprecated
+    odom.child_frame_id = 12; //MAV_FRAME_BODY_FRD MAV_FRAME_RESERVED_12
 
     odom.x = position.X();
     odom.y = position.Y();
