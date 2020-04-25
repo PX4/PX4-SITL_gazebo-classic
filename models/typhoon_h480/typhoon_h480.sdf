@@ -1578,7 +1578,7 @@
       <control_gimbal_channels>
         <channel>
           <joint_control_pid>
-            <p>0.8</p>
+            <p>0.6</p>
             <i>0.1</i>
             <d>0.02</d>
             <iMax>0</iMax>

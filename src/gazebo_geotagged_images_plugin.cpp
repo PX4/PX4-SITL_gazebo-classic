@@ -51,7 +51,7 @@ GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     , _fd(-1)
     , _mode(CAMERA_MODE_VIDEO)
     , _captureMode(CAPTURE_DISABLED)
-    , _hfov(0.3)
+    , _hfov(1.57)
     , _zoom(1.0)
     , _maxZoom(8.0)
 {
