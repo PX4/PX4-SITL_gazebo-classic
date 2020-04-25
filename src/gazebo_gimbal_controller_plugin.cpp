@@ -483,7 +483,7 @@ void GimbalControllerPlugin::OnUpdate()
     double dt = (time - this->lastUpdateTime).Double();
 
     // We want yaw to control in body frame, not in global.
-    this->yawCommand += this->lastImuYaw;
+    double yaw_command = this->yawCommand + this->lastImuYaw;
 
     // truncate command inside joint angle limits
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -493,7 +493,7 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchLimited = ignition::math::clamp(this->pitchCommand,
       pDir*this->pitchJoint->UpperLimit(0),
       pDir*this->pitchJoint->LowerLimit(0));
-    double yawLimited = ignition::math::clamp(this->yawCommand,
+    double yawLimited = ignition::math::clamp(yaw_command,
       yDir*this->yawJoint->LowerLimit(0),
 	  yDir*this->yawJoint->UpperLimit(0));
 #else
@@ -503,7 +503,7 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchLimited = ignition::math::clamp(this->pitchCommand,
       pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
       pDir*this->pitchJoint->GetLowerLimit(0).Radian());
-    double yawLimited = ignition::math::clamp(this->yawCommand,
+    double yawLimited = ignition::math::clamp(yaw_command,
       yDir*this->yawJoint->GetLowerLimit(0).Radian(),
 	  yDir*this->yawJoint->GetUpperLimit(0).Radian());
 #endif
