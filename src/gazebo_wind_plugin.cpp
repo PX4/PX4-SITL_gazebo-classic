@@ -28,16 +28,14 @@ GazeboWindPlugin::~GazeboWindPlugin() {
   update_connection_->~Connection();
 }
 
-void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
-  // Store the pointer to the model.
-  model_ = _model;
-  world_ = model_->GetWorld();
+void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
+  world_ = world;
 
   double wind_gust_start = kDefaultWindGustStart;
   double wind_gust_duration = kDefaultWindGustDuration;
 
-  if (_sdf->HasElement("robotNamespace")) {
-    namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
+  if (sdf->HasElement("robotNamespace")) {
+    namespace_ = sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
     gzerr << "[gazebo_wind_plugin] Please specify a robotNamespace.\n";
   }
@@ -45,28 +43,27 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  if (_sdf->HasElement("xyzOffset"))
-    xyz_offset_ = _sdf->GetElement("xyzOffset")->Get<ignition::math::Vector3d>();
+  if (sdf->HasElement("xyzOffset"))
+    xyz_offset_ = sdf->GetElement("xyzOffset")->Get<ignition::math::Vector3d>();
   else
     gzerr << "[gazebo_wind_plugin] Please specify a xyzOffset.\n";
 
-  getSdfParam<std::string>(_sdf, "windPubTopic", wind_pub_topic_, "~/" + wind_pub_topic_);
-  getSdfParam<std::string>(_sdf, "frameId", frame_id_, frame_id_);
-  getSdfParam<std::string>(_sdf, "linkName", link_name_, link_name_);
+  getSdfParam<std::string>(sdf, "windPubTopic", wind_pub_topic_, "~/" + wind_pub_topic_);
+  getSdfParam<std::string>(sdf, "frameId", frame_id_, frame_id_);
   // Get the wind params from SDF.
-  getSdfParam<double>(_sdf, "windVelocityMean", wind_velocity_mean_, wind_velocity_mean_);
-  getSdfParam<double>(_sdf, "windVelocityMax", wind_velocity_max_, wind_velocity_max_);
-  getSdfParam<double>(_sdf, "windVelocityVariance", wind_velocity_variance_, wind_velocity_variance_);
-  getSdfParam<ignition::math::Vector3d>(_sdf, "windDirectionMean", wind_direction_mean_, wind_direction_mean_);
-  getSdfParam<double>(_sdf, "windDirectionVariance", wind_direction_variance_, wind_direction_variance_);
+  getSdfParam<double>(sdf, "windVelocityMean", wind_velocity_mean_, wind_velocity_mean_);
+  getSdfParam<double>(sdf, "windVelocityMax", wind_velocity_max_, wind_velocity_max_);
+  getSdfParam<double>(sdf, "windVelocityVariance", wind_velocity_variance_, wind_velocity_variance_);
+  getSdfParam<ignition::math::Vector3d>(sdf, "windDirectionMean", wind_direction_mean_, wind_direction_mean_);
+  getSdfParam<double>(sdf, "windDirectionVariance", wind_direction_variance_, wind_direction_variance_);
   // Get the wind gust params from SDF.
-  getSdfParam<double>(_sdf, "windGustStart", wind_gust_start, wind_gust_start);
-  getSdfParam<double>(_sdf, "windGustDuration", wind_gust_duration, wind_gust_duration);
-  getSdfParam<double>(_sdf, "windGustVeloctiyMean", wind_gust_velocity_mean_, wind_gust_velocity_mean_);
-  getSdfParam<double>(_sdf, "windGustVelocityMax", wind_gust_velocity_max_, wind_gust_velocity_max_);
-  getSdfParam<double>(_sdf, "windGustVelocityVariance", wind_gust_velocity_variance_, wind_gust_velocity_variance_);
-  getSdfParam<ignition::math::Vector3d>(_sdf, "windGustDirectionMean", wind_gust_direction_mean_, wind_gust_direction_mean_);
-  getSdfParam<double>(_sdf, "windGustDirectionVariance", wind_gust_direction_variance_, wind_gust_direction_variance_);
+  getSdfParam<double>(sdf, "windGustStart", wind_gust_start, wind_gust_start);
+  getSdfParam<double>(sdf, "windGustDuration", wind_gust_duration, wind_gust_duration);
+  getSdfParam<double>(sdf, "windGustVeloctiyMean", wind_gust_velocity_mean_, wind_gust_velocity_mean_);
+  getSdfParam<double>(sdf, "windGustVelocityMax", wind_gust_velocity_max_, wind_gust_velocity_max_);
+  getSdfParam<double>(sdf, "windGustVelocityVariance", wind_gust_velocity_variance_, wind_gust_velocity_variance_);
+  getSdfParam<ignition::math::Vector3d>(sdf, "windGustDirectionMean", wind_gust_direction_mean_, wind_gust_direction_mean_);
+  getSdfParam<double>(sdf, "windGustDirectionVariance", wind_gust_direction_variance_, wind_gust_direction_variance_);
 
   wind_direction_mean_.Normalize();
   wind_gust_direction_mean_.Normalize();
@@ -85,15 +82,11 @@ void GazeboWindPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   wind_gust_direction_distribution_Y_.param(std::normal_distribution<double>::param_type(wind_gust_direction_mean_.Y(), sqrt(wind_gust_direction_variance_)));
   wind_gust_direction_distribution_Z_.param(std::normal_distribution<double>::param_type(wind_gust_direction_mean_.Z(), sqrt(wind_gust_direction_variance_)));
 
-  link_ = model_->GetLink(link_name_);
-  if (link_ == NULL)
-    gzthrow("[gazebo_wind_plugin] Couldn't find specified link \"" << link_name_ << "\".");
-
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboWindPlugin::OnUpdate, this, _1));
 
-  wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>("~/" + model_->GetName() + "/wind", 10);
+  wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>("~/world_wind", 10);
 }
 
 // This gets called by the world update start event.
@@ -143,5 +136,5 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
   wind_pub_->Publish(wind_msg);
 }
 
-GZ_REGISTER_MODEL_PLUGIN(GazeboWindPlugin);
+GZ_REGISTER_WORLD_PLUGIN(GazeboWindPlugin);
 }
