@@ -36,7 +36,6 @@ namespace gazebo {
 // Default values
 static const std::string kDefaultNamespace = "";
 static const std::string kDefaultFrameId = "world";
-static const std::string kDefaultLinkName = "base_link";
 
 static constexpr double kDefaultWindVelocityMean = 0.0;
 static constexpr double kDefaultWindVelocityMax = 100.0;
@@ -54,10 +53,10 @@ static constexpr double kDefaultWindDirectionVariance = 0.0;
 static constexpr double kDefaultWindGustDirectionVariance = 0.0;
 
 /// \brief This gazebo plugin simulates wind acting on a model.
-class GazeboWindPlugin : public ModelPlugin {
+class GazeboWindPlugin : public WorldPlugin {
  public:
   GazeboWindPlugin()
-      : ModelPlugin(),
+      : WorldPlugin(),
         namespace_(kDefaultNamespace),
         wind_pub_topic_("wind"),
         wind_velocity_mean_(kDefaultWindVelocityMean),
@@ -71,7 +70,6 @@ class GazeboWindPlugin : public ModelPlugin {
         wind_gust_direction_mean_(kDefaultWindGustDirectionMean),
         wind_gust_direction_variance_(kDefaultWindGustDirectionVariance),
         frame_id_(kDefaultFrameId),
-        link_name_(kDefaultLinkName),
         node_handle_(NULL) {}
 
   virtual ~GazeboWindPlugin();
@@ -80,7 +78,7 @@ class GazeboWindPlugin : public ModelPlugin {
   /// \brief Load the plugin.
   /// \param[in] _model Pointer to the model that loaded this plugin.
   /// \param[in] _sdf SDF element that describes the plugin.
-  void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  void Load(physics::WorldPtr world, sdf::ElementPtr sdf);
 
   /// \brief Called when the world is updated.
   /// \param[in] _info Update timing information.
@@ -91,13 +89,10 @@ class GazeboWindPlugin : public ModelPlugin {
   event::ConnectionPtr update_connection_;
 
   physics::WorldPtr world_;
-  physics::ModelPtr model_;
-  physics::LinkPtr link_;
 
   std::string namespace_;
 
   std::string frame_id_;
-  std::string link_name_;
   std::string wind_pub_topic_;
 
   double wind_velocity_mean_;

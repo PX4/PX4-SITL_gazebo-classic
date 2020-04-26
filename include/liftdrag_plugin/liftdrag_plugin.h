@@ -140,11 +140,11 @@ namespace gazebo
     protected: sdf::ElementPtr sdf;
 
     private: void WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg);
-    
+
     private: transport::NodePtr node_handle_;
     private: transport::SubscriberPtr wind_sub_;
     private: std::string namespace_;
-    private: std::string wind_sub_topic_;
+    private: std::string wind_sub_topic_ = "world_wind";
     private: ignition::math::Vector3d wind_vel_;
   };
 }

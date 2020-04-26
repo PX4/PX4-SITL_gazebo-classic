@@ -50,7 +50,7 @@ static const std::string kDefaultNamespace = "";
 static const std::string kDefaultCommandSubTopic = "/gazebo/command/motor_speed";
 static const std::string kDefaultMotorFailureNumSubTopic = "/gazebo/motor_failure_num";
 static const std::string kDefaultMotorVelocityPubTopic = "/motor_speed";
-std::string wind_sub_topic_ = "/wind";
+std::string wind_sub_topic_ = "/world_wind";
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;

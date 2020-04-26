@@ -168,7 +168,7 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("windSubTopic")){
     this->wind_sub_topic_ = _sdf->Get<std::string>("windSubTopic");
-    wind_sub_ = node_handle_->Subscribe("~/" + _model->GetName() + wind_sub_topic_, &LiftDragPlugin::WindVelocityCallback, this);
+    wind_sub_ = node_handle_->Subscribe("~/" + wind_sub_topic_, &LiftDragPlugin::WindVelocityCallback, this);
   }
 
   if (_sdf->HasElement("control_joint_name"))
