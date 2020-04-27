@@ -1531,6 +1531,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 #endif
 
         double err = current - target;
+        err = std::max(std::min(err, 0.2), -0.2);
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
       }
