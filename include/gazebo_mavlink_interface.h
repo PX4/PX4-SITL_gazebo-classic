@@ -383,7 +383,7 @@ private:
   double groundtruth_lon_rad;
   double groundtruth_altitude;
 
-  double imu_update_interval_ = 0.004; ///< Used for non-lockstep
+  double imu_update_interval_ = 0.005; ///< Used for non-lockstep
 
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
