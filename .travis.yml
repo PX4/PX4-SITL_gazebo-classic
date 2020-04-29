@@ -93,6 +93,11 @@ matrix:
           cache:
             ccache: true
 
+before_cache:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew cleanup
+    fi
+
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       brew update;
