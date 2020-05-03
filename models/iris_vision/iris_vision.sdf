@@ -4,7 +4,7 @@
         <robotNamespace></robotNamespace>
         <pubRate>30</pubRate>
         <randomWalk>0.1</randomWalk>
-        <noiseDensity>5e-04</noiseDensity>
+        <noiseDensity>0.01</noiseDensity>
         <corellationTime>60.0</corellationTime>
     </plugin>
 
