@@ -100,8 +100,8 @@ void OpticalFlowMockupPlugin::OnUpdate(const common::UpdateInfo&)
     ignition::math::Vector3d angular_velocity_model = ignitionFromGazeboMath(model_->GetRelativeAngularVel());
 #endif
     // Compute velocities in body FRD frame
-    ignition::math::Vector3d angular_velocity = q_br.Inverse().RotateVector(angular_velocity_model);
-    ignition::math::Vector3d linear_velocity = q_br.Inverse().RotateVector(
+    ignition::math::Vector3d angular_velocity = q_FLU_to_FRD.RotateVector(angular_velocity_model);
+    ignition::math::Vector3d linear_velocity = q_FLU_to_FRD.RotateVector(
                                          pose_model_world.Rot().Inverse().RotateVector(velocity_model_world));
 
   // Compute flow
