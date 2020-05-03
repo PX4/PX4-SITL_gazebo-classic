@@ -221,16 +221,18 @@ inline ignition::math::Pose3d ignitionFromGazeboMath(const gazebo::math::Pose &p
  *
  * NED to ENU: +PI/2 rotation about Z (Down) followed by a +PI rotation around X (old North/new East)
  * ENU to NED: +PI/2 rotation about Z (Up) followed by a +PI rotation about X (old East/new North)
+ * This rotation is symmetric, so q_ENU_to_NED == q_NED_to_ENU.
  */
-static const auto q_ng = ignition::math::Quaterniond(0, 0.70711, 0.70711, 0);
+static const auto q_ENU_to_NED = ignition::math::Quaterniond(0, 0.70711, 0.70711, 0);
 
 /**
  * @brief Quaternion for rotation between body FLU and body FRD frames
  *
  * +PI rotation around X (Forward) axis rotates from Forward, Right, Down (aircraft)
  * to Forward, Left, Up (base_link) frames and vice-versa.
+ * This rotation is symmetric, so q_FLU_to_FRD == q_FRD_to_FLU.
  */
-static const auto q_br = ignition::math::Quaterniond(0, 1, 0, 0);
+static const auto q_FLU_to_FRD = ignition::math::Quaterniond(0, 1, 0, 0);
 
 // sensor X-axis unit vector in `base_link` frame
 static const ignition::math::Vector3d kDownwardRotation = ignition::math::Vector3d(0, 0, -1);

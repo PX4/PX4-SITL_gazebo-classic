@@ -864,12 +864,12 @@ void GazeboMavlinkInterface::SendSensorMessages()
   // send always accel and gyro data (not dependent of the bitmask)
   // required so to keep the timestamps on sync and the lockstep can
   // work properly
-  ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d accel_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
     last_imu_message_.linear_acceleration().x(),
     last_imu_message_.linear_acceleration().y(),
     last_imu_message_.linear_acceleration().z()));
 
-  ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d gyro_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
     last_imu_message_.angular_velocity().x(),
     last_imu_message_.angular_velocity().y(),
     last_imu_message_.angular_velocity().z()));
@@ -885,10 +885,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
   // send only mag data
   if (mag_updated_) {
-    ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
-    ignition::math::Quaterniond q_nb = q_ng*q_gb;
+    ignition::math::Quaterniond q_body_to_world = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
 
-    ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n_);
+    ignition::math::Vector3d mag_b = q_body_to_world.RotateVectorReverse(mag_n_);
 
     sensor_msg.xmag = mag_b.X();
     sensor_msg.ymag = mag_b.Y();
@@ -920,7 +919,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     const float diff_pressure_stddev = 0.01f;
     const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev;
 
-    ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
+    ignition::math::Quaterniond q_gb = q_gr*q_FLU_to_FRD.Inverse();
 #if GAZEBO_MAJOR_VERSION >= 9
     ignition::math::Vector3d vel_a = q_gb.RotateVector(model_->WorldLinearVel() - wind_vel_);
 #else
@@ -954,23 +953,22 @@ void GazeboMavlinkInterface::SendGroundTruth()
     last_imu_message_.orientation().y(),
     last_imu_message_.orientation().z());
 
-  ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
-  ignition::math::Quaterniond q_nb = q_ng*q_gb;
+  ignition::math::Quaterniond q_nb = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
-  ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
-  ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
+  ignition::math::Vector3d vel_b = q_FLU_to_FRD.RotateVector(model_->RelativeLinearVel());
+  ignition::math::Vector3d vel_n = q_ENU_to_NED.RotateVector(model_->WorldLinearVel());
+  ignition::math::Vector3d omega_nb_b = q_FLU_to_FRD.RotateVector(model_->RelativeAngularVel());
 #else
-  ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
-  ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
-  ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
+  ignition::math::Vector3d vel_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
+  ignition::math::Vector3d vel_n = q_ENU_to_NED.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
+  ignition::math::Vector3d omega_nb_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
 #endif
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d accel_true_b = q_br.RotateVector(model_->RelativeLinearAccel());
+  ignition::math::Vector3d accel_true_b = q_FLU_to_FRD.RotateVector(model_->RelativeLinearAccel());
 #else
-  ignition::math::Vector3d accel_true_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
+  ignition::math::Vector3d accel_true_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
 #endif
 
   // send ground truth
@@ -1190,7 +1188,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   mavlink_message_t msg;
 
   // transform position from local ENU to local NED frame
-  ignition::math::Vector3d position = q_ng.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d position = q_ENU_to_NED.RotateVector(ignition::math::Vector3d(
     odom_message->position().x(),
     odom_message->position().y(),
     odom_message->position().z()));
@@ -1206,17 +1204,17 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   // transform the vehicle orientation from the ENU to the NED frame
   // q_nb is the quaternion that represents the orientation of the vehicle
   // the NED earth/local
-  ignition::math::Quaterniond q_nb = q_ng * q_gr * q_br.Inverse();
+  ignition::math::Quaterniond q_nb = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
 
   // transform linear velocity from local ENU to body FRD frame
-  ignition::math::Vector3d linear_velocity = q_br.Inverse().RotateVector(
+  ignition::math::Vector3d linear_velocity = q_FLU_to_FRD.RotateVector(
     q_gr.Inverse().RotateVector(ignition::math::Vector3d(
       odom_message->linear_velocity().x(),
       odom_message->linear_velocity().y(),
       odom_message->linear_velocity().z())));
 
   // transform angular velocity from body FLU to body FRD frame
-  ignition::math::Vector3d angular_velocity = q_br.Inverse().RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d angular_velocity = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
     odom_message->angular_velocity().x(),
     odom_message->angular_velocity().y(),
     odom_message->angular_velocity().z()));
