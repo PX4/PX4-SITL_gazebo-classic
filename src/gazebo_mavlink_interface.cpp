@@ -925,9 +925,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
     ignition::math::Quaterniond q_gb = q_gr*q_FLU_to_FRD.Inverse();
 #if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d vel_a = q_gb.RotateVector(model_->WorldLinearVel() - wind_vel_);
+    ignition::math::Vector3d vel_a = q_gb.RotateVectorReverse(model_->WorldLinearVel() - wind_vel_);
 #else
-    ignition::math::Vector3d vel_a = q_gb.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel() -  wind_vel_));
+    ignition::math::Vector3d vel_a = q_gb.RotateVectorReverse(ignitionFromGazeboMath(model_->GetWorldLinearVel() -  wind_vel_));
 #endif
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
