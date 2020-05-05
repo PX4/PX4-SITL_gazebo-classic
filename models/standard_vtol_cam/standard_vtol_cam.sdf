@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='standard_vtol_cam'>
+    <include>
+      <uri>model://standard_vtol</uri>
+    </include>
+    <!--geotagged images camera-->
+    <include>
+      <uri>model://geotagged_cam</uri>
+      <pose>0 0 0.3 0 -1.571 0</pose>
+    </include>
+    <joint name="geotagged_cam_joint" type="fixed">
+      <parent>standard_vtol::base_link</parent>
+      <child>geotagged_cam::camera_link</child>
+    </joint>
+  </model>
+</sdf>
