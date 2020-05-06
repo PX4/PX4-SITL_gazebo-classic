@@ -1083,6 +1083,7 @@
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor1_tilt">
@@ -1101,6 +1102,7 @@
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor2_tilt">
@@ -1119,6 +1121,7 @@
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor3_tilt">
@@ -1137,6 +1140,7 @@
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="left_elevon">
