@@ -156,6 +156,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   input_reference_.resize(n_out_max);
   joints_.resize(n_out_max);
   pids_.resize(n_out_max);
+  joint_max_errors_.resize(n_out_max);
   for (int i = 0; i < n_out_max; ++i)
   {
     pids_[i].Init(0, 0, 0, 0, 0, 0, 0);
@@ -235,6 +236,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
             double cmdMin = 0;
             if (pid->HasElement("cmdMin"))
               cmdMin = pid->Get<double>("cmdMin");
+            if (pid->HasElement("errMax")) {
+              joint_max_errors_[index] = pid->Get<double>("errMax");
+            }
             pids_[index].Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
           }
         }
@@ -1530,6 +1534,9 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 #endif
 
         double err = current - target;
+        if(joint_max_errors_[i]!=0.) {
+          err = std::max(std::min(err, joint_max_errors_[i]), -joint_max_errors_[i]);
+        }
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
       }
