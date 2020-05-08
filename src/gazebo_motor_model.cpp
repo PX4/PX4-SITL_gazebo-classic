@@ -200,9 +200,9 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // XXX this has to be modelled better
   //
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d body_velocity = link_->WorldLinearVel() - wind_vel_;
+  ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
 #else
-  ignition::math::Vector3d body_velocity = ignitionFromGazeboMath(link_->GetWorldLinearVel())  - wind_vel_;
+  ignition::math::Vector3d body_velocity = ignitionFromGazeboMath(link_->GetWorldLinearVel());
 #endif
   double vel = body_velocity.Length();
   double scalar = 1 - vel / 25.0; // at 50 m/s the rotor will not produce any force anymore
@@ -219,8 +219,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #else
   ignition::math::Vector3d joint_axis = ignitionFromGazeboMath(joint_->GetGlobalAxis(0));
 #endif
-  //ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
-  ignition::math::Vector3d body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
+  ignition::math::Vector3d relative_wind_velocity = body_velocity - wind_vel_;
+  ignition::math::Vector3d body_velocity_perpendicular = relative_wind_velocity - (relative_wind_velocity.Dot(joint_axis)) * joint_axis;
   ignition::math::Vector3d air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
   // Apply air_drag to link.
   link_->AddForce(air_drag);
