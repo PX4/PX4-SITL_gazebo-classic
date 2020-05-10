@@ -85,6 +85,7 @@ private:
     int         _captureCount;
     double      _captureInterval;
     int         _fd;
+    int         _zoom_cmd;
 
     enum {
         CAPTURE_DISABLED,
