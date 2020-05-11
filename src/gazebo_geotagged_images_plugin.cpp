@@ -54,6 +54,7 @@ GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     , _hfov(1.57)
     , _zoom(1.0)
     , _maxZoom(8.0)
+    , _zoom_cmd(0)
 {
 }
 
@@ -428,6 +429,14 @@ void GeotaggedImagesPlugin::cameraThread() {
             _last_heartbeat = current_time;
             _send_heartbeat();
         }
+
+        //Move camera zoom incase of continuous zoom
+        // _zoom_cmd is set by MAV_CMD_SET_CAMERA_ZOOM
+        if (_zoom_cmd!=0) {
+            _zoom = std::max(std::min(float(_zoom + 0.05 * _zoom_cmd), _maxZoom), 1.0f);
+            _camera->SetHFOV(_hfov / _zoom);
+        }
+
     }
 }
 
@@ -689,8 +698,13 @@ void GeotaggedImagesPlugin::_handle_camera_zoom(const mavlink_message_t *pMsg, s
     _send_cmd_ack(pMsg->sysid, pMsg->compid,
                   MAV_CMD_SET_CAMERA_ZOOM, MAV_RESULT_ACCEPTED, srcaddr);
 
-    _zoom = std::max(std::min(float(_zoom + 0.1 * cmd.param2), _maxZoom), 1.0f);
-    _camera->SetHFOV(_hfov / _zoom);
+    if (cmd.param1 == ZOOM_TYPE_CONTINUOUS) {
+        _zoom = std::max(std::min(float(_zoom + 0.1 * cmd.param2), _maxZoom), 1.0f);
+        _zoom_cmd = cmd.param2;
+    } else {
+        _zoom = std::max(std::min(float(_zoom + 0.1 * cmd.param2), _maxZoom), 1.0f);
+        _camera->SetHFOV(_hfov / _zoom);
+    }
 }
 
 void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
