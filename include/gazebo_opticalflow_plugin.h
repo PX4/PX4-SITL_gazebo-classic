@@ -40,7 +40,7 @@
 #include "flow_px4.hpp"
 
 #define DEFAULT_RATE 20
-#define HAS_GYRO TRUE
+#define HAS_GYRO 1
 
 using namespace cv;
 using namespace std;
