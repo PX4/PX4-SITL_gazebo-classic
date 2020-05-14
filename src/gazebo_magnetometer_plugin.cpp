@@ -195,6 +195,7 @@ void MagnetometerPlugin::OnUpdate(const common::UpdateInfo&)
     magnetic_field->set_z(magnetic_field_I[2]);
     mag_message_.set_allocated_magnetic_field(magnetic_field);
 
+    mag_message_.clear_magnetic_field_covariance();
     for (auto i = 0; i < 9; ++i) {
       switch (i){
         // principal diagonal = the variance of the random variables
