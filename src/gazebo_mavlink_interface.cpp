@@ -1515,7 +1515,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
   for (int i = 0; i < input_reference_.size(); i++) {
-    if (joints_[i]) {
+    if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
       double target = input_reference_[i];
       if (joint_control_type_[i] == "velocity")
       {
