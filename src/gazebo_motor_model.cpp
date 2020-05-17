@@ -108,14 +108,18 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   if (_sdf->HasElement("turningDirection")) {
     std::string turning_direction = _sdf->GetElement("turningDirection")->Get<std::string>();
     if (turning_direction == "cw")
-      turning_direction_ = turning_direction::CW;
+      turning_direction_type_ = turning_direction::CW;
     else if (turning_direction == "ccw")
-      turning_direction_ = turning_direction::CCW;
+      turning_direction_type_ = turning_direction::CCW;
+    else if (turning_direction == "cwr")
+      turning_direction_type_ = turning_direction::CW_REVERSABLE;
+    else if (turning_direction == "ccwr")
+      turning_direction_type_ = turning_direction::CCW_REVERSABLE;
     else
-      gzerr << "[gazebo_motor_model] Please only use 'cw' or 'ccw' as turningDirection.\n";
+      gzerr << "[gazebo_motor_model] Please only use 'cw', 'ccw', 'cwr', or 'ccwr' as turningDirection.\n";
   }
   else
-    gzerr << "[gazebo_motor_model] Please specify a turning direction ('cw' or 'ccw').\n";
+    gzerr << "[gazebo_motor_model] Please specify a turning direction ('cw', 'ccw', 'cwr', or 'ccwr').\n";
 
   getSdfParam<std::string>(_sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
   getSdfParam<std::string>(_sdf, "motorSpeedPubTopic", motor_speed_pub_topic_,
@@ -194,8 +198,13 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
     gzerr << "Aliasing on motor [" << motor_number_ << "] might occur. Consider making smaller simulation time steps or raising the rotor_velocity_slowdown_sim_ param.\n";
   }
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
-  // double force = real_motor_velocity * real_motor_velocity * motor_constant_;
-  double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_; // TODO: remove std::abs for multicopter.
+  double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
+  if(turning_direction_type_ == turning_direction::CCW || turning_direction_type_ == turning_direction::CW) {
+    // Not allowed to have negative thrust.
+    force = std::abs(force);
+  }
+
+  int turning_dir = turning_direction_type_ / std::abs(turning_direction_type_);
 
   // scale down force linearly with forward speed
   // XXX this has to be modelled better
@@ -208,8 +217,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   double vel = body_velocity.Length();
   double scalar = 1 - vel / 25.0; // at 50 m/s the rotor will not produce any force anymore
   scalar = ignition::math::clamp(scalar, 0.0, 1.0);
-  // Apply a force to the link. TODO: Remove turning_direction_ for multicopter.
-  link_->AddRelativeForce(ignition::math::Vector3d(0, 0, turning_direction_ * force * scalar));
+  // Apply a force to the link.
+  link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force * scalar));
 
   // Forces from Philppe Martin's and Erwan Salaün's
   // 2010 IEEE Conference on Robotics and Automation paper
@@ -234,7 +243,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #else
   ignition::math::Pose3d pose_difference = ignitionFromGazeboMath(link_->GetWorldCoGPose() - parent_links.at(0)->GetWorldCoGPose());
 #endif
-  ignition::math::Vector3d drag_torque(0, 0, -turning_direction_ * force * moment_constant_);
+  ignition::math::Vector3d drag_torque(0, 0, -turning_dir * force * moment_constant_);
   // Transforming the drag torque into the parent frame to handle arbitrary rotor orientations.
   ignition::math::Vector3d drag_torque_parent_frame = pose_difference.Rot().RotateVector(drag_torque);
   parent_links.at(0)->AddRelativeTorque(drag_torque_parent_frame);
@@ -250,7 +259,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #if 0 //FIXME: disable PID for now, it does not play nice with the PX4 CI system.
   if (use_pid_)
   {
-    double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
+    double err = joint_->GetVelocity(0) - turning_dir * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
     double rotorForce = pid_.Update(err, sampling_time_);
     joint_->SetForce(0, rotorForce);
     // gzerr << "rotor " << joint_->GetName() << " : " << rotorForce << "\n";
@@ -260,16 +269,16 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #if GAZEBO_MAJOR_VERSION >= 7
     // Not desirable to use SetVelocity for parts of a moving model
     // impact on rest of the dynamic system is non-physical.
-    joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+    joint_->SetVelocity(0, turning_dir * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #elif GAZEBO_MAJOR_VERSION >= 6
     // Not ideal as the approach could result in unrealistic impulses, and
     // is only available in ODE
     joint_->SetParam("fmax", 0, 2.0);
-    joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+    joint_->SetParam("vel", 0, turning_dir * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif
   }
 #else
-  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+  joint_->SetVelocity(0, turning_dir * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif /* if 0 */
 }
 
