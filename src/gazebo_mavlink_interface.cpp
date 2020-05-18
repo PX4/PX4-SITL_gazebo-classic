@@ -30,6 +30,16 @@ GazeboMavlinkInterface::~GazeboMavlinkInterface() {
   updateConnection_->~Connection();
 }
 
+template <class T>
+T our_any_cast(const boost::any &val) {
+#if GAZEBO_MAJOR_VERSION >= 11
+  return gazebo::physics::PhysicsEngine::any_cast<T>(val);
+#else
+  return boost::any_cast<T>(val);
+#endif
+}
+
+
 /// \brief      A helper class that provides storage for additional parameters that are inserted into the callback.
 /// \details    GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
 template <typename GazeboMsgT>
@@ -312,7 +322,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     // Therefore we check these params and abort if they won't work.
 
     presetManager->GetCurrentProfileParam("real_time_update_rate", param);
-    double real_time_update_rate = boost::any_cast<double>(param);
+    double real_time_update_rate = our_any_cast<double>(param);
     const int real_time_update_rate_int = static_cast<int>(real_time_update_rate + 0.5);
 
     if (real_time_update_rate_int % 250 != 0)
@@ -323,7 +333,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
-    const double max_step_size = boost::any_cast<double>(param);
+    const double max_step_size = our_any_cast<double>(param);
     if (1.0 / real_time_update_rate != max_step_size)
     {
       gzerr << "max_step_size of " << max_step_size
