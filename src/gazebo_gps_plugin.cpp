@@ -152,7 +152,7 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(model_->GetWorldPose());    // TODO(burrimi): Check tf
 #endif
   ignition::math::Vector3d& pos_W_I = T_W_I.Pos();           // Use the models' world position for GPS and groundtruth
-
+  ignition::math::Quaterniond& att_W_I = T_W_I.Rot();
   // reproject position without noise into geographic coordinates
   auto latlon_gt = reproject(pos_W_I);
 
@@ -252,6 +252,10 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   groundtruth_msg.set_velocity_east(velocity_current_W.X());
   groundtruth_msg.set_velocity_north(velocity_current_W.Y());
   groundtruth_msg.set_velocity_up(velocity_current_W.Z());
+  groundtruth_msg.set_attitude_q_w(att_W_I.W());
+  groundtruth_msg.set_attitude_q_x(att_W_I.X());
+  groundtruth_msg.set_attitude_q_y(att_W_I.Y());
+  groundtruth_msg.set_attitude_q_z(att_W_I.Z());
 
   // publish Groundtruth msg at full rate
   gt_pub_->Publish(groundtruth_msg);
