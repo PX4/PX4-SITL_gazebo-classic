@@ -33,7 +33,6 @@
 #include <gazebo/sensors/sensors.hh>
 #include <ignition/math.hh>
 
-#include "Imu.pb.h"
 #include "Groundtruth.pb.h"
 
 namespace gazebo
@@ -68,7 +67,6 @@ namespace gazebo
   static double kPitchDir = -1.0;
   static double kYawDir = 1.0;
 
-  typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
   typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
   class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
