@@ -247,11 +247,8 @@ void UsvDynamicsPlugin::Update()
 
   // Vehicle frame transform
   ignition::math::Quaterniond vq(kEuler.X(), kEuler.Y(), kEuler.Z());
-  #if GAZEBO_MAJOR_VERSION >= 8
-    ignition::math::Matrix4 xformV(vq);
-  #else
-    ignition::math::Matrix4<double> xformV(vq);
-  #endif
+
+  ignition::math::Matrix4<double> xformV(vq);
 
   // Sum all forces - in body frame
   const Eigen::VectorXd kForceSum = kAmassVec + kDvec;
