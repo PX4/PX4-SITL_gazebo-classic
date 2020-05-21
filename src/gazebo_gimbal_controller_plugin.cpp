@@ -99,7 +99,7 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
   this->yawCommand = 0;
-  this->lastImuYaw = 0;
+  this->vehicleYaw = 0;
   this->rDir = kRollDir;
   this->pDir = kPitchDir;
   this->yDir = kYawDir;
@@ -394,18 +394,18 @@ void GimbalControllerPlugin::Init()
   // Although gazebo above 7.4 support Any, still use GzString instead
   this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
 
-  imuSub = node->Subscribe("~/" + model->GetName() + "/imu", &GimbalControllerPlugin::ImuCallback, this);
+  imuSub = node->Subscribe("~/" + model->GetName() + "/groundtruth", &GimbalControllerPlugin::GroundTruthCallback, this);
 
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
 }
 
-void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
+void GimbalControllerPlugin::GroundTruthCallback(GtPtr& msg)
 {
   const std::lock_guard<std::mutex> lock(cmd_mutex);
-  this->lastImuYaw = ignition::math::Quaterniond(imu_message->orientation().w(),
-						 imu_message->orientation().x(),
-						 imu_message->orientation().y(),
-						 imu_message->orientation().z()).Euler()[2];
+  this->vehicleYaw = ignition::math::Quaterniond(msg->attitude_q_w(),
+						 msg->attitude_q_x(),
+						 msg->attitude_q_y(),
+						 msg->attitude_q_z()).Euler()[2];
 }
 
 #if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
@@ -483,7 +483,7 @@ void GimbalControllerPlugin::OnUpdate()
     double dt = (time - this->lastUpdateTime).Double();
 
     // We want yaw to control in body frame, not in global.
-    double yaw_command = this->yawCommand + this->lastImuYaw;
+    double yaw_command = this->yawCommand + this->vehicleYaw;
 
     // truncate command inside joint angle limits
 #if GAZEBO_MAJOR_VERSION >= 9
