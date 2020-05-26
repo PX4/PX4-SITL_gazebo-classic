@@ -1,4 +1,4 @@
-<sdf version='1.5'>
+<sdf version='1.7'>
   <model name='iris_opt_flow'>
     <include>
       <uri>model://iris</uri>
