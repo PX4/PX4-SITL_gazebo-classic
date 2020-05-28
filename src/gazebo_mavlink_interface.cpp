@@ -1241,11 +1241,9 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.time_usec = odom_message->time_usec();
 
     odom.frame_id = MAV_FRAME_LOCAL_NED;
-    //TODO: This is a interim fix to get the code to compile
-    //      This needs to eventually be changed to MAV_FRAME_BODY_OFFSET_NED
-    //      This is due to a update on the mavlink: https://github.com/mavlink/mavlink/pull/1112
-    //      where MAV_FRAME_BODY_FRD has been deprecated
-    odom.child_frame_id = 12; //MAV_FRAME_BODY_FRD MAV_FRAME_RESERVED_12
+    odom.child_frame_id = MAV_FRAME_BODY_FRD;
+
+    odom.estimator_type = MAV_ESTIMATOR_TYPE_VISION;
 
     odom.x = position.X();
     odom.y = position.Y();
@@ -1264,7 +1262,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.pitchspeed = angular_velocity.Y();
     odom.yawspeed = angular_velocity.Z();
 
-    // parse covariance matrices
+    // Parse covariance matrices
     // The main diagonal values are always positive (variance), so a transform
     // in the covariance matrices from one frame to another would only
     // change the values of the main diagonal. Since they are all zero,
