@@ -88,16 +88,17 @@ matrix:
         #   env:
         #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2020-05-28
         #     - BUILD=${KINETIC}
-        - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
-          os: linux
-          language: cpp
-          services:
-            - docker
-          cache:
-            ccache: true
-          env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-05-28
-            - BUILD=${MELODIC}
+        # FIXME: we need a new MAVLink ROS release (by 2020-05-28)
+        # - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
+        #   os: linux
+        #   language: cpp
+        #   services:
+        #     - docker
+        #   cache:
+        #     ccache: true
+        #   env:
+        #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-05-28
+        #     - BUILD=${MELODIC}
         - name: Validate SDF schemas
           os: linux
           language: cpp
