@@ -717,18 +717,26 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
     float available_mib = 0.0f;
     boost::filesystem::space_info si = boost::filesystem::space(".");
     available_mib = (float)((double)si.available / (1024.0 * 1024.0));
+
+#if GAZEBO_MAJOR_VERSION >= 9
+    common::Time current_time = _scene->SimTime();
+#else
+    common::Time current_time = _scene->GetSimTime();
+#endif
+
     mavlink_message_t msg;
     mavlink_msg_camera_capture_status_pack_chan(
         1,
         MAV_COMP_ID_CAMERA,
         MAVLINK_COMM_1,
         &msg,
-        0,
+        current_time.Double() * 1e3,
         status,                                 // image status
         0,                                      // video status (Idle)
         interval,                               // image interval
-        0,                                      // recording_time_s
-        available_mib);                         // available_capacity
+        0,                                      // recording time in ms
+        available_mib,                          // available storage capacity
+        0);                                     // total number of images
     _send_mavlink_message(&msg, srcaddr);
 }
 
