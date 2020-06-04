@@ -735,8 +735,7 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
         0,                                      // video status (Idle)
         interval,                               // image interval
         0,                                      // recording time in ms
-        available_mib,                          // available storage capacity
-        _imageCounter);                         // total number of images
+        available_mib)                          // available storage capacity
     _send_mavlink_message(&msg, srcaddr);
 }
 
