@@ -57,8 +57,8 @@ namespace gazebo {
 /// This plugin accepts the following SDF parameters:
 ///
 /// <linkName>: Name of base link for receiving pose and and applying forces.
-/// <hullVolume>: The volume of the hull of the airship.
-/// <airDensity>: The density of air.
+/// <hullVolume>: The volume of the hull of the airship [m^3].
+/// <airDensity>: The density of air [kg/(m^3)].
 /// <m11>: The added mass matrix term in row 1 column 1.
 /// <m22>: The added mass matrix term in row 2 column 2.
 /// <m26>: The added mass matrix term in row 2 column 6.
@@ -69,10 +69,10 @@ namespace gazebo {
 /// <m55>: The added mass matrix term in row 5 column 5.
 /// <m62>: The added mass matrix term in row 6 column 2.
 /// <m66>: The added mass matrix term in row 6 column 6.
-/// <distCOV>: The distance from the nose to the Center of Volume (CoV).
-/// <distPotentialFlow>: The distance from the nose where the flow ceases to be potential.
-/// <distFinCenter>: The distance from the nose to the center of a fin.
-/// <distQuarterChord>: The distance from the center to the quarter chord length of a fin.
+/// <distCOV>: The distance from the nose to the Center of Volume (CoV) [m].
+/// <distPotentialFlow>: The distance from the nose where the flow ceases to be potential [m].
+/// <distFinCenter>: The distance from the nose to the center of a fin [m].
+/// <distQuarterChord>: The distance from the center to the quarter chord length of a fin [m].
 /// <forceHullInviscidFlowCoeff>: The force coefficient of the inviscid flow contribution of the hull.
 /// <forceHullViscousFlowCoeff>: The force coefficient of the viscous flow contribution of the hull.
 /// <momentHullInviscidFlowCoeff>: The moment coefficient of the inviscid flow contribution of the hull.
@@ -105,28 +105,51 @@ class GazeboLTADynamicsPlugin : public ModelPlugin {
   transport::SubscriberPtr wind_sub_;
   typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
+  // The volume of the hull of the airship [m^3].
   double param_hull_volume_;
+  // The density of air [kg/(m^3)].
   double param_air_density_;
+  // The added mass matrix term in row 1 column 1.
   double param_m11_;
+  // The added mass matrix term in row 2 column 2.
   double param_m22_;
+  // The added mass matrix term in row 2 column 6.
   double param_m26_;
+  // The added mass matrix term in row 3 column 3.
   double param_m33_;
+  // The added mass matrix term in row 3 column 5.
   double param_m35_;
+  // The added mass matrix term in row 4 column 4.
   double param_m44_;
+  // The added mass matrix term in row 5 column 3.
   double param_m53_;
+  // The added mass matrix term in row 5 column 5.
   double param_m55_;
+  // The added mass matrix term in row 6 column 2.
   double param_m62_;
+  // The added mass matrix term in row 6 column 6.
   double param_m66_;
+  // The distance from the nose to the Center of Volume (CoV) [m].
   double param_cov_;
+  // The distance from the nose where the flow ceases to be potential [m].
   double param_eps_v_;
+  // The distance from the nose to the center of a fin [m].
   double param_dist_fin_x_;
+  // The distance from the center to the quarter chord length of a fin [m].
   double param_dist_fin_quarter_chord_;
+  // The force coefficient of the inviscid flow contribution of the hull.
   double param_f_hif_coeff_;
+  // The force coefficient of the viscous flow contribution of the hull.
   double param_f_hvf_coeff_;
+  // The moment coefficient of the inviscid flow contribution of the hull.
   double param_m_hif_coeff_;
+  // The moment coefficient of the viscous flow contribution of the hull.
   double param_m_hvf_coeff_;
+  // The fin normal force coefficient.
   double param_f_fnf_coeff_;
+  // The fin stall angle [deg].
   double param_fin_stall_angle_;
+  // The axial drag coefficient.
   double param_axial_drag_coeff_;
 
   ignition::math::Vector3d wind_;

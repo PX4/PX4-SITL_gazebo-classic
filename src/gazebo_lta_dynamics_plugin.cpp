@@ -206,9 +206,9 @@ void GazeboLTADynamicsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sd
   }
 
   // Set initial wind as zero
-  wind_[0] = 0;
-  wind_[1] = 0;
-  wind_[2] = 0;
+  wind_.X() = 0;
+  wind_.Y() = 0;
+  wind_.Z() = 0;
 
   // Listen to the update event. This event is broadcast every simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboLTADynamicsPlugin::OnUpdate, this, _1));
@@ -227,7 +227,11 @@ void GazeboLTADynamicsPlugin::WindVelocityCallback(WindPtr &wind) {
   ignition::math::Vector3d wind_world = ignition::math::Vector3d(wind->velocity().x(), wind->velocity().y(), wind->velocity().z());
 
   // Rotate to body frame
-  wind_ = link_->WorldPose().Rot().Inverse().RotateVector(wind_world);
+  #if GAZEBO_MAJOR_VERSION >= 9
+    wind_ = link_->WorldPose().Rot().Inverse().RotateVector(wind_world);
+  #else
+    wind_ = ignitionFromGazeboMath(link_->GetWorldPose()).Rot().Inverse().RotateVector(wind_world);
+  #endif
 }
 
 double GazeboLTADynamicsPlugin::Sign(double val) {
@@ -260,14 +264,18 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
   #else
     ignition::math::Vector3d gravity_w = ignitionFromGazeboMath(world_->GetPhysicsEngine()->GetGravity());
     ignition::math::Vector3d linear_acc = ignitionFromGazeboMath(link_->GetRelativeLinearAccel());
-    ignition::math::Vector3d linear_vel = ignitionFromGazeboMath(link_->RelativeLinearVel());
-    ignition::math::Vector3d angular_acc = ignitionFromGazeboMath(link_->RelativeAngularAccel());
+    ignition::math::Vector3d linear_vel = ignitionFromGazeboMath(link_->GetRelativeLinearVel());
+    ignition::math::Vector3d angular_acc = ignitionFromGazeboMath(link_->GetRelativeAngularAccel());
     ignition::math::Vector3d angular_vel = ignitionFromGazeboMath(link_->GetRelativeAngularVel());
   #endif
 
   //Calculate buoyancy force
   ignition::math::Vector3d bouyancy_force_world = - param_air_density_ * param_hull_volume_ * gravity_w;
-  ignition::math::Vector3d bouyancy_force_body = link_->WorldPose().Rot().Inverse().RotateVector(bouyancy_force_world);
+  #if GAZEBO_MAJOR_VERSION >= 9
+    ignition::math::Vector3d bouyancy_force_body = link_->WorldPose().Rot().Inverse().RotateVector(bouyancy_force_world);
+  #else
+    ignition::math::Vector3d bouyancy_force_body = ignitionFromGazeboMath(link_->GetWorldPose()).Rot().Inverse().RotateVector(bouyancy_force_world);
+  #endif
 
   // Construct added mass matrices
   ignition::math::Matrix3d M11 = ignition::math::Matrix3d(param_m11_, 0, 0, 0, param_m22_, 0, 0, 0, param_m33_);
@@ -278,8 +286,10 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
   // Calculate added mass forces and moments
   ignition::math::Vector3d am_comp1 = M11 * linear_acc + M12 * angular_acc;
   ignition::math::Vector3d am_comp2 = M21 * linear_acc + M22 * angular_acc;
-  ignition::math::Vector3d added_mass_force = -am_comp1 - (angular_vel.Cross(am_comp1));
-  ignition::math::Vector3d added_mass_moment = -am_comp2 - (linear_vel.Cross(am_comp1) + angular_vel.Cross(am_comp2));
+  ignition::math::Vector3d munk_comp1 = M11 * linear_vel + M12 * angular_vel;
+  ignition::math::Vector3d munk_comp2 = M21 * linear_vel + M22 * angular_vel;
+  ignition::math::Vector3d added_mass_force = -am_comp1 - (angular_vel.Cross(munk_comp1));
+  ignition::math::Vector3d added_mass_moment = -am_comp2 - (linear_vel.Cross(munk_comp1) + angular_vel.Cross(munk_comp2));
 
   // Calculate viscous forces
   ignition::math::Vector3d vel_eps_v = LocalVelocity(linear_vel, angular_vel, ignition::math::Vector3d(param_eps_v_, 0, 0));
