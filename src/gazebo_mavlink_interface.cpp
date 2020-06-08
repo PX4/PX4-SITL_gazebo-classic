@@ -30,6 +30,16 @@ GazeboMavlinkInterface::~GazeboMavlinkInterface() {
   updateConnection_->~Connection();
 }
 
+template <class T>
+T our_any_cast(const boost::any &val) {
+#if GAZEBO_MAJOR_VERSION >= 11
+  return gazebo::physics::PhysicsEngine::any_cast<T>(val);
+#else
+  return boost::any_cast<T>(val);
+#endif
+}
+
+
 /// \brief      A helper class that provides storage for additional parameters that are inserted into the callback.
 /// \details    GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
 template <typename GazeboMsgT>
@@ -156,6 +166,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   input_reference_.resize(n_out_max);
   joints_.resize(n_out_max);
   pids_.resize(n_out_max);
+  joint_max_errors_.resize(n_out_max);
   for (int i = 0; i < n_out_max; ++i)
   {
     pids_[i].Init(0, 0, 0, 0, 0, 0, 0);
@@ -235,6 +246,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
             double cmdMin = 0;
             if (pid->HasElement("cmdMin"))
               cmdMin = pid->Get<double>("cmdMin");
+            if (pid->HasElement("errMax")) {
+              joint_max_errors_[index] = pid->Get<double>("errMax");
+            }
             pids_[index].Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
           }
         }
@@ -308,7 +322,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     // Therefore we check these params and abort if they won't work.
 
     presetManager->GetCurrentProfileParam("real_time_update_rate", param);
-    double real_time_update_rate = boost::any_cast<double>(param);
+    double real_time_update_rate = our_any_cast<double>(param);
     const int real_time_update_rate_int = static_cast<int>(real_time_update_rate + 0.5);
 
     if (real_time_update_rate_int % 250 != 0)
@@ -319,7 +333,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
-    const double max_step_size = boost::any_cast<double>(param);
+    const double max_step_size = our_any_cast<double>(param);
     if (1.0 / real_time_update_rate != max_step_size)
     {
       gzerr << "max_step_size of " << max_step_size
@@ -921,9 +935,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
     ignition::math::Quaterniond q_gb = q_gr*q_FLU_to_FRD.Inverse();
 #if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d vel_a = q_gb.RotateVector(model_->WorldLinearVel() - wind_vel_);
+    ignition::math::Vector3d vel_a = q_gb.RotateVectorReverse(model_->WorldLinearVel() - wind_vel_);
 #else
-    ignition::math::Vector3d vel_a = q_gb.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel() -  wind_vel_));
+    ignition::math::Vector3d vel_a = q_gb.RotateVectorReverse(ignitionFromGazeboMath(model_->GetWorldLinearVel() -  wind_vel_));
 #endif
     // calculate differential pressure in hPa
     // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
@@ -1227,11 +1241,9 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.time_usec = odom_message->time_usec();
 
     odom.frame_id = MAV_FRAME_LOCAL_NED;
-    //TODO: This is a interim fix to get the code to compile
-    //      This needs to eventually be changed to MAV_FRAME_BODY_OFFSET_NED
-    //      This is due to a update on the mavlink: https://github.com/mavlink/mavlink/pull/1112
-    //      where MAV_FRAME_BODY_FRD has been deprecated
-    odom.child_frame_id = 12; //MAV_FRAME_BODY_FRD MAV_FRAME_RESERVED_12
+    odom.child_frame_id = MAV_FRAME_BODY_FRD;
+
+    odom.estimator_type = MAV_ESTIMATOR_TYPE_VISION;
 
     odom.x = position.X();
     odom.y = position.Y();
@@ -1250,7 +1262,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.pitchspeed = angular_velocity.Y();
     odom.yawspeed = angular_velocity.Z();
 
-    // parse covariance matrices
+    // Parse covariance matrices
     // The main diagonal values are always positive (variance), so a transform
     // in the covariance matrices from one frame to another would only
     // change the values of the main diagonal. Since they are all zero,
@@ -1511,7 +1523,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
   for (int i = 0; i < input_reference_.size(); i++) {
-    if (joints_[i]) {
+    if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
       double target = input_reference_[i];
       if (joint_control_type_[i] == "velocity")
       {
@@ -1530,6 +1542,9 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 #endif
 
         double err = current - target;
+        if(joint_max_errors_[i]!=0.) {
+          err = std::max(std::min(err, joint_max_errors_[i]), -joint_max_errors_[i]);
+        }
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
       }

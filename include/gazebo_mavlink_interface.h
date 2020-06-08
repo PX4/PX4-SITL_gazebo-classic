@@ -273,6 +273,7 @@ private:
 
   std::vector<physics::JointPtr> joints_;
   std::vector<common::PID> pids_;
+  std::vector<double> joint_max_errors_;
 
   /// \brief Pointer to the update event connection.
   event::ConnectionPtr updateConnection_;

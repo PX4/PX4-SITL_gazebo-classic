@@ -120,14 +120,14 @@
       <pose>0.35 -0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_0_collision'>
@@ -173,10 +173,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -257,14 +258,14 @@
       <pose>-0.35 0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_1_collision'>
@@ -310,10 +311,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -394,14 +396,14 @@
       <pose>0.35 0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_2_collision'>
@@ -447,10 +449,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -530,14 +533,14 @@
        <pose>-0.35 -0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_3_collision'>
@@ -583,10 +586,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -1065,74 +1069,78 @@
         </channel>
         <channel name="motor0_tilt">
           <input_index>4</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>3.141592</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_0_joint</joint_name>
            <joint_control_pid>
-            <p>80</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor1_tilt">
           <input_index>5</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>3.141592</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_1_joint</joint_name>
            <joint_control_pid>
-            <p>80</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor2_tilt">
           <input_index>6</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>3.141592</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_2_joint</joint_name>
            <joint_control_pid>
-            <p>80</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor3_tilt">
           <input_index>7</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>3.141592</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_3_joint</joint_name>
            <joint_control_pid>
-            <p>80</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="left_elevon">
