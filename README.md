@@ -40,6 +40,7 @@ Some plugins on this packages require some specific dependencies:
 * Protobuf is required to generate custom protobuf messages to be published and subscribed between topics of different plugins;
 * Jinja 2 is used to generate some SDF models from templates;
 * Gstreamer is required for a plugin that streams video from a simulated camera.
+* Mavlink v2.0 header files.
 
 
 ### Ubuntu 
@@ -79,6 +80,19 @@ sudo pacman -S --noconfirm --needed eigen3 hdf5 opencv protobuf vtk yay python2-
 sudo pacman -S --needed $(pacman -Ssq gstreamer)
 ```
 
+### Mavlink header files
+
+There is a dependency on the Mavlink v2.0 header files and these files can be installed either using a build 
+of `PX4/Firmware` or installing the ROS package `ros-<distro>-mavlink`.  If build fails with missing header
+files or function parameter mis-match problems, then you can clone and install the files as follows (for Ubuntu):
+
+```bash
+mkdir -p ~/src/mavlink
+cd src/mavlink
+git clone --depth 1 https://github.com/mavlink/c_library_v2.git
+sudo mkdir -p /usr/local/include/mavlink/v2.0
+sudo cp -rf ~/src/mavlink/c_library_v2/* /usr/local/include/mavlink/v2.0
+```
 
 ## Build *sitl_gazebo*
 
