@@ -85,6 +85,39 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+    <link name='tailsitter/airspeed_link'>
+      <pose>0 0 0 0 -1.57 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='tailsitter/airspeed_joint' type='revolute'>
+      <child>tailsitter/airspeed_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
     <link name='rotor_0'>
       <pose>0.3 -0.3 0.4 0 0 0</pose>
       <inertial>
@@ -508,6 +541,8 @@
         left_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -528,6 +563,8 @@
         right_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -547,6 +584,8 @@
       <control_joint_name>
         elevator_joint
       </control_joint_name>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
@@ -563,6 +602,8 @@
       <forward>0 0 1</forward>
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
     </plugin>
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
@@ -667,6 +708,10 @@
       <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
+    <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+      <robotNamespace/>
+      <linkName>tailsitter/airspeed_link</linkName>
+    </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
@@ -686,7 +731,6 @@
       <hil_state_level>false</hil_state_level>
       <enable_lockstep>true</enable_lockstep>
       <use_tcp>true</use_tcp>
-      <vehicle_is_tailsitter>true</vehicle_is_tailsitter>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name="rotor0">

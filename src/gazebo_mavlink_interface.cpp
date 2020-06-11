@@ -159,6 +159,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
   getSdfParam<std::string>(_sdf, "magSubTopic", mag_sub_topic_, mag_sub_topic_);
+  getSdfParam<std::string>(_sdf, "airspeedSubTopic", airspeed_sub_topic_, airspeed_sub_topic_);
   getSdfParam<std::string>(_sdf, "baroSubTopic", baro_sub_topic_, baro_sub_topic_);
   groundtruth_sub_topic_ = "/groundtruth";
 
@@ -367,6 +368,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
+  airspeed_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + airspeed_sub_topic_, &GazeboMavlinkInterface::AirspeedCallback, this);
   baro_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + baro_sub_topic_, &GazeboMavlinkInterface::BarometerCallback, this);
   wind_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + wind_sub_topic_, &GazeboMavlinkInterface::WindVelocityCallback, this);
   // Get the model links
@@ -614,11 +616,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       fds_[CONNECTION_FD].fd = simulator_socket_fd_;
       fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
     }
-  }
-
-  if(_sdf->HasElement("vehicle_is_tailsitter"))
-  {
-    vehicle_is_tailsitter_ = _sdf->GetElement("vehicle_is_tailsitter")->Get<bool>();
   }
 
   if(_sdf->HasElement("send_vision_estimation"))
@@ -923,29 +920,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
   // send only diff pressure data
   if (diff_press_updated_) {
-    const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
-    float temperature_local = sensor_msg.temperature + 273.0f;
-    const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
-    float rho = 1.225f / density_ratio;
-
-    // Let's use a rough guess of 0.01 hPa as the standard devitiation which roughly yields
-    // about +/- 1 m/s noise.
-    const float diff_pressure_stddev = 0.01f;
-    const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev;
-
-    ignition::math::Quaterniond q_gb = q_gr*q_FLU_to_FRD.Inverse();
-#if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d vel_a = q_gb.RotateVectorReverse(model_->WorldLinearVel() - wind_vel_);
-#else
-    ignition::math::Vector3d vel_a = q_gb.RotateVectorReverse(ignitionFromGazeboMath(model_->GetWorldLinearVel() -  wind_vel_));
-#endif
-    // calculate differential pressure in hPa
-    // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
-    if (vehicle_is_tailsitter_) {
-      sensor_msg.diff_pressure = 0.005f * rho * vel_a.Z() * vel_a.Z() + diff_pressure_noise;
-    } else {
-      sensor_msg.diff_pressure = 0.005f * rho * vel_a.X() * vel_a.X() + diff_pressure_noise;
-    }
+    sensor_msg.diff_pressure = diff_pressure_;
     sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::DIFF_PRESS;
 
     diff_press_updated_ = false;
@@ -1329,15 +1304,18 @@ void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
   mag_updated_ = true;
 }
 
+void GazeboMavlinkInterface::AirspeedCallback(AirspeedPtr& airspeed_msg) {
+  diff_pressure_ = airspeed_msg->diff_pressure();
+
+  diff_press_updated_ = true;
+}
+
 void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
   temperature_ = baro_msg->temperature();
   pressure_alt_ = baro_msg->pressure_altitude();
   abs_pressure_ = baro_msg->absolute_pressure();
 
-  // Note: Both baro and diff pressure sources need to be as updated as there's
-  // no specific diff pressure sensor plugin yet
   baro_updated_ = true;
-  diff_press_updated_ = true;
 }
 
 void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
