@@ -31,7 +31,7 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(LiftDragPlugin)
 
 /////////////////////////////////////////////////
-LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
+LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
 {
   this->cp = ignition::math::Vector3d(0, 0, 0);
   this->forward = ignition::math::Vector3d(1, 0, 0);
@@ -367,10 +367,6 @@ void LiftDragPlugin::OnUpdate()
   }
   else
     cm = this->cma * this->alpha * cosSweepAngle;
-
-  /// \TODO: implement cm
-  /// for now, reset cm to zero, as cm needs testing
-  cm = 0.0;
 
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
