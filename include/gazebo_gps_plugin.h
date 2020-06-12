@@ -44,22 +44,24 @@
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
 
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/GpsSensor.hh>
+
 #include <SITLGps.pb.h>
 #include <Groundtruth.pb.h>
 
 namespace gazebo
 {
-class GAZEBO_VISIBLE GpsPlugin : public ModelPlugin
+class GAZEBO_VISIBLE GpsPlugin : public SensorPlugin
 {
 public:
   GpsPlugin();
   virtual ~GpsPlugin();
 
 protected:
-  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo&);
 
-protected:
   /* Keep this protected so that it's possible to unit test it. */
   std::pair<double, double> reproject(ignition::math::Vector3d& pos);
 
@@ -72,11 +74,13 @@ private:
   bool checkWorldHomePosition(physics::WorldPtr world);
 
   std::string namespace_;
+  std::string gps_id_;
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
 
   bool gps_noise_;
 
+  sensors::GpsSensorPtr parentSensor_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
   event::ConnectionPtr updateConnection_;
@@ -84,6 +88,8 @@ private:
   transport::NodePtr node_handle_;
   transport::PublisherPtr gt_pub_;
   transport::PublisherPtr gps_pub_;
+
+  std::string gps_topic_;
 
   sensor_msgs::msgs::SITLGps gps_msg;
   sensor_msgs::msgs::Groundtruth groundtruth_msg;

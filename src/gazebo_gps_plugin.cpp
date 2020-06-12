@@ -26,16 +26,22 @@
 
 #include <gazebo_gps_plugin.h>
 
-namespace gazebo {
-GZ_REGISTER_MODEL_PLUGIN(GpsPlugin)
+#include <boost/algorithm/string.hpp>
 
-GpsPlugin::GpsPlugin() : ModelPlugin()
+using namespace std;
+
+namespace gazebo {
+GZ_REGISTER_SENSOR_PLUGIN(GpsPlugin)
+
+GpsPlugin::GpsPlugin()
 { }
 
 GpsPlugin::~GpsPlugin()
 {
     if (updateConnection_)
       updateConnection_->~Connection();
+    parentSensor_.reset();
+    world_->Reset();
 }
 
 bool GpsPlugin::checkWorldHomePosition(physics::WorldPtr world) {
@@ -56,19 +62,49 @@ bool GpsPlugin::checkWorldHomePosition(physics::WorldPtr world) {
   return (world_latitude_ && world_longitude_ && world_altitude_) ? true : false;
 }
 
-void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
+void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
-  // Store the pointer to the model.
-  model_ = _model;
+  // Get then name of the parent sensor
+  parentSensor_ = std::dynamic_pointer_cast<sensors::GpsSensor>(_parent);
 
-  world_ = model_->GetWorld();
-#if GAZEBO_MAJOR_VERSION >= 9
-  last_time_ = world_->SimTime();
-  last_gps_time_ = world_->SimTime();
-#else
-  last_time_ = world_->GetSimTime();
-  last_gps_time_ = world_->GetSimTime();
-#endif
+  if (!parentSensor_)
+    gzthrow("GpsPlugin requires a GPS Sensor as its parent");
+
+  // Get the root model name
+  const string scopedName = _parent->ParentName();
+  vector<std::string> names_splitted;
+  boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+  names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                            [](const string& name)
+                            { return name.size() == 0; }), end(names_splitted));
+  const string rootModelName = names_splitted.front(); // The first element is the name of the root model
+
+  // the second to the last name is the model name
+  const string parentSensorModelName = names_splitted.rbegin()[1];
+
+  // get gps topic name
+  if(_sdf->HasElement("topic")) {
+    gps_topic_ = parentSensor_->Topic();
+  } else {
+    // if not set by parameter, get the topic name from the model name
+    gps_topic_ = parentSensorModelName;
+    gzwarn << "[gazebo_gps_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
+      " using gps topic \"" << parentSensorModelName << "\"\n";
+  }
+
+  // Store the pointer to the wprld.
+  world_ = physics::get_world(parentSensor_->WorldName());
+
+  #if GAZEBO_MAJOR_VERSION >= 9
+    last_time_ = world_->SimTime();
+    last_gps_time_ = world_->SimTime();
+  #else
+    last_time_ = world_->GetSimTime();
+    last_gps_time_ = world_->GetSimTime();
+  #endif
+
+  // Store the pointer to the model.
+  model_ = world_->ModelByName(names_splitted[0]);
 
   // Use environment variables if set for home position.
   const char *env_lat = std::getenv("PX4_HOME_LAT");
@@ -134,8 +170,8 @@ void GpsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   gravity_W_ = world_->Gravity();
 
-  gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + model_->GetName() + "/gps", 10);
-  gt_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Groundtruth>("~/" + model_->GetName() + "/groundtruth", 10);
+  gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + names_splitted[0] + "/link/" + gps_topic_, 10);
+  gt_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Groundtruth>("~/" + names_splitted[0] + "/groundtruth", 10);
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){

@@ -88,6 +88,7 @@ static constexpr size_t MAX_TXQ_SIZE = 1000;
 //! Default distance sensor model joint naming
 static const std::regex kDefaultLidarModelLinkNaming("(lidar|sf10a)(.*::link)");
 static const std::regex kDefaultSonarModelLinkNaming("(sonar|mb1240-xl-ez4)(.*::link)");
+static const std::regex kDefaultGPSModelLinkNaming("(gps)(.*::link)");
 
 namespace gazebo {
 
@@ -117,7 +118,6 @@ static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/comma
 static const std::string kDefaultImuTopic = "/imu";
 static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
-static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
 static const std::string kDefaultMagTopic = "/mag";
 static const std::string kDefaultBarometerTopic = "/baro";
@@ -173,7 +173,6 @@ public:
     imu_sub_topic_(kDefaultImuTopic),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
-    gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
     mag_sub_topic_(kDefaultMagTopic),
     baro_sub_topic_(kDefaultBarometerTopic),
@@ -282,7 +281,7 @@ private:
   boost::thread callback_queue_thread_;
   void QueueThread();
   void ImuCallback(ImuPtr& imu_msg);
-  void GpsCallback(GpsPtr& gps_msg);
+  void GpsCallback(GpsPtr& gps_msg, const int& id);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg, const int& id);
   void SonarCallback(SonarPtr& sonar_msg, const int& id);
@@ -324,7 +323,7 @@ private:
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
       void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-      GazeboMavlinkInterface* ptr, const physics::Link_V& links);
+      GazeboMavlinkInterface* ptr, const physics::Link_V& links, const std::regex& model);
 
   // Serial interface
   void open();
@@ -350,7 +349,6 @@ private:
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
-  transport::SubscriberPtr gps_sub_;
   transport::SubscriberPtr groundtruth_sub_;
   transport::SubscriberPtr vision_sub_;
   transport::SubscriberPtr mag_sub_;
@@ -362,7 +360,6 @@ private:
   std::string imu_sub_topic_;
   std::string opticalFlow_sub_topic_;
   std::string irlock_sub_topic_;
-  std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
   std::string mag_sub_topic_;
