@@ -1,4 +1,35 @@
 <?xml version="1.0"?>
+<!--
+  -   Copyright (c) 2020 PX4 Development Team. All rights reserved.
+  -
+  - Redistribution and use in source and binary forms, with or without
+  - modification, are permitted provided that the following conditions
+  - are met:
+  -
+  - 1. Redistributions of source code must retain the above copyright
+  -    notice, this list of conditions and the following disclaimer.
+  - 2. Redistributions in binary form must reproduce the above copyright
+  -    notice, this list of conditions and the following disclaimer in
+  -    the documentation and/or other materials provided with the
+  -    distribution.
+  - 3. Neither the name PX4 nor the names of its contributors may be
+  -    used to endorse or promote products derived from this software
+  -    without specific prior written permission.
+  -
+  - THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  - "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  - LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  - FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+  - COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  - INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  - BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+  - OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+  - AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  - LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+  - ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  - POSSIBILITY OF SUCH DAMAGE.
+  -
+  -->
 
 <robot name="plane" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Properties -->
@@ -25,10 +56,10 @@
 
   <!-- Property Blocks -->
   <xacro:property name="body_inertia">
-    <inertia 
+    <inertia
     ixx="${1/12 * mass * (body_height * body_height + body_width * body_width)}"
     iyy="${1/12 * mass * (body_height * body_height + body_width * body_width)}"
-    izz="${1/12 * mass * (body_width * body_width + body_width * body_width)}"    
+    izz="${1/12 * mass * (body_width * body_width + body_width * body_width)}"
     ixy="0.0" ixz="0.0" iyz="0.0" /> <!-- [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] [kg.m^2] -->
   </xacro:property>
 
@@ -80,7 +111,7 @@
   <!-- Instantiate multirotor_base_macro once -->
   <xacro:fixedwing_base_macro
     robot_namespace="${namespace}">
-    <origin xyz="0 0 0.0" rpy="0 0 0" />      
+    <origin xyz="0 0 0.0" rpy="0 0 0" />
   </xacro:fixedwing_base_macro>
 
   <!-- Instantiate rotors -->
@@ -128,7 +159,7 @@
     <axis xyz="0 1 0" />
     <xacro:insert_block name="left_aileron_joint_origin" />
     <xacro:insert_block name="left_aileron_mesh_origin" />
-  </xacro:control_surface> 
+  </xacro:control_surface>
 
   <!-- Right Aileron -->
   <xacro:control_surface
@@ -152,7 +183,7 @@
     <axis xyz="0 1 0" />
     <xacro:insert_block name="right_aileron_joint_origin" />
     <xacro:insert_block name="right_aileron_mesh_origin" />
-  </xacro:control_surface> 
+  </xacro:control_surface>
 
   <!-- Elevator -->
   <xacro:control_surface
@@ -176,7 +207,7 @@
     <axis xyz="0 1 0" />
       <xacro:insert_block name="elevator_joint_origin" />
     <xacro:insert_block name="elevator_mesh_origin" />
-  </xacro:control_surface> 
+  </xacro:control_surface>
 
 
   <!-- Rudder -->
@@ -201,6 +232,6 @@
     <axis xyz="0 0 1" />
     <xacro:insert_block name="rudder_joint_origin" />
     <xacro:insert_block name="rudder_mesh_origin" />
-  </xacro:control_surface> 
+  </xacro:control_surface>
 
 </robot>

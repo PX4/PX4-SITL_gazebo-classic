@@ -86,9 +86,9 @@ static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
 //! Default distance sensor model joint naming
-static const std::regex kDefaultLidarModelLinkNaming("(lidar|sf10a)(.*::link)");
-static const std::regex kDefaultSonarModelLinkNaming("(sonar|mb1240-xl-ez4)(.*::link)");
-static const std::regex kDefaultGPSModelLinkNaming("(gps)(.*::link)");
+static const std::regex kDefaultLidarModelJointNaming("(lidar|sf10a)(.*_joint)");
+static const std::regex kDefaultSonarModelJointNaming("(sonar|mb1240-xl-ez4)(.*_joint)");
+static const std::regex kDefaultGPSModelJointNaming("(gps)(.*_joint)");
 
 namespace gazebo {
 
@@ -323,7 +323,7 @@ private:
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
       void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-      GazeboMavlinkInterface* ptr, const physics::Link_V& links, const std::regex& model);
+      GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model);
 
   // Serial interface
   void open();

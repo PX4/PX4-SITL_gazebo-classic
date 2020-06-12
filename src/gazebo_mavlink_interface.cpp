@@ -64,29 +64,29 @@ struct SensorHelperStorage {
 template <typename GazeboMsgT>
 void GazeboMavlinkInterface::CreateSensorSubscription(
     void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-    GazeboMavlinkInterface* ptr, const physics::Link_V& links, const std::regex& model) {
+    GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model) {
 
-  // Verify if the sensor link exists
-  for (physics::Link_V::const_iterator it = links.begin(); it != links.end(); ++it) {
+  // Verify if the sensor joint exists
+  for (physics::Joint_V::const_iterator it = joints.begin(); it != joints.end(); ++it) {
     if (std::regex_match ((*it)->GetName(), model)) {
 
-      // Get sensor link name (without the ''::link' suffix)
-      const std::string link_name = (*it)->GetName().substr(0, (*it)->GetName().size() - 6);
+      // Get sensor joint name (without the ''::link' suffix)
+      const std::string joint_name = (*it)->GetName().substr(0, (*it)->GetName().size() - 6);
 
-      // Get sensor ID from link name
+      // Get sensor ID from joint name
       int sensor_id = 0;
       try {
-        // get the sensor id by getting the (last) numbers on the link name (ex. lidar10::link, gets id 10)
-        sensor_id = std::stoi(link_name.substr(link_name.find_last_not_of("0123456789") + 1));
+        // get the sensor id by getting the (last) numbers on the joint name (ex. lidar10_joint, gets id 10)
+        sensor_id = std::stoi(joint_name.substr(joint_name.find_last_not_of("0123456789") + 1));
       } catch(...) {
-        gzwarn << "No identifier on link. Using 0 as default sensor ID" << std::endl;
+        gzwarn << "No identifier on joint. Using 0 as default sensor ID" << std::endl;
       }
 
       // Get the sensor link orientation with respect to the base_link
   #if GAZEBO_MAJOR_VERSION >= 9
-      const auto sensor_orientation = (*it)->RelativePose().Rot();
+      const auto sensor_orientation = (*it)->GetChild()->RelativePose().Rot();
   #else
-      const auto sensor_orientation = ignitionFromGazeboMath((*it)->GetRelativePose()).Rot();
+      const auto sensor_orientation = ignitionFromGazeboMath((*it)->GetChild()->GetRelativePose()).Rot();
   #endif
 
       // One map will be created for each Gazebo message type
@@ -94,7 +94,7 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
 
       // Store the callback entries
       auto callback_entry = callback_map.emplace(
-          "~/" + model_->GetName() + "/link/" + link_name,
+          "~/" + model_->GetName() + "/link/" + joint_name,
           SensorHelperStorage<GazeboMsgT>{ptr, fp, sensor_id});
 
       // Check if element was already present
@@ -103,7 +103,7 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
               << std::endl;
 
       // Create the subscriber for the sensors
-      auto subscriberPtr = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + link_name,
+      auto subscriberPtr = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + joint_name,
                                                    &SensorHelperStorage<GazeboMsgT>::callback,
                                                    &callback_entry.first->second);
 
@@ -352,13 +352,13 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   baro_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + baro_sub_topic_, &GazeboMavlinkInterface::BarometerCallback, this);
   wind_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + wind_sub_topic_, &GazeboMavlinkInterface::WindVelocityCallback, this);
 
-  // Get the model links
-  auto links = model_->GetLinks();
+  // Get the model joints
+  auto joints = model_->GetJoints();
 
   // Create subscriptions to the distance sensors
-  CreateSensorSubscription(&GazeboMavlinkInterface::LidarCallback, this, links, kDefaultLidarModelLinkNaming);
-  CreateSensorSubscription(&GazeboMavlinkInterface::SonarCallback, this, links, kDefaultSonarModelLinkNaming);
-  CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, links, kDefaultGPSModelLinkNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::LidarCallback, this, joints, kDefaultLidarModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::SonarCallback, this, joints, kDefaultSonarModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, joints, kDefaultGPSModelJointNaming);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
