@@ -88,7 +88,7 @@ static constexpr size_t MAX_TXQ_SIZE = 1000;
 //! Default distance sensor model joint naming
 static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");
 static const std::regex kDefaultSonarModelJointNaming(".*(sonar|mb1240-xl-ez4)(.*_joint)");
-static const std::regex kDefaultGPSModelJointNaming(".*(gps)(.*_joint)");
+static const std::regex kDefaultGPSModelJointNaming(".*(gps|ublox-neo-7M)(.*_joint)");
 
 namespace gazebo {
 

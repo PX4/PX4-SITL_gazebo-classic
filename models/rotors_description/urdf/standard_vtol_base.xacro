@@ -81,7 +81,20 @@
   </xacro:if>
 
   <!-- Mount a GPS module. -->
-  <xacro:gps_macro parent_link="base_link">
+  <xacro:gps_macro
+    gps_name="gps0"
+    pos_x="0.0"
+    pos_y="0.0"
+    pos_z="0.0"
+    gps_noise="true"
+    gps_xy_random_walk="2.0"
+    gps_z_random_walk="4.0"
+    gps_xy_noise_density="2.0e-4"
+    gps_z_noise_density="4.0e-4"
+    gps_vxy_noise_density="0.2"
+    gps_vz_noise_density="0.4"
+    namespace=""
+    parent_link="base_link">
   </xacro:gps_macro>
 
   <!-- Instantiate magnetometer plugin. -->
