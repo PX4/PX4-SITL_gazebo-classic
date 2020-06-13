@@ -23,7 +23,9 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Macro to a add a GPS sensor. -->
   <xacro:macro name="gps_macro"
-    params="gps_name pos_x pos_y pos_z gps_noise namespace parent_link">
+    params="gps_name pos_x pos_y pos_z namespace gps_noise gps_xy_random_walk
+            gps_z_random_walk gps_xy_noise_density gps_z_noise_density
+            gps_vxy_noise_density gps_vz_noise_density parent_link">
     <gazebo>
       <model name="${gps_name}">
         <link name="link">
@@ -58,6 +60,12 @@
             <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
               <robotNamespace>${namespace}</robotNamespace>
               <gpsNoise>${gps_noise}</gpsNoise>
+              <gpsXYRandomWalk>${gps_xy_random_walk}</gpsXYRandomWalk>
+              <gpsZRandomWalk>${gps_z_random_walk}</gpsZRandomWalk>
+              <gpsXYNoiseDensity>${gps_xy_noise_density}</gpsXYNoiseDensity>
+              <gpsZNoiseDensity>${gps_z_noise_density}</gpsZNoiseDensity>
+              <gpsVXYNoiseDensity>${gps_vxy_noise_density}</gpsVXYNoiseDensity>
+              <gpsVZNoiseDensity>${gps_vz_noise_density}</gpsVZNoiseDensity>
             </plugin>
           </sensor>
         </link>

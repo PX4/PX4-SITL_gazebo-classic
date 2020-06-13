@@ -154,6 +154,54 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     getSdfParam<double>(_sdf, "homeAltitude", alt_home, alt_home);
   }
 
+  // get random walk in XY plane
+  if (_sdf->HasElement("gpsXYRandomWalk")) {
+    getSdfParam<double>(_sdf, "gpsXYRandomWalk", gps_xy_random_walk_, kDefaultGpsXYRandomWalk);
+  } else {
+    gzwarn << "[gazebo_gps_plugin] Using default random walk in XY plane: "
+           << kDefaultGpsXYRandomWalk << "\n";
+  }
+
+  // get random walk in Z
+  if (_sdf->HasElement("gpsZRandomWalk")) {
+    getSdfParam<double>(_sdf, "gpsZRandomWalk", gps_z_random_walk_, kDefaultGpsZRandomWalk);
+  } else {
+    gzwarn << "[gazebo_gps_plugin] Using default random walk in Z: "
+           << kDefaultGpsZRandomWalk << "\n";
+  }
+
+  // get position noise density in XY plane
+  if (_sdf->HasElement("gpsXYNoiseDensity")) {
+    getSdfParam<double>(_sdf, "gpsXYNoiseDensity", gps_xy_noise_density_, kDefaultGpsXYNoiseDensity);
+  } else {
+    gzwarn << "[gazebo_gps_plugin] Using default position noise density in XY plane: "
+           << kDefaultGpsXYNoiseDensity << "\n";
+  }
+
+  // get position noise density in Z
+  if (_sdf->HasElement("gpsZNoiseDensity")) {
+    getSdfParam<double>(_sdf, "gpsZNoiseDensity", gps_z_noise_density_, kDefaultGpsZNoiseDensity);
+  } else {
+    gzwarn << "[gazebo_gps_plugin] Using default position noise density in Z: "
+           << kDefaultGpsZNoiseDensity << "\n";
+  }
+
+  // get velocity noise density in XY plane
+  if (_sdf->HasElement("gpsVXYNoiseDensity")) {
+    getSdfParam<double>(_sdf, "gpsVXYNoiseDensity", gps_vxy_noise_density_, kDefaultGpsVXYNoiseDensity);
+  } else {
+    gzwarn << "[gazebo_gps_plugin] Using default velocity noise density in XY plane: "
+           << kDefaultGpsVXYNoiseDensity << "\n";
+  }
+
+  // get velocity noise density in Z
+  if (_sdf->HasElement("gpsVZNoiseDensity")) {
+    getSdfParam<double>(_sdf, "gpsVZNoiseDensity", gps_vz_noise_density_, kDefaultGpsVZNoiseDensity);
+  } else {
+    gzwarn << "[gazebo_gps_plugin] Using default velocity noise density in Z: "
+           << kDefaultGpsVZNoiseDensity << "\n";
+  }
+
   namespace_.clear();
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -223,15 +271,15 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 
   // update noise parameters if gps_noise_ is set
   if (gps_noise_) {
-    noise_gps_pos.X() = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_pos.Y() = gps_xy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_pos.Z() = gps_z_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.X() = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.Y() = gps_vxy_noise_density * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.Z() = gps_vz_noise_density * sqrt(dt) * randn_(rand_);
-    random_walk_gps.X() = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
-    random_walk_gps.Y() = gps_xy_random_walk * sqrt(dt) * randn_(rand_);
-    random_walk_gps.Z() = gps_z_random_walk * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.X() = gps_xy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.Y() = gps_xy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_pos.Z() = gps_z_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.X() = gps_vxy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.Y() = gps_vxy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_vel.Z() = gps_vz_noise_density_ * sqrt(dt) * randn_(rand_);
+    random_walk_gps.X() = gps_xy_random_walk_ * sqrt(dt) * randn_(rand_);
+    random_walk_gps.Y() = gps_xy_random_walk_ * sqrt(dt) * randn_(rand_);
+    random_walk_gps.Z() = gps_z_random_walk_ * sqrt(dt) * randn_(rand_);
   }
   else {
     noise_gps_pos.X() = 0.0;
@@ -246,9 +294,9 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   }
 
   // gps bias integration
-  gps_bias.X() += random_walk_gps.X() * dt - gps_bias.X() / gps_corellation_time;
-  gps_bias.Y() += random_walk_gps.Y() * dt - gps_bias.Y() / gps_corellation_time;
-  gps_bias.Z() += random_walk_gps.Z() * dt - gps_bias.Z() / gps_corellation_time;
+  gps_bias.X() += random_walk_gps.X() * dt - gps_bias.X() / gps_corellation_time_;
+  gps_bias.Y() += random_walk_gps.Y() * dt - gps_bias.Y() / gps_corellation_time_;
+  gps_bias.Z() += random_walk_gps.Z() * dt - gps_bias.Z() / gps_corellation_time_;
 
   // reproject position with noise into geographic coordinates
   auto pos_with_noise = pos_W_I + noise_gps_pos + gps_bias;
