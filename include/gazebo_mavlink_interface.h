@@ -86,9 +86,9 @@ static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
 //! Default distance sensor model joint naming
-static const std::regex kDefaultLidarModelJointNaming("(lidar|sf10a)(.*_joint)");
-static const std::regex kDefaultSonarModelJointNaming("(sonar|mb1240-xl-ez4)(.*_joint)");
-static const std::regex kDefaultGPSModelJointNaming("(gps)(.*_joint)");
+static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");
+static const std::regex kDefaultSonarModelJointNaming(".*(sonar|mb1240-xl-ez4)(.*_joint)");
+static const std::regex kDefaultGPSModelJointNaming(".*(gps)(.*_joint)");
 
 namespace gazebo {
 

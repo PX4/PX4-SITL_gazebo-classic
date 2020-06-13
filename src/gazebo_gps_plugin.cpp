@@ -82,6 +82,9 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   // the second to the last name is the model name
   const string parentSensorModelName = names_splitted.rbegin()[1];
 
+  // store the model name
+  model_name_ = names_splitted[0];
+
   // get gps topic name
   if(_sdf->HasElement("topic")) {
     gps_topic_ = parentSensor_->Topic();
@@ -92,7 +95,7 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
       " using gps topic \"" << parentSensorModelName << "\"\n";
   }
 
-  // Store the pointer to the wprld.
+  // Store the pointer to the world.
   world_ = physics::get_world(parentSensor_->WorldName());
 
   #if GAZEBO_MAJOR_VERSION >= 9
@@ -102,9 +105,6 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     last_time_ = world_->GetSimTime();
     last_gps_time_ = world_->GetSimTime();
   #endif
-
-  // Store the pointer to the model.
-  model_ = world_->ModelByName(names_splitted[0]);
 
   // Use environment variables if set for home position.
   const char *env_lat = std::getenv("PX4_HOME_LAT");
@@ -164,17 +164,36 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  // Listen to the update event. This event is broadcast every simulation iteration.
-  updateConnection_ = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&GpsPlugin::OnUpdate, this, _1));
+  // Check first if the model was loaded before storing a pointer to it
+  addEntityConnection_ = event::Events::ConnectAddEntity(
+      std::bind(&GpsPlugin::addEntityEventCallback, this, std::placeholders::_1));
+
+  if (addEntityConnection_->Id() < 1) {
+    // Listen to the update event. This event is broadcast every simulation iteration.
+    updateConnection_ = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&GpsPlugin::OnUpdate, this, _1));
+  }
 
   gravity_W_ = world_->Gravity();
 
-  gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + names_splitted[0] + "/link/" + gps_topic_, 10);
-  gt_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Groundtruth>("~/" + names_splitted[0] + "/groundtruth", 10);
+  gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + model_name_ + "/link/" + gps_topic_, 10);
+  gt_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Groundtruth>("~/" + model_name_ + "/groundtruth", 10);
+}
+
+void GpsPlugin::addEntityEventCallback(const std::string &name) {
+    // Start listening to the update event when the loaded entity matches.
+    if (name == model_name_) {
+      // Listen to the update event. This event is broadcast every simulation iteration.
+      updateConnection_ = event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&GpsPlugin::OnUpdate, this, _1));
+    }
 }
 
 void GpsPlugin::OnUpdate(const common::UpdateInfo&){
+  // Store the pointer to the model.
+  if (model_ == NULL)
+    model_ = world_->ModelByName(model_name_);
+
 #if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
 #else

@@ -69,15 +69,23 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
   // Verify if the sensor joint exists
   for (physics::Joint_V::const_iterator it = joints.begin(); it != joints.end(); ++it) {
     if (std::regex_match ((*it)->GetName(), model)) {
-
-      // Get sensor joint name (without the ''::link' suffix)
+      // Get sensor joint name (without the ''::joint' suffix)
       const std::string joint_name = (*it)->GetName().substr(0, (*it)->GetName().size() - 6);
+
+      // If the model is nested, use the sensor name (child model) as the sensor topic
+      const std::string model_name = model_->GetName();
+      const std::string::size_type pos = joint_name.find("::");
+
+      std::string sensor_name = joint_name;
+      if (pos != std::string::npos) {
+        sensor_name = joint_name.substr(pos + 2);
+      }
 
       // Get sensor ID from joint name
       int sensor_id = 0;
       try {
         // get the sensor id by getting the (last) numbers on the joint name (ex. lidar10_joint, gets id 10)
-        sensor_id = std::stoi(joint_name.substr(joint_name.find_last_not_of("0123456789") + 1));
+        sensor_id = std::stoi(sensor_name.substr(sensor_name.find_last_not_of("0123456789") + 1));
       } catch(...) {
         gzwarn << "No identifier on joint. Using 0 as default sensor ID" << std::endl;
       }
@@ -94,7 +102,7 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
 
       // Store the callback entries
       auto callback_entry = callback_map.emplace(
-          "~/" + model_->GetName() + "/link/" + joint_name,
+          "~/" + model_name + "/link/" + sensor_name,
           SensorHelperStorage<GazeboMsgT>{ptr, fp, sensor_id});
 
       // Check if element was already present
@@ -103,7 +111,7 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
               << std::endl;
 
       // Create the subscriber for the sensors
-      auto subscriberPtr = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + joint_name,
+      auto subscriberPtr = node_handle_->Subscribe("~/" + model_name + "/link/" + sensor_name,
                                                    &SensorHelperStorage<GazeboMsgT>::callback,
                                                    &callback_entry.first->second);
 

@@ -62,9 +62,9 @@
           </sensor>
         </link>
       </model>
-      <joint name="gps_joint" type="fixed">
+      <joint name="${gps_name}_joint" type="fixed">
         <parent>${parent_link}</parent>
-        <child>gps::link</child>
+        <child>${gps_name}::link</child>
       </joint>
     </gazebo>
   </xacro:macro>

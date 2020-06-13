@@ -352,10 +352,20 @@
     </joint>
     <include>
       <uri>model://gps</uri>
-      <pose>0.03 0 0 0 0 0</pose>
+      <pose>0.1 0 0.01 0 0 0</pose>
+      <name>gps0</name>
     </include>
-    <joint name='gps_joint' type='fixed'>
-      <child>gps::link</child>
+    <joint name='gps0_joint' type='fixed'>
+      <child>gps0::link</child>
+      <parent>base_link</parent>
+    </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>-0.1 0 0.01 0 0 0</pose>
+      <name>gps1</name>
+    </include>
+    <joint name='gps1_joint' type='fixed'>
+      <child>gps1::link</child>
       <parent>base_link</parent>
     </joint>
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>

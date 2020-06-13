@@ -73,6 +73,8 @@ private:
    **/
   bool checkWorldHomePosition(physics::WorldPtr world);
 
+  void addEntityEventCallback(const std::string &name);
+
   std::string namespace_;
   std::string gps_id_;
   std::default_random_engine random_generator_;
@@ -80,10 +82,13 @@ private:
 
   bool gps_noise_;
 
+  std::string model_name_;
+
   sensors::GpsSensorPtr parentSensor_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
   event::ConnectionPtr updateConnection_;
+  event::ConnectionPtr addEntityConnection_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr gt_pub_;

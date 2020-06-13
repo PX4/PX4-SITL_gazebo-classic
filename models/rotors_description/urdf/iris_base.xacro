@@ -82,8 +82,8 @@
 
   <!-- Mount a GPS module. -->
   <xacro:gps_macro
-    gps_name="gps"
-    pos_x="0.015"
+    gps_name="gps0"
+    pos_x="0.0"
     pos_y="0.0"
     pos_z="0.0"
     gps_noise="true"
