@@ -33,7 +33,7 @@ using namespace std;
 namespace gazebo {
 GZ_REGISTER_SENSOR_PLUGIN(GpsPlugin)
 
-GpsPlugin::GpsPlugin()
+GpsPlugin::GpsPlugin() : SensorPlugin()
 { }
 
 GpsPlugin::~GpsPlugin()
@@ -295,7 +295,6 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
   gps_msg.set_altitude(pos_W_I.Z() + alt_home_ - noise_gps_pos.Z() + gps_bias.Z());
-  gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
 
   std_xy = 1.0;
   std_z = 1.0;
