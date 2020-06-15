@@ -1,56 +1,40 @@
-{# parameters #}
-{%- set m = 0.0168 -%}
-{%- set l = 0.038 -%}
-{%- set w = 0.038 -%}
-{%- set h = 0.0085 -%}
-{%- set ixx = m/12*(w**2 + h**2) -%}
-{%- set iyy = m/12*(l**2 + h**2) -%}
-{%- set izz = m/12*(l**2 + w**2) -%}
-
-{%- macro box(l, w, h) -%}
-<geometry>
-  <box>
-    <size>{{l}} {{w}} {{h}}</size>
-  </box>
-</geometry>
-{%- endmacro -%}
-
 <?xml version="1.0" ?>
-<sdf version="1.5">
-
-  <!--3DR GPS-->
-  <model name="3DR_gps_mag">
-
+<sdf version="1.6">
+  <model name="gps">
     <link name="link">
-
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
-        <mass>{{m}}</mass>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>{{ixx}}</ixx>
-          <iyy>{{iyy}}</iyy>
-          <izz>{{izz}}</izz>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
         </inertia>
       </inertial>
-
       <visual name="visual">
-        {{ box(l, w, h)|indent(8) }}
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.002</length>
+          </cylinder>
+        </geometry>
         <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
         </material>
       </visual>
-
-      <collision name="collision">
-        {{ box(l, w, h)|indent(8) }}
-      </collision>
-
-      <sensor name="ublox-neo-7M" type="gps">
+      <sensor name="gps" type="gps">
         <pose>0 0 0 0 0 0</pose>
-        <update_rate>10.0</update_rate>
+        <update_rate>5.0</update_rate>
         <always_on>true</always_on>
-        <gps>
+        <visualize>false</visualize>
+        <!-- GpsSensor noise currently not used -->
+        <!-- <gps>
           <position_sensing>
             <horizontal>
               <noise type="gaussian_quantized">
@@ -91,7 +75,7 @@
               </noise>
             </vertical>
           </velocity_sensing>
-        </gps>
+        </gps> -->
         <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
           <robotNamespace></robotNamespace>
           <gpsNoise>true</gpsNoise>
@@ -103,44 +87,6 @@
           <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
         </plugin>
       </sensor>
-
-      <sensor name="HMC5883L" type="magnetometer">
-        <always_on>true</always_on>
-        <update_rate>50</update_rate>
-        <magnetometer>
-          <x>
-            <noise type="gaussian">
-             <mean>0</mean>
-             <stddev>0.0002</stddev>
-             <bias_mean>7.5e-06</bias_mean>
-             <bias_stddev>8e-07</bias_stddev>
-            </noise>
-          </x>
-          <y>
-            <noise type="gaussian">
-             <mean>0</mean>
-             <stddev>0.0002</stddev>
-             <bias_mean>7.5e-06</bias_mean>
-             <bias_stddev>8e-07</bias_stddev>
-            </noise>
-          </y>
-          <z>
-            <noise type="gaussian">
-             <mean>0</mean>
-             <stddev>0.0002</stddev>
-             <bias_mean>7.5e-06</bias_mean>
-             <bias_stddev>8e-07</bias_stddev>
-            </noise>
-          </z>
-        </magnetometer>
-
-      </sensor>
-
     </link>
-
   </model>
-
 </sdf>
-
-
-<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

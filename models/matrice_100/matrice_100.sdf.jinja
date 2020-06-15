@@ -273,9 +273,8 @@
       <!--<sonar_topic>fuselage/mb1240-xl-ez4/link/sonar</sonar_topic>-->
     <!--</plugin>-->
 
-    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
-        <robotNamespace></robotNamespace>
-        <gpsNoise>true</gpsNoise>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
     </plugin>
 
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>

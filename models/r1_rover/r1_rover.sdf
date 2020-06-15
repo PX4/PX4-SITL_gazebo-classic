@@ -458,6 +458,15 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0.12 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>rover/imu_link</linkName>
@@ -471,9 +480,8 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
-    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
-        <robotNamespace></robotNamespace>
-        <gpsNoise>true</gpsNoise>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
@@ -491,7 +499,6 @@
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <gpsSubTopic>/gps</gpsSubTopic>
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
@@ -581,7 +588,7 @@
             <cmdMin>-1200</cmdMin>
           </joint_control_pid>
         </channel>
-      </control_channels> 
+      </control_channels>
     </plugin>
     <!-- <plugin name='skid_steer_drive_controller' filename='libgazebo_ros_skid_steer_drive.so'>
       <updateRate>50.0</updateRate>

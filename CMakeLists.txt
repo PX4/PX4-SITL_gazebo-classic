@@ -313,6 +313,7 @@ link_libraries(physics_msgs)
 add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
+add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(gazebo_opticalflow_mockup_plugin SHARED src/gazebo_opticalflow_mockup_plugin.cpp)
@@ -337,6 +338,7 @@ set(plugins
   gazebo_airspeed_plugin
   gazebo_geotagged_images_plugin
   gazebo_gps_plugin
+  gazebo_groundtruth_plugin
   gazebo_irlock_plugin
   gazebo_lidar_plugin
   gazebo_opticalflow_mockup_plugin

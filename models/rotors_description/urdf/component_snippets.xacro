@@ -5,6 +5,7 @@
   Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
   Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
   Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+  Copyright 2015-2020 PX4 Development Team. All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,6 +21,62 @@
 -->
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Macro to a add a GPS sensor. -->
+  <xacro:macro name="gps_macro"
+    params="gps_name pos_x pos_y pos_z namespace gps_noise gps_xy_random_walk
+            gps_z_random_walk gps_xy_noise_density gps_z_noise_density
+            gps_vxy_noise_density gps_vz_noise_density parent_link">
+    <gazebo>
+      <model name="${gps_name}">
+        <link name="link">
+          <pose>${pos_x} ${pos_y} ${pos_z} 0 0 0</pose>
+          <inertial>
+            <pose>0 0 0 0 0 0</pose>
+            <mass>0.01</mass>
+            <inertia>
+              <ixx>2.1733e-6</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>2.1733e-6</iyy>
+              <iyz>0</iyz>
+              <izz>1.8e-7</izz>
+            </inertia>
+          </inertial>
+          <visual name="visual">
+            <geometry>
+              <cylinder>
+                <radius>0.01</radius>
+                <length>0.002</length>
+              </cylinder>
+            </geometry>
+            <material>
+              <script>
+                <name>Gazebo/Black</name>
+              </script>
+            </material>
+          </visual>
+          <sensor name="gps" type="gps">
+            <pose>0 0 0 0 0 0</pose>
+            <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+              <robotNamespace>${namespace}</robotNamespace>
+              <gpsNoise>${gps_noise}</gpsNoise>
+              <gpsXYRandomWalk>${gps_xy_random_walk}</gpsXYRandomWalk>
+              <gpsZRandomWalk>${gps_z_random_walk}</gpsZRandomWalk>
+              <gpsXYNoiseDensity>${gps_xy_noise_density}</gpsXYNoiseDensity>
+              <gpsZNoiseDensity>${gps_z_noise_density}</gpsZNoiseDensity>
+              <gpsVXYNoiseDensity>${gps_vxy_noise_density}</gpsVXYNoiseDensity>
+              <gpsVZNoiseDensity>${gps_vz_noise_density}</gpsVZNoiseDensity>
+            </plugin>
+          </sensor>
+        </link>
+      </model>
+      <joint name="${gps_name}_joint" type="fixed">
+        <parent>${parent_link}</parent>
+        <child>${gps_name}::link</child>
+      </joint>
+    </gazebo>
+  </xacro:macro>
+
   <!-- Macro to add logging to a bag file. -->
   <xacro:macro name="bag_plugin_macro"
     params="namespace bag_file rotor_velocity_slowdown_sim">
@@ -124,12 +181,11 @@
     </gazebo>
   </xacro:macro>
 
-  <!-- Macro to add the gps_plugin. -->
-  <xacro:macro name="gps_plugin_macro" params="namespace gps_noise">
+  <!-- Macro to add the groundtruth_plugin. -->
+  <xacro:macro name="groundtruth_plugin_macro" params="namespace">
     <gazebo>
-      <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+      <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
         <robotNamespace>${namespace}</robotNamespace>
-        <gpsNoise>${gps_noise}</gpsNoise>
       </plugin>
     </gazebo>
   </xacro:macro>
@@ -160,12 +216,11 @@
   </xacro:macro>
 
   <!-- Macro to add the mavlink interface. -->
-  <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
+  <xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
     <gazebo>
       <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
         <imuSubTopic>${imu_sub_topic}</imuSubTopic>
-        <gpsSubTopic>${gps_sub_topic}</gpsSubTopic>
         <magSubTopic>${mag_sub_topic}</magSubTopic>
         <baroSubTopic>${baro_sub_topic}</baroSubTopic>
         <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>
@@ -289,12 +344,11 @@
   </xacro:macro>
 
   <!-- Macro to add the mavlink interface for a fixed-wing model. -->
-  <xacro:macro name="mavlink_interface_macro_fw" params="namespace imu_sub_topic gps_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
+  <xacro:macro name="mavlink_interface_macro_fw" params="namespace imu_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
     <gazebo>
       <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
         <robotNamespace>${namespace}</robotNamespace>
         <imuSubTopic>${imu_sub_topic}</imuSubTopic>
-        <gpsSubTopic>${gps_sub_topic}</gpsSubTopic>
         <magSubTopic>${mag_sub_topic}</magSubTopic>
         <baroSubTopic>${baro_sub_topic}</baroSubTopic>
         <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>
@@ -367,12 +421,11 @@
   </xacro:macro>
 
   <!-- Macro to add the mavlink interface for a fixed-wing model. -->
-  <xacro:macro name="mavlink_interface_macro_vtol" params="namespace imu_sub_topic gps_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
+  <xacro:macro name="mavlink_interface_macro_vtol" params="namespace imu_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
     <gazebo>
       <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
         <robotNamespace>${namespace}</robotNamespace>
         <imuSubTopic>${imu_sub_topic}</imuSubTopic>
-        <gpsSubTopic>${gps_sub_topic}</gpsSubTopic>
         <magSubTopic>${mag_sub_topic}</magSubTopic>
         <baroSubTopic>${baro_sub_topic}</baroSubTopic>
         <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>

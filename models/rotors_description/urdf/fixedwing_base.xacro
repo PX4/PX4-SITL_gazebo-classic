@@ -5,6 +5,7 @@
   Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
   Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
   Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+  Copyright 2020 PX4 Development Team. All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,7 +27,7 @@
     <link name="base_link"></link>
     <joint name="base_joint" type="fixed">
       <parent link="base_link" />
-      <child link="base_link_inertial" />      
+      <child link="base_link_inertial" />
     </joint>
     <link name="base_link_inertial">
       <inertial>
