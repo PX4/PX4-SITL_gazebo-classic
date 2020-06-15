@@ -68,6 +68,7 @@ public:
 protected:
   virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
   virtual void OnSensorUpdate();
+  virtual void OnWorldUpdate(const common::UpdateInfo& /*_info*/);
 
 private:
   std::string namespace_;
@@ -82,6 +83,7 @@ private:
   sensors::GpsSensorPtr parentSensor_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
+  event::ConnectionPtr updateWorldConnection_;
   event::ConnectionPtr updateSensorConnection_;
 
   transport::NodePtr node_handle_;
@@ -92,6 +94,7 @@ private:
 
   common::Time last_gps_time_;
   common::Time last_time_;
+  common::Time current_time_;
 
   // Home defaults to Zurich Irchel Park
   // @note The home position can be specified using the environment variables:
@@ -104,7 +107,6 @@ private:
   double world_altitude_ = 0.0;
 
   // gps delay related
-  static constexpr double gps_update_interval_ = 0.2; // 5hz
   static constexpr double gps_delay = 0.12;           // 120 ms
   static constexpr int gps_buffer_size_max = 1000;
   std::queue<sensor_msgs::msgs::SITLGps> gps_delay_buffer;

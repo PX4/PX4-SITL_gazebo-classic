@@ -71,7 +71,7 @@ public:
 
 protected:
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
-  virtual void OnUpdate(const common::UpdateInfo&  /*_info*/);
+  virtual void OnUpdate(const common::UpdateInfo& /*_info*/);
 
 private:
   std::string namespace_;

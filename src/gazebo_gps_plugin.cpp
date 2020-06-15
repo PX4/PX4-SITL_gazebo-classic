@@ -208,22 +208,27 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   updateSensorConnection_ = parentSensor_->ConnectUpdated(boost::bind(&GpsPlugin::OnSensorUpdate, this));
   parentSensor_->SetActive(true);
 
+  // Listen to the update event. This event is broadcast every simulation iteration.
+  updateWorldConnection_ = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&GpsPlugin::OnWorldUpdate, this, _1));
+
   gravity_W_ = world_->Gravity();
 
   gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + model_name_ + "/link/" + gps_topic_, 10);
 }
 
-void GpsPlugin::OnSensorUpdate() {
+void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
+{
   // Store the pointer to the model.
   if (model_ == NULL)
     model_ = world_->ModelByName(model_name_);
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  common::Time current_time = world_->SimTime();
+  current_time_ = world_->SimTime();
 #else
-  common::Time current_time = world_->GetSimTime();
+  current_time_ = world_->GetSimTime();
 #endif
-  double dt = (current_time - last_time_).Double();
+  double dt = (current_time_ - last_time_).Double();
 
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d T_W_I = model_->WorldPose();
@@ -280,7 +285,7 @@ void GpsPlugin::OnSensorUpdate() {
   // fill SITLGps msg
   sensor_msgs::msgs::SITLGps gps_msg;
 
-  gps_msg.set_time_usec(current_time.Double() * 1e6);
+  gps_msg.set_time_usec(current_time_.Double() * 1e6);
 
   // @note Unfurtonately the Gazebo GpsSensor seems to provide bad readings,
   // starting to drift and leading to global position loss
@@ -290,42 +295,52 @@ void GpsPlugin::OnSensorUpdate() {
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
   gps_msg.set_altitude(pos_W_I.Z() + alt_home_ - noise_gps_pos.Z() + gps_bias.Z());
+  gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
 
   std_xy = 1.0;
   std_z = 1.0;
   gps_msg.set_eph(std_xy);
   gps_msg.set_epv(std_z);
 
-  gps_msg.set_velocity(velocity_current_W_xy.Length());
   gps_msg.set_velocity_east(velocity_current_W.X() + noise_gps_vel.Y());
+  gps_msg.set_velocity(velocity_current_W_xy.Length());
   gps_msg.set_velocity_north(velocity_current_W.Y() + noise_gps_vel.X());
   gps_msg.set_velocity_up(velocity_current_W.Z() - noise_gps_vel.Z());
 
   // add msg to buffer
   gps_delay_buffer.push(gps_msg);
 
-  // apply GPS delay
-  while (true) {
-    gps_msg = gps_delay_buffer.front();
-    double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time_usec() / 1e6f;
-    if (gps_delay_buffer.empty()) {
-      // abort if buffer is empty already
-      break;
-    }
-    // remove data that is too old or if buffer size is too large
-    if (gps_current_delay > gps_delay) {
-      gps_delay_buffer.pop();
-    // remove data if buffer too large
-    } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
-      gps_delay_buffer.pop();
-    } else {
-      // if we get here, we have good data, stop
-      break;
-    }
-  }
-  // publish SITLGps msg at 5hz
-  gps_pub_->Publish(gps_msg);
+  last_time_ = current_time_;
+}
 
-  last_time_ = current_time;
+void GpsPlugin::OnSensorUpdate()
+{
+  sensor_msgs::msgs::SITLGps gps_msg;
+  // apply GPS delay
+  if ((current_time_ - last_gps_time_).Double() > 1 / parentSensor_->UpdateRate()) {
+    last_gps_time_ = current_time_;
+
+    while (true) {
+      gps_msg = gps_delay_buffer.front();
+      double gps_current_delay = current_time_.Double() - gps_delay_buffer.front().time_usec() / 1e6f;
+
+      if (gps_delay_buffer.empty()) {
+        // abort if buffer is empty already
+        break;
+      }
+      // remove data that is too old or if buffer size is too large
+      if (gps_current_delay >= gps_delay) {
+        gps_delay_buffer.pop();
+      // remove data if buffer too large
+      } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
+        gps_delay_buffer.pop();
+      } else {
+        // if we get here, we have good data, stop
+        break;
+      }
+    }
+    // publish SITLGps msg at the defined update rate
+    gps_pub_->Publish(gps_msg);
+  }
 }
 } // namespace gazebo
