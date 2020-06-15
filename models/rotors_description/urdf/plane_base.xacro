@@ -97,6 +97,12 @@
     parent_link="base_link">
   </xacro:gps_macro>
 
+  <!-- Instantiate groundtruth plugin. -->
+  <xacro:groundtruth_plugin_macro
+    namespace="${namespace}"
+    >
+  </xacro:groundtruth_plugin_macro>
+
   <!-- Instantiate magnetometer plugin. -->
   <xacro:magnetometer_plugin_macro
     namespace="${namespace}"

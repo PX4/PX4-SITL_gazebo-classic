@@ -181,6 +181,15 @@
     </gazebo>
   </xacro:macro>
 
+  <!-- Macro to add the groundtruth_plugin. -->
+  <xacro:macro name="groundtruth_plugin_macro" params="namespace">
+    <gazebo>
+      <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+        <robotNamespace>${namespace}</robotNamespace>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
   <!-- Macro to add the magnetometer_plugin. -->
   <xacro:macro name="magnetometer_plugin_macro" params="namespace pub_rate noise_density random_walk bias_correlation_time mag_topic">
     <gazebo>

@@ -6,6 +6,8 @@
  * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+ * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+ * Copyright 2019-2020 PX4 Development Team. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +28,7 @@
 #include <Eigen/Dense>
 #include <gazebo/gazebo.hh>
 #include <ignition/math.hh>
-#include "gazebo/physics/physics.hh"
+#include <gazebo/physics/physics.hh>
 
 namespace gazebo {
 
@@ -241,5 +243,70 @@ static const ignition::math::Vector3d kBackwardRotation = ignition::math::Vector
 static const ignition::math::Vector3d kForwardRotation = ignition::math::Vector3d(1, 0, 0);
 static const ignition::math::Vector3d kLeftRotation = ignition::math::Vector3d(0, 1, 0);
 static const ignition::math::Vector3d kRightRotation = ignition::math::Vector3d(0, -1, 0);
+
+// Zurich Irchel Park
+static constexpr const double kDefaultHomeLatitude = 47.397742 * M_PI / 180.0;   // rad
+static constexpr const double kDefaultHomeLongitude = 8.545594 * M_PI / 180.0;   // rad
+static constexpr const double kDefaultHomeAltitude = 488.0;                      // meters
+
+// Earth radius
+static constexpr const double earth_radius = 6353000.0;      // meters
+
+/**
+ * @brief Get latitude and longitude coordinates from local position
+ * @param[in] pos position in the local frame
+ * @return std::pair of Latitude and Longitude
+ */
+inline std::pair<double, double> reproject(ignition::math::Vector3d& pos,
+                                    double& lat_home,
+                                    double& lon_home,
+                                    double& alt_home)
+{
+  // reproject local position to gps coordinates
+  const double x_rad = pos.Y() / earth_radius;    // north
+  const double y_rad = pos.X() / earth_radius;    // east
+  const double c = sqrt(x_rad * x_rad + y_rad * y_rad);
+  const double sin_c = sin(c);
+  const double cos_c = cos(c);
+
+  double lat_rad, lon_rad;
+
+  if (c != 0.0) {
+    lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
+    lon_rad = (lon_home + atan2(y_rad * sin_c, c * cos(lat_home) * cos_c - x_rad * sin(lat_home) * sin_c));
+  } else {
+    lat_rad = lat_home;
+    lon_rad = lon_home;
+  }
+
+  return std::make_pair (lat_rad, lon_rad);
+}
+
+/**
+ * @brief Check if the world spherical coordinates are set and set them
+ * @param[in] world ptr to the world
+ * @return true if they exist, false otherwise
+ */
+inline const bool checkWorldHomePosition(gazebo::physics::WorldPtr& world,
+                                         double& world_latitude,
+                                         double& world_longitude,
+                                         double& world_altitude)
+{
+#if GAZEBO_MAJOR_VERSION >= 9
+  gazebo::common::SphericalCoordinatesPtr spherical_coords = world->SphericalCoords();
+#else
+  gazebo::common::SphericalCoordinatesPtr spherical_coords = world->GetSphericalCoordinates();
+#endif
+
+  if (!spherical_coords) {
+    return false;
+  }
+  world_latitude = spherical_coords->LatitudeReference().Radian();
+  world_longitude = spherical_coords->LongitudeReference().Radian();
+  world_altitude = spherical_coords->GetElevationReference();
+  // This logic is required given that the spherical coordinates reference call
+  // return 0 if the spherical coordnates are not defined in the world file
+  return (world_latitude && world_latitude && world_latitude) ? true : false;
+}
 
 #endif  // SITL_GAZEBO_COMMON_H_

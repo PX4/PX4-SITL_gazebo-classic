@@ -472,6 +472,10 @@
       <rotorVelocitySlowdownSim>0.05</rotorVelocitySlowdownSim>
     </plugin>
 
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
+    </plugin>
+
     <!--
       propXlinks receive relative force from uuv_plugin
       baselink receives relative torque

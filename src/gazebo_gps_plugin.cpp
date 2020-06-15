@@ -38,28 +38,10 @@ GpsPlugin::GpsPlugin()
 
 GpsPlugin::~GpsPlugin()
 {
-    if (updateConnection_)
-      updateConnection_->~Connection();
-    parentSensor_.reset();
-    world_->Reset();
-}
-
-bool GpsPlugin::checkWorldHomePosition(physics::WorldPtr world) {
-#if GAZEBO_MAJOR_VERSION >= 9
-  common::SphericalCoordinatesPtr spherical_coords = world_->SphericalCoords();
-#else
-  common::SphericalCoordinatesPtr spherical_coords = world_->GetSphericalCoordinates();
-#endif
-
-  if (!spherical_coords) {
-    return false;
-  }
-  world_latitude_ = spherical_coords->LatitudeReference().Degree() * M_PI / 180.0;
-  world_longitude_ = spherical_coords->LongitudeReference().Degree() * M_PI / 180.0;
-  world_altitude_ = spherical_coords->GetElevationReference();
-  // This logic is required given that the spherical coordinates reference call
-  // return 0 if the spherical coordnates are not defined in the world file
-  return (world_latitude_ && world_longitude_ && world_altitude_) ? true : false;
+  if (updateSensorConnection_)
+    updateSensorConnection_->~Connection();
+  parentSensor_.reset();
+  world_->Reset();
 }
 
 void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
@@ -118,40 +100,40 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     gps_noise_ = false;
   }
 
-  bool world_has_origin = checkWorldHomePosition(world_);
+  const bool world_has_origin = checkWorldHomePosition(world_, world_latitude_, world_longitude_, world_altitude_);
 
   if (env_lat) {
-    lat_home = std::stod(env_lat) * M_PI / 180.0;
-    gzmsg << "Home latitude is set to " << lat_home << ".\n";
+    lat_home_ = std::stod(env_lat) * M_PI / 180.0;
+    gzmsg << "Home latitude is set to " << std::stod(env_lat) << ".\n";
   } else if (world_has_origin) {
-    lat_home = world_latitude_;
-    gzmsg << "Home latitude is set to " << lat_home << ".\n";
+    lat_home_ = world_latitude_;
+    gzmsg << "[gazebo_gps_plugin] Home latitude is set to " << lat_home_ << ".\n";
   } else if(_sdf->HasElement("homeLatitude")) {
     double latitude;
-    getSdfParam<double>(_sdf, "homeLatitude", latitude, 47.397742);
-    lat_home = latitude * M_PI / 180.0;
+    getSdfParam<double>(_sdf, "homeLatitude", latitude, lat_home_);
+    lat_home_ = latitude * M_PI / 180.0;
   }
 
   if (env_lon) {
-    lon_home = std::stod(env_lon) * M_PI / 180.0;
-    gzmsg << "Home longitude is set to " << lon_home << ".\n";
+    lon_home_ = std::stod(env_lon) * M_PI / 180.0;
+    gzmsg << "Home longitude is set to " << std::stod(env_lon) << ".\n";
   } else if (world_has_origin) {
-    lon_home = world_longitude_;
-    gzmsg << "Home longitude is set to " << lon_home << ".\n";
+    lon_home_ = world_longitude_;
+    gzmsg << "[gazebo_gps_plugin] Home longitude is set to " << lon_home_ << ".\n";
   } else if(_sdf->HasElement("homeLongitude")) {
     double longitude;
-    getSdfParam<double>(_sdf, "homeLongitude", longitude, 8.545594);
-    lon_home = longitude * M_PI / 180.0;
+    getSdfParam<double>(_sdf, "homeLongitude", longitude, lon_home_);
+    lon_home_ = longitude * M_PI / 180.0;
   }
 
   if (env_alt) {
-    alt_home = std::stod(env_alt);
-    gzmsg << "Home altitude is set to " << alt_home << ".\n";
+    alt_home_ = std::stod(env_alt);
+    gzmsg << "Home altitude is set to " << alt_home_ << ".\n";
   } else if (world_has_origin) {
-    alt_home = world_altitude_;
-    gzmsg << "Home altitude is set to " << alt_home << ".\n";
+    alt_home_ = world_altitude_;
+    gzmsg << "[gazebo_gps_plugin] Home altitude is set to " << alt_home_ << ".\n";
   } else if(_sdf->HasElement("homeAltitude")) {
-    getSdfParam<double>(_sdf, "homeAltitude", alt_home, alt_home);
+    getSdfParam<double>(_sdf, "homeAltitude", alt_home_, alt_home_);
   }
 
   // get random walk in XY plane
@@ -209,35 +191,29 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     gzerr << "[gazebo_gps_plugin] Please specify a robotNamespace.\n";
   }
 
+  // get update rate
+  if (_sdf->HasElement("update_rate")) {
+    getSdfParam<double>(_sdf, "update_rate", update_rate_, kDefaultUpdateRate);
+  } else {
+    update_rate_ = kDefaultUpdateRate;
+    gzwarn << "[gazebo_gps_plugin] Using default update rate of "
+           << kDefaultUpdateRate << "hz \n";
+  }
+  parentSensor_->SetUpdateRate(update_rate_);
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  // Check first if the model was loaded before storing a pointer to it
-  addEntityConnection_ = event::Events::ConnectAddEntity(
-      std::bind(&GpsPlugin::addEntityEventCallback, this, std::placeholders::_1));
-
-  if (addEntityConnection_->Id() < 1) {
-    // Listen to the update event. This event is broadcast every simulation iteration.
-    updateConnection_ = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&GpsPlugin::OnUpdate, this, _1));
-  }
+  parentSensor_->SetActive(false);
+  updateSensorConnection_ = parentSensor_->ConnectUpdated(boost::bind(&GpsPlugin::OnSensorUpdate, this));
+  parentSensor_->SetActive(true);
 
   gravity_W_ = world_->Gravity();
 
   gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + model_name_ + "/link/" + gps_topic_, 10);
-  gt_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Groundtruth>("~/" + model_name_ + "/groundtruth", 10);
 }
 
-void GpsPlugin::addEntityEventCallback(const std::string &name) {
-    // Start listening to the update event when the loaded entity matches.
-    if (name == model_name_) {
-      // Listen to the update event. This event is broadcast every simulation iteration.
-      updateConnection_ = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&GpsPlugin::OnUpdate, this, _1));
-    }
-}
-
-void GpsPlugin::OnUpdate(const common::UpdateInfo&){
+void GpsPlugin::OnSensorUpdate() {
   // Store the pointer to the model.
   if (model_ == NULL)
     model_ = world_->ModelByName(model_name_);
@@ -250,14 +226,13 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
   double dt = (current_time - last_time_).Double();
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Pose3d T_W_I = model_->WorldPose();    // TODO(burrimi): Check tf
+  ignition::math::Pose3d T_W_I = model_->WorldPose();
 #else
-  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(model_->GetWorldPose());    // TODO(burrimi): Check tf
+  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(model_->GetWorldPose());
 #endif
-  ignition::math::Vector3d& pos_W_I = T_W_I.Pos();           // Use the models' world position for GPS and groundtruth
+  // Use the model world position for GPS
+  ignition::math::Vector3d& pos_W_I = T_W_I.Pos();
   ignition::math::Quaterniond& att_W_I = T_W_I.Rot();
-  // reproject position without noise into geographic coordinates
-  auto latlon_gt = reproject(pos_W_I);
 
   // Use the models' world position for GPS velocity.
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -300,90 +275,57 @@ void GpsPlugin::OnUpdate(const common::UpdateInfo&){
 
   // reproject position with noise into geographic coordinates
   auto pos_with_noise = pos_W_I + noise_gps_pos + gps_bias;
-  auto latlon = reproject(pos_with_noise);
-
-  // standard deviation TODO: add a way of computing this
-  std_xy = 1.0;
-  std_z = 1.0;
+  auto latlon = reproject(pos_with_noise, lat_home_, lon_home_, alt_home_);
 
   // fill SITLGps msg
+  sensor_msgs::msgs::SITLGps gps_msg;
+
   gps_msg.set_time_usec(current_time.Double() * 1e6);
+
+  // @note Unfurtonately the Gazebo GpsSensor seems to provide bad readings,
+  // starting to drift and leading to global position loss
+  // gps_msg.set_latitude_deg(parentSensor_->Latitude().Degree());
+  // gps_msg.set_longitude_deg(parentSensor_->Longitude().Degree());
+  // gps_msg.set_altitude(parentSensor_->Altitude());
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
-  gps_msg.set_altitude(pos_W_I.Z() + alt_home + noise_gps_pos.Z() + gps_bias.Z());
+  gps_msg.set_altitude(pos_W_I.Z() + alt_home_ - noise_gps_pos.Z() + gps_bias.Z());
+
+  std_xy = 1.0;
+  std_z = 1.0;
   gps_msg.set_eph(std_xy);
   gps_msg.set_epv(std_z);
+
   gps_msg.set_velocity(velocity_current_W_xy.Length());
   gps_msg.set_velocity_east(velocity_current_W.X() + noise_gps_vel.Y());
   gps_msg.set_velocity_north(velocity_current_W.Y() + noise_gps_vel.X());
-  gps_msg.set_velocity_up(velocity_current_W.Z() + noise_gps_vel.Z());
+  gps_msg.set_velocity_up(velocity_current_W.Z() - noise_gps_vel.Z());
 
   // add msg to buffer
   gps_delay_buffer.push(gps_msg);
 
   // apply GPS delay
-  if ((current_time - last_gps_time_).Double() > gps_update_interval_) {
-    last_gps_time_ = current_time;
-
-    while (true) {
-      gps_msg = gps_delay_buffer.front();
-      double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time_usec() / 1e6f;
-      if (gps_delay_buffer.empty()) {
-        // abort if buffer is empty already
-        break;
-      }
-      // remove data that is too old or if buffer size is too large
-      if (gps_current_delay > gps_delay) {
-        gps_delay_buffer.pop();
-        // remove data if buffer too large
-      } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
-        gps_delay_buffer.pop();
-      } else {
-        // if we get here, we have good data, stop
-        break;
-      }
+  while (true) {
+    gps_msg = gps_delay_buffer.front();
+    double gps_current_delay = current_time.Double() - gps_delay_buffer.front().time_usec() / 1e6f;
+    if (gps_delay_buffer.empty()) {
+      // abort if buffer is empty already
+      break;
     }
-    // publish SITLGps msg at 5hz
-    gps_pub_->Publish(gps_msg);
+    // remove data that is too old or if buffer size is too large
+    if (gps_current_delay > gps_delay) {
+      gps_delay_buffer.pop();
+    // remove data if buffer too large
+    } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
+      gps_delay_buffer.pop();
+    } else {
+      // if we get here, we have good data, stop
+      break;
+    }
   }
-
-  // fill Groundtruth msg
-  groundtruth_msg.set_time_usec(current_time.Double() * 1e6);
-  groundtruth_msg.set_latitude_rad(latlon_gt.first);
-  groundtruth_msg.set_longitude_rad(latlon_gt.second);
-  groundtruth_msg.set_altitude(pos_W_I.Z() + alt_home);
-  groundtruth_msg.set_velocity_east(velocity_current_W.X());
-  groundtruth_msg.set_velocity_north(velocity_current_W.Y());
-  groundtruth_msg.set_velocity_up(velocity_current_W.Z());
-  groundtruth_msg.set_attitude_q_w(att_W_I.W());
-  groundtruth_msg.set_attitude_q_x(att_W_I.X());
-  groundtruth_msg.set_attitude_q_y(att_W_I.Y());
-  groundtruth_msg.set_attitude_q_z(att_W_I.Z());
-
-  // publish Groundtruth msg at full rate
-  gt_pub_->Publish(groundtruth_msg);
+  // publish SITLGps msg at 5hz
+  gps_pub_->Publish(gps_msg);
 
   last_time_ = current_time;
-}
-
-std::pair<double, double> GpsPlugin::reproject(ignition::math::Vector3d& pos)
-{
-  // reproject local position to gps coordinates
-  double x_rad = pos.Y() / earth_radius;    // north
-  double y_rad = pos.X() / earth_radius;    // east
-  double c = sqrt(x_rad * x_rad + y_rad * y_rad);
-  double sin_c = sin(c);
-  double cos_c = cos(c);
-  double lat_rad, lon_rad;
-
-  if (c != 0.0) {
-    lat_rad = asin(cos_c * sin(lat_home) + (x_rad * sin_c * cos(lat_home)) / c);
-    lon_rad = (lon_home + atan2(y_rad * sin_c, c * cos(lat_home) * cos_c - x_rad * sin(lat_home) * sin_c));
-  } else {
-    lat_rad = lat_home;
-    lon_rad = lon_home;
-  }
-
-  return std::make_pair (lat_rad, lon_rad);
 }
 } // namespace gazebo

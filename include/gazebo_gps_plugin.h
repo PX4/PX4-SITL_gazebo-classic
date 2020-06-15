@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012-2017 Open Source Robotics Foundation
- * Copyright (C) 2017-2018 PX4 Pro Development Team
+ * Copyright (C) 2017-2020 PX4 Development Team. All rights reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  * @brief GPS Plugin
  *
- * This plugin publishes GPS and Groundtruth data to be used and propagated
+ * This plugin publishes GPS data to be used and propagated
  *
  * @author Amy Wagoner <arwagoner@gmail.com>
  * @author Nuno Marques <nuno.marques@dronesolutions.io>
@@ -48,10 +48,10 @@
 #include <gazebo/sensors/GpsSensor.hh>
 
 #include <SITLGps.pb.h>
-#include <Groundtruth.pb.h>
 
 namespace gazebo
 {
+static constexpr double kDefaultUpdateRate = 5.0;               // hz
 static constexpr double kDefaultGpsXYRandomWalk = 2.0;          // (m/s) / sqrt(hz)
 static constexpr double kDefaultGpsZRandomWalk = 4.0;           // (m/s) / sqrt(hz)
 static constexpr double kDefaultGpsXYNoiseDensity = 2.0e-4;     // (m) / sqrt(hz)
@@ -67,21 +67,9 @@ public:
 
 protected:
   virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
-  virtual void OnUpdate(const common::UpdateInfo&);
-
-  /* Keep this protected so that it's possible to unit test it. */
-  std::pair<double, double> reproject(ignition::math::Vector3d& pos);
+  virtual void OnSensorUpdate();
 
 private:
-  /**
-   * @brief     Check if the <sperical_coordinates> tag was defined in the world file
-   * @param     world pointer to gazebo world
-   * @returns   whether if <sperical_coordinates> tag exists in the world file
-   **/
-  bool checkWorldHomePosition(physics::WorldPtr world);
-
-  void addEntityEventCallback(const std::string &name);
-
   std::string namespace_;
   std::string gps_id_;
   std::default_random_engine random_generator_;
@@ -94,42 +82,26 @@ private:
   sensors::GpsSensorPtr parentSensor_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
-  event::ConnectionPtr updateConnection_;
-  event::ConnectionPtr addEntityConnection_;
+  event::ConnectionPtr updateSensorConnection_;
 
   transport::NodePtr node_handle_;
-  transport::PublisherPtr gt_pub_;
   transport::PublisherPtr gps_pub_;
 
   std::string gps_topic_;
-
-  sensor_msgs::msgs::SITLGps gps_msg;
-  sensor_msgs::msgs::Groundtruth groundtruth_msg;
+  double update_rate_;
 
   common::Time last_gps_time_;
   common::Time last_time_;
 
-  // Set global reference point
-  // Zurich Irchel Park: 47.397742, 8.545594, 488m
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031, 86m
-  // Moscow downtown: 55.753395, 37.625427, 155m
-
-  // The home position can be specified using the environment variables:
+  // Home defaults to Zurich Irchel Park
+  // @note The home position can be specified using the environment variables:
   // PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
-
-  // Zurich Irchel Park
-  double lat_home = 47.397742 * M_PI / 180.0;  // rad
-  double lon_home = 8.545594 * M_PI / 180.0;   // rad
-  double alt_home = 488.0;                     // meters
+  double lat_home_ = kDefaultHomeLatitude;
+  double lon_home_ = kDefaultHomeLongitude;
+  double alt_home_ = kDefaultHomeAltitude;
   double world_latitude_ = 0.0;
   double world_longitude_ = 0.0;
   double world_altitude_ = 0.0;
-  // Seattle downtown (15 deg declination): 47.592182, -122.316031
-  // static const double lat_home = 47.592182 * M_PI / 180;    // rad
-  // static const double lon_home = -122.316031 * M_PI / 180;  // rad
-  // static const double alt_home = 86.0;                      // meters
-
-  static constexpr const double earth_radius = 6353000.0;      // meters
 
   // gps delay related
   static constexpr double gps_update_interval_ = 0.2; // 5hz
