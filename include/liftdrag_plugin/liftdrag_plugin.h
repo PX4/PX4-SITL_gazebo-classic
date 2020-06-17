@@ -84,6 +84,9 @@ namespace gazebo
     /// \brief Cm-alpha rate after stall
     protected: double cmaStall;
 
+    /// \breif Coefficient of Moment / control surface deflection angle slope
+    protected: double cm_delta;
+
     /// \brief: \TODO: make a stall velocity curve
     protected: double velocityStall;
 
