@@ -999,7 +999,7 @@ void GazeboMavlinkInterface::SendGroundTruth()
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg, const int& id) {
   // fill HIL GPS Mavlink msg
   mavlink_hil_gps_t hil_gps_msg;
-  hil_gps_msg.time_usec = gps_msg->time_usec();
+  hil_gps_msg.time_usec = gps_msg->time_utc_usec();
   hil_gps_msg.fix_type = 3;
   hil_gps_msg.lat = gps_msg->latitude_deg() * 1e7;
   hil_gps_msg.lon = gps_msg->longitude_deg() * 1e7;

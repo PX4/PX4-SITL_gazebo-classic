@@ -83,9 +83,11 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   #if GAZEBO_MAJOR_VERSION >= 9
     last_time_ = world_->SimTime();
     last_gps_time_ = world_->SimTime();
+    start_time_ = world_->StartTime();
   #else
     last_time_ = world_->GetSimTime();
     last_gps_time_ = world_->GetSimTime();
+    start_time_ = world_->GetStartTime();
   #endif
 
   // Use environment variables if set for home position.
@@ -286,6 +288,7 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
   sensor_msgs::msgs::SITLGps gps_msg;
 
   gps_msg.set_time_usec(current_time_.Double() * 1e6);
+  gps_msg.set_time_utc_usec((current_time_.Double() + start_time_.Double()) * 1e6);
 
   // @note Unfurtonately the Gazebo GpsSensor seems to provide bad readings,
   // starting to drift and leading to global position loss
