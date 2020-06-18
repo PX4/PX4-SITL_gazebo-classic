@@ -9,7 +9,23 @@ endif()
 
 message(STATUS "install-prefix: ${CMAKE_INSTALL_PREFIX}")
 
+# CMake build type (Debug Release RelWithDebInfo MinSizeRel)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Build type" FORCE)
+endif()
+
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug;Release;RelWithDebInfo;MinSizeRel;Coverage;AddressSanitizer;UndefinedBehaviorSanitizer")
+message(STATUS "cmake build type: ${CMAKE_BUILD_TYPE}")
+
 project(mavlink_sitl_gazebo VERSION 1.0.0)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 include(GNUInstallDirs)
 
 #######################
@@ -144,8 +160,7 @@ endif()
 ## Build ##
 ###########
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations -Wno-address-of-packed-member")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-address-of-packed-member")
+add_compile_options(-Wno-deprecated-declarations -Wno-address-of-packed-member)
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
