@@ -111,7 +111,11 @@ void AirspeedPlugin::OnUpdate(const common::UpdateInfo&){
 #endif
   ignition::math::Quaterniond C_W_I = T_W_I.Rot();
 
+#if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel_a = link_->RelativeLinearVel() - C_W_I.RotateVector(wind_vel_);
+#else
+  ignition::math::Vector3d vel_a = ignitionFromGazeboMath(link_->GetRelativeLinearVel()) - C_W_I.RotateVector(wind_vel_);
+#endif
   double diff_pressure = 0.005f * rho * vel_a.X() * vel_a.X() + diff_pressure_noise;
 
   // calculate differential pressure in hPa
