@@ -167,6 +167,31 @@
     </gazebo>
   </xacro:macro>
 
+  <!-- Macro to add the airspeed sensor_plugin. -->
+  <xacro:macro name="airspeed_plugin_macro" params="namespace parent_link">
+    <link name="${namespace}/airspeed_link">
+      <inertial>
+        <inertia ixx="1e-05" ixy="0.0" iyy="1e-05" ixz="0.0" iyz="0.0" izz="1e-05" />
+        <mass value="0.015" />  <!-- [kg] -->
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </inertial>
+    </link>
+    <!-- IMU joint -->
+    <joint name="${namespace}/airspeed_joint" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${parent_link}" />
+      <child link="${namespace}/airspeed_link" />
+      <limit upper="0" lower="0" effort="0" velocity="0" />
+    </joint>
+
+    <gazebo>
+      <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+        <robotNamespace/>
+        <linkName>${namespace}/airspeed_link</linkName>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
   <!-- Macro to add the controller interface. -->
   <xacro:macro name="controller_plugin_macro" params="namespace imu_sub_topic">
     <gazebo>

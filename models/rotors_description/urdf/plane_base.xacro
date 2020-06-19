@@ -114,6 +114,13 @@
     >
   </xacro:magnetometer_plugin_macro>
 
+  <!-- Instantiate magnetometer plugin. -->
+  <xacro:airspeed_plugin_macro
+    namespace="${namespace}"
+    parent_link="base_link"
+    >
+  </xacro:airspeed_plugin_macro>
+
   <!-- Instantiate barometer plugin. -->
   <xacro:barometer_plugin_macro
     namespace="${namespace}"
