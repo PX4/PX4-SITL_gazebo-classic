@@ -150,6 +150,12 @@
   </xacro:mavlink_interface_macro_vtol>
   </xacro:if>
 
+  <xacro:airspeed_plugin_macro
+    namespace="${namespace}"
+    parent_link="base_link"
+    >
+  </xacro:airspeed_plugin_macro>
+
   <!-- Mount an ADIS16448 IMU. -->
   <xacro:imu_plugin_macro
     namespace="${namespace}"

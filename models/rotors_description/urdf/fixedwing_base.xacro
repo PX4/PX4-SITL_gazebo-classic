@@ -173,6 +173,8 @@
                ${link_name}_joint
             </control_joint_name>
             <control_joint_rad_to_cl>${control_joint_rad_to_cl}</control_joint_rad_to_cl>
+            <robotNamespace></robotNamespace>
+            <windSubTopic>/wind</windSubTopic>
          </plugin>
     </gazebo>
     <gazebo reference="${link_name}">
@@ -225,6 +227,8 @@
                ${link_name}_joint
             </control_joint_name>
             <control_joint_rad_to_cl>${control_joint_rad_to_cl}</control_joint_rad_to_cl>
+            <robotNamespace></robotNamespace>
+            <windSubTopic>/wind</windSubTopic>
          </plugin>
     </gazebo>
     <gazebo reference="${link_name}">
