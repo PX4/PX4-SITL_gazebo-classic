@@ -1045,6 +1045,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, const int& i
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = lidar_message->h_fov();
   sensor_msg.vertical_fov = lidar_message->v_fov();
+  sensor_msg.signal_quality = lidar_message->signal_quality();
 
   ignition::math::Quaterniond q_ls = ignition::math::Quaterniond(
     lidar_message->orientation().w(),
@@ -1116,6 +1117,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const int& i
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
+  sensor_msg.signal_quality = sonar_message->signal_quality();
 
   ignition::math::Quaterniond q_ls;
   for (Sensor_M::iterator it = sensor_map_.begin(); it != sensor_map_.end(); ++it) {

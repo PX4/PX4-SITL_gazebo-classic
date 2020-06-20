@@ -124,5 +124,9 @@ void SonarPlugin::OnNewScans()
   sonar_message_.set_v_fov(2.0f * atan(parentSensor_->Radius() / parentSensor_->RangeMax()));
   sonar_message_.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
 
+  // For now, sending 0 as invalid. Might need a different signal modelling
+  // than the lidar plugin
+  sonar_message_.set_signal_quality(0);
+
   sonar_pub_->Publish(sonar_message_);
 }
