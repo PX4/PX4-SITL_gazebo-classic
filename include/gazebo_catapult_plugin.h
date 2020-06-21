@@ -90,11 +90,11 @@ private:
 
   event::ConnectionPtr _updateConnection;
 
-  LaunchStatus launch_status_;
+  LaunchStatus launch_status_ = VEHICLE_STANDBY;
   common::Time trigger_time_;
   
   double max_rot_velocity_ = 3500;
-  double ref_motor_rot_vel_;
+  double ref_motor_rot_vel_ = 0.0;
   double arm_rot_vel_ = 100;
   double launch_duration_ = 0.01;
   double force_magnitude_ = 1.0;
