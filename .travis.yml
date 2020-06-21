@@ -56,27 +56,26 @@ matrix:
           env:
             - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-20
             - BUILD=${CMAKE_UNIT_TEST_BUILD}
-        # FIXME: Currently failing when creating QT moc files
-        # - name: CMake build (Gazebo 11)
-        #   os: linux
-        #   language: cpp
-        #   services:
-        #     - docker
-        #   cache:
-        #     ccache: true
-        #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-20
-        #     - BUILD=${CMAKE_BUILD}
-        # - name: CMake unit tests build and run (Gazebo 11)
-        #   os: linux
-        #   language: cpp
-        #   services:
-        #     - docker
-        #   cache:
-        #     ccache: true
-        #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-20
-        #     - BUILD=${CMAKE_UNIT_TEST_BUILD}
+        - name: CMake build (Gazebo 11)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-20
+            - BUILD=${CMAKE_BUILD}
+        - name: CMake unit tests build and run (Gazebo 11)
+          os: linux
+          language: cpp
+          services:
+            - docker
+          cache:
+            ccache: true
+          env:
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-20
+            - BUILD=${CMAKE_UNIT_TEST_BUILD}
         # FIXME: px4-dev-ros-kinetic is failing due to some pip install problems
         # - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
         #   os: linux
