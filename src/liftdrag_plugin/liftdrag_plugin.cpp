@@ -394,7 +394,7 @@ void LiftDragPlugin::OnUpdate()
   // gzerr << this->cp << " : " << this->link->GetInertial()->CoG() << "\n";
 
   // force and torque about cg in inertial frame
-  ignition::math::Vector3d force = lift + drag + moment.Cross(momentArm);
+  ignition::math::Vector3d force = lift + drag;
 
   ignition::math::Vector3d torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
