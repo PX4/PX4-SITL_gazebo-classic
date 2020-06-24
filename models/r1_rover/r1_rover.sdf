@@ -1,4 +1,4 @@
-<sdf version='1.7'>
+<sdf version='1.6'>
   <model name='r1_rover'>
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
@@ -173,7 +173,7 @@
           <contact>
             <ode>
               <min_depth>0.001</min_depth>
-              <mav_vel>0.0</mav_vel>
+              <max_vel>0.0</max_vel>
               <kp>1.0e6</kp>
               <kd>100.0</kd>
             </ode>
@@ -259,7 +259,7 @@
           <contact>
             <ode>
               <min_depth>0.001</min_depth>
-              <mav_vel>0.0</mav_vel>
+              <max_vel>0.0</max_vel>
               <kp>1.0e6</kp>
               <kd>100.0</kd>
             </ode>
@@ -429,7 +429,7 @@
           <contact>
             <ode>
               <min_depth>0.001</min_depth>
-              <mav_vel>0.0</mav_vel>
+              <max_vel>0.0</max_vel>
               <kp>1.0e6</kp>
               <kd>100.0</kd>
             </ode>
