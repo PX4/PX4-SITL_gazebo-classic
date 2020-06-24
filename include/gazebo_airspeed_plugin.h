@@ -31,21 +31,26 @@
  *
  ****************************************************************************/
 /**
- * @brief Catapult Plugin
+ * @brief Airspeed Plugin
  *
- * This plugin simulates a catapult / handlaunch for fixed wing vehicles
+ * This plugin publishes Airspeed sensor data
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
  */
 
-#ifndef _GAZEBO_CATAPULT_PLUGIN_HH_
-#define _GAZEBO_CATAPULT_PLUGIN_HH_
+#ifndef _GAZEBO_AIRSPEED_PLUGIN_HH_
+#define _GAZEBO_AIRSPEED_PLUGIN_HH_
 
 #include <math.h>
-#include <common.h>
-#include <sdf/sdf.hh>
+#include <cstdio>
+#include <cstdlib>
+#include <queue>
+#include <random>
 
-#include <gazebo/common/common.hh>
+#include <sdf/sdf.hh>
+#include <common.h>
+#include <random>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/util/system.hh>
@@ -53,58 +58,49 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
-#include "CommandMotorSpeed.pb.h"
 
-
-#include <Odometry.pb.h>
+#include <Airspeed.pb.h>
+#include <Wind.pb.h>
 
 namespace gazebo
 {
 
-typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
+typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
-enum LaunchStatus {
-    VEHICLE_STANDBY,
-    VEHICLE_INLAUNCH,
-    VEHICLE_LAUNCHED
-};
-
-class GAZEBO_VISIBLE CatapultPlugin : public ModelPlugin
+class GAZEBO_VISIBLE AirspeedPlugin : public ModelPlugin
 {
 public:
-  CatapultPlugin();
-  virtual ~CatapultPlugin();
+  AirspeedPlugin();
+  virtual ~AirspeedPlugin();
 
 protected:
-  virtual void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo&);
 
 private:
-  void TriggerCallback(const boost::shared_ptr<const msgs::Int> &_msg);
-  void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
+  void WindVelocityCallback(WindPtr& msg);
 
-  std::string namespace_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
   physics::LinkPtr link_;
 
-  event::ConnectionPtr _updateConnection;
-
-  LaunchStatus launch_status_ = VEHICLE_STANDBY;
-  common::Time trigger_time_;
-  
-  double max_rot_velocity_ = 3500;
-  double ref_motor_rot_vel_ = 0.0;
-  double arm_rot_vel_ = 100;
-  double launch_duration_ = 0.01;
-  double force_magnitude_ = 1.0;
-  int motor_number_;
-
-  std::string trigger_sub_topic_ = "/gazebo/command/motor_speed";
-
   transport::NodePtr node_handle_;
-  transport::SubscriberPtr trigger_sub_;
+  transport::SubscriberPtr wind_sub_;
+  transport::PublisherPtr airspeed_pub_;
+  event::ConnectionPtr updateConnection_;
 
-};     // class GAZEBO_VISIBLE CatapultPlugin
+  common::Time last_time_;
+  std::string namespace_;
+  std::string link_name_;
+
+  ignition::math::Vector3d wind_vel_;
+
+  std::default_random_engine random_generator_;
+  std::normal_distribution<float> standard_normal_distribution_;
+
+  float diff_pressure_stddev_;
+  float temperature_;
+
+};     // class GAZEBO_VISIBLE AirspeedPlugin
 }      // namespace gazebo
-#endif // _GAZEBO_CATAPULT_PLUGIN_HH_
+#endif // _GAZEBO_AIRSPEED_PLUGIN_HH_

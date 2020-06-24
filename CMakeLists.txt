@@ -9,7 +9,23 @@ endif()
 
 message(STATUS "install-prefix: ${CMAKE_INSTALL_PREFIX}")
 
+# CMake build type (Debug Release RelWithDebInfo MinSizeRel)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Build type" FORCE)
+endif()
+
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug;Release;RelWithDebInfo;MinSizeRel;Coverage;AddressSanitizer;UndefinedBehaviorSanitizer")
+message(STATUS "cmake build type: ${CMAKE_BUILD_TYPE}")
+
 project(mavlink_sitl_gazebo VERSION 1.0.0)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 include(GNUInstallDirs)
 
 #######################
@@ -144,8 +160,7 @@ endif()
 ## Build ##
 ###########
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations -Wno-address-of-packed-member")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-address-of-packed-member")
+add_compile_options(-Wno-deprecated-declarations -Wno-address-of-packed-member)
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
@@ -279,6 +294,7 @@ set(nav_msgs msgs/Odometry.proto)
 set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
+  msgs/Airspeed.proto
   msgs/Imu.proto
   msgs/IRLock.proto
   msgs/Float.proto
@@ -309,8 +325,10 @@ add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
 link_libraries(physics_msgs)
 
+add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
+add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
 add_library(gazebo_opticalflow_mockup_plugin SHARED src/gazebo_opticalflow_mockup_plugin.cpp)
@@ -332,8 +350,10 @@ add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 
 set(plugins
+  gazebo_airspeed_plugin
   gazebo_geotagged_images_plugin
   gazebo_gps_plugin
+  gazebo_groundtruth_plugin
   gazebo_irlock_plugin
   gazebo_lidar_plugin
   gazebo_opticalflow_mockup_plugin
