@@ -3,22 +3,22 @@
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>-0.010806 -1.4e-05 0.07358 0 -0 0</pose>
-        <mass>4.298</mass>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>20.0</mass>
         <inertia>
-          <ixx>0.0243769</ixx>
-          <ixy>-4.91142e-06</ixy>
-          <ixz>0.00236836</ixz>
-          <iyy>0.0614505</iyy>
-          <iyz>3.06364e-06</iyz>
-          <izz>0.072743</izz>
+          <ixx>0.37083</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.37083</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.53333</izz>
         </inertia>
       </inertial>
       <collision name='odom_fixed_joint_lump__base_link_collision'>
         <pose>0 0 0.15 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.455 0.426 0.32</size>
+            <size>0.4 0.4 0.25</size>
           </box>
         </geometry>
         <surface>
@@ -131,39 +131,51 @@
     <link name='lb_wheel_link'>
       <pose>-0.15 0.16317 0.0215 0 -0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <mass>0.414</mass>
         <inertia>
-          <ixx>0.00097298</ixx>
+          <ixx>0.00068682</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.00132536</iyy>
+          <iyy>0.00068682</iyy>
           <iyz>0</iyz>
           <izz>0.00097299</izz>
         </inertia>
       </inertial>
       <collision name='lb_wheel_link_collision'>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://r1_rover/meshes/wheel_link_simple.STL</uri>
-          </mesh>
+          <cylinder>
+            <radius>0.0686</radius>
+            <length>0.0762</length>
+          </cylinder>
         </geometry>
         <max_contacts>1</max_contacts>
         <surface>
           <friction>
+            <torsional>
+              <coefficient>0.25</coefficient>
+              <use_patch_radius>1</use_patch_radius>
+              <surface_radius>0.0686</surface_radius>
+            </torsional>
             <ode>
-              <mu>200</mu>
-              <mu2>100</mu2>
-              <fdir1>0 0 1</fdir1>
+              <mu>1.0</mu>
+              <mu2>0.45</mu2>
+              <fdir1>1 0 0</fdir1>
               <slip1>0.0</slip1>
               <slip2>0.0</slip2>
             </ode>
           </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e6</threshold>
+          </bounce>          
           <contact>
             <ode>
-              <min_depth>0.005</min_depth>
-              <kp>1e8</kp>
+              <min_depth>0.001</min_depth>
+              <max_vel>0.0</max_vel>
+              <kp>1.0e6</kp>
+              <kd>100.0</kd>
             </ode>
           </contact>
         </surface>
@@ -205,39 +217,51 @@
     <link name='lf_wheel_link'>
       <pose>0.15 0.16317 0.0215 0 -0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <mass>0.414</mass>
         <inertia>
-          <ixx>0.00097298</ixx>
+          <ixx>0.00068682</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.00132536</iyy>
+          <iyy>0.00068682</iyy>
           <iyz>0</iyz>
           <izz>0.00097299</izz>
         </inertia>
       </inertial>
       <collision name='lf_wheel_link_collision'>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://r1_rover/meshes/wheel_link_simple.STL</uri>
-          </mesh>
+          <cylinder>
+            <radius>0.0686</radius>
+            <length>0.0762</length>
+          </cylinder>
         </geometry>
         <max_contacts>1</max_contacts>
         <surface>
           <friction>
+            <torsional>
+              <coefficient>0.25</coefficient>
+              <use_patch_radius>1</use_patch_radius>
+              <surface_radius>0.0686</surface_radius>
+            </torsional>
             <ode>
-              <mu>200</mu>
-              <mu2>100</mu2>
-              <fdir1>0 0 1</fdir1>
+              <mu>1.0</mu>
+              <mu2>0.45</mu2>
+              <fdir1>1 0 0</fdir1>
               <slip1>0.0</slip1>
               <slip2>0.0</slip2>
             </ode>
           </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e6</threshold>
+          </bounce>
           <contact>
             <ode>
-              <min_depth>0.005</min_depth>
-              <kp>1e8</kp>
+              <min_depth>0.001</min_depth>
+              <max_vel>0.0</max_vel>
+              <kp>1.0e6</kp>
+              <kd>100.0</kd>
             </ode>
           </contact>
         </surface>
@@ -279,38 +303,48 @@
     <link name='rb_wheel_link'>
       <pose>-0.15 -0.16317 0.0215 0 -0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <mass>0.414</mass>
         <inertia>
-          <ixx>0.00097298</ixx>
+          <ixx>0.00068682</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.00132536</iyy>
+          <iyy>0.00068682</iyy>
           <iyz>0</iyz>
           <izz>0.00097299</izz>
         </inertia>
       </inertial>
       <collision name='rb_wheel_link_collision'>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://r1_rover/meshes/wheel_link_simple.STL</uri>
-          </mesh>
+          <cylinder>
+            <radius>0.0686</radius>
+            <length>0.0762</length>
+          </cylinder>
         </geometry>
         <max_contacts>1</max_contacts>
         <surface>
           <friction>
+            <torsional>
+              <coefficient>0.25</coefficient>
+              <use_patch_radius>1</use_patch_radius>
+              <surface_radius>0.0686</surface_radius>
+            </torsional>
             <ode>
-              <mu>200</mu>
-              <mu2>100</mu2>
-              <fdir1>0 0 1</fdir1>
+              <mu>1.0</mu>
+              <mu2>0.45</mu2>
+              <fdir1>1 0 0</fdir1>
               <slip1>0.0</slip1>
               <slip2>0.0</slip2>
             </ode>
           </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e6</threshold>
+          </bounce>
           <contact>
             <ode>
-              <min_depth>0.005</min_depth>
+              <min_depth>0.001</min_depth>
               <kp>1e8</kp>
             </ode>
           </contact>
@@ -353,39 +387,51 @@
     <link name='rf_wheel_link'>
       <pose>0.15 -0.16317 0.0215 0 -0 0</pose>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <mass>0.414</mass>
         <inertia>
-          <ixx>0.00097298</ixx>
+          <ixx>0.00068682</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.00132536</iyy>
+          <iyy>0.00068682</iyy>
           <iyz>0</iyz>
           <izz>0.00097299</izz>
         </inertia>
       </inertial>
       <collision name='rf_wheel_link_collision'>
+        <pose>0 0 0 1.57079632679 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://r1_rover/meshes/wheel_link_simple.STL</uri>
-          </mesh>
+          <cylinder>
+            <radius>0.0686</radius>
+            <length>0.0762</length>
+          </cylinder>
         </geometry>
         <max_contacts>1</max_contacts>
         <surface>
           <friction>
+            <torsional>
+              <coefficient>0.25</coefficient>
+              <use_patch_radius>1</use_patch_radius>
+              <surface_radius>0.0686</surface_radius>
+            </torsional>
             <ode>
-              <mu>200</mu>
-              <mu2>100</mu2>
-              <fdir1>0 0 1</fdir1>
+              <mu>1.0</mu>
+              <mu2>0.45</mu2>
+              <fdir1>1 0 0</fdir1>
               <slip1>0.0</slip1>
               <slip2>0.0</slip2>
             </ode>
           </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e6</threshold>
+          </bounce>          
           <contact>
             <ode>
-              <min_depth>0.005</min_depth>
-              <kp>1e8</kp>
+              <min_depth>0.001</min_depth>
+              <max_vel>0.0</max_vel>
+              <kp>1.0e6</kp>
+              <kd>100.0</kd>
             </ode>
           </contact>
         </surface>
@@ -426,7 +472,7 @@
     </joint>
     <static>0</static>
     <link name='rover/imu_link'>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 .2 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.015</mass>
@@ -439,6 +485,17 @@
           <izz>1e-05</izz>
         </inertia>
       </inertial>
+      <!--<visual name='imu_box'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>.05 .05 .02</size>
+          </box>
+        </geometry>
+        <material>
+          <emissive>1.0 0.0 0.0 1</emissive>
+        </material>
+      </visual>--> <!--uncomment visual block to see IMU-->
     </link>
     <joint name='rover/imu_joint' type='revolute'>
       <child>rover/imu_link</child>
@@ -516,7 +573,7 @@
       <use_tcp>true</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
-        <channel name="front_left_wheel_drive">
+        <channel name="left_front_wheel_drive">
           <input_index>0</input_index>
           <input_offset>0</input_offset>
           <input_scaling>40</input_scaling>
@@ -534,8 +591,8 @@
             <cmdMin>-1200</cmdMin>
           </joint_control_pid>
         </channel>
-        <channel name="rear_left_wheel_drive">
-          <input_index>0</input_index>
+        <channel name="left_back_wheel_drive">
+          <input_index>1</input_index>
           <input_offset>0</input_offset>
           <input_scaling>40</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -552,8 +609,8 @@
             <cmdMin>-1200</cmdMin>
           </joint_control_pid>
         </channel>
-        <channel name="front_right_wheel_drive">
-          <input_index>1</input_index>
+        <channel name="right_front_wheel_drive">
+          <input_index>5</input_index>
           <input_offset>0</input_offset>
           <input_scaling>40</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -570,8 +627,8 @@
             <cmdMin>-1200</cmdMin>
           </joint_control_pid>
         </channel>
-        <channel name="front_left_wheel_drive">
-          <input_index>1</input_index>
+        <channel name="right_back_wheel_drive">
+          <input_index>6</input_index>
           <input_offset>0</input_offset>
           <input_scaling>40</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -590,24 +647,5 @@
         </channel>
       </control_channels>
     </plugin>
-    <!-- <plugin name='skid_steer_drive_controller' filename='libgazebo_ros_skid_steer_drive.so'>
-      <updateRate>50.0</updateRate>
-      <robotNamespace/>
-      <leftFrontJoint>lf_wheel_joint</leftFrontJoint>
-      <rightFrontJoint>rf_wheel_joint</rightFrontJoint>
-      <leftRearJoint>lb_wheel_joint</leftRearJoint>
-      <rightRearJoint>rb_wheel_joint</rightRearJoint>
-      <wheelSeparation>0.324</wheelSeparation>
-      <wheelDiameter>0.156</wheelDiameter>
-      <robotBaseFrame>base_link</robotBaseFrame>
-      <torque>10.0</torque>
-      <commandTopic>cmd_vel_mux/input/teleop</commandTopic>
-      <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
-      <broadcastTF>50</broadcastTF>
-      <covariance_x>0.0001</covariance_x>
-      <covariance_y>0.0001</covariance_y>
-      <covariance_yaw>0.01</covariance_yaw>
-    </plugin> -->
   </model>
 </sdf>
