@@ -26,58 +26,58 @@ matrix:
           services:
             - docker
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-06-21
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-06-27
             - BUILD=${CMAKE_BUILD}
         - name: CMake unit tests build and run (Gazebo 7)
           os: linux
           services: docker
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-06-21
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-06-27
             - BUILD=${CMAKE_UNIT_TEST_BUILD}
         - name: CMake build (Gazebo 9)
           os: linux
           services: docker
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-21
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-27
             - BUILD=${CMAKE_BUILD}
         - name: CMake unit tests build and run (Gazebo 9)
           os: linux
           services: docker
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-21
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-27
             - BUILD=${CMAKE_UNIT_TEST_BUILD}
         # FIXME: Currently failing when creating QT moc files
         # - name: CMake build (Gazebo 11)
         #   os: linux
         #   services: docker
         #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-21
+        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-27
         #     - BUILD=${CMAKE_BUILD}
         # - name: CMake unit tests build and run (Gazebo 11)
         #   os: linux
         #   services: docker
         #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-21
+        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-27
         #     - BUILD=${CMAKE_UNIT_TEST_BUILD}
         # FIXME: px4-dev-ros-kinetic is failing due to some pip install problems
         # - name: Catkin build on Ubuntu 16.04 with ROS Kinetic (Gazebo 7)
         #   os: linux
         #   services: docker
         #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2020-06-21
+        #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-kinetic:2020-06-27
         #     - BUILD=${KINETIC}
-        # FIXME: we need a new MAVLink ROS release (by 2020-06-21)
+        # FIXME: we need a new MAVLink ROS release (by 2020-06-27)
         # - name: Catkin build on Ubuntu 18.04 with ROS Melodic (Gazebo 9)
         #   os: linux
         #   services: docker
         #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-06-21
+        #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-06-27
         #     - BUILD=${MELODIC}
         - name: Validate SDF schemas
           os: linux
           services: docker
           env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-21
+            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-27
             - BUILD="source ./scripts/validate_sdf.bash"
         - name: macOS Catalina (Xcode 11.4)
           os: osx
@@ -105,7 +105,7 @@ install:
       brew tap PX4/px4;
       brew install px4-dev;
       brew install px4-sim;
-      brew remove gazebo9;
+      brew remove --ignore-dependencies gazebo9;
       brew install --build-from-source gazebo9;
       pip3 install --user --upgrade setuptools;
       pip3 install --user --upgrade rospkg pyserial empy toml numpy pandas jinja2;
