@@ -17,7 +17,10 @@ branches:
 language: cpp
 
 cache:
-  ccache: true
+  ccache:
+    - true
+  directories:
+    - $HOME/Library/Caches/Homebrew
 
 matrix:
     include:
@@ -82,6 +85,9 @@ matrix:
         - name: macOS Catalina (Xcode 11.4)
           os: osx
           osx_image: xcode11.4
+          cache:
+            directories:
+              - $HOME/Library/Caches/Homebrew
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -93,6 +99,8 @@ before_install:
 install:
   - export -f travis_wait
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew install ccache;
+      export PATH="/usr/local/opt/ccache/libexec:$PATH";
       pushd googletest;
       mkdir build;
       pushd build;
@@ -107,14 +115,13 @@ install:
       brew install px4-dev;
       brew install px4-sim;
       brew remove --ignore-dependencies gazebo9;
-      travis_wait 30 brew install --build-from-source gazebo9;
+      travis_wait 45 brew install --build-from-source gazebo9;
       pip3 install --user --upgrade setuptools;
       pip3 install --user --upgrade rospkg pyserial empy toml numpy pandas jinja2;
     fi
 
 after_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      brew cleanup;
       rm -rf /usr/local/include/mavlink/v2.0/.git googletest/.git;
     fi
 
@@ -130,4 +137,9 @@ script:
         --volume=${CCACHE_DIR}:${CCACHE_DIR}:rw
         --volume=${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}:rw
         ${PX4_DOCKER_REPO} /bin/bash -e -c "${BUILD}";
+    fi
+
+before_cache:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      brew cleanup;
     fi
