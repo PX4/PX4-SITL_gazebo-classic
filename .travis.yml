@@ -1,7 +1,7 @@
 env:
   global:
     - CCACHE_DIR=$HOME/.ccache
-    - CMAKE_BUILD="mkdir Build; cd Build; cmake ..; make -j$(nproc) -l$(nproc)"
+    - CMAKE_BUILD="mkdir Build; cd Build; cmake ..; travis_wait 30 make -j$(nproc) -l$(nproc)"
     - CMAKE_UNIT_TEST_BUILD="mkdir Build; cd Build; cmake -DENABLE_UNIT_TESTS=On ..;
       make -j$(nproc) -l$(nproc); make -j$(nproc) test"
     - CATKIN_BUILD="mkdir -p ~/catkin_ws/src; cd ~/catkin_ws; catkin init;
@@ -148,6 +148,7 @@ after_install:
     fi
 
 script:
+  - export -f travis_wait
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       echo $PYTHONPATH;
       mkdir build;
