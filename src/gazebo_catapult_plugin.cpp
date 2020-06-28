@@ -98,7 +98,6 @@ void CatapultPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
 void CatapultPlugin::OnUpdate(const common::UpdateInfo&){
 
-    bool vehicle_launched_ = false;
     //Launch vehicle if the vehilce is armed
     if(ref_motor_rot_vel_ > arm_rot_vel_ && launch_status_ != VEHICLE_LAUNCHED ) {
       if(launch_status_ == VEHICLE_STANDBY) {

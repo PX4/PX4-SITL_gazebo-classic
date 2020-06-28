@@ -31,7 +31,7 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(LiftDragPlugin)
 
 /////////////////////////////////////////////////
-LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
+LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
 {
   this->cp = ignition::math::Vector3d(0, 0, 0);
   this->forward = ignition::math::Vector3d(1, 0, 0);
@@ -55,6 +55,9 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
 
   /// how much to change CL per every radian of the control joint value
   this->controlJointRadToCL = 4.0;
+
+  // How much Cm changes with a change in control surface deflection angle
+  this->cm_delta = 0.0;
 }
 
 /////////////////////////////////////////////////
@@ -109,6 +112,9 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("cma_stall"))
     this->cmaStall = _sdf->Get<double>("cma_stall");
+
+    if (_sdf->HasElement("cm_delta"))
+        this->cm_delta = _sdf->Get<double>("cm_delta");
 
   if (_sdf->HasElement("cp"))
     this->cp = _sdf->Get<ignition::math::Vector3d>("cp");
@@ -310,15 +316,16 @@ void LiftDragPlugin::OnUpdate()
     cl = this->cla * this->alpha * cosSweepAngle;
 
   // modify cl per control joint value
+  double controlAngle;
   if (this->controlJoint)
   {
 #if GAZEBO_MAJOR_VERSION >= 9
-    double controlAngle = this->controlJoint->Position(0);
+    controlAngle = this->controlJoint->Position(0);
 #else
-    double controlAngle = this->controlJoint->GetAngle(0).Radian();
+    controlAngle = this->controlJoint->GetAngle(0).Radian();
 #endif
     cl = cl + this->controlJointRadToCL * controlAngle;
-    /// \TODO: also change cm and cd
+    /// \TODO: also change cd
   }
 
   // compute lift force at cp
@@ -368,9 +375,8 @@ void LiftDragPlugin::OnUpdate()
   else
     cm = this->cma * this->alpha * cosSweepAngle;
 
-  /// \TODO: implement cm
-  /// for now, reset cm to zero, as cm needs testing
-  cm = 0.0;
+  // Take into account the effect of control surface deflection angle to Cm
+  cm += this->cm_delta * controlAngle;
 
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
@@ -389,10 +395,8 @@ void LiftDragPlugin::OnUpdate()
 
   // force and torque about cg in inertial frame
   ignition::math::Vector3d force = lift + drag;
-  // + moment.Cross(momentArm);
 
-  ignition::math::Vector3d torque = moment;
-  // - lift.Cross(momentArm) - drag.Cross(momentArm);
+  ignition::math::Vector3d torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   // debug
   //

@@ -73,6 +73,8 @@ namespace gazebo
       std::string namespace_;
       double min_distance_;
       double max_distance_;
+      double low_signal_strength_;
+      double high_signal_strength_;
 
       gazebo::msgs::Quaternion orientation_;
 

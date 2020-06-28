@@ -56,6 +56,7 @@
 #include <ignition/math.hh>
 #include <sdf/sdf.hh>
 #include <common.h>
+#include <Airspeed.pb.h>
 #include <CommandMotorSpeed.pb.h>
 #include <MotorSpeed.pb.h>
 #include <Imu.pb.h>
@@ -86,13 +87,15 @@ static constexpr ssize_t MAX_SIZE = MAVLINK_MAX_PACKET_LEN + 16;
 static constexpr size_t MAX_TXQ_SIZE = 1000;
 
 //! Default distance sensor model joint naming
-static const std::regex kDefaultLidarModelLinkNaming("(lidar|sf10a)(.*::link)");
-static const std::regex kDefaultSonarModelLinkNaming("(sonar|mb1240-xl-ez4)(.*::link)");
+static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");
+static const std::regex kDefaultSonarModelJointNaming(".*(sonar|mb1240-xl-ez4)(.*_joint)");
+static const std::regex kDefaultGPSModelJointNaming(".*(gps|ublox-neo-7M)(.*_joint)");
 
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 typedef const boost::shared_ptr<const nav_msgs::msgs::Odometry> OdomPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::Airspeed> AirspeedPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::IRLock> IRLockPtr;
@@ -117,9 +120,9 @@ static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/comma
 static const std::string kDefaultImuTopic = "/imu";
 static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
-static const std::string kDefaultGPSTopic = "/gps";
 static const std::string kDefaultVisionTopic = "/vision_odom";
 static const std::string kDefaultMagTopic = "/mag";
+static const std::string kDefaultAirspeedTopic = "/airspeed";
 static const std::string kDefaultBarometerTopic = "/baro";
 static const std::string kDefaultWindTopic = "/wind";
 
@@ -167,15 +170,14 @@ public:
     use_elevator_pid_(false),
     use_left_elevon_pid_(false),
     use_right_elevon_pid_(false),
-    vehicle_is_tailsitter_(false),
     send_vision_estimation_(false),
     send_odometry_(false),
     imu_sub_topic_(kDefaultImuTopic),
     opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
     irlock_sub_topic_(kDefaultIRLockTopic),
-    gps_sub_topic_(kDefaultGPSTopic),
     vision_sub_topic_(kDefaultVisionTopic),
     mag_sub_topic_(kDefaultMagTopic),
+    airspeed_sub_topic_(kDefaultAirspeedTopic),
     baro_sub_topic_(kDefaultBarometerTopic),
     sensor_map_ {},
     wind_sub_topic_(kDefaultWindTopic),
@@ -266,8 +268,6 @@ private:
   bool use_left_elevon_pid_;
   bool use_right_elevon_pid_;
 
-  bool vehicle_is_tailsitter_;
-
   bool send_vision_estimation_;
   bool send_odometry_;
 
@@ -282,7 +282,7 @@ private:
   boost::thread callback_queue_thread_;
   void QueueThread();
   void ImuCallback(ImuPtr& imu_msg);
-  void GpsCallback(GpsPtr& gps_msg);
+  void GpsCallback(GpsPtr& gps_msg, const int& id);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg, const int& id);
   void SonarCallback(SonarPtr& sonar_msg, const int& id);
@@ -290,6 +290,7 @@ private:
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
   void MagnetometerCallback(MagnetometerPtr& mag_msg);
+  void AirspeedCallback(AirspeedPtr& airspeed_msg);
   void BarometerCallback(BarometerPtr& baro_msg);
   void WindVelocityCallback(WindPtr& msg);
   void send_mavlink_message(const mavlink_message_t *message);
@@ -324,7 +325,7 @@ private:
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
       void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-      GazeboMavlinkInterface* ptr, const physics::Link_V& links);
+      GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model);
 
   // Serial interface
   void open();
@@ -350,10 +351,10 @@ private:
   transport::SubscriberPtr imu_sub_;
   transport::SubscriberPtr opticalFlow_sub_;
   transport::SubscriberPtr irlock_sub_;
-  transport::SubscriberPtr gps_sub_;
   transport::SubscriberPtr groundtruth_sub_;
   transport::SubscriberPtr vision_sub_;
   transport::SubscriberPtr mag_sub_;
+  transport::SubscriberPtr airspeed_sub_;
   transport::SubscriberPtr baro_sub_;
   transport::SubscriberPtr wind_sub_;
 
@@ -362,10 +363,10 @@ private:
   std::string imu_sub_topic_;
   std::string opticalFlow_sub_topic_;
   std::string irlock_sub_topic_;
-  std::string gps_sub_topic_;
   std::string groundtruth_sub_topic_;
   std::string vision_sub_topic_;
   std::string mag_sub_topic_;
+  std::string airspeed_sub_topic_;
   std::string baro_sub_topic_;
   std::string wind_sub_topic_;
 
@@ -427,6 +428,7 @@ private:
 
   double optflow_distance;
   double sonar_distance;
+  double diff_pressure_;
 
   in_addr_t mavlink_addr_;
   int mavlink_udp_port_; // MAVLink refers to the PX4 simulator interface here

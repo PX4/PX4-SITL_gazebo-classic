@@ -31,21 +31,25 @@
  *
  ****************************************************************************/
 /**
- * @brief Catapult Plugin
+ * @brief Groundtruth Plugin
  *
- * This plugin simulates a catapult / handlaunch for fixed wing vehicles
+ * This plugin gets and publishes ground-truth data
  *
- * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ * @author Nuno Marques <nuno.marques@dronesolutions.io>
  */
 
-#ifndef _GAZEBO_CATAPULT_PLUGIN_HH_
-#define _GAZEBO_CATAPULT_PLUGIN_HH_
+#ifndef _GAZEBO_GROUNDTRUTH_PLUGIN_HH_
+#define _GAZEBO_GROUNDTRUTH_PLUGIN_HH_
 
 #include <math.h>
-#include <common.h>
-#include <sdf/sdf.hh>
+#include <cstdio>
+#include <cstdlib>
+#include <queue>
+#include <random>
 
-#include <gazebo/common/common.hh>
+#include <sdf/sdf.hh>
+#include <common.h>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/util/system.hh>
@@ -53,58 +57,41 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
-#include "CommandMotorSpeed.pb.h"
 
-
-#include <Odometry.pb.h>
+#include <Groundtruth.pb.h>
 
 namespace gazebo
 {
 
-typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
-
-enum LaunchStatus {
-    VEHICLE_STANDBY,
-    VEHICLE_INLAUNCH,
-    VEHICLE_LAUNCHED
-};
-
-class GAZEBO_VISIBLE CatapultPlugin : public ModelPlugin
+class GAZEBO_VISIBLE GroundtruthPlugin : public ModelPlugin
 {
 public:
-  CatapultPlugin();
-  virtual ~CatapultPlugin();
+  GroundtruthPlugin();
+  virtual ~GroundtruthPlugin();
 
 protected:
-  virtual void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
-  virtual void OnUpdate(const common::UpdateInfo&);
+  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  virtual void OnUpdate(const common::UpdateInfo& /*_info*/);
 
 private:
-  void TriggerCallback(const boost::shared_ptr<const msgs::Int> &_msg);
-  void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
-
   std::string namespace_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
-  physics::LinkPtr link_;
-
-  event::ConnectionPtr _updateConnection;
-
-  LaunchStatus launch_status_ = VEHICLE_STANDBY;
-  common::Time trigger_time_;
-  
-  double max_rot_velocity_ = 3500;
-  double ref_motor_rot_vel_ = 0.0;
-  double arm_rot_vel_ = 100;
-  double launch_duration_ = 0.01;
-  double force_magnitude_ = 1.0;
-  int motor_number_;
-
-  std::string trigger_sub_topic_ = "/gazebo/command/motor_speed";
+  event::ConnectionPtr updateConnection_;
 
   transport::NodePtr node_handle_;
-  transport::SubscriberPtr trigger_sub_;
+  transport::PublisherPtr gt_pub_;
 
-};     // class GAZEBO_VISIBLE CatapultPlugin
+  // Home defaults to Zurich Irchel Park
+  // @note The home position can be specified using the environment variables:
+  // PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
+  double lat_home_ = kDefaultHomeLatitude;
+  double lon_home_ = kDefaultHomeLongitude;
+  double alt_home_ = kDefaultHomeAltitude;
+  double world_latitude_ = 0.0;
+  double world_longitude_ = 0.0;
+  double world_altitude_ = 0.0;
+
+};     // class GAZEBO_VISIBLE GroundtruthPlugin
 }      // namespace gazebo
-#endif // _GAZEBO_CATAPULT_PLUGIN_HH_
+#endif // _GAZEBO_GROUNDTRUTH_PLUGIN_HH_

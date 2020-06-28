@@ -5,6 +5,7 @@
   Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
   Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
   Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+  Copyright 2020 PX4 Development Team. All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -26,7 +27,7 @@
     <link name="base_link"></link>
     <joint name="base_joint" type="fixed">
       <parent link="base_link" />
-      <child link="base_link_inertial" />      
+      <child link="base_link_inertial" />
     </joint>
     <link name="base_link_inertial">
       <inertial>
@@ -157,7 +158,7 @@
             <a0>${a0}</a0>
             <cla>4.752798721</cla>
             <cda>0.6417112299</cda>
-            <cma>-1.8</cma>
+            <cma>0.0</cma>
             <alpha_stall>0.3391428111</alpha_stall>
             <cla_stall>-3.85</cla_stall>
             <cda_stall>-0.9233984055</cda_stall>
@@ -172,6 +173,8 @@
                ${link_name}_joint
             </control_joint_name>
             <control_joint_rad_to_cl>${control_joint_rad_to_cl}</control_joint_rad_to_cl>
+            <robotNamespace></robotNamespace>
+            <windSubTopic>/wind</windSubTopic>
          </plugin>
     </gazebo>
     <gazebo reference="${link_name}">
@@ -209,7 +212,7 @@
             <a0>${a0}</a0>
             <cla>4.752798721</cla>
             <cda>0.6417112299</cda>
-            <cma>-1.8</cma>
+            <cma>0.0</cma>
             <alpha_stall>0.3391428111</alpha_stall>
             <cla_stall>-3.85</cla_stall>
             <cda_stall>-0.9233984055</cda_stall>
@@ -224,6 +227,8 @@
                ${link_name}_joint
             </control_joint_name>
             <control_joint_rad_to_cl>${control_joint_rad_to_cl}</control_joint_rad_to_cl>
+            <robotNamespace></robotNamespace>
+            <windSubTopic>/wind</windSubTopic>
          </plugin>
     </gazebo>
     <gazebo reference="${link_name}">

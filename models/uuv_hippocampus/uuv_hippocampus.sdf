@@ -452,6 +452,17 @@
       </axis>
     </joint>
 
+<!-- GPS -->
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
+
 <!-- Plugins -->
     <static>0</static>
 
@@ -459,6 +470,10 @@
       <robotNamespace/>
       <linkName>base_link</linkName>
       <rotorVelocitySlowdownSim>0.05</rotorVelocitySlowdownSim>
+    </plugin>
+
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
     </plugin>
 
     <!--
@@ -560,11 +575,6 @@
       <rotorVelocitySlowdownSim>0.05</rotorVelocitySlowdownSim>
     </plugin>
 
-    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
-        <robotNamespace/>
-        <gpsNoise>true</gpsNoise>
-    </plugin>
-
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
       <pubRate>100</pubRate>
@@ -583,7 +593,6 @@
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
-      <gpsSubTopic>/gps</gpsSubTopic>
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
