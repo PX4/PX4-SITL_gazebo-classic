@@ -384,6 +384,55 @@
       </collision>
     </link>
 
+    <model name='gps0'>
+      <link name='link'>
+        <pose frame=''>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>2.1733e-06</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>2.1733e-06</iyy>
+            <iyz>0</iyz>
+            <izz>1.8e-07</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.01</radius>
+              <length>0.002</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <sensor name='gps' type='gps'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
+            <robotNamespace/>
+            <gpsNoise>1</gpsNoise>
+            <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
+            <gpsZRandomWalk>4.0</gpsZRandomWalk>
+            <gpsXYNoiseDensity>0.0002</gpsXYNoiseDensity>
+            <gpsZNoiseDensity>0.0004</gpsZNoiseDensity>
+            <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
+            <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+          </plugin>
+        </sensor>
+      </link>
+    </model>
+    <joint name='gps0_joint' type='fixed'>
+      <parent>hull</parent>
+      <child>gps0::link</child>
+    </joint>
+
     {# Thrusters Rod #}
     <link name="thrusters_rod">
       <pose>{{ origin_x + r_p_x }} {{ origin_y }} {{ origin_z - r_p_z }} 0 0 0</pose>
@@ -496,12 +545,6 @@
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
-    </plugin>
-
-    {# GPS #}
-    <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
-      <robotNamespace/>
-      <gpsNoise>true</gpsNoise>
     </plugin>
 
     {# Magnetometer #}
