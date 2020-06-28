@@ -42,8 +42,6 @@
 namespace turning_direction {
 const static int CCW = 1;
 const static int CW = -1;
-const static int CCW_REVERSABLE = 2;
-const static int CW_REVERSABLE = -2;
 }
 
 namespace gazebo {
@@ -84,7 +82,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
         motor_speed_pub_topic_(kDefaultMotorVelocityPubTopic),
         motor_number_(0),
         motor_Failure_Number_(0),
-        turning_direction_type_(turning_direction::CW),
+        turning_direction_(turning_direction::CW),
         max_force_(kDefaultMaxForce),
         max_rot_velocity_(kDefaulMaxRotVelocity),
         moment_constant_(kDefaultMomentConstant),
@@ -95,7 +93,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
         rotor_drag_coefficient_(kDefaultRotorDragCoefficient),
         rotor_velocity_slowdown_sim_(kDefaultRotorVelocitySlowdownSim),
         time_constant_down_(kDefaultTimeConstantDown),
-        time_constant_up_(kDefaultTimeConstantUp) {
+        time_constant_up_(kDefaultTimeConstantUp),
+        reversible_(false) {
   }
 
   virtual ~GazeboMotorModel();
@@ -120,7 +119,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   std::string namespace_;
 
   int motor_number_;
-  int turning_direction_type_;
+  int turning_direction_;
 
   int motor_Failure_Number_; /*!< motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly */
   int tmp_motor_num; // A temporary variable used to print msg
@@ -137,6 +136,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   double rotor_velocity_slowdown_sim_;
   double time_constant_down_;
   double time_constant_up_;
+
+  bool reversible_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_pub_;

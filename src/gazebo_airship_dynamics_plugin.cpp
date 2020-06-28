@@ -35,13 +35,13 @@
  *
  * This plugin simulates the aerodynamics of an airship.
  * The equations are based on the paper:
- * Dynamic Modelling of the Airship with MATLAB using Geometric Aerodynamic Parameters
- * Authors: M.Z. Ashraf, M.A. Choudhry
+ * Airship Dynamics Modeling: A Literature Review
+ * Authors: Yuwen Li, Meyer Nahon, Inna Sharf
  *
  * @author Anton Erasmus <anton@flycloudline.com>
  */
 
-#include "gazebo_lta_dynamics_plugin.h"
+#include "gazebo_airship_dynamics_plugin.h"
 #include <ignition/math.hh>
 #include <iostream>
 
@@ -272,9 +272,9 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
   //Calculate buoyancy force
   ignition::math::Vector3d bouyancy_force_world = - param_air_density_ * param_hull_volume_ * gravity_w;
   #if GAZEBO_MAJOR_VERSION >= 9
-    ignition::math::Vector3d bouyancy_force_body = link_->WorldPose().Rot().Inverse().RotateVector(bouyancy_force_world);
+    ignition::math::Vector3d bouyancy_force_body = link_->WorldPose().Rot().RotateVectorReverse(bouyancy_force_world);
   #else
-    ignition::math::Vector3d bouyancy_force_body = ignitionFromGazeboMath(link_->GetWorldPose()).Rot().Inverse().RotateVector(bouyancy_force_world);
+    ignition::math::Vector3d bouyancy_force_body = ignitionFromGazeboMath(link_->GetWorldPose()).Rot().RotateVectorReverse(bouyancy_force_world);
   #endif
 
   // Construct added mass matrices

@@ -330,7 +330,7 @@ add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
 add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
-add_library(gazebo_lta_dynamics_plugin SHARED src/gazebo_lta_dynamics_plugin.cpp)
+add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 
 set(plugins
   gazebo_geotagged_images_plugin
@@ -354,7 +354,7 @@ set(plugins
   gazebo_catapult_plugin
   gazebo_usv_dynamics_plugin
   gazebo_parachute_plugin
-  gazebo_lta_dynamics_plugin
+  gazebo_airship_dynamics_plugin
   )
 
 foreach(plugin ${plugins})
