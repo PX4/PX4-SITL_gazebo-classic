@@ -523,7 +523,7 @@
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name="rotor4">
-          <input_index>4</input_index>
+          <input_index>0</input_index>
           <input_offset>0</input_offset>
           <input_scaling>5500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -532,7 +532,7 @@
           <joint_name>rotor_puller_joint</joint_name>
         </channel>
         <channel name="left_elevon">
-          <input_index>5</input_index>
+          <input_index>1</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -541,7 +541,7 @@
           <joint_name>left_elevon_joint</joint_name>
         </channel>
         <channel name="right_elevon">
-          <input_index>6</input_index>
+          <input_index>2</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -550,7 +550,7 @@
           <joint_name>right_elevon_joint</joint_name>
         </channel>
         <channel name="elevator">
-          <input_index>7</input_index>
+          <input_index>3</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
