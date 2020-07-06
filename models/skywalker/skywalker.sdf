@@ -1,0 +1,482 @@
+<?xml version='1.0'?>
+<sdf version='1.5'>
+  <model name='skywalker'>
+    <!-- Note: Unlike standard aero NED systems, this makes use of the ROS ENU standard with mapping taking place externally -->
+    <pose>0 0 0 0 0 0</pose>
+    <!-- <static>false</static> -->
+    <link name='base_link'>
+      <pose>0 0 0.11 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose> <!-- Body origin defined at CG -->
+        <mass>3.364</mass>
+        <inertia> <!-- Note that X and Y are swapped from NED coordinate version -->
+          <ixx>0.1702</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.229</iyy>
+          <iyz>0.9343</iyz>
+          <izz>0.8808</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0.045 0 0 1.5708</pose>
+        <geometry>
+          <box>
+            <size>0.931 2.151 0.31</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <max_vel>10</max_vel>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://skywalker/meshes/x8_body.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+          </material>
+      </visual>
+    </link>
+ <link name='skywalker/imu_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='skywalker/imu_joint' type='revolute'>
+      <child>skywalker/imu_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='skywalker/airspeed_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='skywalker/airspeed_joint' type='revolute'>
+      <child>skywalker/airspeed_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='rotor_pusher'>
+      <pose>0 -0.34687 0.11 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_pusher_collision'>
+        <pose>0 0 0 1.5707963 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.01031</length>
+            <radius>0.13</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_pusher_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://skywalker/meshes/x8_propeller.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+    <joint name='rotor_pusher_joint' type='revolute'>
+      <child>rotor_pusher</child>
+      <parent>base_link</parent>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <!-- <damping>1</damping> -->
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+      <!-- <physics>
+        <ode>
+          <implicit_spring_damper>true</implicit_spring_damper>
+        </ode>
+      </physics> -->
+    </joint>
+
+    <link name="left_elevon">
+      <pose>-0.75116 -0.35502 0.10633 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.00001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <visual name='left_elevon_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://skywalker/meshes/x8_elevon_left.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='left_elevon_joint' type='revolute'>
+      <parent>base_link</parent>
+      <child>left_elevon</child>
+      <pose>0 0.042273 0 0 0 0.26529</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <!-- -15/+15 deg. -->
+          <lower>-0.2618</lower>
+          <upper>0.2618</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+    <link name="right_elevon">
+      <pose>0.75116 -0.35502 0.10633 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.00001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <visual name='right_elevon_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://skywalker/meshes/x8_elevon_right.dae</uri>
+          </mesh>
+        </geometry>
+         <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='right_elevon_joint' type='revolute'>
+      <parent>base_link</parent>
+      <child>right_elevon</child>
+      <pose>0 0.042273 0 0 0 -0.26529</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <!-- -15/+15 deg. -->
+          <lower>-0.2618</lower>
+          <upper>0.2618</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+      <a0>0</a0> 
+      <cla>4.02</cla>
+      <cda>0.0791</cda>
+      <cma>-0.126</cma>
+
+      <!-- Stall parameters for flat plate model -->
+      <alpha_stall>0.267</alpha_stall>
+      <cla_stall>-0.945159</cla_stall>
+      <cda_stall>-0.110347</cda_stall>
+      <cma_stall>0</cma_stall>
+
+      <!-- TODO CALCULATE THIS -->
+      <cp>-0.05 0.45 0.05</cp>
+
+      <area>0.375</area>
+      <air_density>1.225</air_density>
+
+      <forward>1 0 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        left_elevon_joint
+      </control_joint_name>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
+    </plugin>
+
+    <plugin name="right_wing" filename="libLiftDragPlugin.so">
+      <a0>0.267</a0>
+      <cla>4.02</cla>
+      <cda>0.0791</cda>
+      <cma>-0.126</cma>
+
+      <!-- Stall parameters for flat plate model -->
+      <alpha_stall>0.267</alpha_stall>
+      <cla_stall>-0.945159</cla_stall>
+      <cda_stall>-0.110347</cda_stall>
+      <cma_stall>0</cma_stall>
+
+      <!-- TODO CALCULATE THIS -->
+      <cp>-0.05 -0.45 0.05</cp>
+
+      <area>0.375</area>
+      <air_density>1.225</air_density>
+
+      <forward>1 0 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>
+        left_elevon_joint
+      </control_joint_name>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
+    </plugin>
+
+
+  <plugin name='pusher' filename='libgazebo_motor_model.so'>
+      <robotNamespace></robotNamespace>
+      <jointName>rotor_pusher_joint</jointName>
+      <linkName>rotor_pusher</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>3500</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.01</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>4</motorNumber>
+      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>/wind</windSubTopic>
+ </plugin>
+ 
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+      <robotNamespace></robotNamespace>
+      <linkName>skywalker/imu_link</linkName>
+      <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
+      <frameId>base_link</frameId>
+      <linkName>base_link</linkName>
+      <robotNamespace/>
+      <xyzOffset>1 0 0</xyzOffset>
+      <windDirectionMean>0 1 0</windDirectionMean>
+      <windVelocityMean>0.7</windVelocityMean>
+      <windGustDirection>0 0 0</windGustDirection>
+      <windGustDuration>0</windGustDuration>
+      <windGustStart>0</windGustStart>
+      <windGustVelocityMean>0</windGustVelocityMean>
+      <windPubTopic>/wind</windPubTopic>
+    </plugin>
+        <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
+    </plugin>
+    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>100</pubRate>
+      <noiseDensity>0.0004</noiseDensity>
+      <randomWalk>6.4e-06</randomWalk>
+      <biasCorrelationTime>600</biasCorrelationTime>
+      <magTopic>/mag</magTopic>
+    </plugin>
+    <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>50</pubRate>
+      <baroTopic>/baro</baroTopic>
+    </plugin>
+    <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+      <robotNamespace/>
+      <linkName>skywalker/airspeed_link</linkName>
+    </plugin>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace></robotNamespace>
+      <imuSubTopic>/imu</imuSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <sdk_addr>INADDR_ANY</sdk_addr>
+      <sdk_udp_port>14540</sdk_udp_port>
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <control_channels>
+        <channel name="rotor4">
+          <input_index>4</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>3500</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rotor_pusher_joint</joint_name>
+        </channel>
+        <channel name="left_elevon">
+          <input_index>2</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>left_elevon_joint</joint_name>
+        </channel>
+        <channel name="right_elevon">
+          <input_index>3</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>right_elevon_joint</joint_name>
+        </channel>      
+      </control_channels>
+    </plugin>
+    <static>0</static>
+  </model>
+</sdf>
