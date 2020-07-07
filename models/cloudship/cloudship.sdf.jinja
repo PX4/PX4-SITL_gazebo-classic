@@ -22,17 +22,17 @@
 {# distances: prefix d_ is measured from a specific point and prefix r_ is measured from CoV #}
 {# measured in body NED frame #}
 {# gondola distance from nose and height #}
-{%- set d_gon_x = 1.7 -%}
+{%- set d_gon_x = 2 -%}
 {%- set r_gon_y = 0 -%}
-{%- set r_gon_z = 0.848 -%}
+{%- set r_gon_z = 0.8486 -%}
 
 {# payload distance from nose and height #}
 {%- set d_pl_x = 2.4 -%}
 {%- set r_pl_z = 0.784 -%}
 
 {# thrust point distance from front of gondola and height #}
-{%- set d_p_x = 0.3 -%}
-{%- set r_p_z = 0.848 -%}
+{%- set d_p_x = 0.1 -%}
+{%- set r_p_z = 0.8486 -%}
 
 {# start of fin distance from nose and distance from center of hull #}
 {%- set d_fin_x_s = 3.635 -%}
@@ -56,11 +56,11 @@
 {# hull mass #}
 {%- set hull_mass = 1.7 -%}
 {# hull volume #}
-{%- set hull_volume = 6.5460312 -%}
+{%- set hull_volume = 5.97 -%}
 {# gondola mass #}
 {%- set gondola_mass = 3.3 -%}
 {# payload mass #}
-{%- set pl_mass = 1.7 -%}
+{%- set pl_mass = 1.05 -%}
 {# fin mass #}
 {%- set fin_mass = 0.055 -%}
 
@@ -508,26 +508,26 @@
       <linkName>hull</linkName>
       <hullVolume>{{ hull_volume }}</hullVolume>
       <airDensity>{{ air_density }}</airDensity>
-      <m11>1.271</m11>
-      <m22>6.12</m22>
-      <m26>0.121556</m26>
-      <m33>6.12</m33>
-      <m35>-0.121556</m35>
-      <m44>0.00110685</m44>
-      <m53>-0.121556</m53>
-      <m55>1.27293</m55>
-      <m62>0.121556</m62>
-      <m66>1.27293</m66>
-      <distCOV>2.22</distCOV>
-      <distPotentialFlow>3.76</distPotentialFlow>
-      <distFinCenter>3.8675</distFinCenter>
-      <distQuarterChord>0.6609</distQuarterChord>
-      <forceHullInviscidFlowCoeff>1.09183452</forceHullInviscidFlowCoeff>
-      <forceHullViscousFlowCoeff>0.68099461</forceHullViscousFlowCoeff>
-      <momentHullInviscidFlowCoeff>-2.0945788</momentHullInviscidFlowCoeff>
-      <momentHullViscousFlowCoeff>-1.2204789</momentHullViscousFlowCoeff>
-      <finNormalForceCoeff>0.00288306</finNormalForceCoeff>
-      <finStallAngle>18.7968442</finStallAngle>
+      <m11>0.34094584</m11>
+      <m22>6.89645916</m22>
+      <m26>0.8003539</m26>
+      <m33>6.89645916</m33>
+      <m35>-0.8003539</m35>
+      <m44>0.03909877</m44>
+      <m53>-0.8003539</m53>
+      <m55>4.51385307</m55>
+      <m62>0.8003539</m62>
+      <m66>4.51385307</m66>
+      <distCOV>{{ hull_cov }}</distCOV>
+      <distPotentialFlow>3.758</distPotentialFlow>
+      <distFinCenter>3.884</distFinCenter>
+      <distQuarterChord>0.7454</distQuarterChord>
+      <forceHullInviscidFlowCoeff>-0.9576310423950283</forceHullInviscidFlowCoeff>
+      <forceHullViscousFlowCoeff>0.5829522229750153</forceHullViscousFlowCoeff>
+      <momentHullInviscidFlowCoeff>1.9534480725890846</momentHullInviscidFlowCoeff>
+      <momentHullViscousFlowCoeff>-1.1196943420983705</momentHullViscousFlowCoeff>
+      <finNormalForceCoeff>0.552208563394833</finNormalForceCoeff>
+      <finStallAngle>19.098</finStallAngle>
       <axialDragCoeff>0.35</axialDragCoeff>
       <windSubTopic>/wind_vel</windSubTopic>
     </plugin>

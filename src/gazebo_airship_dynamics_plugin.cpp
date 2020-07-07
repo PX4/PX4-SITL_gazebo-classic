@@ -298,8 +298,8 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
   if(fabsf(vel_eps_v[0]) > EPS) {
     gamma_eps_v = atan2(sqrt(vel_eps_v[1]*vel_eps_v[1] + vel_eps_v[2]*vel_eps_v[2]), vel_eps_v[0]);
   }
-  double force_visc_mag = q0_eps_v*(param_f_hif_coeff_*sin(2*gamma_eps_v) + param_f_hvf_coeff_*sin(gamma_eps_v)*sin(gamma_eps_v));
-  double moment_visc_mag = q0_eps_v*(param_m_hif_coeff_*sin(2*gamma_eps_v) + param_m_hvf_coeff_*sin(gamma_eps_v)*sin(gamma_eps_v));
+  double force_visc_mag = q0_eps_v*(-param_f_hif_coeff_*sin(2*gamma_eps_v) + param_f_hvf_coeff_*sin(gamma_eps_v)*sin(gamma_eps_v));
+  double moment_visc_mag = q0_eps_v*(-param_m_hif_coeff_*sin(2*gamma_eps_v) + param_m_hvf_coeff_*sin(gamma_eps_v)*sin(gamma_eps_v));
   double visc_normal_mag = sqrt(vel_eps_v[1]*vel_eps_v[1] + vel_eps_v[2]*vel_eps_v[2]);
   double visc_normal_y = 0.0f;
   double visc_normal_z = 0.0f;
