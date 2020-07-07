@@ -516,7 +516,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -538,7 +538,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="left_flap" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -604,7 +604,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
@@ -622,7 +622,7 @@
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name='puller' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -641,7 +641,7 @@
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
@@ -655,19 +655,6 @@
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
-    </plugin>
-    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
-      <frameId>base_link</frameId>
-      <linkName>base_link</linkName>
-      <robotNamespace/>
-      <xyzOffset>1 0 0</xyzOffset>
-      <windDirectionMean>0 1 0</windDirectionMean>
-      <windVelocityMean>0.7</windVelocityMean>
-      <windGustDirection>0 0 0</windGustDirection>
-      <windGustDuration>0</windGustDuration>
-      <windGustStart>0</windGustStart>
-      <windGustVelocityMean>0</windGustVelocityMean>
-      <windPubTopic>/wind</windPubTopic>
     </plugin>
     <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
