@@ -115,10 +115,12 @@
   </xacro:magnetometer_plugin_macro>
 
   <!-- Instantiate barometer plugin. -->
+  <!-- 1 Pa/s drift is roughly 10 cm/s -->
   <xacro:barometer_plugin_macro
     namespace="${namespace}"
     pub_rate="10"
     baro_topic="/baro"
+    baro_drift_pa_per_sec="0"
     >
   </xacro:barometer_plugin_macro>
 

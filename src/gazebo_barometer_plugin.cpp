@@ -46,7 +46,8 @@ GZ_REGISTER_MODEL_PLUGIN(BarometerPlugin)
 
 BarometerPlugin::BarometerPlugin() : ModelPlugin(),
     baro_rnd_y2_(0.0),
-    baro_rnd_use_last_(false)
+    baro_rnd_use_last_(false),
+    baro_drift_pa_(0.0)
 {
 }
 
@@ -84,6 +85,12 @@ void BarometerPlugin::getSdfParams(sdf::ElementPtr sdf)
   } else {
     baro_topic_ = kDefaultBarometerTopic;
     gzwarn << "[gazebo_barometer_plugin] Using default barometer topic " << baro_topic_ << "\n";
+  }
+
+  if (sdf->HasElement("baroDriftPaPerSec")) {
+    baro_drift_pa_per_sec_ = sdf->GetElement("baroDriftPaPerSec")->Get<double>();
+  } else {
+    baro_drift_pa_per_sec_ = 0.0;
   }
 }
 
@@ -169,9 +176,10 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
       }
     }
 
-    // Apply 1 Pa RMS noise
-    const float abs_pressure_noise = 1.0f * (float)y1;
-    const float absolute_pressure_noisy = absolute_pressure + abs_pressure_noise;
+    // Apply noise and drift
+    const float abs_pressure_noise = 1.0f * (float)y1;  // 1 Pa RMS noise
+    baro_drift_pa_ += baro_drift_pa_per_sec_ * dt;
+    const float absolute_pressure_noisy = absolute_pressure + abs_pressure_noise + baro_drift_pa_;
 
     // convert to hPa
     const float absolute_pressure_noisy_hpa = absolute_pressure_noisy * 0.01f;
@@ -182,7 +190,9 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
     const float rho = 1.225f / density_ratio;
 
     // calculate pressure altitude including effect of pressure noise
-    baro_msg_.set_pressure_altitude(alt_msl - abs_pressure_noise / (gravity_W_.Length() * rho));
+    baro_msg_.set_pressure_altitude(alt_msl -
+                                    (abs_pressure_noise + baro_drift_pa_) /
+                                        (gravity_W_.Length() * rho));
 
     // calculate temperature in Celsius
     baro_msg_.set_temperature(temperature_local - 273.0f);

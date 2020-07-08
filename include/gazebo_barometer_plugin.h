@@ -99,6 +99,9 @@ namespace gazebo {
     // state variables for baro pressure sensor random noise generator
     double baro_rnd_y2_;
     bool baro_rnd_use_last_;
+
+    double baro_drift_pa_per_sec_;
+    double baro_drift_pa_;
   }; // class BarometerPlugin
 } // namespace gazebo
 #endif // _GAZEBO_BAROMETER_PLUGIN_HH_

@@ -230,12 +230,13 @@
   </xacro:macro>
 
   <!-- Macro to add the barometer_plugin. -->
-  <xacro:macro name="barometer_plugin_macro" params="namespace pub_rate baro_topic">
+  <xacro:macro name="barometer_plugin_macro" params="namespace pub_rate baro_topic baro_drift_pa_per_sec">
     <gazebo>
       <plugin name="barometer_plugin" filename="libgazebo_barometer_plugin.so">
         <robotNamespace>${namespace}</robotNamespace>
         <pubRate>${pub_rate}</pubRate>
         <baroTopic>${baro_topic}</baroTopic>
+        <baroDriftPaPerSec>${baro_drift_pa_per_sec}</baroDriftPaPerSec>
       </plugin>
     </gazebo>
   </xacro:macro>
