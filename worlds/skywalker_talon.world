@@ -1,36 +1,27 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
-  <world name="skywalker_talon">
-	<gui>
+  <world name="default">
+    <gui>
       <plugin name="video_widget" filename="libgazebo_video_stream_widget.so"/>
     </gui>
-    <scene>
-      <sky>
-        <clouds>
-          <speed>12</speed>
-        </clouds>
-      </sky>
-    </scene>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
+    <!-- A ground plane -->
     <include>
-      <uri>model://yosemite</uri>
+      <uri>model://ground_plane</uri>
     </include>
-    <spherical_coordinates>
-      <surface_model>EARTH_WGS84</surface_model>
-      <latitude_deg>37.7332531</latitude_deg>
-      <longitude_deg>-119.5616378</longitude_deg>
-      <elevation>2800.4</elevation>
-    </spherical_coordinates>
+    <include>
+      <uri>model://asphalt_plane</uri>
+    </include>
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
         <solver>
           <type>quick</type>
-          <iters>10</iters>
-          <sor>1.3</sor>
+          <iters>50</iters>
+          <sor>1.0</sor>
           <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
         </solver>
         <constraints>
