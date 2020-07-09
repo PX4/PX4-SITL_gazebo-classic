@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version='1.5'>
-  <model name='skywalker_cam'>
+  <model name='skywalker_talon'>
     <include>
       <uri>model://skywalker</uri>
     </include>
