@@ -1,6 +1,8 @@
+![Gibson Robotics](gr_banner.png)
+
 # Gazebo for MAVLink SITL and HITL
 
-[![Build Status](https://travis-ci.org/PX4/sitl_gazebo.svg?branch=master)](https://travis-ci.org/PX4/sitl_gazebo)
+[![Build Status](https://travis-ci.com/iwishiwasaneagle/sitl_gazebo.svg?branch=master)](https://travis-ci.com/iwishiwasaneagle/sitl_gazebo)
 
 This is a flight simulator for multirotors, VTOL and fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. This repository is in the process of being re-integrated into RotorS, which then will support ROS and MAVLink as transport options: https://github.com/ethz-asl/rotors_simulator.
 
