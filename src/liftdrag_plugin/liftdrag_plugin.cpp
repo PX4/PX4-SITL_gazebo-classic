@@ -387,16 +387,8 @@ void LiftDragPlugin::OnUpdate()
   ignition::math::Vector3d cog = ignitionFromGazeboMath(this->link->GetInertial()->GetCoG());
 #endif
 
-  // moment arm from cg to cp in inertial plane
-  ignition::math::Vector3d momentArm = pose.Rot().RotateVector(
-    this->cp - cog
-  );
-  // gzerr << this->cp << " : " << this->link->GetInertial()->CoG() << "\n";
-
-  // force and torque about cg in inertial frame
+  // force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag;
-
-  ignition::math::Vector3d torque = moment - lift.Cross(momentArm) - drag.Cross(momentArm);
 
   // debug
   //
@@ -425,19 +417,18 @@ void LiftDragPlugin::OnUpdate()
     gzdbg << "drag: " << drag << " cd: "
           << cd << " cda: " << this->cda << "\n";
     gzdbg << "moment: " << moment << "\n";
-    gzdbg << "cp momentArm: " << momentArm << "\n";
     gzdbg << "force: " << force << "\n";
-    gzdbg << "torque: " << torque << "\n";
+    gzdbg << "moment: " << moment << "\n";
   }
 
   // Correct for nan or inf
   force.Correct();
   this->cp.Correct();
-  torque.Correct();
+  moment.Correct();
 
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
-  this->link->AddTorque(torque);
+  this->link->AddTorque(moment);
 }
 
 void LiftDragPlugin::WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg) {
