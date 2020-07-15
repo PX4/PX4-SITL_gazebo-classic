@@ -119,6 +119,7 @@
     namespace="${namespace}"
     pub_rate="50"
     baro_topic="/baro"
+    baro_drift_pa_per_sec="0"
     >
   </xacro:barometer_plugin_macro>
 
