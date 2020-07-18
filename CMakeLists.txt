@@ -47,7 +47,6 @@ include(EnableC++XX)
 find_package(Boost 1.58 REQUIRED COMPONENTS system thread filesystem)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_program(px4 REQUIRED)
 # Note: If using catkin, Python 2 is found since it points
 # to the Python libs installed with the ROS distro
 if (NOT CATKIN_DEVEL_PREFIX)
