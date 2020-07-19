@@ -1,0 +1,646 @@
+{# ---------------------------------------------------------------- #}
+{# general geometry and properties#}
+{# ---------------------------------------------------------------- #}
+{# geometry #}
+{# hull geometry #}
+{%- set hull_length = 4.7 -%}
+{%- set hull_max_diameter = 1.6 -%}
+
+{# gondola geometry #}
+{%- set gondola_length = 0.4 -%}
+{%- set gondola_width = 0.17 -%}
+{%- set gondola_height = 0.1 -%}
+
+{# fin geometry #}
+{%- set fin_root_chord = 0.465 -%}
+{%- set fin_thickness = 0.01 -%}
+{%- set fin_span = 0.39 -%}
+
+{# center of volume as measured from the nose #}
+{%- set hull_cov = 2.22 -%}
+
+{# distances: prefix d_ is measured from a specific point and prefix r_ is measured from CoV #}
+{# measured in body NED frame #}
+{# gondola distance from nose and height #}
+{%- set d_gon_x = 2 -%}
+{%- set r_gon_y = 0 -%}
+{%- set r_gon_z = 0.8486 -%}
+
+{# payload distance from nose and height #}
+{%- set d_pl_x = 2.4 -%}
+{%- set r_pl_z = 0.784 -%}
+
+{# thrust point distance from front of gondola and height #}
+{%- set d_p_x = 0.1 -%}
+{%- set r_p_z = 0.8486 -%}
+
+{# start of fin distance from nose and distance from center of hull #}
+{%- set d_fin_x_s = 3.635 -%}
+{%- set r_fin_rad = 0.5634 -%}
+
+{# actuator distances #}
+{# motor distance from gondola #}
+{%- set d_mot_y = 0.45 -%}
+{# thruster rod radius #}
+{%- set mot_rod_r = 0.01 -%}
+{# thruster prop radius (13") #}
+{%- set mot_prop_r = 0.1651 -%}
+{# thruster prop height #}
+{%- set mot_prop_h = 0.02 -%}
+{# rudder prop radius (5") #}
+{%- set rud_prop_r = 0.0635 -%}
+{# rudder prop height #}
+{%- set rud_prop_h = 0.02 -%}
+
+{# masses #}
+{# hull mass #}
+{%- set hull_mass = 1.7 -%}
+{# hull volume #}
+{%- set hull_volume = 5.97 -%}
+{# gondola mass #}
+{%- set gondola_mass = 3.3 -%}
+{# payload mass #}
+{%- set pl_mass = 1.05 -%}
+{# fin mass #}
+{%- set fin_mass = 0.055 -%}
+
+{# material properties #}
+{# air density (at MSL 15 deg) #}
+{%- set air_density = 1.225 -%}
+{# gas density (Helium) #}
+{%- set gas_density = 0.175 -%}
+
+{# motor properties #}
+{# maximum thruster rotational velocity (rad/s) #}
+{%- set mot_max_vel = 1500 -%}
+{# maximum thruster lift (kg) #}
+{%- set mot_max_thrust_kg = 1.62 -%}
+{# main thrusters time constant #}
+{%- set mot_tau = 0.05 -%}
+{# maximum thruster angle (rad) #}
+{%- set mot_max_angle = 135 * np.pi / 180 -%}
+{# maximum rudder rotational velocity (rad/s) #}
+{%- set rud_max_vel = 1500 -%}
+{# maximum rudder lift (kg) #}
+{%- set rud_max_thrust_kg = 0.24 -%}
+{# rudder motor time constant #}
+{%- set rud_tau = 0.025 -%}
+
+{# aerodynamic properties #}
+{# added mass due to the hull coefficients #}
+{%- set k_axial = 0.04662 -%}
+{%- set k_transverse = 0.9147 -%}
+{%- set k_rotation = 0.75567 -%}
+
+{# added mass due to the fins coefficients #}
+{%- set m_added_fins_k44 = 1 -%}
+{%- set m_added_fins_efficiency_factor = 0.191395 -%}
+
+{# ---------------------------------------------------------------- #}
+{# positions #}
+{# ---------------------------------------------------------------- #}
+{# spawn height above ground #}
+{%- set origin_height = 2 -%}
+
+{# hull center of volume #}
+{%- set origin_x = hull_cov - hull_length/2 -%}
+{%- set origin_y = 0 -%}
+{%- set origin_z = origin_height + hull_max_diameter/2 + gondola_height + 0.2 -%}
+
+{# ---------------------------------------------------------------- #}
+{# calculations #}
+{# ---------------------------------------------------------------- #}
+{# gas mass #}
+{%- set gas_mass = gas_density*hull_volume -%}
+
+{# total mass #}
+{%- set total_mass = hull_mass + gas_mass + gondola_mass + 4*fin_mass + pl_mass -%}
+
+{# distances (calculate from hull ellipsoid geometry) #}
+{# gondola center #}
+{%- set r_gon_x = hull_cov - d_gon_x -%}
+{# payload center #}
+{%- set r_pl_x = hull_cov - d_pl_x -%}
+{# thrust center #}
+{%- set r_p_x = hull_cov - (d_p_x + d_gon_x - gondola_length/2)-%}
+{# fin center #}
+{%- set r_fin_x = hull_cov - (d_fin_x_s + fin_root_chord/2) -%}
+{%- set r_fin_center_rad = r_fin_rad + fin_span/2 -%}
+
+{# center of gravity coordinate #}
+{%- set r_g_x = (gondola_mass*r_gon_x + 4*fin_mass*r_fin_x + pl_mass*r_pl_x)/total_mass -%}
+{%- set r_g_y = 0 -%}
+{%- set r_g_z = (gondola_mass*r_gon_z + pl_mass*r_pl_z)/total_mass -%}
+
+{# moment of inertia #}
+{# hull #}
+{%- set hull_ixx = (1/3)*hull_mass*((hull_max_diameter/2)**2 + (hull_max_diameter/2)**2) -%}
+{%- set hull_iyy = (1/3)*hull_mass*((hull_max_diameter/2)**2 + (hull_length/2)**2) -%}
+{%- set hull_izz = (1/3)*hull_mass*((hull_max_diameter/2)**2 + (hull_length/2)**2) -%}
+
+{# gas #}
+{%- set gas_ixx = (1/5)*gas_mass*((hull_max_diameter/2)**2 + (hull_max_diameter/2)**2) -%}
+{%- set gas_iyy = (1/5)*gas_mass*((hull_max_diameter/2)**2 + (hull_length/2)**2) -%}
+{%- set gas_izz = (1/5)*gas_mass*((hull_max_diameter/2)**2 + (hull_length/2)**2) -%}
+
+{# gondola #}
+{%- set gondola_ixx = (1/12)*gondola_mass*(gondola_height**2 + gondola_width**2) + gondola_mass*r_gon_x**2 -%}
+{%- set gondola_iyy = (1/12)*gondola_mass*(gondola_height**2 + gondola_length**2) + gondola_mass*r_gon_y**2 -%}
+{%- set gondola_izz = (1/12)*gondola_mass*(gondola_width**2 + gondola_length**2) + gondola_mass*r_gon_z**2 -%}
+
+{# payload #}
+{%- set payload_ixx = pl_mass*r_pl_x**2 -%}
+{%- set payload_iyy = 0 -%}
+{%- set payload_izz = pl_mass*r_pl_z**2 -%}
+
+{# fins #}
+{%- set fins_ixx = 4*((1/12)*fin_mass*(fin_span**2) + fin_mass*r_fin_x**2) -%}
+{%- set fins_iyy = 2*((1/12)*fin_mass*fin_root_chord**2 + fin_mass*r_fin_center_rad**2 + (1/12)*fin_mass*(fin_root_chord**2 + fin_span**2) + fin_mass*(r_fin_center_rad**2 + 0*r_fin_x**2)) -%}
+{%- set fins_izz = fins_iyy -%}
+
+{# total mass moment of inertia #}
+{%- set ixx = hull_ixx + gas_ixx + gondola_ixx + fins_ixx + payload_ixx -%}
+{%- set iyy = hull_iyy + gas_iyy + gondola_iyy + fins_iyy + payload_iyy -%}
+{%- set izz = hull_izz + gas_izz + gondola_izz + fins_izz + payload_izz -%}
+
+{# actuator properties #}
+{# simulation motor slowdown #}
+{%- set sim_rotor_slow = 10 -%}
+{# thruster motor constant #}
+{%- set mot_coeff = (mot_max_thrust_kg * 9.81)/(mot_max_vel**2) -%}
+{# thruster motor constant #}
+{%- set rud_coeff = (rud_max_thrust_kg * 9.81)/(rud_max_vel**2) -%}
+
+{# ---------------------------------------------------------------- #}
+{# macros #}
+{# ---------------------------------------------------------------- #}
+{%- macro inertial(m, ixx, iyy, izz) -%}
+<inertial>
+  <mass>{{m}}</mass>
+  <inertia>
+    <ixx>{{ixx}}</ixx>
+    <iyy>{{iyy}}</iyy>
+    <izz>{{izz}}</izz>
+  </inertia>
+</inertial>
+{%- endmacro -%}
+
+{%- macro inertial_offset(m, ixx, iyy, izz, x, y, z) -%}
+<inertial>
+  <pose>{{ x }} {{ y }} {{ z }} 0 0 0</pose>
+  <mass>{{m}}</mass>
+  <inertia>
+    <ixx>{{ixx}}</ixx>
+    <iyy>{{iyy}}</iyy>
+    <izz>{{izz}}</izz>
+  </inertia>
+</inertial>
+{%- endmacro -%}
+
+{%- macro cylinder(r, h) -%}
+<geometry>
+  <cylinder>
+    <radius>{{r}}</radius>
+    <length>{{h}}</length>
+  </cylinder>
+</geometry>
+{%- endmacro -%}
+
+{%- macro box(x, y, z) -%}
+<geometry>
+  <box>
+    <size>{{x}} {{y}} {{z}}</size>
+  </box>
+</geometry>
+{%- endmacro -%}
+
+{%- macro thruster(motor_num, direction, reverse, parent, mass, dist_x, dist_y, dist_z, roll, pitch, radius, height, tau, max_vel, motor_constant, moment_constant, drag_coeff, roll_coeff) -%}
+<link name="rotor_{{ motor_num }}">
+  <pose>{{ origin_x + dist_x }} {{ origin_y + dist_y }} {{ origin_z + dist_z }} {{ roll }} {{ pitch }} 0</pose>
+  {{ inertial(mass, mass*height**2, mass*(1/12)*((2*radius)**2 + height**2), mass*(1/12)*((2*radius)**2 + height**2))|indent(6) }}
+
+  <gravity>false</gravity>
+  <self_collide>false</self_collide>
+  <velocity_decay/>
+
+  <visual name="rotor_{{ motor_num }}_visual">
+    <geometry>
+      <mesh>
+        <scale>{{ radius * 2 / 0.25711 }} {{ radius * 2 / 0.25711 }} {{ height / 0.00959 }}</scale>
+        <uri>model://cloudship/meshes/prop_{{ direction }}.dae</uri>
+      </mesh>
+    </geometry>
+  </visual>
+
+  <collision name="rotor_{{ motor_num }}_collision">
+    <geometry>
+      <cylinder>
+        <length>{{ mot_prop_h }}</length>
+        <radius>{{ radius }}</radius>
+      </cylinder>
+    </geometry>
+  </collision>
+</link>
+
+<joint name='rotor_{{ motor_num }}_joint' type='revolute'>
+  <child>rotor_{{ motor_num }}</child>
+  <parent>{{ parent }}</parent>
+  <axis>
+    <xyz>0 0 1</xyz>
+    <limit>
+      <lower>-1e+16</lower>
+      <upper>1e+16</upper>
+    </limit>
+    <dynamics>
+      <spring_reference>0</spring_reference>
+      <spring_stiffness>0</spring_stiffness>
+    </dynamics>
+  </axis>
+</joint>
+
+{# Only to visualize motor spin #}
+<plugin name='rotor_{{ motor_num }}_model' filename='libgazebo_motor_model.so'>
+  <robotNamespace/>
+  <jointName>rotor_{{ motor_num }}_joint</jointName>
+  <linkName>rotor_{{ motor_num }}</linkName>
+  <turningDirection>{{ direction }}</turningDirection>
+  <reversible>{{ reverse }}</reversible>
+  <timeConstantUp>{{ tau }}</timeConstantUp>
+  <timeConstantDown>{{ tau }}</timeConstantDown>
+  <maxRotVelocity>{{ max_vel }}</maxRotVelocity>
+  <motorConstant>{{ motor_constant }}</motorConstant>
+  <momentConstant>{{ moment_constant }}</momentConstant>
+  <rotorDragCoefficient>{{ drag_coeff }}</rotorDragCoefficient>
+  <rollingMomentCoefficient>{{ roll_coeff }}</rollingMomentCoefficient>
+  <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+  <motorNumber>{{ motor_num }}</motorNumber>
+  <motorSpeedPubTopic>/motor_speed/{{ motor_num }}</motorSpeedPubTopic>
+  <rotorVelocitySlowdownSim>{{sim_rotor_slow}}</rotorVelocitySlowdownSim>
+</plugin>
+{%- endmacro -%}
+
+{%- macro fin(name, roll, y, z) -%}
+<visual name="{{ name }}_visual">
+  <pose>{{ r_fin_x - fin_root_chord/2 }} {{ y }} {{ z }} {{ roll }} 0 0</pose>
+  {{ box(fin_root_chord, fin_thickness, fin_span * 2) | indent(8) }}
+</visual>
+
+<collision name="{{ name }}_collision">
+  <pose>{{ r_fin_x - fin_root_chord/2 }} {{ y }} {{ z }} {{ roll }} 0 0</pose>
+  {{ box(fin_root_chord, fin_thickness, fin_span * 2) | indent(8) }}
+</collision>
+{%- endmacro -%}
+
+{# ---------------------------------------------------------------- #}
+{# SDF description #}
+{# ---------------------------------------------------------------- #}
+<?xml version="1.0" ?>
+<!-- DO NOT EDIT: Generated from cloudship.sdf.jinja -->
+<sdf version="1.5">
+
+  <model name="cloudship">
+
+    <self_collide>false</self_collide>
+    <static>false</static>
+
+    {# Airship #}
+    <link name="hull">
+      <pose>{{ origin_x }} {{ origin_y }} {{ origin_z }} 0 0 0</pose>
+      {{ inertial_offset(total_mass, ixx, iyy, izz, r_g_x, r_g_y, -r_g_z)|indent(6) }}
+
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay/>
+
+      {# Hull #}
+      <visual name="hull_visual">
+        <geometry>
+          <mesh>
+            <scale>{{ hull_length / 2 }} {{ hull_max_diameter / 2 }} {{ hull_max_diameter / 2 }}</scale>
+            <uri>model://cloudship/meshes/ellipsoid.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <collision name="hull_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>{{ hull_length / 2 }} {{ hull_max_diameter / 2 }} {{ hull_max_diameter / 2 }}</scale>
+            <uri>model://cloudship/meshes/ellipsoid.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+
+      {# Gondola #}
+      <visual name="gondola_visual">
+        <pose>{{ r_gon_x }} {{ r_gon_y }} {{ -r_gon_z + gondola_height / 2 }} 0 0 0</pose>
+        {{ box(gondola_length, gondola_width, gondola_height * 2) | indent(8) }}
+      </visual>
+
+      <collision name="gondola_collision">
+        <pose>{{ r_gon_x }} {{ r_gon_y }} {{ -r_gon_z }} 0 0 0</pose>
+        {{ box(gondola_length, gondola_width, gondola_height) | indent(8) }}
+      </collision>
+
+      {# Payload #}
+      <visual name="payload_visual">
+      <pose>{{ r_pl_x }} {{ 0 }} {{ -r_pl_z }} {{ np.pi / 2 }} 0 0</pose>
+        {{ cylinder(0.05, 0.1) | indent(8) }}
+      </visual>
+
+      <collision name="payload_collision">
+      <pose>{{ r_pl_x }} {{ 0 }} {{ -r_pl_z }} {{ np.pi / 2 }} 0 0</pose>
+        {{ cylinder(0.05, 0.1) | indent(8) }}
+      </collision>
+
+      {# Fins #}
+      {{ fin("fin_top", 0, 0, r_fin_rad - fin_span/2) }}
+      {{ fin("fin_port", -np.pi / 2, r_fin_rad - fin_span/2, 0) }}
+      {{ fin("fin_sb", np.pi / 2, -r_fin_rad + fin_span/2, 0) }}
+
+      <visual name="fin_bottom_rotor_visual">
+        <pose>{{ r_fin_x - fin_root_chord/2 }} {{ 0 }} {{ -r_fin_rad - fin_span/2 }} 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>{{ fin_root_chord }} {{ fin_thickness }} {{ fin_span }}</scale>
+            <uri>model://cloudship/meshes/fin_prop.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name="fin_bottom_plate_visual">
+        <pose>{{ r_fin_x - fin_root_chord/2 }} {{ 0 }} {{ -r_fin_rad + fin_span }} 0 0 0</pose>
+        {{ box(fin_root_chord, fin_thickness, fin_span) | indent(8) }}
+      </visual>
+
+      <collision name="fin_bottom_collision">
+        <pose>{{ r_fin_x - fin_root_chord/2 }} {{ 0 }} {{ -r_fin_rad - fin_span/2 }} 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>{{ fin_root_chord }} {{ fin_thickness }} {{ fin_span }}</scale>
+            <uri>model://cloudship/meshes/fin_prop.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <model name='gps0'>
+      <link name='link'>
+        <pose frame=''>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <mass>0.01</mass>
+          <inertia>
+            <ixx>2.1733e-06</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>2.1733e-06</iyy>
+            <iyz>0</iyz>
+            <izz>1.8e-07</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.01</radius>
+              <length>0.002</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <sensor name='gps' type='gps'>
+          <pose frame=''>0 0 0 0 0 0</pose>
+          <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
+            <robotNamespace/>
+            <gpsNoise>1</gpsNoise>
+            <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
+            <gpsZRandomWalk>4.0</gpsZRandomWalk>
+            <gpsXYNoiseDensity>0.0002</gpsXYNoiseDensity>
+            <gpsZNoiseDensity>0.0004</gpsZNoiseDensity>
+            <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
+            <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+          </plugin>
+        </sensor>
+      </link>
+    </model>
+    <joint name='gps0_joint' type='fixed'>
+      <parent>hull</parent>
+      <child>gps0::link</child>
+    </joint>
+
+    {# Thrusters Rod #}
+    <link name="thrusters_rod">
+      <pose>{{ origin_x + r_p_x }} {{ origin_y }} {{ origin_z - r_p_z }} 0 0 0</pose>
+      {%- set thrusters_rod_mass = 0.5 -%}
+      {{ inertial(thrusters_rod_mass, thrusters_rod_mass * (1/12)*(3*mot_rod_r**2 + (2*d_mot_y)**2), thrusters_rod_mass * 0.5*mot_rod_r**2, thrusters_rod_mass * (1/12)*(3*mot_rod_r**2 + (2*d_mot_y)**2))|indent(6) }}
+
+      <gravity>false</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay/>
+
+      <visual name="thrusters_rod_visual">
+        <pose>0 0 0 {{ np.pi / 2 }} 0 0</pose>
+        {{ cylinder(mot_rod_r, 2*d_mot_y) | indent(8) }}
+      </visual>
+      <visual name="port_prop_gaurd_visual">
+        <pose>{{ mot_prop_h }} {{ d_mot_y }} 0 0 {{ np.pi / 2 }} 0</pose>
+        <geometry>
+          <mesh>
+            <scale>{{ 1.1 * mot_prop_r }} {{ 1.1 * mot_prop_r }} {{ mot_prop_h }}</scale>
+            <uri>model://cloudship/meshes/prop_gaurd.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name="sb_prop_gaurd_visual">
+        <pose>{{ mot_prop_h }} {{ -d_mot_y }} 0 0 {{ np.pi / 2 }} 0</pose>
+        <geometry>
+          <mesh>
+            <scale>{{ 1.1 * mot_prop_r }} {{ 1.1 * mot_prop_r }} {{ mot_prop_h }}</scale>
+            <uri>model://cloudship/meshes/prop_gaurd.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <collision name="thrusters_rod_port_collision">
+        <pose>0 {{ (d_mot_y - gondola_width/2)/2 + gondola_width/2 }} 0 {{np.pi / 2}} 0 0</pose>
+        {{ cylinder(mot_rod_r, d_mot_y - gondola_width/2) | indent(8) }}
+      </collision>
+      <collision name="thrusters_rod_sb_collision">
+        <pose>0 {{ -((d_mot_y - gondola_width/2)/2 + gondola_width/2) }} 0 {{np.pi / 2}} 0 0</pose>
+        {{ cylinder(mot_rod_r, d_mot_y - gondola_width/2) | indent(8) }}
+      </collision>
+    </link>
+
+    <joint name='thrusters_rod_joint' type='revolute'>
+      <parent>hull</parent>
+      <child>thrusters_rod</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-{{ np.pi }}</lower>
+          <upper>{{ np.pi }}</upper>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+    {# Thrusters #}
+    {{ thruster(0, "ccw", false, "thrusters_rod", 0.0025, r_p_x + mot_prop_h / 2 + mot_rod_r, d_mot_y, - r_p_z - mot_rod_r / 2, 0, np.pi / 2, mot_prop_r, mot_prop_h, mot_tau, mot_max_vel, mot_coeff, 0, 0.000806428, 0.000001) }}
+    {{ thruster(1, "cw", false, "thrusters_rod", 0.0025, r_p_x + mot_prop_h / 2 + mot_rod_r, -d_mot_y, - r_p_z, 0, np.pi / 2, mot_prop_r, mot_prop_h, mot_tau, mot_max_vel, mot_coeff, 0, 0.000806428, 0.000001) }}
+    {{ thruster(3, "cw", true, "hull", 0.0015, r_fin_x - fin_root_chord/2, 0, -r_fin_rad, np.pi / 2, 0, rud_prop_r, rud_prop_h, rud_tau, rud_max_vel, rud_coeff, 0, 0.000806428, 0.000001) }}
+
+    {# Plugins #}
+    {# Airship Dynamics #}
+    <plugin name='gazebo_airship_dynamics_plugin' filename='libgazebo_airship_dynamics_plugin.so'>
+      <robotNamespace/>
+      <linkName>hull</linkName>
+      <hullVolume>{{ hull_volume }}</hullVolume>
+      <airDensity>{{ air_density }}</airDensity>
+      <m11>0.34094584</m11>
+      <m22>6.89645916</m22>
+      <m26>0.8003539</m26>
+      <m33>6.89645916</m33>
+      <m35>-0.8003539</m35>
+      <m44>0.03909877</m44>
+      <m53>-0.8003539</m53>
+      <m55>4.51385307</m55>
+      <m62>0.8003539</m62>
+      <m66>4.51385307</m66>
+      <distCOV>{{ hull_cov }}</distCOV>
+      <distPotentialFlow>3.758</distPotentialFlow>
+      <distFinCenter>3.884</distFinCenter>
+      <distQuarterChord>0.7454</distQuarterChord>
+      <forceHullInviscidFlowCoeff>-0.9576310423950283</forceHullInviscidFlowCoeff>
+      <forceHullViscousFlowCoeff>0.5829522229750153</forceHullViscousFlowCoeff>
+      <momentHullInviscidFlowCoeff>1.9534480725890846</momentHullInviscidFlowCoeff>
+      <momentHullViscousFlowCoeff>-1.1196943420983705</momentHullViscousFlowCoeff>
+      <finNormalForceCoeff>0.552208563394833</finNormalForceCoeff>
+      <finStallAngle>19.098</finStallAngle>
+      <axialDragCoeff>0.35</axialDragCoeff>
+      <windSubTopic>/wind_vel</windSubTopic>
+    </plugin>
+
+    {# IMU #}
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+      <robotNamespace/>
+      <linkName>hull</linkName>
+      <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+
+    {# Magnetometer #}
+    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>20</pubRate>
+      <noiseDensity>0.0004</noiseDensity>
+      <randomWalk>6.4e-06</randomWalk>
+      <biasCorrelationTime>600</biasCorrelationTime>
+      <magTopic>/mag</magTopic>
+    </plugin>
+
+    {# Barometer #}
+    <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>10</pubRate>
+      <baroTopic>/baro</baroTopic>
+    </plugin>
+
+    {# MAVLink #}
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace/>
+      <imuSubTopic>/imu</imuSubTopic>
+      <gpsSubTopic>/gps</gpsSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <mavlink_tcp_port>4560</mavlink_tcp_port>
+      <serialEnabled>false</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+
+      <hil_mode>false</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+
+      <vehicle_is_tailsitter>false</vehicle_is_tailsitter>
+      <send_vision_estimation>true</send_vision_estimation>
+      <send_odometry>false</send_odometry>
+
+      <control_channels>
+        <channel name='rotor_1'>
+          <input_index>0</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>{{ mot_max_vel }}</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rotor_1_joint</joint_name>
+        </channel>
+        <channel name='rotor_2'>
+          <input_index>1</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>{{ mot_max_vel }}</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rotor_2_joint</joint_name>
+        </channel>
+        <channel name="thrusters_rod">
+          <input_index>2</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>-{{ mot_max_angle }}</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position</joint_control_type>
+          <joint_control_pid>
+            <p>80</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0.0</iMax>
+            <iMin>0.0</iMin>
+            <cmdMax>{{ mot_max_angle/2 }}</cmdMax>
+            <cmdMin>-{{ mot_max_angle/2 }}</cmdMin>
+          </joint_control_pid>
+          <joint_name>thrusters_rod_joint</joint_name>
+        </channel>
+        <channel name='rotor_3'>
+          <input_index>3</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>{{ rud_max_vel }}</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rotor_3_joint</joint_name>
+        </channel>
+      </control_channels>
+    </plugin>
+
+  </model>
+
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

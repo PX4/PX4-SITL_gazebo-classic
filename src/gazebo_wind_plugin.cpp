@@ -48,7 +48,7 @@ void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
   else
     gzerr << "[gazebo_wind_plugin] Please specify a xyzOffset.\n";
 
-  getSdfParam<std::string>(sdf, "windPubTopic", wind_pub_topic_, "~/" + wind_pub_topic_);
+  getSdfParam<std::string>(sdf, "windPubTopic", wind_pub_topic_, wind_pub_topic_);
   getSdfParam<std::string>(sdf, "frameId", frame_id_, frame_id_);
   // Get the wind params from SDF.
   getSdfParam<double>(sdf, "windVelocityMean", wind_velocity_mean_, wind_velocity_mean_);
@@ -86,7 +86,7 @@ void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
   // simulation iteration.
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboWindPlugin::OnUpdate, this, _1));
 
-  wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>("~/world_wind", 10);
+  wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>("~/" + wind_pub_topic_, 10);
 }
 
 // This gets called by the world update start event.

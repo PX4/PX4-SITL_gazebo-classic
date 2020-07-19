@@ -93,7 +93,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
         rotor_drag_coefficient_(kDefaultRotorDragCoefficient),
         rotor_velocity_slowdown_sim_(kDefaultRotorVelocitySlowdownSim),
         time_constant_down_(kDefaultTimeConstantDown),
-        time_constant_up_(kDefaultTimeConstantUp) {
+        time_constant_up_(kDefaultTimeConstantUp),
+        reversible_(false) {
   }
 
   virtual ~GazeboMotorModel();
@@ -135,6 +136,8 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   double rotor_velocity_slowdown_sim_;
   double time_constant_down_;
   double time_constant_up_;
+
+  bool reversible_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_pub_;

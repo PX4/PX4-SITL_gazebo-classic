@@ -117,6 +117,10 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   else
     gzerr << "[gazebo_motor_model] Please specify a turning direction ('cw' or 'ccw').\n";
 
+  if(_sdf->HasElement("reversible")) {
+    reversible_ = _sdf->GetElement("reversible")->Get<bool>();
+  }
+
   getSdfParam<std::string>(_sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
   getSdfParam<std::string>(_sdf, "motorSpeedPubTopic", motor_speed_pub_topic_,
                            motor_speed_pub_topic_);
@@ -194,7 +198,11 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
     gzerr << "Aliasing on motor [" << motor_number_ << "] might occur. Consider making smaller simulation time steps or raising the rotor_velocity_slowdown_sim_ param.\n";
   }
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
-  double force = real_motor_velocity * real_motor_velocity * motor_constant_;
+  double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
+  if(!reversible_) {
+    // Not allowed to have negative thrust.
+    force = std::abs(force);
+  }
 
   // scale down force linearly with forward speed
   // XXX this has to be modelled better

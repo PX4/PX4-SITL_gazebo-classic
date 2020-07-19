@@ -58,7 +58,7 @@ class GazeboWindPlugin : public WorldPlugin {
   GazeboWindPlugin()
       : WorldPlugin(),
         namespace_(kDefaultNamespace),
-        wind_pub_topic_("wind"),
+        wind_pub_topic_("world_wind"),
         wind_velocity_mean_(kDefaultWindVelocityMean),
         wind_velocity_max_(kDefaultWindVelocityMax),
         wind_velocity_variance_(kDefaultWindVelocityVariance),
