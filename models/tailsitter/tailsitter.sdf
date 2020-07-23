@@ -517,7 +517,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -540,7 +540,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
@@ -558,7 +558,7 @@
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>

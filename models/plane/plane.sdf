@@ -560,7 +560,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_flap" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -582,7 +582,7 @@
       </control_joint_name>
       <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
-      <windSubTopic>/wind</windSubTopic>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>

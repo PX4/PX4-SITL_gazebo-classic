@@ -22,7 +22,7 @@
       <windGustDuration>0</windGustDuration>
       <windGustStart>0</windGustStart>
       <windGustVelocityMean>0</windGustVelocityMean>
-      <windPubTopic>/wind</windPubTopic>
+      <windPubTopic>world_wind</windPubTopic>
     </plugin>
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
