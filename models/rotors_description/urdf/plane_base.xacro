@@ -124,6 +124,7 @@
   <!-- Instantiate barometer plugin. -->
   <xacro:barometer_plugin_macro
     namespace="${namespace}"
+    baro_drift_pa_per_sec="0"
     pub_rate="10"
     baro_topic="/baro"
     >
