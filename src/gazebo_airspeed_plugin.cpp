@@ -84,7 +84,7 @@ void AirspeedPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       boost::bind(&AirspeedPlugin::OnUpdate, this, _1));
 
   airspeed_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Airspeed>("~/" + model_->GetName() + "/airspeed", 10);
-  wind_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/wind", &AirspeedPlugin::WindVelocityCallback, this);
+  wind_sub_ = node_handle_->Subscribe("~/world_wind", &AirspeedPlugin::WindVelocityCallback, this);
 
   getSdfParam<float>(_sdf, "DiffPressureStdev", diff_pressure_stddev_, diff_pressure_stddev_);
   getSdfParam<float>(_sdf, "Temperature", temperature_, temperature_);
