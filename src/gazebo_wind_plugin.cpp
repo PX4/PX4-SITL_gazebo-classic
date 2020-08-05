@@ -49,6 +49,9 @@ void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
     gzerr << "[gazebo_wind_plugin] Please specify a xyzOffset.\n";
 
   getSdfParam<std::string>(sdf, "windPubTopic", wind_pub_topic_, wind_pub_topic_);
+  double pub_rate = 2.0;
+  getSdfParam<double>(sdf, "publishRate", pub_rate, pub_rate); //Wind topic publishing rates
+  pub_interval_ = (pub_rate > 0.0) ? 1/pub_rate : 0.0;
   getSdfParam<std::string>(sdf, "frameId", frame_id_, frame_id_);
   // Get the wind params from SDF.
   getSdfParam<double>(sdf, "windVelocityMean", wind_velocity_mean_, wind_velocity_mean_);
@@ -87,6 +90,13 @@ void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboWindPlugin::OnUpdate, this, _1));
 
   wind_pub_ = node_handle_->Advertise<physics_msgs::msgs::Wind>("~/" + wind_pub_topic_, 10);
+
+#if GAZEBO_MAJOR_VERSION >= 9
+  last_time_ = world_->SimTime();
+#else
+  last_time_ = world_->GetSimTime();
+#endif
+
 }
 
 // This gets called by the world update start event.
@@ -97,6 +107,10 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
 #else
   common::Time now = world_->GetSimTime();
 #endif
+  if ((now - last_time_).Double() < pub_interval_ || pub_interval_ == 0.0) {
+    return;
+  }
+  last_time_ = now;
 
   // Calculate the wind force.
   // Get normal distribution wind strength

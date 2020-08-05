@@ -70,6 +70,7 @@ class GazeboWindPlugin : public WorldPlugin {
         wind_gust_direction_mean_(kDefaultWindGustDirectionMean),
         wind_gust_direction_variance_(kDefaultWindGustDirectionVariance),
         frame_id_(kDefaultFrameId),
+        pub_interval_(0.5),
         node_handle_(NULL) {}
 
   virtual ~GazeboWindPlugin();
@@ -101,6 +102,7 @@ class GazeboWindPlugin : public WorldPlugin {
   double wind_gust_velocity_mean_;
   double wind_gust_velocity_max_;
   double wind_gust_velocity_variance_;
+  double pub_interval_;
   std::default_random_engine wind_velocity_generator_;
   std::normal_distribution<double> wind_velocity_distribution_;
   std::default_random_engine wind_gust_velocity_generator_;
@@ -122,6 +124,7 @@ class GazeboWindPlugin : public WorldPlugin {
 
   common::Time wind_gust_end_;
   common::Time wind_gust_start_;
+  common::Time last_time_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr wind_pub_;
