@@ -256,7 +256,7 @@ void LiftDragPlugin::OnUpdate()
   //
   // so,
   // removing spanwise velocity from vel
-  ignition::math::Vector3d velInLDPlane = vel - vel.Dot(spanwiseI)*velI;
+  ignition::math::Vector3d velInLDPlane = vel - vel.Dot(spanwiseI)*spanwiseI;
 
   // get direction of drag
   ignition::math::Vector3d dragDirection = -velInLDPlane;
