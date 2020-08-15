@@ -673,6 +673,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   // Always send Gyro and Accel data at full rate (= sim update rate)
   SendSensorMessages();
 
+  // Send groudntruth at full rate
+  SendGroundTruth();
+
   if (close_conn_) { // close connection if required
     close();
   }
@@ -1029,9 +1032,6 @@ void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
   groundtruth_altitude = groundtruth_msg->altitude();
   // the rest of the data is obtained directly on this interface and sent to
   // the FCU
-
-  // Send groudntruth at full rate
-  SendGroundTruth();
 }
 
 void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, const int& id) {
