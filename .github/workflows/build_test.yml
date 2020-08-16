@@ -1,0 +1,37 @@
+name: Build Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+        - 'px4io/px4-dev-simulation-focal:2020-08-14' # Gazebo 11
+        - 'px4io/px4-dev-simulation-bionic:2020-08-14' # Gazebo 9
+        - 'px4io/px4-dev-simulation-xenial:2020-06-20' # Gazebo 7
+    container: ${{ matrix.container }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: submodule update
+      run: git submodule update --init --recursive
+    - name: Cmake Build
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+        make
+    - name: Unit Tests
+      working-directory: build
+      run: |
+        cmake -DENABLE_UNIT_TESTS=On ..
+        make
+        make test

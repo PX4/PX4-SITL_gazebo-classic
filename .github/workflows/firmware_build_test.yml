@@ -1,0 +1,36 @@
+name: Firmware Build Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  Firmware-build:
+    runs-on: ubuntu-latest
+    container: px4io/px4-dev-simulation-focal:2020-08-14
+    steps:
+    - name: Checkout Firmware master
+      uses: actions/checkout@v2.3.1
+      with:
+        repository: PX4/Firmware
+        ref: master
+        path: Firmware
+        fetch-depth: 0
+        submodules: recurvise
+    - name: Checkout matching branch on PX4/Firmware if possible
+      run: |
+        git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using master instead"
+        git submodule update --init --recursive
+      working-directory: Firmware
+    - name: Configure Firmware to include current sitl_gazebo version
+      working-directory: Firmware/Tools/sitl_gazebo
+      run: |
+        git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}}
+        git checkout ${{github.head_ref}}
+    - name: Build Firmware
+      working-directory: Firmware
+      run: DONT_RUN=1 make px4_sitl_default gazebo
