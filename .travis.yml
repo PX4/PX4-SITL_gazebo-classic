@@ -16,57 +16,7 @@ branches:
 
 matrix:
     include:
-        - name: CMake build (Gazebo 7)
-          os: linux
-          language: cpp
-          services:
-            - docker
-          cache:
-            ccache: true
-          env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-06-20
-            - BUILD=${CMAKE_BUILD}
-        - name: CMake unit tests build and run (Gazebo 7)
-          os: linux
-          language: cpp
-          services:
-            - docker
-          cache:
-            ccache: true
-          env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-xenial:2020-06-20
-            - BUILD=${CMAKE_UNIT_TEST_BUILD}
-        - name: CMake build (Gazebo 9)
-          os: linux
-          language: cpp
-          services:
-            - docker
-          cache:
-            ccache: true
-          env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-20
-            - BUILD=${CMAKE_BUILD}
-        - name: CMake unit tests build and run (Gazebo 9)
-          os: linux
-          language: cpp
-          services:
-            - docker
-          cache:
-            ccache: true
-          env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-20
-            - BUILD=${CMAKE_UNIT_TEST_BUILD}
         # FIXME: Currently failing when creating QT moc files
-        # - name: CMake build (Gazebo 11)
-        #   os: linux
-        #   language: cpp
-        #   services:
-        #     - docker
-        #   cache:
-        #     ccache: true
-        #   env:
-        #     - PX4_DOCKER_REPO=px4io/px4-dev-simulation-focal:2020-06-20
-        #     - BUILD=${CMAKE_BUILD}
         # - name: CMake unit tests build and run (Gazebo 11)
         #   os: linux
         #   language: cpp
@@ -99,16 +49,6 @@ matrix:
         #   env:
         #     - PX4_DOCKER_REPO=px4io/px4-dev-ros-melodic:2020-06-20
         #     - BUILD=${MELODIC}
-        - name: Validate SDF schemas
-          os: linux
-          language: cpp
-          services:
-            - docker
-          cache:
-            ccache: true
-          env:
-            - PX4_DOCKER_REPO=px4io/px4-dev-simulation-bionic:2020-06-20
-            - BUILD="source ./scripts/validate_sdf.bash"
         - name: macOS Mojave (Xcode 11.3)
           os: osx
           osx_image: xcode11.3
