@@ -33,7 +33,7 @@ jobs:
     - name: Configure Firmware to include current sitl_gazebo version
       working-directory: Firmware/Tools/sitl_gazebo
       run: |
-        git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}}
+        git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} } || echo "Couldn't find the pull request, using default branch"
         git checkout ${{github.head_ref}}
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
