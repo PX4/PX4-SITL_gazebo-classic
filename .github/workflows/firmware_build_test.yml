@@ -30,11 +30,6 @@ jobs:
         git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using master instead"
         git submodule update --init --recursive
       working-directory: Firmware
-    - name: Build Firmware
-      working-directory: Firmware
-      env:
-        DONT_RUN: 1
-      run: make px4_sitl_default gazebo
     - name: Configure Firmware to include current sitl_gazebo version
       working-directory: Firmware/Tools/sitl_gazebo
       run: |
@@ -44,11 +39,13 @@ jobs:
       working-directory: Firmware
       env:
         DONT_RUN: 1
+        GIT_SUBMODULES_ARE_EVIL: 1
       run: make px4_sitl_default gazebo
     - name: Build MAVSDK tests
       working-directory: Firmware
       env:
         DONT_RUN: 1
+        GIT_SUBMODULES_ARE_EVIL: 1
       run: make px4_sitl_default gazebo mavsdk_tests
     - name: Run SITL tests
       working-directory: Firmware
