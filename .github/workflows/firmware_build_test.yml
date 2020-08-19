@@ -49,4 +49,4 @@ jobs:
       run: make px4_sitl_default gazebo mavsdk_tests
     - name: Run SITL tests
       working-directory: Firmware
-      run: test/mavsdk_tests/mavsdk_test_runner.py --speed-factor 20 --abort-early Tools/sitl_gazebo/scripts/sitl.json
+      run: test/mavsdk_tests/mavsdk_test_runner.py --speed-factor 20 --abort-early Tools/sitl_gazebo/resources/sitl.json
