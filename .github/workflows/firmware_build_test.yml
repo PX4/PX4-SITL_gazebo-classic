@@ -74,4 +74,4 @@ jobs:
       run: ccache -s
     - name: Run SITL tests
       working-directory: Firmware
-      run: test/mavsdk_tests/mavsdk_test_runner.py --speed-factor 20 --abort-early Tools/sitl_gazebo/resources/sitl.json
+      run: test/mavsdk_tests/mavsdk_test_runner.py --speed-factor 20 Tools/sitl_gazebo/resources/sitl.json
