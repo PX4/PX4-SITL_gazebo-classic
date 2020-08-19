@@ -35,18 +35,43 @@ jobs:
       run: |
         git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}}
         git checkout ${{github.head_ref}}
+    - name: Prepare ccache timestamp
+      id: ccache_cache_timestamp
+      shell: cmake -P {0}
+      run: |
+        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+        message("::set-output name=timestamp::${current_date}")
+    - name: ccache cache files
+      uses: actions/cache@v2
+      with:
+        path: ~/.ccache
+        key: sitl_tests-${{matrix.config.build_type}}-ccache-${{steps.ccache_cache_timestamp.outputs.timestamp}}
+        restore-keys: sitl_tests-${{matrix.config.build_type}}-ccache-
+    - name: setup ccache
+      run: |
+          mkdir -p ~/.ccache
+          echo "base_dir = ${GITHUB_WORKSPACE}" > ~/.ccache/ccache.conf
+          echo "compression = true" >> ~/.ccache/ccache.conf
+          echo "compression_level = 6" >> ~/.ccache/ccache.conf
+          echo "max_size = 400M" >> ~/.ccache/ccache.conf
+          ccache -s
+          ccache -z
     - name: Build Firmware
       working-directory: Firmware
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
       run: make px4_sitl_default gazebo
+    - name: ccache post-run px4/firmware
+      run: ccache -s
     - name: Build MAVSDK tests
       working-directory: Firmware
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
       run: make px4_sitl_default gazebo mavsdk_tests
+    - name: ccache post-run mavsdk_tests
+      run: ccache -s
     - name: Run SITL tests
       working-directory: Firmware
       run: test/mavsdk_tests/mavsdk_test_runner.py --speed-factor 20 --abort-early Tools/sitl_gazebo/resources/sitl.json
