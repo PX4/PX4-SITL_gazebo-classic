@@ -33,15 +33,15 @@ using namespace gazebo;
 using namespace std;
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(LidarPlugin)
 
 /////////////////////////////////////////////////
-RayPlugin::RayPlugin()
+LidarPlugin::LidarPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-RayPlugin::~RayPlugin()
+LidarPlugin::~LidarPlugin()
 {
   newLaserScansConnection_->~Connection();
   newLaserScansConnection_.reset();
@@ -50,18 +50,18 @@ RayPlugin::~RayPlugin()
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
+void LidarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   parentSensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!parentSensor_)
-    gzthrow("RayPlugin requires a Ray Sensor as its parent");
+    gzthrow("LidarPlugin requires a Ray Sensor as its parent");
 
   world_ = physics::get_world(parentSensor_->WorldName());
 
   newLaserScansConnection_ = parentSensor_->LaserShape()->ConnectNewLaserScans(
-      boost::bind(&RayPlugin::OnNewLaserScans, this));
+      boost::bind(&LidarPlugin::OnNewLaserScans, this));
 
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -89,6 +89,12 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     gzwarn << "[gazebo_lidar_plugin] Using default maximum distance: " << kDefaultMaxDistance << "\n";
     max_distance_ = kDefaultMaxDistance;
   }
+
+  // Set high and low signal strength
+  // The considered relationship of distance to returned signal strength is an
+  // inverse square.
+  low_signal_strength_ = sqrt(min_distance_);
+  high_signal_strength_ = sqrt(max_distance_ + 0.02); // extend the threshold so there is still quality at max distance
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
@@ -129,7 +135,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::OnNewLaserScans()
+void LidarPlugin::OnNewLaserScans()
 {
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -142,6 +148,7 @@ void RayPlugin::OnNewLaserScans()
   lidar_message_.set_min_distance(min_distance_);
   lidar_message_.set_max_distance(max_distance_);
 
+  // get current distance measured from the sensor
   double current_distance = parentSensor_->Range(0);
 
   // set distance to min/max if actual value is smaller/bigger
@@ -155,6 +162,21 @@ void RayPlugin::OnNewLaserScans()
   lidar_message_.set_h_fov(kDefaultFOV);
   lidar_message_.set_v_fov(kDefaultFOV);
   lidar_message_.set_allocated_orientation(new gazebo::msgs::Quaternion(orientation_));
+
+  // Compute signal strength
+  // Other effects like target size, shape or reflectivity are not considered
+  const double signal_strength = sqrt(current_distance);
+
+  // Compute and set the signal quality
+  // The signal quality is normalized between 1 and 100 using the absolute
+  // signal strength (DISTANCE_SENSOR signal_quality value of 0 means invalid)
+  uint8_t signal_quality = 1;
+  if (signal_strength > low_signal_strength_) {
+    signal_quality = static_cast<uint8_t>(99 * ((high_signal_strength_ - signal_strength) /
+            (high_signal_strength_ - low_signal_strength_)) + 1);
+  }
+
+  lidar_message_.set_signal_quality(signal_quality);
 
   lidar_pub_->Publish(lidar_message_);
 }

@@ -20,14 +20,152 @@
  */
 
 #include <gazebo_mavlink_interface.h>
-
 namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
+GazeboMavlinkInterface::GazeboMavlinkInterface() : ModelPlugin(),
+    received_first_actuator_(false),
+    namespace_(kDefaultNamespace),
+    protocol_version_(2.0),
+    motor_velocity_reference_pub_topic_(kDefaultMotorVelocityReferencePubTopic),
+    use_propeller_pid_(false),
+    use_elevator_pid_(false),
+    use_left_elevon_pid_(false),
+    use_right_elevon_pid_(false),
+    send_vision_estimation_(false),
+    send_odometry_(false),
+    imu_sub_topic_(kDefaultImuTopic),
+    opticalFlow_sub_topic_(kDefaultOpticalFlowTopic),
+    irlock_sub_topic_(kDefaultIRLockTopic),
+    vision_sub_topic_(kDefaultVisionTopic),
+    mag_sub_topic_(kDefaultMagTopic),
+    airspeed_sub_topic_(kDefaultAirspeedTopic),
+    baro_sub_topic_(kDefaultBarometerTopic),
+    sensor_map_ {},
+    wind_sub_topic_(kDefaultWindTopic),
+    model_ {},
+    world_(nullptr),
+    left_elevon_joint_(nullptr),
+    right_elevon_joint_(nullptr),
+    elevator_joint_(nullptr),
+    propeller_joint_(nullptr),
+    gimbal_yaw_joint_(nullptr),
+    gimbal_pitch_joint_(nullptr),
+    gimbal_roll_joint_(nullptr),
+    input_offset_ {},
+    input_scaling_ {},
+    zero_position_disarmed_ {},
+    zero_position_armed_ {},
+    input_index_ {},
+    mag_updated_(false),
+    baro_updated_(false),
+    diff_press_updated_(false),
+    groundtruth_lat_rad(0.0),
+    groundtruth_lon_rad(0.0),
+    groundtruth_altitude(0.0),
+    hil_mode_(false),
+    hil_state_level_(false) {
+      mavlink_interface_ = std::make_unique<MavlinkInterface>();
+
+}
+
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
-  close();
+  mavlink_interface_->close();
   sigIntConnection_->~Connection();
   updateConnection_->~Connection();
+}
+
+template <class T>
+T our_any_cast(const boost::any &val) {
+#if GAZEBO_MAJOR_VERSION >= 11
+  return gazebo::physics::PhysicsEngine::any_cast<T>(val);
+#else
+  return boost::any_cast<T>(val);
+#endif
+}
+
+
+/// \brief      A helper class that provides storage for additional parameters that are inserted into the callback.
+/// \details    GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
+template <typename GazeboMsgT>
+struct SensorHelperStorage {
+  /// \brief    Pointer to the ROS interface plugin class.
+  GazeboMavlinkInterface* ptr;
+
+  /// \brief    Function pointer to the subscriber callback with additional parameters.
+  void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&);
+
+  /// \brief    The sensor ID.
+  int sensor_id;
+
+  /// \brief    This is what gets passed into the Gazebo Subscribe method as a callback,
+  ///           and hence can onlyhave one parameter (note boost::bind() does not work with the
+  ///           current Gazebo Subscribe() definitions).
+  void callback(const boost::shared_ptr<GazeboMsgT const>& msg_ptr) {
+    (ptr->*fp)(msg_ptr, sensor_id);
+  }
+};
+
+template <typename GazeboMsgT>
+void GazeboMavlinkInterface::CreateSensorSubscription(
+    void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
+    GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model) {
+
+  // Verify if the sensor joint exists
+  for (physics::Joint_V::const_iterator it = joints.begin(); it != joints.end(); ++it) {
+    if (std::regex_match ((*it)->GetName(), model)) {
+      // Get sensor joint name (without the ''::joint' suffix)
+      const std::string joint_name = (*it)->GetName().substr(0, (*it)->GetName().size() - 6);
+
+      // If the model is nested, use the sensor name (child model) as the sensor topic
+      const std::string model_name = model_->GetName();
+      const std::string::size_type pos = joint_name.find("::");
+
+      std::string sensor_name = joint_name;
+      if (pos != std::string::npos) {
+        sensor_name = joint_name.substr(pos + 2);
+      }
+
+      // Get sensor ID from joint name
+      int sensor_id = 0;
+      try {
+        // get the sensor id by getting the (last) numbers on the joint name (ex. lidar10_joint, gets id 10)
+        sensor_id = std::stoi(sensor_name.substr(sensor_name.find_last_not_of("0123456789") + 1));
+      } catch(...) {
+        gzwarn << "No identifier on joint. Using 0 as default sensor ID" << std::endl;
+      }
+
+      // Get the sensor link orientation with respect to the base_link
+  #if GAZEBO_MAJOR_VERSION >= 9
+      const auto sensor_orientation = (*it)->GetChild()->RelativePose().Rot();
+  #else
+      const auto sensor_orientation = ignitionFromGazeboMath((*it)->GetChild()->GetRelativePose()).Rot();
+  #endif
+
+      // One map will be created for each Gazebo message type
+      static std::map<std::string, SensorHelperStorage<GazeboMsgT> > callback_map;
+
+      // Store the callback entries
+      auto callback_entry = callback_map.emplace(
+          "~/" + model_name + "/link/" + sensor_name,
+          SensorHelperStorage<GazeboMsgT>{ptr, fp, sensor_id});
+
+      // Check if element was already present
+      if (!callback_entry.second)
+        gzerr << "Tried to add element to map but the gazebo topic name was already present in map."
+              << std::endl;
+
+      // Create the subscriber for the sensors
+      auto subscriberPtr = node_handle_->Subscribe("~/" + model_name + "/link/" + sensor_name,
+                                                   &SensorHelperStorage<GazeboMsgT>::callback,
+                                                   &callback_entry.first->second);
+
+      // Store the SubscriberPtr, sensor ID and sensor orientation
+      sensor_map_.insert(std::pair<transport::SubscriberPtr, SensorIdRot_P>(subscriberPtr,
+                                                                            SensorIdRot_P(sensor_id, sensor_orientation))
+                                                                           );
+    }
+  }
 }
 
 void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -52,14 +190,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
       motor_velocity_reference_pub_topic_);
   getSdfParam<std::string>(_sdf, "imuSubTopic", imu_sub_topic_, imu_sub_topic_);
-  getSdfParam<std::string>(_sdf, "gpsSubTopic", gps_sub_topic_, gps_sub_topic_);
   getSdfParam<std::string>(_sdf, "visionSubTopic", vision_sub_topic_, vision_sub_topic_);
-  getSdfParam<std::string>(_sdf, "lidarSubTopic", lidar_sub_topic_, lidar_sub_topic_);
   getSdfParam<std::string>(_sdf, "opticalFlowSubTopic",
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
-  getSdfParam<std::string>(_sdf, "sonarSubTopic", sonar_sub_topic_, sonar_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
   getSdfParam<std::string>(_sdf, "magSubTopic", mag_sub_topic_, mag_sub_topic_);
+  getSdfParam<std::string>(_sdf, "airspeedSubTopic", airspeed_sub_topic_, airspeed_sub_topic_);
   getSdfParam<std::string>(_sdf, "baroSubTopic", baro_sub_topic_, baro_sub_topic_);
   groundtruth_sub_topic_ = "/groundtruth";
 
@@ -67,6 +203,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   input_reference_.resize(n_out_max);
   joints_.resize(n_out_max);
   pids_.resize(n_out_max);
+  joint_max_errors_.resize(n_out_max);
   for (int i = 0; i < n_out_max; ++i)
   {
     pids_[i].Init(0, 0, 0, 0, 0, 0, 0);
@@ -105,7 +242,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
               gztopic_[index] = "~/" + model_->GetName() + channel->Get<std::string>("gztopic");
             else
               gztopic_[index] = "control_position_gztopic_" + std::to_string(index);
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
             /// only gazebo 7.4 and above support Any
             joint_control_pub_[index] = node_handle_->Advertise<gazebo::msgs::Any>(
                 gztopic_[index]);
@@ -119,21 +256,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
           {
             std::string joint_name = channel->Get<std::string>("joint_name");
             joints_[index] = model_->GetJoint(joint_name);
-            if (joints_[index] == nullptr)
-            {
-              gzwarn << "joint [" << joint_name << "] not found for channel["
-                     << index << "] no joint control for this channel.\n";
-            }
-            else
-            {
-              gzdbg << "joint [" << joint_name << "] found for channel["
-                    << index << "] joint control active for this channel.\n";
-            }
-          }
-          else
-          {
-            gzdbg << "<joint_name> not found for channel[" << index
-                  << "] no joint control will be performed for this channel.\n";
           }
 
           // setup joint control pid to control joint
@@ -161,6 +283,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
             double cmdMin = 0;
             if (pid->HasElement("cmdMin"))
               cmdMin = pid->Get<double>("cmdMin");
+            if (pid->HasElement("errMax")) {
+              joint_max_errors_[index] = pid->Get<double>("errMax");
+            }
             pids_[index].Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
           }
         }
@@ -181,27 +306,34 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   if(_sdf->HasElement("hil_mode"))
   {
     hil_mode_ = _sdf->GetElement("hil_mode")->Get<bool>();
+    mavlink_interface_->SetHILMode(hil_mode_);
   }
 
   if(_sdf->HasElement("hil_state_level"))
   {
     hil_state_level_ = _sdf->GetElement("hil_state_level")->Get<bool>();
+    mavlink_interface_->SetHILStateLevel(hil_state_level_);
   }
 
+  bool serial_enabled=false;
   if(_sdf->HasElement("serialEnabled"))
   {
-    serial_enabled_ = _sdf->GetElement("serialEnabled")->Get<bool>();
+    serial_enabled = _sdf->GetElement("serialEnabled")->Get<bool>();
+    mavlink_interface_->SetSerialEnabled(serial_enabled);
   }
 
-  if (!serial_enabled_ && _sdf->HasElement("use_tcp"))
+  bool use_tcp = false;
+  if (!serial_enabled && _sdf->HasElement("use_tcp"))
   {
-    use_tcp_ = _sdf->GetElement("use_tcp")->Get<bool>();
+    use_tcp = _sdf->GetElement("use_tcp")->Get<bool>();
+    mavlink_interface_->SetUseTcp(use_tcp);
   }
-  gzmsg << "Connecting to PX4 SITL using " << (serial_enabled_ ? "serial" : (use_tcp_ ? "TCP" : "UDP")) << "\n";
+  gzmsg << "Connecting to PX4 SITL using " << (serial_enabled ? "serial" : (use_tcp ? "TCP" : "UDP")) << "\n";
 
   if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
     enable_lockstep_ = _sdf->GetElement("enable_lockstep")->Get<bool>();
+    mavlink_interface_->SetEnableLockstep(enable_lockstep_);
   }
   gzmsg << "Lockstep is " << (enable_lockstep_ ? "enabled" : "disabled") << "\n";
 
@@ -229,29 +361,32 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 #endif
     presetManager->CurrentProfile("default_physics");
 
-    // We currently need to have the max_step_size pinned at 4 ms and the
-    // real_time_update_rate set to 250 Hz for lockstep.
-    // Therefore it makes sense to check these params.
+    // We currently need to have the real_time_update_rate at a multiple of 250 Hz for lockstep.
+    // Also, the max_step_size needs to match this (e.g. 0.004 s at 250 Hz or 0.002 s at 500 Hz).
+    // Therefore we check these params and abort if they won't work.
 
     presetManager->GetCurrentProfileParam("real_time_update_rate", param);
-    double real_time_update_rate = boost::any_cast<double>(param);
-    const double correct_real_time_update_rate = 250.0;
-    if (real_time_update_rate != correct_real_time_update_rate)
+    double real_time_update_rate = our_any_cast<double>(param);
+    const int real_time_update_rate_int = static_cast<int>(real_time_update_rate + 0.5);
+
+    if (real_time_update_rate_int % 250 != 0)
     {
-      gzerr << "real_time_update_rate is set to " << real_time_update_rate
-            << " instead of " << correct_real_time_update_rate << ", aborting.\n";
+      gzerr << "real_time_update_rate is " << real_time_update_rate_int
+            << " but needs to be multiple of 250 Hz, aborting.\n";
       abort();
     }
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
-    const double max_step_size = boost::any_cast<double>(param);
-    const double correct_max_step_size = 0.004;
-    if (max_step_size != correct_max_step_size)
+    const double max_step_size = our_any_cast<double>(param);
+    if (1.0 / real_time_update_rate != max_step_size)
     {
-      gzerr << "max_step_size is set to " << max_step_size
-            << " instead of " << correct_max_step_size << ", aborting.\n";
+      gzerr << "max_step_size of " << max_step_size
+            << " s does not match real_time_update_rate of "
+            << real_time_update_rate << ", aborting.\n";
       abort();
     }
+
+    update_skip_factor_ = real_time_update_rate_int / 250;
 
     // Adapt the real_time_update_rate according to the speed
     // that we ask for in the env variable.
@@ -270,15 +405,22 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // Subscribe to messages of other plugins.
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
-  lidar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + lidar_sub_topic_, &GazeboMavlinkInterface::LidarCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
-  sonar_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + "/link/" + sonar_sub_topic_, &GazeboMavlinkInterface::SonarCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
-  gps_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + gps_sub_topic_, &GazeboMavlinkInterface::GpsCallback, this);
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
+  airspeed_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + airspeed_sub_topic_, &GazeboMavlinkInterface::AirspeedCallback, this);
   baro_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + baro_sub_topic_, &GazeboMavlinkInterface::BarometerCallback, this);
+  wind_sub_ = node_handle_->Subscribe("~/" + wind_sub_topic_, &GazeboMavlinkInterface::WindVelocityCallback, this);
+
+  // Get the model joints
+  auto joints = model_->GetJoints();
+
+  // Create subscriptions to the distance sensors
+  CreateSensorSubscription(&GazeboMavlinkInterface::LidarCallback, this, joints, kDefaultLidarModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::SonarCallback, this, joints, kDefaultSonarModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, joints, kDefaultGPSModelJointNaming);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
@@ -286,11 +428,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 #if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
   last_imu_time_ = world_->SimTime();
-  gravity_W_ = world_->Gravity();
 #else
   last_time_ = world_->GetSimTime();
   last_imu_time_ = world_->GetSimTime();
-  gravity_W_ = ignitionFromGazeboMath(world_->GetPhysicsEngine()->GetGravity());
 #endif
 
   // This doesn't seem to be used anywhere but we leave it here
@@ -299,15 +439,10 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
   }
 
-  mavlink_addr_ = htonl(INADDR_ANY);
   if (_sdf->HasElement("mavlink_addr")) {
     std::string mavlink_addr_str = _sdf->GetElement("mavlink_addr")->Get<std::string>();
     if (mavlink_addr_str != "INADDR_ANY") {
-      mavlink_addr_ = inet_addr(mavlink_addr_str.c_str());
-      if (mavlink_addr_ == INADDR_NONE) {
-        gzerr << "Invalid mavlink_addr: " << mavlink_addr_str << ", aborting\n";
-        abort();
-      }
+      mavlink_interface_->SetMavlinkAddr(mavlink_addr_str);
     }
   }
 
@@ -318,211 +453,49 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 #endif
 
   if (_sdf->HasElement("mavlink_udp_port")) {
-    mavlink_udp_port_ = _sdf->GetElement("mavlink_udp_port")->Get<int>();
+    int mavlink_udp_port = _sdf->GetElement("mavlink_udp_port")->Get<int>();
+    mavlink_interface_->SetMavlinkUdpPort(mavlink_udp_port);
   }
-  model_param(worldName, model_->GetName(), "mavlink_udp_port", mavlink_udp_port_);
 
   if (_sdf->HasElement("mavlink_tcp_port")) {
-    mavlink_tcp_port_ = _sdf->GetElement("mavlink_tcp_port")->Get<int>();
+    int mavlink_tcp_port = _sdf->GetElement("mavlink_tcp_port")->Get<int>();
+    mavlink_interface_->SetMavlinkTcpPort(mavlink_tcp_port);
   }
-  model_param(worldName, model_->GetName(), "mavlink_tcp_port", mavlink_tcp_port_);
 
-  local_qgc_addr_.sin_port = htonl(INADDR_ANY);
   if (_sdf->HasElement("qgc_addr")) {
     std::string qgc_addr = _sdf->GetElement("qgc_addr")->Get<std::string>();
     if (qgc_addr != "INADDR_ANY") {
-      local_qgc_addr_.sin_port = inet_addr(qgc_addr.c_str());
-      if (local_qgc_addr_.sin_port == INADDR_NONE) {
-        gzerr << "Invalid qgc_addr: " << qgc_addr << ", aborting\n";
-        abort();
-      }
+      mavlink_interface_->SetQgcAddr(qgc_addr);
     }
   }
   if (_sdf->HasElement("qgc_udp_port")) {
-    qgc_udp_port_ = _sdf->GetElement("qgc_udp_port")->Get<int>();
+    int qgc_udp_port = _sdf->GetElement("qgc_udp_port")->Get<int>();
+    mavlink_interface_->SetQgcUdpPort(qgc_udp_port);
   }
 
-  local_sdk_addr_.sin_port = htonl(INADDR_ANY);
   if (_sdf->HasElement("sdk_addr")) {
     std::string sdk_addr = _sdf->GetElement("sdk_addr")->Get<std::string>();
     if (sdk_addr != "INADDR_ANY") {
-      local_sdk_addr_.sin_port = inet_addr(sdk_addr.c_str());
-      if (local_sdk_addr_.sin_port == INADDR_NONE) {
-        gzerr << "Invalid sdk_addr: " << sdk_addr << ", aborting\n";
-        abort();
-      }
+      mavlink_interface_->SetSdkAddr(sdk_addr);
     }
   }
   if (_sdf->HasElement("sdk_udp_port")) {
-    sdk_udp_port_ = _sdf->GetElement("sdk_udp_port")->Get<int>();
+    int sdk_udp_port = _sdf->GetElement("sdk_udp_port")->Get<int>();
+    mavlink_interface_->SetSdkUdpPort(sdk_udp_port);
   }
 
-  if (hil_mode_) {
-
-    local_qgc_addr_.sin_family = AF_INET;
-    local_qgc_addr_.sin_port = htons(0);
-    local_qgc_addr_len_ = sizeof(local_qgc_addr_);
-
-    remote_qgc_addr_.sin_family = AF_INET;
-    remote_qgc_addr_.sin_port = htons(qgc_udp_port_);
-    remote_qgc_addr_len_ = sizeof(remote_qgc_addr_);
-
-    local_sdk_addr_.sin_family = AF_INET;
-    local_sdk_addr_.sin_port = htons(0);
-    local_sdk_addr_len_ = sizeof(local_sdk_addr_);
-
-    remote_sdk_addr_.sin_family = AF_INET;
-    remote_sdk_addr_.sin_port = htons(sdk_udp_port_);
-    remote_sdk_addr_len_ = sizeof(remote_sdk_addr_);
-
-    if ((qgc_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-      gzerr << "Creating QGC UDP socket failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    if (bind(qgc_socket_fd_, (struct sockaddr *)&local_qgc_addr_, local_qgc_addr_len_) < 0) {
-      gzerr << "QGC UDP bind failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    if ((sdk_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-      gzerr << "Creating SDK UDP socket failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-    if (bind(sdk_socket_fd_, (struct sockaddr *)&local_sdk_addr_, local_sdk_addr_len_) < 0) {
-      gzerr << "SDK UDP bind failed: " << strerror(errno) << ", aborting\n";
-      abort();
-    }
-
-  }
-
-  if (serial_enabled_) {
+  if (serial_enabled) {
     // Set up serial interface
     if(_sdf->HasElement("serialDevice"))
     {
-      device_ = _sdf->GetElement("serialDevice")->Get<std::string>();
+      std::string device = _sdf->GetElement("serialDevice")->Get<std::string>();
+      mavlink_interface_->SetDevice(device);
     }
 
     if (_sdf->HasElement("baudRate")) {
-      baudrate_ = _sdf->GetElement("baudRate")->Get<int>();
+      int baudrate = _sdf->GetElement("baudRate")->Get<int>();
+      mavlink_interface_->SetBaudrate(baudrate);
     }
-    io_service.post(std::bind(&GazeboMavlinkInterface::do_read, this));
-
-    // run io_service for async io
-    io_thread = std::thread([this] () {
-      io_service.run();
-    });
-    open();
-
-  } else {
-    memset((char *)&remote_simulator_addr_, 0, sizeof(remote_simulator_addr_));
-    remote_simulator_addr_.sin_family = AF_INET;
-    remote_simulator_addr_len_ = sizeof(remote_simulator_addr_);
-
-    memset((char *)&local_simulator_addr_, 0, sizeof(local_simulator_addr_));
-    local_simulator_addr_.sin_family = AF_INET;
-    local_simulator_addr_len_ = sizeof(local_simulator_addr_);
-
-    if (use_tcp_) {
-
-      local_simulator_addr_.sin_addr.s_addr = htonl(mavlink_addr_);
-      local_simulator_addr_.sin_port = htons(mavlink_tcp_port_);
-
-      if ((simulator_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        gzerr << "Creating TCP socket failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      int yes = 1;
-      int result = setsockopt(simulator_socket_fd_, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
-      if (result != 0) {
-        gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      struct linger nolinger {};
-      nolinger.l_onoff = 1;
-      nolinger.l_linger = 0;
-
-      result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_LINGER, &nolinger, sizeof(nolinger));
-      if (result != 0) {
-        gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      // The socket reuse is necessary for reconnecting to the same address
-      // if the socket does not close but gets stuck in TIME_WAIT. This can happen 
-      // if the server is suddenly closed, for example, if the robot is deleted in gazebo.
-      int socket_reuse = 1;
-      result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEADDR, &socket_reuse, sizeof(socket_reuse));
-      if (result != 0) {
-        gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      // Same as above but for a given port
-      result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEPORT, &socket_reuse, sizeof(socket_reuse));
-      if (result != 0) {
-        gzerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      // set socket to non-blocking
-      result = fcntl(simulator_socket_fd_, F_SETFL, O_NONBLOCK);
-      if (result == -1) {
-        gzerr << "setting socket to non-blocking failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
-        gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      errno = 0;
-      if (listen(simulator_socket_fd_, 0) < 0) {
-        gzerr << "listen failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      memset(fds_, 0, sizeof(fds_));
-      fds_[LISTEN_FD].fd = simulator_socket_fd_;
-      fds_[LISTEN_FD].events = POLLIN; // only listens for new connections on tcp
-
-    } else {
-      remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
-      remote_simulator_addr_.sin_port = htons(mavlink_udp_port_);
-
-      local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-      local_simulator_addr_.sin_port = htons(0);
-
-      if ((simulator_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        gzerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      // set socket to non-blocking
-      int result = fcntl(simulator_socket_fd_, F_SETFL, O_NONBLOCK);
-      if (result == -1) {
-        gzerr << "setting socket to non-blocking failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
-        gzerr << "bind failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
-
-      memset(fds_, 0, sizeof(fds_));
-      fds_[CONNECTION_FD].fd = simulator_socket_fd_;
-      fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
-    }
-  }
-
-  if(_sdf->HasElement("vehicle_is_tailsitter"))
-  {
-    vehicle_is_tailsitter_ = _sdf->GetElement("vehicle_is_tailsitter")->Get<bool>();
   }
 
   if(_sdf->HasElement("send_vision_estimation"))
@@ -550,27 +523,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default \n";
   }
 
-  standard_normal_distribution_ = std::normal_distribution<float>(0.0f, 1.0f);
-
-  // Get the lidar link orientation with respect to the base_link
-  const auto lidar_link = model_->GetLink(lidar_sub_topic_ + "::link");
-  if (lidar_link != NULL) {
-#if GAZEBO_MAJOR_VERSION >= 9
-    lidar_orientation_ = lidar_link->RelativePose().Rot();
-#else
-    lidar_orientation_ = ignitionFromGazeboMath(lidar_link->GetRelativePose()).Rot();
-#endif
-  }
-
-  // Get the sonar link orientation with respect to the base_link
-  const auto sonar_link = model_->GetLink(sonar_sub_topic_ + "::link");
-  if (sonar_link != NULL) {
-#if GAZEBO_MAJOR_VERSION >= 9
-    sonar_orientation_ = sonar_link->RelativePose().Rot();
-#else
-    sonar_orientation_ = ignitionFromGazeboMath(sonar_link->GetRelativePose()).Rot();
-#endif
-  }
+  mavlink_interface_->Load();
 }
 
 // This gets called by the world update start event.
@@ -586,6 +539,11 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   previous_imu_seq_ = last_imu_message_.seq();
 
+  // Always run at 250 Hz. At 500 Hz, the skip factor should be 2, at 1000 Hz 4.
+  if (!(previous_imu_seq_ % update_skip_factor_ == 0)) {
+    return;
+  }
+
 #if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
 #else
@@ -593,18 +551,25 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 #endif
   double dt = (current_time - last_time_).Double();
 
-  close_conn_ = false;
+  bool close_conn_ = false;
+
   if (hil_mode_) {
-    pollFromQgcAndSdk();
+    mavlink_interface_->pollFromQgcAndSdk();
   } else {
-    pollForMAVLinkMessages();
+    mavlink_interface_->pollForMAVLinkMessages();
   }
 
+  // Always send Gyro and Accel data at full rate (= sim update rate)
   SendSensorMessages();
 
+  // Send groudntruth at full rate
+  SendGroundTruth();
+
   if (close_conn_) { // close connection if required
-    close();
+    mavlink_interface_->close();
   }
+
+  handle_actuator_controls();
 
   handle_control(dt);
 
@@ -626,73 +591,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   }
 
   last_time_ = current_time;
-}
-
-void GazeboMavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
-{
-  assert(message != nullptr);
-
-  if (gotSigInt_ || close_conn_) {
-    return;
-  }
-
-  if (serial_enabled_) {
-
-    if (!is_open()) {
-      gzerr << "Serial port closed! \n";
-      return;
-    }
-
-    {
-      std::lock_guard<std::recursive_mutex> lock(mutex);
-
-      if (tx_q.size() >= MAX_TXQ_SIZE) {
-        gzwarn << "Tx queue overflow\n";
-      }
-      tx_q.emplace_back(message);
-    }
-    io_service.post(std::bind(&GazeboMavlinkInterface::do_write, this, true));
-
-  } else {
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-    int packetlen = mavlink_msg_to_send_buffer(buffer, message);
-
-    if (fds_[CONNECTION_FD].fd > 0) {
-      int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
-      int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
-
-      if (ret < 0) {
-        gzerr << "poll error: " << strerror(errno) << "\n";
-        return;
-      }
-
-      if (ret == 0 && timeout_ms > 0) {
-        gzerr << "poll timeout\n";
-        return;
-      }
-
-      if (!(fds_[CONNECTION_FD].revents & POLLOUT)) {
-        gzerr << "invalid events at fd:" << fds_[CONNECTION_FD].revents << "\n";
-        return;
-      }
-
-      size_t len;
-      if (use_tcp_) {
-        len = send(fds_[CONNECTION_FD].fd, buffer, packetlen, 0);
-      } else {
-        len = sendto(fds_[CONNECTION_FD].fd, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
-      }
-      if (len < 0) {
-        gzerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
-        if (errno == ECONNRESET || errno == EPIPE) {
-          if (use_tcp_) { // udp socket remains alive
-            gzerr << "Closing connection." << "\n";
-            close_conn_ = true;
-          }
-        }
-      }
-    }
-  }
 }
 
 template <class T>
@@ -718,33 +616,6 @@ void GazeboMavlinkInterface::setMavlinkSensorOrientation(const ignition::math::V
 
 }
 
-void GazeboMavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
-{
-  if (gotSigInt_) {
-    return;
-  }
-
-  uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-  int packetlen = mavlink_msg_to_send_buffer(buffer, message);
-  ssize_t len;
-  if (qgc_socket_fd_ > 0) {
-    len = sendto(qgc_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_qgc_addr_, remote_qgc_addr_len_);
-
-    if (len <= 0)
-    {
-      gzerr << "Failed sending mavlink message to QGC: " << strerror(errno) << "\n";
-    }
-  }
-
-  if (sdk_socket_fd_ > 0) {
-    len = sendto(sdk_socket_fd_, buffer, packetlen, 0, (struct sockaddr *)&remote_sdk_addr_, remote_sdk_addr_len_);
-    if (len <= 0)
-    {
-      gzerr << "Failed sending mavlink message to SDK: " << strerror(errno) << "\n";
-    }
-  }
-}
-
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 {
   std::unique_lock<std::mutex> lock(last_imu_message_mutex_);
@@ -768,36 +639,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
     last_imu_message_.orientation().y(),
     last_imu_message_.orientation().z());
 
-  ignition::math::Quaterniond q_gb = q_gr*q_br.Inverse();
-  ignition::math::Quaterniond q_nb = q_ng*q_gb;
-
-#if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d pos_g = model_->WorldPose().Pos();
-#else
-  ignition::math::Vector3d pos_g = ignitionFromGazeboMath(model_->GetWorldPose().pos);
-#endif
-  ignition::math::Vector3d pos_n = q_ng.RotateVector(pos_g);
-
-#if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d vel_b = q_br.RotateVector(model_->RelativeLinearVel());
-  ignition::math::Vector3d vel_n = q_ng.RotateVector(model_->WorldLinearVel());
-  ignition::math::Vector3d omega_nb_b = q_br.RotateVector(model_->RelativeAngularVel());
-#else
-  ignition::math::Vector3d vel_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
-  ignition::math::Vector3d vel_n = q_ng.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
-  ignition::math::Vector3d omega_nb_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
-#endif
-
-  ignition::math::Vector3d accel_b = q_br.RotateVector(ignition::math::Vector3d(
-    last_imu_message_.linear_acceleration().x(),
-    last_imu_message_.linear_acceleration().y(),
-    last_imu_message_.linear_acceleration().z()));
-  ignition::math::Vector3d gyro_b = q_br.RotateVector(ignition::math::Vector3d(
-    last_imu_message_.angular_velocity().x(),
-    last_imu_message_.angular_velocity().y(),
-    last_imu_message_.angular_velocity().z()));
-  ignition::math::Vector3d mag_b = q_nb.RotateVectorReverse(mag_n_);
-
   bool should_send_imu = false;
   if (!enable_lockstep_) {
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -813,63 +654,102 @@ void GazeboMavlinkInterface::SendSensorMessages()
     }
   }
 
-  if (enable_lockstep_ || should_send_imu) {
-    mavlink_hil_sensor_t sensor_msg;
+  mavlink_hil_sensor_t sensor_msg;
 #if GAZEBO_MAJOR_VERSION >= 9
-    sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+  sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
 #else
-    sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
 #endif
-    sensor_msg.xacc = accel_b.X();
-    sensor_msg.yacc = accel_b.Y();
-    sensor_msg.zacc = accel_b.Z();
-    sensor_msg.xgyro = gyro_b.X();
-    sensor_msg.ygyro = gyro_b.Y();
-    sensor_msg.zgyro = gyro_b.Z();
+
+  // send always accel and gyro data (not dependent of the bitmask)
+  // required so to keep the timestamps on sync and the lockstep can
+  // work properly
+  ignition::math::Vector3d accel_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
+    last_imu_message_.linear_acceleration().x(),
+    last_imu_message_.linear_acceleration().y(),
+    last_imu_message_.linear_acceleration().z()));
+
+  ignition::math::Vector3d gyro_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
+    last_imu_message_.angular_velocity().x(),
+    last_imu_message_.angular_velocity().y(),
+    last_imu_message_.angular_velocity().z()));
+
+  sensor_msg.xacc = accel_b.X();
+  sensor_msg.yacc = accel_b.Y();
+  sensor_msg.zacc = accel_b.Z();
+  sensor_msg.xgyro = gyro_b.X();
+  sensor_msg.ygyro = gyro_b.Y();
+  sensor_msg.zgyro = gyro_b.Z();
+
+  sensor_msg.fields_updated = SensorSource::ACCEL | SensorSource::GYRO;
+
+  // send only mag data
+  if (mag_updated_) {
+    ignition::math::Quaterniond q_body_to_world = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
+
+    ignition::math::Vector3d mag_b = q_body_to_world.RotateVectorReverse(mag_n_);
+
     sensor_msg.xmag = mag_b.X();
     sensor_msg.ymag = mag_b.Y();
     sensor_msg.zmag = mag_b.Z();
+    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::MAG;
 
+    mag_updated_ = false;
+  }
+
+  // send only baro data
+  if (baro_updated_) {
     sensor_msg.temperature = temperature_;
     sensor_msg.abs_pressure = abs_pressure_;
     sensor_msg.pressure_alt = pressure_alt_;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::BARO;
 
-    const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
-    float temperature_local = sensor_msg.temperature + 273.0f;
-    const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
-    float rho = 1.225f / density_ratio;
-
-    // Let's use a rough guess of 0.05 hPa as the standard devitiation which roughly yields
-    // about +/- 1 m/s noise.
-    const float diff_pressure_stddev = 0.05f;
-    const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev;
-
-    // calculate differential pressure in hPa
-    // if vehicle is a tailsitter the airspeed axis is different (z points from nose to tail)
-    if (vehicle_is_tailsitter_) {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.Z()*vel_b.Z() + diff_pressure_noise;
-    } else {
-      sensor_msg.diff_pressure = 0.005f*rho*vel_b.X()*vel_b.X() + diff_pressure_noise;
-    }
-
-    sensor_msg.fields_updated = 4095;
-
-    if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
-      mavlink_message_t msg;
-      mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-      send_mavlink_message(&msg);
-    }
+    baro_updated_ = false;
   }
 
+  // send only diff pressure data
+  if (diff_press_updated_) {
+    sensor_msg.diff_pressure = diff_pressure_;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::DIFF_PRESS;
+
+    diff_press_updated_ = false;
+  }
+
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+    mavlink_interface_->send_mavlink_message(&msg);
+  }
+}
+
+void GazeboMavlinkInterface::SendGroundTruth()
+{
   // ground truth
+  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+    last_imu_message_.orientation().w(),
+    last_imu_message_.orientation().x(),
+    last_imu_message_.orientation().y(),
+    last_imu_message_.orientation().z());
+
+  ignition::math::Quaterniond q_nb = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
+
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d accel_true_b = q_br.RotateVector(model_->RelativeLinearAccel());
+  ignition::math::Vector3d vel_b = q_FLU_to_FRD.RotateVector(model_->RelativeLinearVel());
+  ignition::math::Vector3d vel_n = q_ENU_to_NED.RotateVector(model_->WorldLinearVel());
+  ignition::math::Vector3d omega_nb_b = q_FLU_to_FRD.RotateVector(model_->RelativeAngularVel());
 #else
-  ignition::math::Vector3d accel_true_b = q_br.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
+  ignition::math::Vector3d vel_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearVel()));
+  ignition::math::Vector3d vel_n = q_ENU_to_NED.RotateVector(ignitionFromGazeboMath(model_->GetWorldLinearVel()));
+  ignition::math::Vector3d omega_nb_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeAngularVel()));
+#endif
+
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d accel_true_b = q_FLU_to_FRD.RotateVector(model_->RelativeLinearAccel());
+#else
+  ignition::math::Vector3d accel_true_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
 #endif
 
   // send ground truth
-
   mavlink_hil_state_quaternion_t hil_state_quat;
 #if GAZEBO_MAJOR_VERSION >= 9
   hil_state_quat.time_usec = world_->SimTime().Double() * 1e6;
@@ -897,9 +777,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
   hil_state_quat.ind_airspeed = vel_b.X();
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  hil_state_quat.true_airspeed = model_->WorldLinearVel().Length() * 100;  //no wind simulated
+  hil_state_quat.true_airspeed = (model_->WorldLinearVel() -  wind_vel_).Length() * 100;
 #else
-  hil_state_quat.true_airspeed = model_->GetWorldLinearVel().GetLength() * 100;  //no wind simulated
+  hil_state_quat.true_airspeed = (model_->GetWorldLinearVel() -  wind_vel_).GetLength() * 100;
 #endif
 
   hil_state_quat.xacc = accel_true_b.X() * 1000;
@@ -909,14 +789,14 @@ void GazeboMavlinkInterface::SendSensorMessages()
   if (!hil_mode_ || (hil_mode_ && hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
-    send_mavlink_message(&msg);
+    mavlink_interface_->send_mavlink_message(&msg);
   }
 }
 
-void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg) {
+void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg, const int& id) {
   // fill HIL GPS Mavlink msg
   mavlink_hil_gps_t hil_gps_msg;
-  hil_gps_msg.time_usec = gps_msg->time_usec();
+  hil_gps_msg.time_usec = gps_msg->time_utc_usec();
   hil_gps_msg.fix_type = 3;
   hil_gps_msg.lat = gps_msg->latitude_deg() * 1e7;
   hil_gps_msg.lon = gps_msg->longitude_deg() * 1e7;
@@ -932,12 +812,13 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg) {
   cog.Normalize();
   hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
   hil_gps_msg.satellites_visible = 10;
+  hil_gps_msg.id = id;
 
   // send HIL_GPS Mavlink msg
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
-    send_mavlink_message(&msg);
+    mavlink_interface_->send_mavlink_message(&msg);
   }
 }
 
@@ -950,17 +831,18 @@ void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
   // the FCU
 }
 
-void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
+void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, const int& id) {
   mavlink_distance_sensor_t sensor_msg;
-  sensor_msg.time_boot_ms = lidar_message->time_usec() / 1e3;
-  sensor_msg.min_distance = lidar_message->min_distance() * 100.0;
-  sensor_msg.max_distance = lidar_message->max_distance() * 100.0;
-  sensor_msg.current_distance = lidar_message->current_distance() * 100.0;
+  sensor_msg.time_boot_ms = lidar_message->time_usec() / 1e3;   // [ms]
+  sensor_msg.min_distance = lidar_message->min_distance() * 100.0;  // [cm]
+  sensor_msg.max_distance = lidar_message->max_distance() * 100.0;  // [cm]
+  sensor_msg.current_distance = lidar_message->current_distance() * 100.0;  // [cm]
   sensor_msg.type = 0;
-  sensor_msg.id = 0;
+  sensor_msg.id = id;
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = lidar_message->h_fov();
   sensor_msg.vertical_fov = lidar_message->v_fov();
+  sensor_msg.signal_quality = lidar_message->signal_quality();
 
   ignition::math::Quaterniond q_ls = ignition::math::Quaterniond(
     lidar_message->orientation().w(),
@@ -968,7 +850,13 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
     lidar_message->orientation().y(),
     lidar_message->orientation().z());
 
-  ignition::math::Quaterniond q_bs = (lidar_orientation_ * q_ls).Inverse();
+  ignition::math::Quaterniond q_bs;
+  for (Sensor_M::iterator it = sensor_map_.begin(); it != sensor_map_.end(); ++it) {
+    // check the ID of the sensor on the sensor map and apply the respective rotation
+    if (it->second.first == id) {
+      q_bs = (it->second.second * q_ls).Inverse();
+    }
+  }
 
   sensor_msg.quaternion[0] = q_bs.W();
   sensor_msg.quaternion[1] = q_bs.X();
@@ -980,12 +868,14 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message) {
 
   setMavlinkSensorOrientation(u_Xs, sensor_msg);
 
-  //distance needed for optical flow message
-  optflow_distance = lidar_message->current_distance();  //[m]
+  // distance needed for optical flow message
+  if (sensor_msg.orientation == MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270) {
+    optflow_distance = lidar_message->current_distance();  // [m]
+  }
 
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+  mavlink_interface_->send_mavlink_message(&msg);
 }
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
@@ -1015,17 +905,24 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
 
   mavlink_message_t msg;
   mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+  mavlink_interface_->send_mavlink_message(&msg);
 }
 
-void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
+void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const int& id) {
   mavlink_distance_sensor_t sensor_msg = {};
   sensor_msg.time_boot_ms = sonar_message->time_usec() / 1e3;
   sensor_msg.min_distance = sonar_message->min_distance() * 100.0;
   sensor_msg.max_distance = sonar_message->max_distance() * 100.0;
   sensor_msg.current_distance = sonar_message->current_distance() * 100.0;
+  sensor_msg.signal_quality = sonar_message->signal_quality();
 
-  ignition::math::Quaterniond q_ls = sonar_orientation_.Inverse();
+  ignition::math::Quaterniond q_ls;
+  for (Sensor_M::iterator it = sensor_map_.begin(); it != sensor_map_.end(); ++it) {
+    // check the ID of the sensor on the sensor map and apply the respective rotation
+    if (it->second.first == id) {
+      q_ls = (it->second.second).Inverse();
+    }
+  }
 
   const ignition::math::Vector3d u_Xb = kForwardRotation; // This is unit vector of X-axis `base_link`
   const ignition::math::Vector3d u_Xs = q_ls.RotateVectorReverse(u_Xb); // This is unit vector of X-axis sensor in `base_link` frame
@@ -1033,7 +930,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   setMavlinkSensorOrientation(u_Xs, sensor_msg);
 
   sensor_msg.type = 1;
-  sensor_msg.id = 1;
+  sensor_msg.id = 100 + id; // to differentiate from Lidars
   sensor_msg.covariance = 0;
   sensor_msg.horizontal_fov = sonar_message->h_fov();
   sensor_msg.vertical_fov = sonar_message->v_fov();
@@ -1042,9 +939,14 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message) {
   sensor_msg.quaternion[2] = q_ls.Y();
   sensor_msg.quaternion[3] = q_ls.Z();
 
+  // distance needed for optical flow message
+  if (sensor_msg.orientation == MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270) {
+    optflow_distance = sonar_message->current_distance();  // [m]
+  }
+
   mavlink_message_t msg;
   mavlink_msg_distance_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+  mavlink_interface_->send_mavlink_message(&msg);
 }
 
 void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
@@ -1060,14 +962,14 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 
   mavlink_message_t msg;
   mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+  mavlink_interface_->send_mavlink_message(&msg);
 }
 
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   mavlink_message_t msg;
 
   // transform position from local ENU to local NED frame
-  ignition::math::Vector3d position = q_ng.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d position = q_ENU_to_NED.RotateVector(ignition::math::Vector3d(
     odom_message->position().x(),
     odom_message->position().y(),
     odom_message->position().z()));
@@ -1083,17 +985,17 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   // transform the vehicle orientation from the ENU to the NED frame
   // q_nb is the quaternion that represents the orientation of the vehicle
   // the NED earth/local
-  ignition::math::Quaterniond q_nb = q_ng * q_gr * q_ng.Inverse();
+  ignition::math::Quaterniond q_nb = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
 
   // transform linear velocity from local ENU to body FRD frame
-  ignition::math::Vector3d linear_velocity = q_ng.RotateVector(
-    q_br.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d linear_velocity = q_FLU_to_FRD.RotateVector(
+    q_gr.Inverse().RotateVector(ignition::math::Vector3d(
       odom_message->linear_velocity().x(),
       odom_message->linear_velocity().y(),
       odom_message->linear_velocity().z())));
 
   // transform angular velocity from body FLU to body FRD frame
-  ignition::math::Vector3d angular_velocity = q_br.RotateVector(ignition::math::Vector3d(
+  ignition::math::Vector3d angular_velocity = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
     odom_message->angular_velocity().x(),
     odom_message->angular_velocity().y(),
     odom_message->angular_velocity().z()));
@@ -1105,8 +1007,10 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
 
     odom.time_usec = odom_message->time_usec();
 
-    odom.frame_id = MAV_FRAME_VISION_NED;
+    odom.frame_id = MAV_FRAME_LOCAL_NED;
     odom.child_frame_id = MAV_FRAME_BODY_FRD;
+
+    odom.estimator_type = MAV_ESTIMATOR_TYPE_VISION;
 
     odom.x = position.X();
     odom.y = position.Y();
@@ -1125,7 +1029,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom.pitchspeed = angular_velocity.Y();
     odom.yawspeed = angular_velocity.Z();
 
-    // parse covariance matrices
+    // Parse covariance matrices
     // The main diagonal values are always positive (variance), so a transform
     // in the covariance matrices from one frame to another would only
     // change the values of the main diagonal. Since they are all zero,
@@ -1135,13 +1039,14 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
       for (size_t y = x; y < 6; y++) {
         size_t index = 6 * x + y;
 
-        odom.pose_covariance[count++] = odom_message->pose_covariance().data()[index];
-        odom.velocity_covariance[count++] = odom_message->velocity_covariance().data()[index];
+        odom.pose_covariance[count] = odom_message->pose_covariance().data()[index];
+        odom.velocity_covariance[count] = odom_message->velocity_covariance().data()[index];
+        count++;
       }
     }
 
     mavlink_msg_odometry_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &odom);
-    send_mavlink_message(&msg);
+    mavlink_interface_->send_mavlink_message(&msg);
   }
   else if (send_vision_estimation_) {
     // send VISION_POSITION_ESTIMATE Mavlink msg
@@ -1177,7 +1082,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     }
 
     mavlink_msg_vision_position_estimate_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &vision);
-    send_mavlink_message(&msg);
+    mavlink_interface_->send_mavlink_message(&msg);
   }
 }
 
@@ -1187,192 +1092,66 @@ void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
     mag_msg->magnetic_field().x(),
     mag_msg->magnetic_field().y(),
     mag_msg->magnetic_field().z());
+
+  mag_updated_ = true;
+}
+
+void GazeboMavlinkInterface::AirspeedCallback(AirspeedPtr& airspeed_msg) {
+  diff_pressure_ = airspeed_msg->diff_pressure();
+
+  diff_press_updated_ = true;
 }
 
 void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
   temperature_ = baro_msg->temperature();
   pressure_alt_ = baro_msg->pressure_altitude();
   abs_pressure_ = baro_msg->absolute_pressure();
+
+  baro_updated_ = true;
 }
 
-void GazeboMavlinkInterface::pollForMAVLinkMessages()
-{
-  if (gotSigInt_) {
-    return;
-  }
-
-  bool received_actuator = false;
-
-  do {
-    int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
-    int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
-
-    if (ret < 0) {
-      gzerr << "poll error: " << strerror(errno) << "\n";
-      return;
-    }
-
-    if (ret == 0 && timeout_ms > 0) {
-      gzerr << "poll timeout\n";
-      return;
-    }
-
-    for (int i = 0; i < N_FDS; i++) {
-      if(fds_[i].revents == 0) {
-        continue;
-      }
-
-      if (!(fds_[i].revents & POLLIN)) { 
-        continue;
-      }
-
-      if (i == LISTEN_FD) { // if event is raised on the listening socket
-        acceptConnections();
-      } else { // if event is raised on connection socket
-        int ret = recvfrom(fds_[i].fd, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
-        if (ret < 0) {
-          // all data is read if EWOULDBLOCK is raised
-          if (errno != EWOULDBLOCK) { // disconnected from client
-            gzerr << "recvfrom error: " << strerror(errno) << "\n";
-          }
-          continue;
-        }
-
-        // client closed the connection orderly, only makes sense on tcp
-        if (use_tcp_ && ret == 0) { 
-          gzerr << "Connection closed by client." << "\n";
-          close_conn_ = true;
-          continue;
-        }
-
-        // data received
-        int len = ret;
-        mavlink_message_t msg;
-        mavlink_status_t status;
-        for (unsigned i = 0; i < len; ++i) {
-          if (mavlink_parse_char(MAVLINK_COMM_0, _buf[i], &msg, &status)) {
-            if (hil_mode_) {
-              send_mavlink_message(&msg);
-            }
-            handle_message(&msg, received_actuator);
-          }
-        }
-      }
-    }
-  } while (!close_conn_ && received_first_actuator_ && !received_actuator && enable_lockstep_ && IsRunning() && !gotSigInt_);
+void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
+  wind_vel_ = ignition::math::Vector3d(msg->velocity().x(),
+            msg->velocity().y(),
+            msg->velocity().z());
 }
 
-void GazeboMavlinkInterface::acceptConnections()
-{
-  if (fds_[CONNECTION_FD].fd > 0) {
-    return;
+void GazeboMavlinkInterface::handle_actuator_controls() {
+  bool armed = mavlink_interface_->GetArmedState();
+
+  #if GAZEBO_MAJOR_VERSION >= 9
+      last_actuator_time_ = world_->SimTime();
+  #else
+      last_actuator_time_ = world_->GetSimTime();
+  #endif
+
+  for (unsigned i = 0; i < n_out_max; i++) {
+    input_index_[i] = i;
   }
+  // Read Input References
+  input_reference_.resize(n_out_max);
 
-  // accepting incoming connections on listen fd
-  int ret =
-    accept(fds_[LISTEN_FD].fd, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
-
-  if (ret < 0) {
-    if (errno != EWOULDBLOCK) {
-      gzerr << "accept error: " << strerror(errno) << "\n";
-    }
-    return;
-  }
-
-  // assign socket to connection descriptor on success
-  fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-  fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
-}
-
-void GazeboMavlinkInterface::pollFromQgcAndSdk()
-{
-  struct pollfd fds[2] = {};
-  fds[0].fd = qgc_socket_fd_;
-  fds[0].events = POLLIN;
-  fds[1].fd = sdk_socket_fd_;
-  fds[1].events = POLLIN;
-
-  const int timeout_ms = 0;
-
-  int ret = ::poll(&fds[0], 2, timeout_ms);
-
-  if (ret < 0) {
-    gzerr << "poll error: " << strerror(errno) << "\n";
-    return;
-  }
-
-  if (fds[0].revents & POLLIN) {
-    int len = recvfrom(qgc_socket_fd_, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_qgc_addr_, &remote_qgc_addr_len_);
-
-    if (len > 0) {
-      mavlink_message_t msg;
-      mavlink_status_t status;
-      for (unsigned i = 0; i < len; ++i) {
-        if (mavlink_parse_char(MAVLINK_COMM_1, _buf[i], &msg, &status)) {
-          // forward message from QGC to serial
-          send_mavlink_message(&msg);
-        }
-      }
+  Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
+  if (actuator_controls.size() < n_out_max) return; //TODO: Handle this properly
+  for (int i = 0; i < input_reference_.size(); i++) {
+    if (armed) {
+      input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
+          * input_scaling_[i] + zero_position_armed_[i];
+      // std::cout << input_reference_ << ", ";
+    } else {
+      input_reference_[i] = zero_position_disarmed_[i];
+      // std::cout << input_reference_ << ", ";
     }
   }
-
-  if (fds[1].revents & POLLIN) {
-    int len = recvfrom(sdk_socket_fd_, _buf, sizeof(_buf), 0, (struct sockaddr *)&remote_sdk_addr_, &remote_sdk_addr_len_);
-
-    if (len > 0) {
-      mavlink_message_t msg;
-      mavlink_status_t status;
-      for (unsigned i = 0; i < len; ++i) {
-        if (mavlink_parse_char(MAVLINK_COMM_2, _buf[i], &msg, &status)) {
-          // forward message from SDK to serial
-          send_mavlink_message(&msg);
-        }
-      }
-    }
-  }
-}
-
-void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, bool &received_actuator)
-{
-  switch (msg->msgid) {
-  case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
-    mavlink_hil_actuator_controls_t controls;
-    mavlink_msg_hil_actuator_controls_decode(msg, &controls);
-
-    bool armed = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
-
-#if GAZEBO_MAJOR_VERSION >= 9
-    last_actuator_time_ = world_->SimTime();
-#else
-    last_actuator_time_ = world_->GetSimTime();
-#endif
-
-    for (unsigned i = 0; i < n_out_max; i++) {
-      input_index_[i] = i;
-    }
-
-    // set rotor speeds, controller targets
-    input_reference_.resize(n_out_max);
-    for (int i = 0; i < input_reference_.size(); i++) {
-      if (armed) {
-        input_reference_[i] = (controls.controls[input_index_[i]] + input_offset_[i])
-            * input_scaling_[i] + zero_position_armed_[i];
-      } else {
-        input_reference_[i] = zero_position_disarmed_[i];
-      }
-    }
-
-    received_actuator = true;
-    received_first_actuator_ = true;
-    break;
-  }
+  // std::cout << "Input Reference: " << input_reference_.transpose() << std::endl;
+  received_first_actuator_ = mavlink_interface_->GetReceivedFirstActuator();
 }
 
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
   for (int i = 0; i < input_reference_.size(); i++) {
-    if (joints_[i]) {
+    if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
       double target = input_reference_[i];
       if (joint_control_type_[i] == "velocity")
       {
@@ -1391,12 +1170,15 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 #endif
 
         double err = current - target;
+        if(joint_max_errors_[i]!=0.) {
+          err = std::max(std::min(err, joint_max_errors_[i]), -joint_max_errors_[i]);
+        }
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
       }
       else if (joint_control_type_[i] == "position_gztopic")
       {
-     #if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+     #if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
         /// only gazebo 7.4 and above support Any
         gazebo::msgs::Any m;
         m.set_type(gazebo::msgs::Any_ValueType_DOUBLE);
@@ -1436,136 +1218,8 @@ bool GazeboMavlinkInterface::IsRunning()
     return world_->GetRunning();
 #endif
 }
-
-void GazeboMavlinkInterface::open() {
-  try{
-    serial_dev.open(device_);
-    serial_dev.set_option(boost::asio::serial_port_base::baud_rate(baudrate_));
-    serial_dev.set_option(boost::asio::serial_port_base::character_size(8));
-    serial_dev.set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
-    serial_dev.set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
-    serial_dev.set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
-    gzdbg << "Opened serial device " << device_ << "\n";
-  }
-  catch (boost::system::system_error &err) {
-    gzerr <<"Error opening serial device: " << err.what() << "\n";
-  }
-}
-
-void GazeboMavlinkInterface::close()
-{
-  if(serial_enabled_) {
-    ::close(qgc_socket_fd_);
-    ::close(sdk_socket_fd_);
-
-    std::lock_guard<std::recursive_mutex> lock(mutex);
-    if (!is_open())
-      return;
-
-    io_service.stop();
-    serial_dev.close();
-
-    if (io_thread.joinable())
-      io_thread.join();
-
-  } else {
-
-    ::close(fds_[CONNECTION_FD].fd);
-    fds_[CONNECTION_FD] = { 0, 0, 0 };
-    fds_[CONNECTION_FD].fd = -1;
-
-    received_first_actuator_ = false;
-
-  }
-}
-
-void GazeboMavlinkInterface::do_read(void)
-{
-  serial_dev.async_read_some(boost::asio::buffer(rx_buf), boost::bind(
-      &GazeboMavlinkInterface::parse_buffer, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred
-      )
-  );
-}
-
-// Based on MAVConnInterface::parse_buffer in MAVROS
-void GazeboMavlinkInterface::parse_buffer(const boost::system::error_code& err, std::size_t bytes_t){
-  mavlink_status_t status;
-  mavlink_message_t message;
-  uint8_t *buf = this->rx_buf.data();
-
-  assert(rx_buf.size() >= bytes_t);
-
-  for(; bytes_t > 0; bytes_t--)
-  {
-    auto c = *buf++;
-
-    auto msg_received = static_cast<Framing>(mavlink_frame_char_buffer(&m_buffer, &m_status, c, &message, &status));
-    if (msg_received == Framing::bad_crc || msg_received == Framing::bad_signature) {
-      _mav_parse_error(&m_status);
-      m_status.msg_received = MAVLINK_FRAMING_INCOMPLETE;
-      m_status.parse_state = MAVLINK_PARSE_STATE_IDLE;
-      if (c == MAVLINK_STX) {
-        m_status.parse_state = MAVLINK_PARSE_STATE_GOT_STX;
-        m_buffer.len = 0;
-        mavlink_start_checksum(&m_buffer);
-      }
-    }
-
-    if (msg_received != Framing::incomplete) {
-      if (hil_mode_) {
-        forward_mavlink_message(&message);
-      }
-      bool not_used;
-      handle_message(&message, not_used);
-    }
-  }
-  do_read();
-}
-
-void GazeboMavlinkInterface::do_write(bool check_tx_state){
-  if (check_tx_state && tx_in_progress)
-    return;
-
-  std::lock_guard<std::recursive_mutex> lock(mutex);
-  if (tx_q.empty())
-    return;
-
-  tx_in_progress = true;
-  auto &buf_ref = tx_q.front();
-
-  serial_dev.async_write_some(
-    boost::asio::buffer(buf_ref.dpos(), buf_ref.nbytes()), [this, &buf_ref] (boost::system::error_code error,   size_t bytes_transferred)
-    {
-      assert(bytes_transferred <= buf_ref.len);
-      if(error) {
-        gzerr << "Serial error: " << error.message() << "\n";
-      return;
-      }
-
-    std::lock_guard<std::recursive_mutex> lock(mutex);
-
-    if (tx_q.empty()) {
-      tx_in_progress = false;
-      return;
-    }
-
-    buf_ref.pos += bytes_transferred;
-    if (buf_ref.nbytes() == 0) {
-      tx_q.pop_front();
-    }
-
-    if (!tx_q.empty()) {
-      do_write(false);
-    }
-    else {
-      tx_in_progress = false;
-    }
-  });
-}
-
 void GazeboMavlinkInterface::onSigInt() {
-  gotSigInt_ = true;
-  close();
+  mavlink_interface_->onSigInt();
 }
 
 }

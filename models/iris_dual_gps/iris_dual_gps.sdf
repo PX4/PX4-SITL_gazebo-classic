@@ -1,0 +1,19 @@
+<sdf version='1.6'>
+  <model name='iris_dual_gps'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+    <!--second GPS-->
+    <include>
+      <uri>model://gps</uri>
+      <pose>-0.1 0 0 0 0 0</pose>
+      <name>gps1</name>
+    </include>
+    <joint name='gps1_joint' type='fixed'>
+      <child>gps1::link</child>
+      <parent>iris::base_link</parent>
+    </joint>
+  </model>
+</sdf>
+
+<!-- vim: set et ft=xml fenc=utf-8 ff=unix sts=0 sw=2 ts=2 : -->

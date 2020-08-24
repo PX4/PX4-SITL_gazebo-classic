@@ -129,6 +129,18 @@ void MagnetometerPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
 
   bias_.setZero();
+
+  for (auto i = 0; i < 9; ++i) {
+    switch (i){
+      // principal diagonal = the variance of the random variables
+      // = noise_density²
+      case 0: case 4: case 8:
+        mag_message_.add_magnetic_field_covariance(noise_density_ * noise_density_);
+        break;
+      default:
+        mag_message_.add_magnetic_field_covariance(0.0);
+    }
+  }
 }
 
 void MagnetometerPlugin::GroundtruthCallback(GtPtr& gt_msg) {
@@ -194,18 +206,6 @@ void MagnetometerPlugin::OnUpdate(const common::UpdateInfo&)
     magnetic_field->set_y(magnetic_field_I[1]);
     magnetic_field->set_z(magnetic_field_I[2]);
     mag_message_.set_allocated_magnetic_field(magnetic_field);
-
-    for (auto i = 0; i < 9; ++i) {
-      switch (i){
-        // principal diagonal = the variance of the random variables
-        // = noise_density²
-        case 0: case 4: case 8:
-          mag_message_.add_magnetic_field_covariance(noise_density_ * noise_density_);
-          break;
-        default:
-          mag_message_.add_magnetic_field_covariance(0.0);
-      }
-    }
 
     last_pub_time_ = current_time;
 

@@ -9,14 +9,31 @@ endif()
 
 message(STATUS "install-prefix: ${CMAKE_INSTALL_PREFIX}")
 
+# CMake build type (Debug Release RelWithDebInfo MinSizeRel)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Build type" FORCE)
+endif()
+
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug;Release;RelWithDebInfo;MinSizeRel;Coverage;AddressSanitizer;UndefinedBehaviorSanitizer")
+message(STATUS "cmake build type: ${CMAKE_BUILD_TYPE}")
+
 project(mavlink_sitl_gazebo VERSION 1.0.0)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+# Set c++11 or higher
+include(EnableC++XX)
+# Set c11
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 include(GNUInstallDirs)
 
 #######################
 ## Find Dependencies ##
 #######################
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
 option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
@@ -24,15 +41,17 @@ option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
 option(SEND_ODOMETRY_DATA "Send Mavlink ODOMETRY msgs" OFF)
 
-# Set c++11 or higher
-include(EnableC++XX)
-
 ## System dependencies are found with CMake's conventions
 find_package(Boost 1.58 REQUIRED COMPONENTS system thread filesystem)
 find_package(gazebo REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_program(px4 REQUIRED)
-find_package(PythonInterp REQUIRED)
+# Note: If using catkin, Python 2 is found since it points
+# to the Python libs installed with the ROS distro
+if (NOT CATKIN_DEVEL_PREFIX)
+	find_package(PythonInterp 3 REQUIRED)
+else()
+	find_package(PythonInterp REQUIRED)
+endif()
 find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
 if (BUILD_GSTREAMER_PLUGIN)
@@ -138,8 +157,7 @@ endif()
 ## Build ##
 ###########
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wno-deprecated-declarations")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+add_compile_options(-Wno-deprecated-declarations -Wno-address-of-packed-member)
 
 set(GAZEBO_MSG_INCLUDE_DIRS)
 foreach(ITR ${GAZEBO_INCLUDE_DIRS})
@@ -273,6 +291,7 @@ set(nav_msgs msgs/Odometry.proto)
 set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
+  msgs/Airspeed.proto
   msgs/Imu.proto
   msgs/IRLock.proto
   msgs/Float.proto
@@ -303,10 +322,13 @@ add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
 link_libraries(physics_msgs)
 
+add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
 add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
+add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
+add_library(gazebo_opticalflow_mockup_plugin SHARED src/gazebo_opticalflow_mockup_plugin.cpp)
 add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
 add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
 add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
@@ -314,18 +336,25 @@ add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
 add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp )
+add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/mavlink_interface.cpp)
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
+add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
+add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
+add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
+add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 
 set(plugins
+  gazebo_airspeed_plugin
   gazebo_geotagged_images_plugin
   gazebo_gps_plugin
+  gazebo_groundtruth_plugin
   gazebo_irlock_plugin
   gazebo_lidar_plugin
+  gazebo_opticalflow_mockup_plugin
   gazebo_opticalflow_plugin
   gazebo_sonar_plugin
   gazebo_uuv_plugin
@@ -339,6 +368,10 @@ set(plugins
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
+  gazebo_catapult_plugin
+  gazebo_usv_dynamics_plugin
+  gazebo_parachute_plugin
+  gazebo_airship_dynamics_plugin
   )
 
 foreach(plugin ${plugins})

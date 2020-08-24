@@ -114,20 +114,51 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
-
+    <link name='tiltrotor/airspeed_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='tiltrotor/airspeed_joint' type='revolute'>
+      <child>tiltrotor/airspeed_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
     <link name='motor_0'>
       <pose>0.35 -0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_0_collision'>
@@ -173,10 +204,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -257,14 +289,14 @@
       <pose>-0.35 0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_1_collision'>
@@ -310,10 +342,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -394,14 +427,14 @@
       <pose>0.35 0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_2_collision'>
@@ -447,10 +480,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -530,14 +564,14 @@
        <pose>-0.35 -0.35 0.02 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.005</mass>
+        <mass>0.05</mass>
         <inertia>
-          <ixx>0.000166704</ixx>
+          <ixx>0.0166704</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000166704</iyy>
+          <iyy>0.0166704</iyy>
           <iyz>0</iyz>
-          <izz>0.000167604</izz>
+          <izz>0.0167604</izz>
         </inertia>
       </inertial>
       <collision name='motor_3_collision'>
@@ -583,10 +617,11 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <lower>-0.1</lower>
+          <lower>-1.5</lower>
           <upper>1.5</upper>
         </limit>
         <dynamics>
+          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
@@ -832,11 +867,22 @@
         </ode>
       </physics>
     </joint>
+
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
+
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -856,7 +902,7 @@
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -876,7 +922,7 @@
       <a0>-0.2</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -896,7 +942,7 @@
       <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -989,27 +1035,12 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
-    <!--
-    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
-      <frameId>base_link</frameId>
-      <linkName>base_link</linkName>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
-      <xyzOffset>1 0 0</xyzOffset>
-      <windDirection>0 1 0</windDirection>
-      <windForceMean>0.7</windForceMean>
-      <windGustDirection>0 0 0</windGustDirection>
-      <windGustDuration>0</windGustDuration>
-      <windGustStart>0</windGustStart>
-      <windGustForceMean>0</windGustForceMean>
-    </plugin>
-    -->
-    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
-        <robotNamespace></robotNamespace>
-        <gpsNoise>true</gpsNoise>
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>20</pubRate>
+      <pubRate>100</pubRate>
       <noiseDensity>0.0004</noiseDensity>
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
@@ -1017,13 +1048,16 @@
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>10</pubRate>
+      <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
+    </plugin>
+    <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+      <robotNamespace/>
+      <linkName>tiltrotor/airspeed_link</linkName>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <gpsSubTopic>/gps</gpsSubTopic>
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
@@ -1079,74 +1113,78 @@
         </channel>
         <channel name="motor0_tilt">
           <input_index>4</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_0_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor1_tilt">
           <input_index>5</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_1_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor2_tilt">
           <input_index>6</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_2_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="motor3_tilt">
           <input_index>7</input_index>
-          <input_offset>0</input_offset>
-          <input_scaling>1.5</input_scaling>
+          <input_offset>0.785398</input_offset>
+          <input_scaling>0.785398</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_3_joint</joint_name>
            <joint_control_pid>
-            <p>100</p>
+            <p>10</p>
             <i>0</i>
             <d>0</d>
             <iMax>0.0</iMax>
             <iMin>0.0</iMin>
             <cmdMax>2</cmdMax>
             <cmdMin>-2</cmdMin>
+            <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
         <channel name="left_elevon">

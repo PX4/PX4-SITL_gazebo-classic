@@ -1,0 +1,21 @@
+name: Validate SDF
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  validate-sdf:
+    runs-on: ubuntu-latest
+    container: px4io/px4-dev-simulation-bionic:2020-08-14
+    steps:
+    - uses: actions/checkout@v1
+    - name: submodule update
+      run: git submodule update --init --recursive
+    - name: Validate SDF
+      shell: bash
+      run: source scripts/validate_sdf.bash

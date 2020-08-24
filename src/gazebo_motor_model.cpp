@@ -33,7 +33,8 @@ void GazeboMotorModel::InitializeParams() {}
 
 void GazeboMotorModel::Publish() {
   turning_velocity_msg_.set_data(joint_->GetVelocity(0));
-  motor_velocity_pub_->Publish(turning_velocity_msg_);
+  // FIXME: Commented out to prevent warnings about queue limit reached.
+  // motor_velocity_pub_->Publish(turning_velocity_msg_);
 }
 
 void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
@@ -116,6 +117,10 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   else
     gzerr << "[gazebo_motor_model] Please specify a turning direction ('cw' or 'ccw').\n";
 
+  if(_sdf->HasElement("reversible")) {
+    reversible_ = _sdf->GetElement("reversible")->Get<bool>();
+  }
+
   getSdfParam<std::string>(_sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
   getSdfParam<std::string>(_sdf, "motorSpeedPubTopic", motor_speed_pub_topic_,
                            motor_speed_pub_topic_);
@@ -147,7 +152,9 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
   //std::cout << "[gazebo_motor_model]: Subscribe to gz topic: "<< motor_failure_sub_topic_ << std::endl;
   motor_failure_sub_ = node_handle_->Subscribe<msgs::Int>(motor_failure_sub_topic_, &GazeboMotorModel::MotorFailureCallback, this);
-  motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>("~/" + model_->GetName() + motor_speed_pub_topic_, 1);
+  // FIXME: Commented out to prevent warnings about queue limit reached.
+  //motor_velocity_pub_ = node_handle_->Advertise<std_msgs::msgs::Float>("~/" + model_->GetName() + motor_speed_pub_topic_, 1);
+  wind_sub_ = node_handle_->Subscribe("~/" + wind_sub_topic_, &GazeboMotorModel::WindVelocityCallback, this);
 
   // Create the first order filter.
   rotor_velocity_filter_.reset(new FirstOrderFilter<double>(time_constant_up_, time_constant_down_, ref_motor_rot_vel_));
@@ -191,7 +198,11 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
     gzerr << "Aliasing on motor [" << motor_number_ << "] might occur. Consider making smaller simulation time steps or raising the rotor_velocity_slowdown_sim_ param.\n";
   }
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
-  double force = real_motor_velocity * real_motor_velocity * motor_constant_;
+  double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
+  if(!reversible_) {
+    // Not allowed to have negative thrust.
+    force = std::abs(force);
+  }
 
   // scale down force linearly with forward speed
   // XXX this has to be modelled better
@@ -216,8 +227,8 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #else
   ignition::math::Vector3d joint_axis = ignitionFromGazeboMath(joint_->GetGlobalAxis(0));
 #endif
-  //ignition::math::Vector3d body_velocity = link_->WorldLinearVel();
-  ignition::math::Vector3d body_velocity_perpendicular = body_velocity - (body_velocity * joint_axis) * joint_axis;
+  ignition::math::Vector3d relative_wind_velocity = body_velocity - wind_vel_;
+  ignition::math::Vector3d body_velocity_perpendicular = relative_wind_velocity - (relative_wind_velocity.Dot(joint_axis)) * joint_axis;
   ignition::math::Vector3d air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * body_velocity_perpendicular;
   // Apply air_drag to link.
   link_->AddForce(air_drag);
@@ -286,6 +297,12 @@ void GazeboMotorModel::UpdateMotorFail() {
        screen_msg_flag = 1;
      }
   }
+}
+
+void GazeboMotorModel::WindVelocityCallback(WindPtr& msg) {
+  wind_vel_ = ignition::math::Vector3d(msg->velocity().x(),
+            msg->velocity().y(),
+            msg->velocity().z());
 }
 
 GZ_REGISTER_MODEL_PLUGIN(GazeboMotorModel);

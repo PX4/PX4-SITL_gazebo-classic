@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-from __future__ import print_function
+
 import jinja2
 import argparse
 import os
@@ -25,9 +25,7 @@ if __name__ == "__main__":
 
     d = {'np': np, 'rospack': rospack}
     result = template.render(d)
-    filename_out = args.filename.replace('.sdf.jinja','-gen.sdf')
+    filename_out = args.filename.replace('.sdf.jinja', '-gen.sdf')
     with open(filename_out, 'w') as f_out:
-        print('{:s} -> {:s}'.format(args.filename, filename_out))
+        print(('{:s} -> {:s}'.format(args.filename, filename_out)))
         f_out.write(result)
-
-

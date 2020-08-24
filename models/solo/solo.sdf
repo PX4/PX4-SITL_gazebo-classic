@@ -350,6 +350,15 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0.1 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>base_link</linkName>
@@ -423,13 +432,12 @@
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
-        <robotNamespace></robotNamespace>
-        <gpsNoise>true</gpsNoise>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>20</pubRate>
+      <pubRate>100</pubRate>
       <noiseDensity>0.0004</noiseDensity>
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
@@ -437,7 +445,7 @@
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>10</pubRate>
+      <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>

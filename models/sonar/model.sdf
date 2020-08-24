@@ -28,7 +28,7 @@
         </material>
       </visual>
       <sensor name="sonar" type="sonar">
-        <pose>0 0 0 0 -1.57 0</pose>
+        <pose>0 0 0 0 1.57 0</pose>
         <sonar>
           <min>0.02</min>
           <max>5.0</max>

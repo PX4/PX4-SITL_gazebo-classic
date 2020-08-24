@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="gps">
+    <link name="link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.002</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor name="gps" type="gps">
+        <pose>0 0 0 0 0 0</pose>
+        <update_rate>5.0</update_rate>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <!-- GpsSensor noise currently not used -->
+        <!-- <gps>
+          <position_sensing>
+            <horizontal>
+              <noise type="gaussian_quantized">
+                <mean>0</mean>
+                <stddev>1</stddev>
+                <bias_mean>3</bias_mean>
+                <bias_stddev>1</bias_stddev>
+                <precision>0.5</precision>
+              </noise>
+            </horizontal>
+            <vertical>
+              <noise type="gaussian_quantized">
+                <mean>0</mean>
+                <stddev>1</stddev>
+                <bias_mean>3</bias_mean>
+                <bias_stddev>1</bias_stddev>
+                <precision>1.0</precision>
+              </noise>
+            </vertical>
+          </position_sensing>
+          <velocity_sensing>
+            <horizontal>
+              <noise type="gaussian_quantized">
+                <mean>0</mean>
+                <stddev>0.1</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.1</bias_stddev>
+                <precision>0.1</precision>
+              </noise>
+            </horizontal>
+            <vertical>
+              <noise type="gaussian_quantized">
+                <mean>0</mean>
+                <stddev>0.2</stddev>
+                <bias_mean>0.2</bias_mean>
+                <bias_stddev>0.2</bias_stddev>
+                <precision>0.2</precision>
+              </noise>
+            </vertical>
+          </velocity_sensing>
+        </gps> -->
+        <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+          <robotNamespace></robotNamespace>
+          <gpsNoise>true</gpsNoise>
+          <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
+          <gpsZRandomWalk>4.0</gpsZRandomWalk>
+          <gpsXYNoiseDensity>2.0e-4</gpsXYNoiseDensity>
+          <gpsZNoiseDensity>4.0e-4</gpsZNoiseDensity>
+          <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
+          <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+        </plugin>
+      </sensor>
+    </link>
+  </model>
+</sdf>

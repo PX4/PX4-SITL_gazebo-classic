@@ -99,7 +99,7 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   this->pitchCommand = 0.5* M_PI;
   this->rollCommand = 0;
   this->yawCommand = 0;
-  this->lastImuYaw = 0;
+  this->vehicleYaw = 0;
   this->rDir = kRollDir;
   this->pDir = kPitchDir;
   this->yDir = kYawDir;
@@ -332,7 +332,7 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
   }
 #if GAZEBO_MAJOR_VERSION >= 7
   this->cameraImuSensor = std::static_pointer_cast<sensors::ImuSensor>(
-    sensors::SensorManager::Instance()->GetSensor(cameraImuSensorName));
+    sensors::SensorManager::Instance()->GetSensor(_model->SensorScopedName(cameraImuSensorName)[0]));
 #elif GAZEBO_MAJOR_VERSION >= 6
   this->cameraImuSensor = boost::static_pointer_cast<sensors::ImuSensor>(
     sensors::SensorManager::Instance()->GetSensor(cameraImuSensorName));
@@ -390,28 +390,30 @@ void GimbalControllerPlugin::Init()
 
   // publish yaw status via gz transport
   yawTopic = std::string("~/") +  this->model->GetName()
-    + "/gimbal_yaw_status";	
-  // Although gazebo above 7.4 support Any, still use GzString instead	
+    + "/gimbal_yaw_status";
+  // Although gazebo above 7.4 support Any, still use GzString instead
   this->yawPub = node->Advertise<gazebo::msgs::GzString>(yawTopic);
 
-  imuSub = node->Subscribe("~/" + model->GetName() + "/imu", &GimbalControllerPlugin::ImuCallback, this);
+  imuSub = node->Subscribe("~/" + model->GetName() + "/groundtruth", &GimbalControllerPlugin::GroundTruthCallback, this);
 
   gzmsg << "GimbalControllerPlugin::Init" << std::endl;
 }
 
-void GimbalControllerPlugin::ImuCallback(ImuPtr& imu_message)
+void GimbalControllerPlugin::GroundTruthCallback(GtPtr& msg)
 {
-  this->lastImuYaw = ignition::math::Quaterniond(imu_message->orientation().w(),
-						 imu_message->orientation().x(),
-						 imu_message->orientation().y(),
-						 imu_message->orientation().z()).Euler()[2];
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
+  this->vehicleYaw = ignition::math::Quaterniond(msg->attitude_q_w(),
+						 msg->attitude_q_x(),
+						 msg->attitude_q_y(),
+						 msg->attitude_q_z()).Euler()[2];
 }
 
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
 /// only gazebo 7.4 and above support Any
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "pitch command received " << _msg->double_value() << std::endl;
   this->pitchCommand = _msg->double_value();
 }
@@ -419,6 +421,7 @@ void GimbalControllerPlugin::OnPitchStringMsg(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "roll command received " << _msg->double_value() << std::endl;
   this->rollCommand = _msg->double_value();
 }
@@ -426,6 +429,7 @@ void GimbalControllerPlugin::OnRollStringMsg(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "yaw command received " << _msg->double_value() << std::endl;
   this->yawCommand = _msg->double_value();
 }
@@ -433,6 +437,7 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "pitch command received " << _msg->data() << std::endl;
   this->pitchCommand = atof(_msg->data().c_str());
 }
@@ -440,6 +445,7 @@ void GimbalControllerPlugin::OnPitchStringMsg(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "roll command received " << _msg->data() << std::endl;
   this->rollCommand = atof(_msg->data().c_str());
 }
@@ -447,6 +453,7 @@ void GimbalControllerPlugin::OnRollStringMsg(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
 //  gzdbg << "yaw command received " << _msg->data() << std::endl;
   this->yawCommand = atof(_msg->data().c_str());
 }
@@ -455,6 +462,8 @@ void GimbalControllerPlugin::OnYawStringMsg(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void GimbalControllerPlugin::OnUpdate()
 {
+  const std::lock_guard<std::mutex> lock(cmd_mutex);
+
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;
 
@@ -474,7 +483,7 @@ void GimbalControllerPlugin::OnUpdate()
     double dt = (time - this->lastUpdateTime).Double();
 
     // We want yaw to control in body frame, not in global.
-    this->yawCommand += this->lastImuYaw;
+    double yaw_command = this->yawCommand + this->vehicleYaw;
 
     // truncate command inside joint angle limits
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -484,7 +493,7 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchLimited = ignition::math::clamp(this->pitchCommand,
       pDir*this->pitchJoint->UpperLimit(0),
       pDir*this->pitchJoint->LowerLimit(0));
-    double yawLimited = ignition::math::clamp(this->yawCommand,
+    double yawLimited = ignition::math::clamp(yaw_command,
       yDir*this->yawJoint->LowerLimit(0),
 	  yDir*this->yawJoint->UpperLimit(0));
 #else
@@ -494,7 +503,7 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchLimited = ignition::math::clamp(this->pitchCommand,
       pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
       pDir*this->pitchJoint->GetLowerLimit(0).Radian());
-    double yawLimited = ignition::math::clamp(this->yawCommand,
+    double yawLimited = ignition::math::clamp(yaw_command,
       yDir*this->yawJoint->GetLowerLimit(0).Radian(),
 	  yDir*this->yawJoint->GetUpperLimit(0).Radian());
 #endif
@@ -642,8 +651,8 @@ void GimbalControllerPlugin::OnUpdate()
 
     ss << this->yawJoint->GetAngle(0).Radian();
     m.set_data(ss.str());
-    this->yawPub->Publish(m);	  
-#endif	  
+    this->yawPub->Publish(m);
+#endif
   }
 }
 

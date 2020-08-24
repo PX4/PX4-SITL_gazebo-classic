@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
@@ -32,7 +33,7 @@
 #include <gazebo/sensors/sensors.hh>
 #include <ignition/math.hh>
 
-#include "Imu.pb.h"
+#include "Groundtruth.pb.h"
 
 namespace gazebo
 {
@@ -66,7 +67,7 @@ namespace gazebo
   static double kPitchDir = -1.0;
   static double kYawDir = 1.0;
 
-  typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
+  typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
   class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
   {
@@ -79,9 +80,9 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: void ImuCallback(ImuPtr& imu_message);
+    private: void GroundTruthCallback(GtPtr& imu_message);
 
-#if GAZEBO_MAJOR_VERSION >= 7 && GAZEBO_MINOR_VERSION >= 4
+#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
     /// only gazebo 7.4 and above support Any
     private: void OnPitchStringMsg(ConstAnyPtr &_msg);
     private: void OnRollStringMsg(ConstAnyPtr &_msg);
@@ -91,6 +92,7 @@ namespace gazebo
     private: void OnRollStringMsg(ConstGzStringPtr &_msg);
     private: void OnYawStringMsg(ConstGzStringPtr &_msg);
 #endif
+    private: std::mutex cmd_mutex;
 
     private: sdf::ElementPtr sdf;
 
@@ -117,7 +119,7 @@ namespace gazebo
     private: physics::JointPtr pitchJoint;
 
     private: sensors::ImuSensorPtr cameraImuSensor;
-    private: double lastImuYaw;
+    private: double vehicleYaw;
 
     private: std::string status;
 

@@ -65,7 +65,7 @@
 namespace gazebo {
 
 static constexpr auto kDefaultMagnetometerTopic = "mag";
-static constexpr auto kDefaultPubRate = 20.0; // [Hz]
+static constexpr auto kDefaultPubRate = 100.0; // [Hz]. Note: corresponds to most of the mag devices supported in PX4
 
 // Default values for use with ADIS16448 IMU
 static constexpr auto kDefaultNoiseDensity = 0.4*1e-3; // [gauss / sqrt(hz)]

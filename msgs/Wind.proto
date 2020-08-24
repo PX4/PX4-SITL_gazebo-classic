@@ -6,5 +6,5 @@ message Wind
 {
   required string frame_id = 1;
   required int64 time_usec = 2;
-  required gazebo.msgs.Vector3d force = 3;
+  required gazebo.msgs.Vector3d velocity = 3;
 }

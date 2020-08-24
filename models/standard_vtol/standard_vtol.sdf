@@ -177,6 +177,39 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+    <link name='standard_vtol/airspeed_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='standard_vtol/airspeed_joint' type='revolute'>
+      <child>standard_vtol/airspeed_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
     <link name='rotor_0'>
       <pose>0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
@@ -679,11 +712,20 @@
         </ode>
       </physics>
     </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -698,12 +740,14 @@
         left_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -718,12 +762,14 @@
         right_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -738,12 +784,14 @@
         elevator_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-12.0</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>-1.8</cma>
+      <cma>0.0.</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -754,6 +802,8 @@
       <forward>1 0 0</forward>
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -763,11 +813,11 @@
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>1500</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
+      <motorConstant>2e-05</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>0</motorNumber>
-      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -780,11 +830,11 @@
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>1500</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
+      <motorConstant>2e-05</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>1</motorNumber>
-      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -797,11 +847,11 @@
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>1500</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
+      <motorConstant>2e-05</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>2</motorNumber>
-      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -814,11 +864,11 @@
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>1500</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
+      <motorConstant>2e-05</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>3</motorNumber>
-      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -835,7 +885,7 @@
       <momentConstant>0.01</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>4</motorNumber>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -853,27 +903,12 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
-    <!--
-    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
-      <frameId>base_link</frameId>
-      <linkName>base_link</linkName>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
-      <xyzOffset>1 0 0</xyzOffset>
-      <windDirection>0 1 0</windDirection>
-      <windForceMean>0.7</windForceMean>
-      <windGustDirection>0 0 0</windGustDirection>
-      <windGustDuration>0</windGustDuration>
-      <windGustStart>0</windGustStart>
-      <windGustForceMean>0</windGustForceMean>
-    </plugin>
-    -->
-    <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
-        <robotNamespace></robotNamespace>
-        <gpsNoise>true</gpsNoise>
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>20</pubRate>
+      <pubRate>100</pubRate>
       <noiseDensity>0.0004</noiseDensity>
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
@@ -881,13 +916,16 @@
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>10</pubRate>
+      <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
+    </plugin>
+    <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+      <robotNamespace/>
+      <linkName>standard_vtol/airspeed_link</linkName>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <gpsSubTopic>/gps</gpsSubTopic>
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>

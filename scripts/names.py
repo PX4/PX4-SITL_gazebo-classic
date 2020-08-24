@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Library for manipulating ROS Names. See U{http://ros.org/wiki/Names}.
+"""
+
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2008, Willow Garage, Inc.
@@ -32,35 +37,15 @@
 #
 # Revision $Id: names.py 14589 2011-08-07 18:30:21Z kwc $
 
-"""
-Library for manipulating ROS Names. See U{http://ros.org/wiki/Names}.
-"""
 
 import os
 import sys
-
-#TODO: why are these here?
-MSG_EXT = '.msg'
-SRV_EXT = '.srv'
 
 SEP = '/'
 GLOBALNS = '/'
 PRIV_NAME = '~'
 REMAP = ":="
 ANYTYPE = '*'
-
-if sys.hexversion > 0x03000000: #Python3
-    def isstring(s):
-        return isinstance(s, str) #Python 3.x
-else:
-    def isstring(s):
-        """
-        Small helper version to check an object is a string in a way that works
-        for both Python 2 and 3
-        """
-        return isinstance(s, basestring) #Python 2.x
-
-
 
 def load_mappings(argv):
     """
@@ -69,9 +54,9 @@ def load_mappings(argv):
 
     @param argv: command-line arguments
     @type  argv: [str]
-    @return: name->name remappings. 
+    @return: name->name remappings.
     @rtype: dict {str: str}
-    """    
+    """
     mappings = {}
     for arg in argv:
         if REMAP in arg:
@@ -80,13 +65,13 @@ def load_mappings(argv):
                 if src and dst:
 
                     if len(src) > 1 and src[0] == '_' and src[1] != '_':
-                        #ignore parameter assignment mappings
+                        # ignore parameter assignment mappings
                         pass
                     else:
                         mappings[src] = dst
-            except:
+            except BaseException:
                 #TODO: remove
-                sys.stderr.write("ERROR: Invalid remapping argument '%s'\n"%arg)
+                sys.stderr.write(
+                    "ERROR: Invalid remapping argument '%s'\n" %
+                    arg)
     return mappings
-
-

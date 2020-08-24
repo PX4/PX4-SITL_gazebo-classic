@@ -19,11 +19,14 @@
 
 #include <string>
 #include <vector>
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include <ignition/math.hh>
+
+#include "Wind.pb.h"
 
 namespace gazebo
 {
@@ -69,7 +72,7 @@ namespace gazebo
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     protected: double cma;
 
-    /// \brief angle of attach when airfoil stalls
+    /// \brief angle of attack when airfoil stalls
     protected: double alphaStall;
 
     /// \brief Cl-alpha rate after stall
@@ -80,6 +83,9 @@ namespace gazebo
 
     /// \brief Cm-alpha rate after stall
     protected: double cmaStall;
+
+    /// \breif Coefficient of Moment / control surface deflection angle slope
+    protected: double cm_delta;
 
     /// \brief: \TODO: make a stall velocity curve
     protected: double velocityStall;
@@ -119,9 +125,6 @@ namespace gazebo
     /// is considered flow in the wing sweep direction.
     protected: ignition::math::Vector3d upward;
 
-    /// \brief Smoothed velocity
-    protected: ignition::math::Vector3d velSmooth;
-
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
 
@@ -135,6 +138,14 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
+
+    private: void WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg);
+
+    private: transport::NodePtr node_handle_;
+    private: transport::SubscriberPtr wind_sub_;
+    private: std::string namespace_;
+    private: std::string wind_sub_topic_ = "world_wind";
+    private: ignition::math::Vector3d wind_vel_;
   };
 }
 #endif

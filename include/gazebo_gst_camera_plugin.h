@@ -35,7 +35,7 @@ namespace gazebo
 /**
  * @class GstCameraPlugin
  * A Gazebo plugin that can be attached to a camera and then streams the video data using gstreamer.
- * It streams to a configurable UDP port, default is 5600.
+ * It streams to a configurable UDP IP and UDP Port, defaults are respectively 127.0.0.1 and 5600.
  *
  * Connect to the stream via command line with:
  * gst-launch-1.0  -v udpsrc port=5600 caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' \
@@ -65,6 +65,7 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
   float rate;
   protected: std::string format;
 
+  protected: std::string udpHost;
   protected: int udpPort;
 
   protected: sensors::CameraSensorPtr parentSensor;

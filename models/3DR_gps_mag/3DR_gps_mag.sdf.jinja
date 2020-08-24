@@ -46,7 +46,7 @@
         {{ box(l, w, h)|indent(8) }}
       </collision>
 
-      <sensor name="ublox-neo-7" type="gps">
+      <sensor name="ublox-neo-7M" type="gps">
         <pose>0 0 0 0 0 0</pose>
         <update_rate>10.0</update_rate>
         <always_on>true</always_on>
@@ -92,6 +92,16 @@
             </vertical>
           </velocity_sensing>
         </gps>
+        <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+          <robotNamespace></robotNamespace>
+          <gpsNoise>true</gpsNoise>
+          <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
+          <gpsZRandomWalk>4.0</gpsZRandomWalk>
+          <gpsXYNoiseDensity>2.0e-4</gpsXYNoiseDensity>
+          <gpsZNoiseDensity>4.0e-4</gpsZNoiseDensity>
+          <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
+          <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+        </plugin>
       </sensor>
 
       <sensor name="HMC5883L" type="magnetometer">
