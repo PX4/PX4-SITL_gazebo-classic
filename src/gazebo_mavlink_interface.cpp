@@ -257,6 +257,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
             std::string joint_name = channel->Get<std::string>("joint_name");
             joints_[index] = model_->GetJoint(joint_name);
           }
+          if (channel->HasElement("link_name"))
+          {
+            link_names.push_back(channel->Get<std::string>("link_name"));
+          }
+          else
+          {
+            link_names.push_back("none");
+          }
 
           // setup joint control pid to control joint
           if (channel->HasElement("joint_control_pid"))
@@ -1173,7 +1181,13 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         if(joint_max_errors_[i]!=0.) {
           err = std::max(std::min(err, joint_max_errors_[i]), -joint_max_errors_[i]);
         }
+        /* ORIGINAL
         double force = pids_[i].Update(err, _dt);
+        joints_[i]->SetForce(0, force);
+        */
+        double ourKp = -20000;
+        double ourOffset = -18;
+        double force = err*ourKp + ourOffset;
         joints_[i]->SetForce(0, force);
       }
       else if (joint_control_type_[i] == "position_gztopic")
@@ -1201,6 +1215,53 @@ void GazeboMavlinkInterface::handle_control(double _dt)
      #else
         joints_[i]->SetAngle(0, input_reference_[i]);
      #endif
+      }
+      else if (joint_control_type_[i] == "force")
+      {
+      	std::string lander_name = "lander";
+        std::string path = lander_name + "::" + link_names[i];
+        if ((link_names[i] == "thruster_1") && (target > 0))
+        {
+          //std::cout << "YAW_PO: " << target << "  ";
+          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
+          const ignition::math::v4::Vector3<double>& force = {0, target, 0};
+          link->AddLinkForce(force);
+        }
+        else if ((link_names[i] == "thruster_3") && (target > 0))
+        {
+          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
+          //std::cout << "YAW_SB: " << target << "  ";
+          const ignition::math::v4::Vector3<double>& force = {0, -target, 0};
+          link->AddLinkForce(force);
+        }
+        else if ((link_names[i] == "thruster_4") && (target < 0))
+        {
+          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
+          //std::cout << "YAW_BO: " << target << "  ";
+          const ignition::math::v4::Vector3<double>& force = {target, 0, 0};
+          link->AddLinkForce(force);
+          //counter++;
+        }
+        else if ((link_names[i] == "thruster_2") && (target < 0))
+        {
+          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
+          //std::cout << "YAW_AF: " << target << "\n";
+          const ignition::math::v4::Vector3<double>& force = {-target, 0, 0};
+          link->AddLinkForce(force);
+        }
+        else if (link_names[i] == "gimbal_ring_inner")
+        {
+          //std::cout << "Thrust: " << target << "\n";
+          if (target < 0)
+          {
+            target = 0;
+          }
+          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
+          //std::cout << "Thrust: " << target << "\n";
+          const ignition::math::v4::Vector3<double>& force = {0, 0, -target};
+          //link->AddRelativeForce(force);
+          link->AddLinkForce(force);
+        }
       }
       else
       {

@@ -140,6 +140,10 @@ protected:
   void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
 private:
+  // Additional Variables -----------------------------------------------------
+  std::vector<std::string> link_names;
+  // --------------------------------------------------------------------------
+
   bool received_first_actuator_;
   Eigen::VectorXd input_reference_;
 
