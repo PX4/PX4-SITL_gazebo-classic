@@ -1471,7 +1471,7 @@
       <robotNamespace/>
       <linkName>lander/airspeed_link</linkName>
     </plugin>
-    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_custom_mavlink_interface.so'>
       <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
       <magSubTopic>/mag</magSubTopic>
