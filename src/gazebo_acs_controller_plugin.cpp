@@ -17,7 +17,7 @@
 
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo_acs_controller_plugin.hh>
+#include <gazebo_acs_controller_plugin.h>
 
 
 using namespace gazebo;
@@ -662,7 +662,7 @@ void GimbalControllerPlugin::OnUpdate()
     }
 
     // apply forces to move gimbal
-    
+
     /*std::string path = "lander::acs_roll_sb";
     gazebo::physics::LinkPtr link = this->model->GetChildLink(path);
     const ignition::math::Vector3<double>& force = {0, 0, 0};
@@ -670,7 +670,7 @@ void GimbalControllerPlugin::OnUpdate()
     */
     //#TODO
     //std::cout<< "con_roll.u[0]:" << con_roll.u[0] << std::endl;
-    
+
     /* #TODO
     if(yawTarget > 0){
         acs_cw[0].force = acs_cw[1].force;
@@ -678,7 +678,7 @@ void GimbalControllerPlugin::OnUpdate()
         acs_cw[0].link->AddRelativeForce(acs_cw[0].force);
         acs_cw[1].link->AddRelativeForce(acs_cw[1].force);
     }
-    
+
     if(yawTarget < 0){
         acs_ccw[0].force = acs_ccw[1].force;
         acs_ccw[0].link = acs_ccw[1].link;
@@ -695,17 +695,17 @@ void GimbalControllerPlugin::OnUpdate()
     /*
     path = "lander::acs_roll_po";
     link = this->model->GetChildLink(path);
-    link->AddRelativeForce(force);    
-    
+    link->AddRelativeForce(force);
+
 
     path = "lander::acs_pitch_bo";
     link = this->model->GetChildLink(path);
-    link->AddRelativeForce(force);    
-    
+    link->AddRelativeForce(force);
+
     path = "lander::acs_pitch_st";
     link = this->model->GetChildLink(path);
-    link->AddRelativeForce(force);    
-    */ 
+    link->AddRelativeForce(force);
+    */
 
     double pitchForce = this->pitchPid.Update(pitchError, dt);
     this->pitchJoint->SetForce(0, pDir*pitchForce);

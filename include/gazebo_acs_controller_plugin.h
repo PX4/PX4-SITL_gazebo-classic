@@ -34,7 +34,7 @@
 #include <ignition/math.hh>
 
 #include "Groundtruth.pb.h"
-#include "PID.cpp"
+#include "PID.h"
 #include <time.h>
 #include <iostream>
 
@@ -140,7 +140,7 @@ namespace gazebo
     private: common::PID rollPid;
     private: common::PID yawPid;
     private: common::Time lastUpdateTime;
-    
+
     private: double thisVariableIsNotUsed = 0;
   };
   class actuator{
