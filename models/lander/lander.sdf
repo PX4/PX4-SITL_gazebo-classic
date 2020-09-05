@@ -508,56 +508,6 @@
         </geometry>
       </visual>
     </link>
-    <link name='cgo3_horizontal_arm_link'>
-      <inertial>
-        <pose>-0.041 0 -0.081 0 -0 0</pose>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0.001</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.001</iyy>
-          <iyz>0</iyz>
-          <izz>0.001</izz>
-        </inertia>
-      </inertial>
-      <self_collide>0</self_collide>
-      <pose>0 0 0 0 -0 0</pose>
-      <visual name='cgo3_horizontal_arm_visual'>
-        <pose>-0.05 0 0 0 -0 3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>model://typhoon_h480/meshes/cgo3_horizontal_arm_remeshed_v1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='cgo3_vertical_arm_link'>
-      <inertial>
-        <pose>-0.041 0 -0.162 0 -0 0</pose>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0.001</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.001</iyy>
-          <iyz>0</iyz>
-          <izz>0.001</izz>
-        </inertia>
-      </inertial>
-      <self_collide>0</self_collide>
-      <pose>0 0 0 0 -0 0</pose>
-      <visual name='cgo3_vertical_arm_visual'>
-        <pose>-0.051 0 0 0 -0 3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>model://typhoon_h480/meshes/cgo3_vertical_arm_remeshed_v1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
     <link name='gimbal_actuator_mount_1'>
       <self_collide>0</self_collide>
       <inertial>
@@ -1245,72 +1195,6 @@
         </ode>
       </physics>
     </joint>
-    <joint name='cgo3_horizontal_arm_joint' type='revolute'>
-      <parent>cgo3_vertical_arm_link</parent>
-      <child>cgo3_horizontal_arm_link</child>
-      <pose>-0.07 0 -0.162 0 -0 0</pose>
-      <axis>
-        <xyz>-1 0 0</xyz>
-        <use_parent_model_frame>1</use_parent_model_frame>
-        <limit>
-          <lower>-0.785398</lower>
-          <upper>0.785398</upper>
-          <effort>100</effort>
-          <velocity>-1</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-          <damping>0.1</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='cgo3_vertical_arm_joint' type='revolute'>
-      <parent>base</parent>
-      <child>cgo3_vertical_arm_link</child>
-      <pose>-0.026 0 -0.1 0 -0 0</pose>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <use_parent_model_frame>1</use_parent_model_frame>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-          <effort>100</effort>
-          <velocity>-1</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-          <damping>0.1</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
     <joint name='gimbal_mid_rotate_1__gimbal_ring_inner__fixed' type='fixed'>
       <parent>gimbal_mid_rotate_1</parent>
       <child>gimbal_ring_inner</child>
@@ -1682,9 +1566,9 @@
       </control_channels>
     </plugin>
     <plugin name='acs_controller' filename='libgazebo_acs_controller_plugin.so'>
-      <joint_yaw>lander::cgo3_vertical_arm_joint</joint_yaw>
-      <joint_roll>lander::cgo3_horizontal_arm_joint</joint_roll>
-      <joint_pitch>lander::cgo3_camera_joint</joint_pitch>
+      <joint_yaw></joint_yaw>
+      <joint_roll></joint_roll>
+      <joint_pitch></joint_pitch>
       <control_acs_channels>
         <channel>
           <joint_control_pid>
