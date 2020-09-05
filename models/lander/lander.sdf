@@ -37,15 +37,6 @@
           </mesh>
         </geometry>
       </visual>
-      <visual name='base_fixed_joint_lump__thruster_mounts_visual_33'>
-        <pose>-0.305168 0.085427 -0.029918 0 1.48353 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_mounts.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
       <visual name='base_fixed_joint_lump__thruster_mount_2_visual_37'>
         <pose>-0.029918 0.085427 0.305168 3.14159 0.087266 -3.14159</pose>
         <geometry>
@@ -79,15 +70,6 @@
           <mesh>
             <scale>1 1 1</scale>
             <uri>model://lander/meshes/thruster_mount_3.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__leg_hinges_visual_3'>
-        <pose>-0.280851 0.168818 -0.34538 -2.33892 0.432187 -1.95529</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_hinges.STL</uri>
           </mesh>
         </geometry>
       </visual>
