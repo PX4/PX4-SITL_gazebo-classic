@@ -621,6 +621,10 @@
       <forward>1 0 0</forward>
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
+      <control_joint_name> 
+         rudder_joint 
+      </control_joint_name> 
+      <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
