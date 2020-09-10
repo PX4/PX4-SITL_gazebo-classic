@@ -1,9 +1,8 @@
 <?xml version='1.0'?>
-<sdf version='1.7'>
-  <model name='lander'>
+<sdf version='1.6'>
+  <model name='lander_0'>
     <link name='base'>
       <inertial>
-        <pose>0 0.128316 0 0 -0 0</pose>
         <mass>29.9608</mass>
         <inertia>
           <ixx>1.81006</ixx>
@@ -13,226 +12,1129 @@
           <iyz>0.010958</iyz>
           <izz>1.90705</izz>
         </inertia>
+        <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0 0 0.671419 1.5707 -0 0</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__platform_top_visual_1'>
-        <pose>0 0.188257 0 1.5708 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/platform_top.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__leg_4_visual_11'>
-        <pose>0.728719 -0.654999 -0.592568 -1.5708 -0.88808 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_4.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__thruster_mount_2_visual_37'>
-        <pose>-0.029918 0.085427 0.305168 3.14159 0.087266 -3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_mount_2.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__leg_hinge_2_visual_6'>
-        <pose>-0.34538 0.168818 0.280851 2.54136 -0.347555 -2.03252</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_hinge_2.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__thruster_mount_1_visual_34'>
-        <pose>-0.305168 0.085427 -0.029918 0 1.48353 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_mount_1.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__thruster_mount_3_visual_40'>
-        <pose>0.305168 0.085427 0.029918 3.14159 -1.48353 -3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_mount_3.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__leg_hinge_3_visual_8'>
-        <pose>0.280851 0.168818 0.34538 0 0.88808 3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_hinge_3.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__platform_bottom_visual_24'>
-        <pose>-4e-06 0 0 1.5708 -9e-06 3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/platform_bottom.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__thruster_2_visual_38'>
-        <pose>-0.057457 0.084082 0.612699 3.07472 0.056111 2.26793</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_2.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__thruster_1_visual_35'>
-        <pose>-0.029918 0.085427 0.305168 3.14159 0.087266 -3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_1.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
+      <pose frame=''>-0 -0 0.3 0 -0 0</pose>
       <visual name='base_fixed_joint_lump__leg_hinge_4_visual_10'>
-        <pose>0.34538 0.168818 -0.280851 0 -0.682716 3.14159</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_hinge_4.STL</uri>
+            <uri>model://lander/meshes/leg_hinge_4.stl</uri>
           </mesh>
         </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__thruster_4_visual_44'>
-        <pose>0.053633 0.081769 -0.612699 -0.0632 -0.043893 0.873767</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_4.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__supports_engine_visual_12'>
-        <pose>0.12146 0.082093 -0.098985 -2.25351 0 -1.5708</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/supports_engine.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__supports_bottom_visual_23'>
-        <pose>0.326361 0.017347 -0.25846 -1.5708 1.34659 3.14159</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/supports_bottom.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name='base_fixed_joint_lump__leg_hinge_1_visual_4'>
-        <pose>-0.280851 0.168818 -0.34538 3.14159 -0.88808 -0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_hinge_1.STL</uri>
-          </mesh>
-        </geometry>
+        <pose frame=''>-0.3125 -0.3125 0.015 0 0 -0.7854</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_4_visual_10_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
       <visual name='base_fixed_joint_lump__supports_top_visual_2'>
-        <pose>-0.303087 0.167319 0.232859 3.03891 -0 1.5708</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/supports_top.STL</uri>
+            <uri>model://lander/meshes/supports_top.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0.0175 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_top_visual_2_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
-      <visual name='base_fixed_joint_lump__thruster_3_visual_41'>
-        <pose>0.569869 0.114795 0.053513 -2.65015 0 -1.5708</pose>
+      <visual name='base_fixed_joint_lump__supports_engine_visual_12'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_3.STL</uri>
+            <uri>model://lander/meshes/supports_engine.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 -0.025 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_engine_visual_12_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__leg_hinge_1_visual_4'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/leg_hinge_1.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>-0.3125 0.3125 0.015 0 -0 0.7854</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_1_visual_4_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__thruster_1_visual_35'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/thruster_1.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>-0.385 0 -0.056 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_1_visual_35_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
       <visual name='base_fixed_joint_lump__supports_mid_visual_22'>
-        <pose>-0.258816 0.003758 -0.318283 -3.14141 -0 -1.5708</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/supports_mid.STL</uri>
+            <uri>model://lander/meshes/supports_mid.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 -0.0575 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_mid_visual_22_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
-      <visual name='base_fixed_joint_lump__leg_3_visual_9'>
-        <pose>0.325469 0.094775 0.400251 1.16791 0.145561 0.287573</pose>
+      <visual name='base_fixed_joint_lump__thruster_mount_1_visual_34'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_3.STL</uri>
+            <uri>model://lander/meshes/thruster_mount_1.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>-0.3 0 -0.065 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_1_visual_34_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
-      <visual name='base_fixed_joint_lump__leg_2_visual_7'>
-        <pose>-0.398311 0.099105 0.323892 2.0914 0.88808 3.14159</pose>
+      <visual name='base_fixed_joint_lump__thruster_mount_3_visual_40'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_2.STL</uri>
+            <uri>model://lander/meshes/thruster_mount_3.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0.3 0 -0.065 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_3_visual_40_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__thruster_4_visual_44'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/thruster_4.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0.385 -0.068 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_4_visual_44_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__leg_hinge_3_visual_8'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/leg_hinge_3.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0.3125 -0.3125 0.015 0 -0 0.7854</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_3_visual_8_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__thruster_3_visual_41'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/thruster_3.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0.385 0 -0.056 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_3_visual_41_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
       <visual name='base_fixed_joint_lump__thruster_mount_4_visual_43'>
-        <pose>0.029917 0.085427 -0.305171 -3.14159 -0.08727 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_mount_4.STL</uri>
+            <uri>model://lander/meshes/thruster_mount_4.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0.3 -0.065 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_4_visual_43_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
       <visual name='base_visual'>
-        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gas_tank.STL</uri>
+            <uri>model://lander/meshes/gas_tank.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0.09 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_visual_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
-      <visual name='base_fixed_joint_lump__leg_1_visual_5'>
-        <pose>-0.323892 0.099105 -0.398311 -1.05095 0.682716 0</pose>
+      <visual name='base_fixed_joint_lump__thruster_mount_2_visual_37'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/leg_1.STL</uri>
+            <uri>model://lander/meshes/thruster_mount_2.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 -0.3 -0.065 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_2_visual_37_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__platform_top_visual_1'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/platform_top.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0.034 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__platform_top_visual_1_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__leg_hinge_2_visual_6'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/leg_hinge_2.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0.3125 0.3125 0.015 0 0 -0.7854</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_2_visual_6_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__supports_bottom_visual_23'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/supports_bottom.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 -0.1325 -9.3e-05 9.3e-05 -1.57089</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_bottom_visual_23_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__platform_bottom_visual_24'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/platform_bottom.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 -0.145 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__platform_bottom_visual_24_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <visual name='base_fixed_joint_lump__thruster_2_visual_38'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/thruster_2.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 -0.385 -0.07 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_2_visual_38_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='actuator_1_inner'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.133874 -0.133918 0.119689 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__actuator_1_inner_visual_27'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_1_inner.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='actuator_1_mount_back'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.265 -0.265 0.146205 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__actuator_1_back_mount_visual_25'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_1_mount_back.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <emissive>0 0 0 1</emissive>
+          <script>
+            <name>ModelPreview_10::actuator_1_mount_back::base_fixed_joint_lump__actuator_1_back_mount_visual_25_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision_1'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/garrett/model_editor_models/lander/meshes/actuator_1_mount_back.stl</uri>
+            <scale>0.022668 0.022668 0.061913</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='actuator_1_mount_front'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.074 -0.074326 0.119514 0 -0 2.354</pose>
+      <visual name='base_fixed_joint_lump__actuator_1_mount_front_visual_28'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_1_mount_front.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='actuator_1_outer'>
+      <self_collide>1</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.200848 -0.200848 0.10934 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__actuator_1_outer_visual_26'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_1_outer.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <emissive>0 0 0 1</emissive>
+          <script>
+            <name>ModelPreview_10::actuator_1_outer::base_fixed_joint_lump__actuator_1_outer_visual_26_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
       <collision name='collision_0'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
-        <pose>0 -0.16 0 0 -0.11 0</pose>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>/home/garrett/model_editor_models/lander/meshes/actuator_1_outer.stl</uri>
+            <scale>0.213909 0.04 0.078104</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <link name='actuator_2_inner'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.120745 0.120746 0.117493 0 -0 0.7854</pose>
+      <visual name='base_fixed_joint_lump__actuator_2_inner_visual_31'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_2_inner.stl</uri>
+          </mesh>
+        </geometry>
+        <cast_shadows>1</cast_shadows>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+    <link name='actuator_2_mount_back'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.265 0.265 0.146522 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__actuator_2_mount_back_visual_29'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_2_mount_back.stl</uri>
+          </mesh>
+        </geometry>
+        <cast_shadows>1</cast_shadows>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+          <emissive>0 0 0 1</emissive>
+        </material>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+    <link name='actuator_2_mount_front'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.060611 0.060611 0.117573 0 -0 0.7854</pose>
+      <visual name='base_fixed_joint_lump__actuator_2_mount_front_visual_32'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_2_mount_front.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='actuator_2_outer'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.200785 0.200785 0.110529 0 -0 0.7854</pose>
+      <visual name='base_fixed_joint_lump__actuator_2_outer_visual_30'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/actuator_2_outer.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+          <emissive>0 0 0 1</emissive>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_actuator_mount_1'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.056078 0.056079 0.182666 0 -0 0.7854</pose>
+      <visual name='base_fixed_joint_lump__gimbal_actuator_mount_1_visual_17'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_actuator_mount_1.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_actuator_mount_2'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.065933 -0.061161 0.173778 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__gimbal_actuator_mount_2_visual_16'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_actuator_mount_2.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_mid_rotate_1'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.067948 0.067947 0.224251 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__gimbal_mid_rotate_1_visual_18'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_mid_rotate_1.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_mid_rotate_2'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>-0.067201 -0.067201 0.221949 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__gimbal_mid_rotate_2_visual_19'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_mid_rotate_2.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_outer_rotate_1'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0.101728 -0.101728 0.22545 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__gimbal_outer_rotate_1_visual_20'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_outer_rotate_1.stl</uri>
+          </mesh>
+        </geometry>
+        <cast_shadows>1</cast_shadows>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+      </visual>
+    </link>
+    <link name='gimbal_outer_rotate_2'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>-0.100497 0.100498 0.224114 0 0 -0.7854</pose>
+      <visual name='base_fixed_joint_lump__gimbal_outer_rotate_2_visual_21'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_outer_rotate_2.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_ring_inner'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>-0 0 0.22074 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__gimbal_inner_visual_15'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_inner.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_ring_mid'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0 -0 0.223638 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__gimbal_mid_visual_14'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_mid.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='gimbal_ring_outer'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>-0 -0 0.217348 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__gimbal_outer_visual_13'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/gimbal_outer.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'/>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+    <link name='leg_1'>
+      <self_collide>0</self_collide>
+      <inertial>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <inertia>
+          <ixx>1</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1</iyy>
+          <iyz>0</iyz>
+          <izz>1</izz>
+        </inertia>
+        <mass>1</mass>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <pose frame=''>-0.463 0.463 0.0015 0.5236 -0 0.7854</pose>
+      <gravity>1</gravity>
+      <visual name='base_fixed_joint_lump__leg_1_visual_5'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/leg_1.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <emissive>0 0 0 1</emissive>
+          <script>
+            <name>ModelPreview_14::leg_1::base_fixed_joint_lump__leg_1_visual_5_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+      <collision name='collision_1'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.08 0 -0 0</pose>
         <geometry>
           <box>
-            <size>1.4 1 1.4</size>
+            <size>0.0889 0.074097 0.960288</size>
           </box>
         </geometry>
         <surface>
@@ -282,10 +1184,10 @@
         </surface>
       </collision>
     </link>
-    <link name='actuator_1_inner'>
+    <link name='leg_2'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose frame=''>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -298,22 +1200,89 @@
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0.197868 0.158532 0.647145 1.6107 -0 -0.9075</pose>
+      <pose frame=''>0.463 0.463 0.0015 0.5236 -0 -0.7854</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_1_inner_visual_27'>
-        <pose>0 0 0 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__leg_2_visual_7'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_1_inner.STL</uri>
+            <uri>model://lander/meshes/leg_2.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <emissive>0 0 0 1</emissive>
+          <script>
+            <name>ModelPreview_20::leg_2::base_fixed_joint_lump__leg_2_visual_7_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
+      <collision name='collision_0'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.08 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0889 0.074097 0.960288</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
     </link>
-    <link name='actuator_1_mount_back'>
+    <link name='leg_3'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose frame=''>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -326,22 +1295,89 @@
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0.295975 0.23731 0.672044 -1.57089 3e-06 -2.45887</pose>
+      <pose frame=''>0.463 -0.463 0.0015 -0.5236 -0 0.7854</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_1_back_mount_visual_25'>
-        <pose>0 0 0 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__leg_3_visual_9'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_1_back_mount.STL</uri>
+            <uri>model://lander/meshes/leg_3.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <emissive>0 0 0 1</emissive>
+          <script>
+            <name>ModelPreview_20::leg_3::base_fixed_joint_lump__leg_3_visual_9_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
+      <collision name='collision_0'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.08 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.089004 0.074221 0.960287</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
     </link>
-    <link name='actuator_1_mount_front'>
+    <link name='leg_4'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose frame=''>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -354,22 +1390,88 @@
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0.073566 0.06101 0.641594 -0.062955 -1.52652 -0.82692</pose>
+      <pose frame=''>-0.463 -0.463 0.0015 -0.5236 -0 -0.7854</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_1_mount_front_visual_28'>
-        <pose>0 0 0 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__leg_4_visual_11'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_1_mount_front.STL</uri>
+            <uri>model://lander/meshes/leg_4.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <emissive>0 0 0 1</emissive>
+          <script>
+            <name>ModelPreview_20::leg_4::base_fixed_joint_lump__leg_4_visual_11_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
+      <collision name='collision_0'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>0 0 -0.08 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0889 0.074097 0.960287</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+            <torsional>
+              <coefficient>1</coefficient>
+              <patch_radius>0</patch_radius>
+              <surface_radius>0</surface_radius>
+              <use_patch_radius>1</use_patch_radius>
+              <ode>
+                <slip>0</slip>
+              </ode>
+            </torsional>
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
+        </surface>
+      </collision>
     </link>
-    <link name='actuator_1_outer'>
+    <link name='thruster_1'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -379,54 +1481,36 @@
           <izz>1</izz>
         </inertia>
         <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0.295975 0.23731 0.671425 -1.5707 -0.005 -2.47342</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_1_outer_visual_26'>
-        <pose>0 0 0 9e-06 -0 0</pose>
+      <pose frame=''>-0.512312 -0 0.280913 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__thruster_1_nozzle_visual_36'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_1_outer.STL</uri>
+            <uri>model://lander/meshes/thruster_1_nozzle.stl</uri>
           </mesh>
         </geometry>
-      </visual>
-    </link>
-    <link name='actuator_2_inner'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.157438 -0.19653 0.645807 1.5685 -0.000175 -2.45332</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_2_inner_visual_31'>
-        <pose>0 0 0 0 0 -6e-06</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_2_inner.STL</uri>
-          </mesh>
-        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_7::thruster_1::base_fixed_joint_lump__thruster_1_nozzle_visual_36_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
     </link>
-    <link name='actuator_2_mount_back'>
+    <link name='thruster_2'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -436,26 +1520,36 @@
           <izz>1</izz>
         </inertia>
         <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0.23794 -0.295259 0.666482 -1.5707 -0 -0.888071</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_2_mount_back_visual_29'>
-        <pose>0 0.001146 0 0 -0 9e-06</pose>
+      <pose frame=''>0 -0.51261 0.287097 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__thruster_2_nozzle_visual_39'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_2_mount_back.STL</uri>
+            <uri>model://lander/meshes/thruster_2_nozzle.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_7::thruster_2::base_fixed_joint_lump__thruster_2_nozzle_visual_39_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
     </link>
-    <link name='actuator_2_mount_front'>
+    <link name='thruster_3'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -465,194 +1559,36 @@
           <izz>1</izz>
         </inertia>
         <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>0.059976 -0.072921 0.647949 2.25549 1.5707 -0.211245</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_2_mount_front_visual_32'>
-        <pose>0 0 0 0 -0 0</pose>
+      <pose frame=''>0.512693 0 0.285137 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__thruster_3_nozzle_visual_42'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_2_mount_front.STL</uri>
+            <uri>model://lander/meshes/thruster_3_nozzle.stl</uri>
           </mesh>
         </geometry>
-      </visual>
-    </link>
-    <link name='actuator_2_outer'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.23794 -0.295259 0.666497 -1.57089 -0.027756 2.25394</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__actuator_2_outer_visual_30'>
-        <pose>0 0.001933 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/actuator_2_outer.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_actuator_mount_1'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.093948 0.014576 0.733439 1.5707 -0 -0.887281</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_actuator_mount_1_visual_17'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_actuator_mount_1.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_actuator_mount_2'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.08487 -0.043083 0.67958 1.5707 -0 0.682603</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_actuator_mount_2_visual_16'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_actuator_mount_2.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_mid_rotate_1'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>-0.087214 -0.07081 0.75266 1.5707 -0 2.24494</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_mid_rotate_1_visual_18'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_mid_rotate_1.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_mid_rotate_2'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.093207 0.075902 0.748775 1.5707 -0 2.2698</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_mid_rotate_2_visual_19'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_mid_rotate_2.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_outer_rotate_1'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.090401 -0.111172 0.750783 1.5707 0 0.682308</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_outer_rotate_1_visual_20'>
-        <pose>0 0 0 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_outer_rotate_1.STL</uri>
-          </mesh>
-        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_7::thruster_3::base_fixed_joint_lump__thruster_3_nozzle_visual_42_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
     </link>
-    <link name='gimbal_outer_rotate_2'>
+    <link name='thruster_4'>
       <self_collide>0</self_collide>
       <inertial>
-        <pose>0 0 0 0 -0 0</pose>
         <inertia>
           <ixx>1</ixx>
           <ixy>0</ixy>
@@ -662,105 +1598,34 @@
           <izz>1</izz>
         </inertia>
         <mass>1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
       <kinematic>0</kinematic>
-      <pose>-0.075031 0.09227 0.750783 1.5707 -0 0.682716</pose>
       <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_outer_rotate_2_visual_21'>
-        <pose>0 0 0 0 -0 0</pose>
+      <pose frame=''>0 0.512953 0.289119 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__thruster_4_nozzle_visual_45'>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_outer_rotate_2.STL</uri>
+            <uri>model://lander/meshes/thruster_4_nozzle.stl</uri>
           </mesh>
         </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+          <script>
+            <name>ModelPreview_7::thruster_4::base_fixed_joint_lump__thruster_4_nozzle_visual_45_MATERIAL_</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
       </visual>
     </link>
-    <link name='gimbal_ring_inner'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0 0 0.671419 1.5707 -0 0</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_inner_visual_15'>
-        <pose>-0.074283 0.080962 0.060295 -2.8921 -0.861934 -0.345373</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_inner.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_ring_mid'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0 0 0.671419 1.5707 -0 0</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_mid_visual_14'>
-        <pose>-0.090508 0.079364 -0.111303 -0.025759 -0.682308 -3.10076</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_mid.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='gimbal_ring_outer'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.119686 0.097543 0.671419 1.5707 -0 0</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__gimbal_outer_visual_13'>
-        <pose>0 0.064364 0 -3.14159 -0.88808 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/gimbal_outer.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
+
     <link name='lander/airspeed_link'>
       <pose>0 0 0.75 0 -0 0</pose>
       <inertial>
@@ -798,585 +1663,14 @@
       <self_collide>0</self_collide>
       <gravity>1</gravity>
     </link>
-    <link name='thruster_1'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>-0.515319 0.048648 0.808231 0 -0 -0.09</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__thruster_1_nozzle_visual_36'>
-        <pose>0 0 0 0 1.5707 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_1_nozzle.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='thruster_2'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>-0.048728 -0.512738 0.806441 -0 -0 -0.09</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__thruster_2_nozzle_visual_39'>
-        <pose>0 0 0 0 1.5707 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_2_nozzle.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='thruster_3'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.515138 -0.048521 0.808781 -0 -0 -0.09</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__thruster_3_nozzle_visual_42'>
-        <pose>0 0 0 0 1.5707 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_3_nozzle.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <link name='thruster_4'>
-      <self_collide>0</self_collide>
-      <inertial>
-        <pose>0 0 0 0 -0 0</pose>
-        <inertia>
-          <ixx>1</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1</iyy>
-          <iyz>0</iyz>
-          <izz>1</izz>
-        </inertia>
-        <mass>1</mass>
-      </inertial>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-      <pose>0.046591 0.513104 0.804554 -0 -0 -0.09</pose>
-      <gravity>1</gravity>
-      <visual name='base_fixed_joint_lump__thruster_4_nozzle_visual_45'>
-        <pose>0 0 0 0 1.5707 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://lander/meshes/thruster_4_nozzle.STL</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='ball'>
-      <parent>actuator_1_inner</parent>
-      <child>actuator_1_mount_front</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_1_mount_back__actuator_1_outer__ball' type='ball'>
-      <parent>actuator_1_mount_back</parent>
-      <child>actuator_1_outer</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_1_mount_front__gimbal_actuator_mount_1__fixed' type='fixed'>
-      <parent>actuator_1_mount_front</parent>
-      <child>gimbal_actuator_mount_1</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_1_outer__actuator_1_inner__prismatic' type='prismatic'>
-      <parent>actuator_1_outer</parent>
-      <child>actuator_1_inner</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.0254</lower>
-          <upper>0.0762</upper>
-          <effort>900</effort>
-          <velocity>0.01</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_2_inner__actuator_2_mount_front__ball' type='ball'>
-      <parent>actuator_2_inner</parent>
-      <child>actuator_2_mount_front</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_2_mount_back__actuator_2_outer__ball' type='ball'>
-      <parent>actuator_2_mount_back</parent>
-      <child>actuator_2_outer</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_2_mount_front__gimbal_actuator_mount_2__fixed' type='fixed'>
-      <parent>actuator_2_mount_front</parent>
-      <child>gimbal_actuator_mount_2</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='actuator_2_outer__actuator_2_inner__prismatic' type='prismatic'>
-      <parent>actuator_2_outer</parent>
-      <child>actuator_2_inner</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.0254</lower>
-          <upper>0.0762</upper>
-          <effort>900</effort>
-          <velocity>0.01</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__actuator_1_mount_back__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>actuator_1_mount_back</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__actuator_2_mount_back__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>actuator_2_mount_back</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__gimbal_ring_outer__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>gimbal_ring_outer</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__thruster_1__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>thruster_1</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__thruster_2__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>thruster_2</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__thruster_3__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>thruster_3</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='base__thruster_4__fixed' type='fixed'>
-      <parent>base</parent>
-      <child>thruster_4</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_mid_rotate_1__gimbal_ring_inner__fixed' type='fixed'>
-      <parent>gimbal_mid_rotate_1</parent>
-      <child>gimbal_ring_inner</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_outer_rotate_1__gimbal_ring_mid__fixed' type='fixed'>
-      <parent>gimbal_outer_rotate_1</parent>
-      <child>gimbal_ring_mid</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_ring_inner__gimbal_actuator_mount_1__fixed' type='fixed'>
-      <parent>gimbal_ring_inner</parent>
-      <child>gimbal_actuator_mount_1</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_ring_inner__gimbal_actuator_mount_2__fixed' type='fixed'>
-      <parent>gimbal_ring_inner</parent>
-      <child>gimbal_actuator_mount_2</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_ring_mid__gimbal_mid_rotate_1__revolute' type='revolute'>
-      <parent>gimbal_ring_mid</parent>
-      <child>gimbal_mid_rotate_1</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.349066</lower>
-          <upper>0.349066</upper>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_ring_mid__gimbal_mid_rotate_2__fixed' type='fixed'>
-      <parent>gimbal_ring_mid</parent>
-      <child>gimbal_mid_rotate_2</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_ring_outer__gimbal_outer_rotate_1__revolute' type='revolute'>
-      <parent>gimbal_ring_outer</parent>
-      <child>gimbal_outer_rotate_1</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <axis>
-        <xyz>0 0 1</xyz>
-        <limit>
-          <lower>-0.349066</lower>
-          <upper>0.349066</upper>
-          <effort>-1</effort>
-          <velocity>-1</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
-    <joint name='gimbal_ring_outer__gimbal_outer_rotate_2__fixed' type='fixed'>
-      <parent>gimbal_ring_outer</parent>
-      <child>gimbal_outer_rotate_2</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0.75 0 0 0</pose>
+      <name>gps</name>
+    </include>
     <joint name='gps_joint' type='fixed'>
-      <parent>base</parent>
       <child>gps::link</child>
-      <pose>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
+      <parent>base</parent>
     </joint>
     <joint name='lander/airspeed_joint' type='revolute'>
       <parent>base</parent>
@@ -1411,15 +1705,6 @@
         </ode>
       </physics>
     </joint>
-    <include>
-      <uri>model://gps</uri>
-      <pose>0 0 0.75 0 0 0</pose>
-      <name>gps</name>
-    </include>
-    <joint name='gps_joint' type='fixed'>
-      <child>gps::link</child>
-      <parent>base</parent>
-    </joint>
     <joint name='lander/imu_joint' type='fixed'>
       <parent>base</parent>
       <child>lander/imu_link</child>
@@ -1437,7 +1722,531 @@
         </ode>
       </physics>
     </joint>
-    
+
+
+    <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='ball'>
+      <parent>actuator_1_inner</parent>
+      <child>actuator_1_mount_front</child>
+      <pose frame=''>-0.02 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_1_mount_back_JOINT_0' type='ball'>
+      <parent>actuator_1_mount_back</parent>
+      <child>actuator_1_outer</child>
+      <pose frame=''>0.09 0 0.02 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_1_mount_front__gimbal_actuator_mount_2__fixed' type='fixed'>
+      <parent>actuator_1_mount_front</parent>
+      <child>gimbal_actuator_mount_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_1_outer__actuator_1_inner__prismatic' type='prismatic'>
+      <parent>actuator_1_outer</parent>
+      <child>actuator_1_inner</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <use_parent_model_frame>0</use_parent_model_frame>
+        <limit>
+          <lower>-0.0254</lower>
+          <upper>0.0762</upper>
+          <effort>900</effort>
+          <velocity>0.01</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_2_inner__actuator_2_mount_front__ball' type='ball'>
+      <parent>actuator_2_inner</parent>
+      <child>actuator_2_mount_front</child>
+      <pose frame=''>0.0175 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_2_mount_back_JOINT_1' type='ball'>
+      <parent>actuator_2_mount_back</parent>
+      <child>actuator_2_outer</child>
+      <pose frame=''>0.09 0 0.02 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_2_mount_front__gimbal_actuator_mount_2__fixed' type='fixed'>
+      <parent>actuator_2_mount_front</parent>
+      <child>gimbal_actuator_mount_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='actuator_2_outer__actuator_2_inner__prismatic' type='prismatic'>
+      <parent>actuator_2_outer</parent>
+      <child>actuator_2_inner</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <use_parent_model_frame>0</use_parent_model_frame>
+        <limit>
+          <lower>-0.0254</lower>
+          <upper>0.0762</upper>
+          <effort>900</effort>
+          <velocity>0.01</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__actuator_1_mount_back__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>actuator_1_mount_back</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__actuator_2_mount_back__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>actuator_2_mount_back</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__gimbal_ring_outer__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>gimbal_ring_outer</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__leg_1__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>leg_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__leg_2__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>leg_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__leg_3__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>leg_3</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__leg_4__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>leg_4</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__thruster_1__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>thruster_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__thruster_2__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>thruster_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__thruster_3__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>thruster_3</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='base__thruster_4__fixed' type='fixed'>
+      <parent>base</parent>
+      <child>thruster_4</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_mid_rotate_1__gimbal_ring_inner__fixed' type='fixed'>
+      <parent>gimbal_mid_rotate_1</parent>
+      <child>gimbal_ring_inner</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_outer_rotate_1__gimbal_ring_mid__fixed' type='fixed'>
+      <parent>gimbal_outer_rotate_1</parent>
+      <child>gimbal_ring_mid</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_ring_inner__gimbal_actuator_mount_1__fixed' type='fixed'>
+      <parent>gimbal_ring_inner</parent>
+      <child>gimbal_actuator_mount_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_ring_inner__gimbal_actuator_mount_2__fixed' type='fixed'>
+      <parent>gimbal_ring_inner</parent>
+      <child>gimbal_actuator_mount_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_ring_mid__gimbal_mid_rotate_1__revolute' type='revolute'>
+      <parent>gimbal_ring_mid</parent>
+      <child>gimbal_mid_rotate_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <use_parent_model_frame>0</use_parent_model_frame>
+        <limit>
+          <lower>-0.349066</lower>
+          <upper>0.349066</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_ring_mid__gimbal_mid_rotate_2__fixed' type='fixed'>
+      <parent>gimbal_ring_mid</parent>
+      <child>gimbal_mid_rotate_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_ring_outer__gimbal_outer_rotate_1__revolute' type='revolute'>
+      <parent>gimbal_ring_outer</parent>
+      <child>gimbal_outer_rotate_1</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <use_parent_model_frame>0</use_parent_model_frame>
+        <limit>
+          <lower>-0.349066</lower>
+          <upper>0.349066</upper>
+          <effort>-1</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+          <damping>0</damping>
+          <friction>0</friction>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
+    <joint name='gimbal_ring_outer__gimbal_outer_rotate_2__fixed' type='fixed'>
+      <parent>gimbal_ring_outer</parent>
+      <child>gimbal_outer_rotate_2</child>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <physics>
+        <ode>
+          <limit>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </limit>
+          <suspension>
+            <cfm>0</cfm>
+            <erp>0.2</erp>
+          </suspension>
+        </ode>
+      </physics>
+    </joint>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>lander/imu_link</linkName>
