@@ -35,10 +35,10 @@ include(GNUInstallDirs)
 ## Find Dependencies ##
 #######################
 
-option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
+#option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
 option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
 
-option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
+#option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
 option(SEND_ODOMETRY_DATA "Send Mavlink ODOMETRY msgs" OFF)
 
 ## System dependencies are found with CMake's conventions
@@ -52,29 +52,29 @@ if (NOT CATKIN_DEVEL_PREFIX)
 else()
 	find_package(PythonInterp REQUIRED)
 endif()
-find_package(OpenCV REQUIRED)
+#find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
-if (BUILD_GSTREAMER_PLUGIN)
-  set(GStreamer_FIND_VERSION "1.0")
-  find_package(GStreamer REQUIRED)
-  if (GSTREAMER_FOUND)
-    if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-      find_package (Qt4)
-      include (${QT_USE_FILE})
-    else()
-      # In order to find Qt5 in macOS, the Qt5 path needs to be added to the CMake prefix path.
-      if(APPLE)
-        execute_process(COMMAND brew --prefix qt5
-                        ERROR_QUIET
-                        OUTPUT_VARIABLE QT5_PREFIX_PATH
-                        OUTPUT_STRIP_TRAILING_WHITESPACE
-                       )
-        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}/lib/cmake")
-      endif()
-      find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
-    endif()
-  endif()
-endif()
+#if (BUILD_GSTREAMER_PLUGIN)
+#  set(GStreamer_FIND_VERSION "1.0")
+#  find_package(GStreamer REQUIRED)
+#  if (GSTREAMER_FOUND)
+#    if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+#      find_package (Qt4)
+#      include (${QT_USE_FILE})
+#    else()
+#      # In order to find Qt5 in macOS, the Qt5 path needs to be added to the CMake prefix path.
+#      if(APPLE)
+#        execute_process(COMMAND brew --prefix qt5
+#                        ERROR_QUIET
+#                        OUTPUT_VARIABLE QT5_PREFIX_PATH
+#                        OUTPUT_STRIP_TRAILING_WHITESPACE
+#                       )
+#        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}/lib/cmake")
+#      endif()
+#      find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+#    endif()
+#  endif()
+#endif()
 
 pkg_check_modules(OGRE OGRE)
 
@@ -177,7 +177,7 @@ include_directories(
   ${MAVLINK_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}/Paging		# Workaround for "fatal error: OgrePagedWorldSection.h: No such file or directory"
-  ${OpenCV_INCLUDE_DIRS}
+  #${OpenCV_INCLUDE_DIRS}
   #${OpticalFlow_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
   )
@@ -193,17 +193,17 @@ link_libraries(
   ${Boost_THREAD_LIBRARY_RELEASE}
   ${Boost_TIMER_LIBRARY_RELEASE}
   ${GAZEBO_LIBRARIES}
-  ${OpenCV_LIBRARIES}
+  #${OpenCV_LIBRARIES}
   ${PROTOBUF_LIBRARY}
   )
 
-if (GSTREAMER_FOUND)
-  link_libraries(
-    ${GSTREAMER_LIBRARIES}
-    glib-2.0
-    gobject-2.0
-  )
-endif()
+#if (GSTREAMER_FOUND)
+#  link_libraries(
+#    ${GSTREAMER_LIBRARIES}
+#    glib-2.0
+#    gobject-2.0
+#  )
+#endif()
 
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
@@ -218,7 +218,7 @@ link_directories(
 set(enable_mavlink_interface "true")
 set(enable_ground_truth "false")
 set(enable_logging "false")
-set(enable_camera "false")
+#set(enable_camera "false")
 set(enable_wind "false")
 set(rotors_description_dir "${CMAKE_CURRENT_SOURCE_DIR}/models/rotors_description")
 set(scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
@@ -404,38 +404,38 @@ if (BUILD_ROS_INTERFACE)
   )
 endif()
 
-if (GSTREAMER_FOUND)
-  add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
-  set(plugins
-    ${plugins}
-    gazebo_gst_camera_plugin
-  )
-  message(STATUS "Found GStreamer: adding gst_camera_plugin")
-  if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-    QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
-    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
-    set(plugins
-      ${plugins}
-      gazebo_video_stream_widget
-    )
-    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
-  else()
-    QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
-    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
-    set(plugins
-      ${plugins}
-      gazebo_video_stream_widget
-    )
-    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
-  endif()
-endif()
+#if (GSTREAMER_FOUND)
+#  add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
+#  set(plugins
+#    ${plugins}
+#    gazebo_gst_camera_plugin
+#  )
+#  message(STATUS "Found GStreamer: adding gst_camera_plugin")
+#  if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+#    QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
+#    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
+#    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
+#    set(plugins
+#      ${plugins}
+#      gazebo_video_stream_widget
+#    )
+#    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+#  else()
+#    QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
+#    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
+#    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
+#    set(plugins
+#      ${plugins}
+#      gazebo_video_stream_widget
+#    )
+#    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+#  endif()
+#endif()
 
 # Linux is not consistent with plugin availability, even on Gazebo 7
 #if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
-  add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
-  list(APPEND plugins LiftDragPlugin)
+  #add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
+  #list(APPEND plugins LiftDragPlugin)
 #endif()
 
 foreach(plugin ${plugins})
