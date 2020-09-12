@@ -40,21 +40,6 @@ static void* start_thread(void* param) {
 
 GeotaggedImagesPlugin::GeotaggedImagesPlugin()
     : SensorPlugin()
-    , _imageCounter(0)
-    , _width(0)
-    , _height(0)
-    , _depth(0)
-    , _destWidth(0)
-    , _destHeight(0)
-    , _captureCount(0)
-    , _captureInterval(0.0)
-    , _fd(-1)
-    , _mode(CAMERA_MODE_VIDEO)
-    , _captureMode(CAPTURE_DISABLED)
-    , _hfov(1.57)
-    , _zoom(1.0)
-    , _maxZoom(8.0)
-    , _zoom_cmd(0)
 {
 }
 

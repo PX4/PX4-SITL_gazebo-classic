@@ -73,19 +73,19 @@ private:
 
 private:
 
-    int         _imageCounter;
-    uint8_t     _mode;
-    uint32_t    _width;
-    uint32_t    _height;
-    uint32_t    _depth;
-    uint32_t    _destWidth;     ///< output size
-    uint32_t    _destHeight;
-    float       _maxZoom;
-    float       _zoom;
-    int         _captureCount;
-    double      _captureInterval;
-    int         _fd;
-    int         _zoom_cmd;
+    int         _imageCounter{0};
+    uint8_t     _mode{CAMERA_MODE_VIDEO};
+    uint32_t    _width{0};
+    uint32_t    _height{0};
+    uint32_t    _depth{0};
+    uint32_t    _destWidth{0};     ///< output size
+    uint32_t    _destHeight{0};
+    float       _maxZoom{8.0};
+    float       _zoom{1.0};
+    int         _captureCount{0};
+    double      _captureInterval{0.0};
+    int         _fd{-1};
+    int         _zoom_cmd{0};
 
     enum {
         CAPTURE_DISABLED,
@@ -93,7 +93,7 @@ private:
         CAPTURE_ELAPSED
     };
 
-    int         _captureMode;
+    int         _captureMode{CAPTURE_DISABLED};
 
     common::Time                _lastImageTime{};
     common::Time                _last_time{};
@@ -104,7 +104,7 @@ private:
     event::ConnectionPtr        _newFrameConnection;
     std::string                 _storageDir;
     ignition::math::Vector3d    _lastGpsPosition;
-    ignition::math::Angle       _hfov;      ///< Horizontal fov
+    ignition::math::Angle       _hfov{1.57};      ///< Horizontal fov
     transport::NodePtr          _node_handle;
     std::string                 _namespace;
     transport::SubscriberPtr    _gpsSub;
