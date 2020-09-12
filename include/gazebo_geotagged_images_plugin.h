@@ -98,16 +98,16 @@ private:
     common::Time                _lastImageTime{};
     common::Time                _last_time{};
     common::Time                _last_heartbeat{};
-    sensors::CameraSensorPtr    _parentSensor;
-    rendering::CameraPtr        _camera;
-    rendering::ScenePtr         _scene;
-    event::ConnectionPtr        _newFrameConnection;
+    sensors::CameraSensorPtr    _parentSensor{nullptr};
+    rendering::CameraPtr        _camera{nullptr};
+    rendering::ScenePtr         _scene{nullptr};
+    event::ConnectionPtr        _newFrameConnection{nullptr};
     std::string                 _storageDir;
     ignition::math::Vector3d    _lastGpsPosition;
     ignition::math::Angle       _hfov{1.57};      ///< Horizontal fov
-    transport::NodePtr          _node_handle;
+    transport::NodePtr          _node_handle{nullptr};;
     std::string                 _namespace;
-    transport::SubscriberPtr    _gpsSub;
+    transport::SubscriberPtr    _gpsSub{nullptr};;
     std::string                 _format;
     struct sockaddr_in          _myaddr;    ///< The locally bound address
     struct sockaddr_in          _gcsaddr;   ///< GCS target

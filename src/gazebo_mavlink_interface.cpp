@@ -156,7 +156,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   getSdfParam<std::string>(_sdf, "magSubTopic", mag_sub_topic_, mag_sub_topic_);
   getSdfParam<std::string>(_sdf, "airspeedSubTopic", airspeed_sub_topic_, airspeed_sub_topic_);
   getSdfParam<std::string>(_sdf, "baroSubTopic", baro_sub_topic_, baro_sub_topic_);
-  groundtruth_sub_topic_ = "/groundtruth";
+  getSdfParam<std::string>(_sdf, "groundtruthSubTopic", groundtruth_sub_topic_, groundtruth_sub_topic_);
 
   // set input_reference_ from inputs.control
   input_reference_.resize(n_out_max);
@@ -724,9 +724,9 @@ void GazeboMavlinkInterface::SendGroundTruth()
   hil_state_quat.pitchspeed = omega_nb_b.Y();
   hil_state_quat.yawspeed = omega_nb_b.Z();
 
-  hil_state_quat.lat = groundtruth_lat_rad * 180 / M_PI * 1e7;
-  hil_state_quat.lon = groundtruth_lon_rad * 180 / M_PI * 1e7;
-  hil_state_quat.alt = groundtruth_altitude * 1000;
+  hil_state_quat.lat = groundtruth_lat_rad_ * 180 / M_PI * 1e7;
+  hil_state_quat.lon = groundtruth_lon_rad_ * 180 / M_PI * 1e7;
+  hil_state_quat.alt = groundtruth_altitude_ * 1000;
 
   hil_state_quat.vx = vel_n.X() * 100;
   hil_state_quat.vy = vel_n.Y() * 100;
@@ -783,9 +783,9 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg, const int& id) {
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
   // update groundtruth lat_rad, lon_rad and altitude
-  groundtruth_lat_rad = groundtruth_msg->latitude_rad();
-  groundtruth_lon_rad = groundtruth_msg->longitude_rad();
-  groundtruth_altitude = groundtruth_msg->altitude();
+  groundtruth_lat_rad_ = groundtruth_msg->latitude_rad();
+  groundtruth_lon_rad_ = groundtruth_msg->longitude_rad();
+  groundtruth_altitude_ = groundtruth_msg->altitude();
   // the rest of the data is obtained directly on this interface and sent to
   // the FCU
 }
@@ -829,7 +829,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, const int& i
 
   // distance needed for optical flow message
   if (sensor_msg.orientation == MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270) {
-    optflow_distance = lidar_message->current_distance();  // [m]
+    optflow_distance_ = lidar_message->current_distance();  // [m]
   }
 
   mavlink_message_t msg;
@@ -860,7 +860,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
   sensor_msg.temperature = opticalFlow_message->temperature();
   sensor_msg.quality = opticalFlow_message->quality();
   sensor_msg.time_delta_distance_us = opticalFlow_message->time_delta_distance_us();
-  sensor_msg.distance = optflow_distance;
+  sensor_msg.distance = optflow_distance_;
 
   mavlink_message_t msg;
   mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
@@ -900,7 +900,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const int& i
 
   // distance needed for optical flow message
   if (sensor_msg.orientation == MAV_SENSOR_ORIENTATION::MAV_SENSOR_ROTATION_PITCH_270) {
-    optflow_distance = sonar_message->current_distance();  // [m]
+    optflow_distance_ = sonar_message->current_distance();  // [m]
   }
 
   mavlink_message_t msg;
