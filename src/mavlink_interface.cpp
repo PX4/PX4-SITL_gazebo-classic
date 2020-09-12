@@ -1,27 +1,7 @@
 #include "mavlink_interface.h"
 
 MavlinkInterface::MavlinkInterface() :
-    received_first_actuator_(false),
-    qgc_socket_fd_(0),
-    sdk_socket_fd_(0), 
-    simulator_socket_fd_(0),
-    simulator_tcp_client_fd_(0),
-    serial_enabled_(false),
-    m_status {},
-    m_buffer {},
-    mavlink_addr_str_("INADDR_ANY"),
-    mavlink_udp_port_(kDefaultMavlinkUdpPort),
-    mavlink_tcp_port_(kDefaultMavlinkTcpPort),
-    qgc_udp_port_(kDefaultQGCUdpPort),
-    sdk_udp_port_(kDefaultSDKUdpPort),
-    qgc_addr_("INADDR_ANY"),
-    sdk_addr_("INADDR_ANY"),
-    io_service(),
-    serial_dev(io_service),
-    device_(kDefaultDevice),
-    baudrate_(kDefaultBaudRate),
-    tx_q {},
-    rx_buf {} {
+    serial_dev(io_service){
 
 }
 
