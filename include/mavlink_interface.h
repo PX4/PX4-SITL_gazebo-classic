@@ -121,7 +121,7 @@ private:
     void do_read();
     void parse_buffer(const boost::system::error_code& err, std::size_t bytes_t);
     inline bool is_open(){
-        return serial_dev.is_open();
+        return serial_dev_.is_open();
     }
     void do_write(bool check_tx_state);
 
@@ -148,14 +148,14 @@ private:
     socklen_t local_sdk_addr_len_;
     std::string sdk_addr_{"INADDR_ANY"};
 
-    unsigned char _buf[65535];
+    unsigned char buf_[65535];
     enum FD_TYPES {
         LISTEN_FD,
         CONNECTION_FD,
         N_FDS
     };
     struct pollfd fds_[N_FDS];
-    bool use_tcp_ {false};
+    bool use_tcp_{false};
     bool close_conn_{false};
 
     in_addr_t mavlink_addr_;
@@ -163,8 +163,8 @@ private:
     int mavlink_udp_port_{kDefaultMavlinkUdpPort}; // MAVLink refers to the PX4 simulator interface here
     int mavlink_tcp_port_{kDefaultMavlinkTcpPort}; // MAVLink refers to the PX4 simulator interface here
 
-    boost::asio::io_service io_service{};
-    boost::asio::serial_port serial_dev;
+    boost::asio::io_service io_service_{};
+    boost::asio::serial_port serial_dev_;
 
     int simulator_socket_fd_{0};
     int simulator_tcp_client_fd_{0};
@@ -175,19 +175,19 @@ private:
     bool enable_lockstep_{false};
 
     // Serial interface
-    mavlink_status_t m_status{};
-    mavlink_message_t m_buffer{};
+    mavlink_status_t m_status_{};
+    mavlink_message_t m_buffer_{};
     bool serial_enabled_{false};
-    std::thread io_thread;
+    std::thread io_thread_;
     std::string device_{kDefaultDevice};
     
-    std::recursive_mutex mutex;
-    std::mutex actuator_mutex;
+    std::recursive_mutex mutex_;
+    std::mutex actuator_mutex_;
 
-    std::array<uint8_t, MAX_SIZE> rx_buf{};
+    std::array<uint8_t, MAX_SIZE> rx_buf_{};
     unsigned int baudrate_{kDefaultBaudRate};
-    std::atomic<bool> tx_in_progress;
-    std::deque<gazebo::MsgBuffer> tx_q{};
+    std::atomic<bool> tx_in_progress_;
+    std::deque<gazebo::MsgBuffer> tx_q_{};
 
     bool hil_mode_;
     bool hil_state_level_;
