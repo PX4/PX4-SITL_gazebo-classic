@@ -112,6 +112,7 @@ static const std::string kDefaultMagTopic = "/mag";
 static const std::string kDefaultAirspeedTopic = "/airspeed";
 static const std::string kDefaultBarometerTopic = "/baro";
 static const std::string kDefaultWindTopic = "/world_wind";
+static const std::string kDefaultGroundtruthTopic = "/groundtruth";
 
 //! OR operation for the enumeration and unsigned types that returns the bitmask
 template<typename A, typename B>
@@ -237,22 +238,22 @@ private:
   int input_index_[n_out_max]{};
   transport::PublisherPtr joint_control_pub_[n_out_max];
 
-  transport::SubscriberPtr imu_sub_;
-  transport::SubscriberPtr opticalFlow_sub_;
-  transport::SubscriberPtr irlock_sub_;
-  transport::SubscriberPtr groundtruth_sub_;
-  transport::SubscriberPtr vision_sub_;
-  transport::SubscriberPtr mag_sub_;
-  transport::SubscriberPtr airspeed_sub_;
-  transport::SubscriberPtr baro_sub_;
-  transport::SubscriberPtr wind_sub_;
+  transport::SubscriberPtr imu_sub_{nullptr};
+  transport::SubscriberPtr opticalFlow_sub_{nullptr};
+  transport::SubscriberPtr irlock_sub_{nullptr};
+  transport::SubscriberPtr groundtruth_sub_{nullptr};
+  transport::SubscriberPtr vision_sub_{nullptr};
+  transport::SubscriberPtr mag_sub_{nullptr};
+  transport::SubscriberPtr airspeed_sub_{nullptr};
+  transport::SubscriberPtr baro_sub_{nullptr};
+  transport::SubscriberPtr wind_sub_{nullptr};
 
   Sensor_M sensor_map_{}; // Map of sensor SubscriberPtr, IDs and orientations
 
   std::string imu_sub_topic_{kDefaultImuTopic};
   std::string opticalFlow_sub_topic_{kDefaultOpticalFlowTopic};
   std::string irlock_sub_topic_{kDefaultIRLockTopic};
-  std::string groundtruth_sub_topic_;
+  std::string groundtruth_sub_topic_{kDefaultGroundtruthTopic};
   std::string vision_sub_topic_{kDefaultVisionTopic};
   std::string mag_sub_topic_{kDefaultMagTopic};
   std::string airspeed_sub_topic_{kDefaultAirspeedTopic};
@@ -270,25 +271,24 @@ private:
   bool baro_updated_{false};
   bool diff_press_updated_{false};
 
-  double groundtruth_lat_rad{0.0};
-  double groundtruth_lon_rad{0.0};
-  double groundtruth_altitude{0.0};
+  double groundtruth_lat_rad_{0.0};
+  double groundtruth_lon_rad_{0.0};
+  double groundtruth_altitude_{0.0};
 
-  double imu_update_interval_ {0.004}; ///< Used for non-lockstep
+  double imu_update_interval_{0.004}; ///< Used for non-lockstep
 
   ignition::math::Vector3d velocity_prev_W_;
   ignition::math::Vector3d mag_n_;
   ignition::math::Vector3d wind_vel_;
 
-  double temperature_;
-  double pressure_alt_;
-  double abs_pressure_;
+  double temperature_{25.0};
+  double pressure_alt_{0.0};
+  double abs_pressure_{0.0};
 
   bool close_conn_{false};
 
-  double optflow_distance;
-  double sonar_distance;
-  double diff_pressure_;
+  double optflow_distance_{0.0};
+  double diff_pressure_{0.0};
 
   bool enable_lockstep_{false};
   double speed_factor_{1.0};
