@@ -255,6 +255,7 @@ add_custom_target(sdf ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/models/iris/iris.s
 #-----------#
 
 function(glob_generate target file_glob)
+  file(READ .gitignore gitignore_content)
   file(GLOB_RECURSE glob_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${file_glob})
 	set(gen_files)
 	foreach(glob_file ${glob_files})
@@ -273,6 +274,12 @@ function(glob_generate target file_glob)
 				VERBATIM
 				)
 			list(APPEND gen_files_${target} ${out_file})
+			string(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" gitignore_str ${in_file})
+			string(REGEX REPLACE ".jinja" "" gitignore_str ${gitignore_str})
+			string(FIND ${gitignore_content} ${gitignore_str} gitignore_substr)
+			if(${gitignore_substr} EQUAL -1)
+				file(APPEND .gitignore ${gitignore_str} "\n")
+			endif()
 		endif()
 	endforeach()
 	add_custom_target(${target} ALL DEPENDS ${gen_files_${target}})
