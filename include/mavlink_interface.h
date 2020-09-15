@@ -110,11 +110,12 @@ public:
     inline void SetHILStateLevel(bool hil_state_level) {hil_state_level_ = hil_state_level;}
 
 private:
+    bool received_actuator_{false};
     bool received_first_actuator_{false};
     bool armed_;
     Eigen::VectorXd input_reference_;
 
-    void handle_message(mavlink_message_t *msg, bool &received_actuator);
+    void handle_message(mavlink_message_t *msg);
     void acceptConnections();
     
     // Serial interface
