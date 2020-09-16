@@ -31,10 +31,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_4_visual_10_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -51,10 +47,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_top_visual_2_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -71,10 +63,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_engine_visual_12_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -91,10 +79,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_1_visual_4_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -111,10 +95,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_1_visual_35_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -131,10 +111,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_mid_visual_22_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -151,10 +127,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_1_visual_34_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -171,10 +143,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_3_visual_40_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -191,10 +159,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_4_visual_44_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -211,10 +175,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_3_visual_8_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -231,10 +191,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_3_visual_41_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -251,10 +207,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_4_visual_43_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -271,10 +223,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_visual_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -291,10 +239,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_mount_2_visual_37_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -311,10 +255,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__platform_top_visual_1_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -331,10 +271,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__leg_hinge_2_visual_6_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -351,10 +287,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__supports_bottom_visual_23_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -371,10 +303,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__platform_bottom_visual_24_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -391,10 +319,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_4::base::base_fixed_joint_lump__thruster_2_visual_38_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -464,10 +388,6 @@
             <normal_map>__default__</normal_map>
           </shader>
           <emissive>0 0 0 1</emissive>
-          <script>
-            <name>ModelPreview_10::actuator_1_mount_back::base_fixed_joint_lump__actuator_1_back_mount_visual_25_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -593,10 +513,6 @@
             <normal_map>__default__</normal_map>
           </shader>
           <emissive>0 0 0 1</emissive>
-          <script>
-            <name>ModelPreview_10::actuator_1_outer::base_fixed_joint_lump__actuator_1_outer_visual_26_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1120,10 +1036,6 @@
             <normal_map>__default__</normal_map>
           </shader>
           <emissive>0 0 0 1</emissive>
-          <script>
-            <name>ModelPreview_14::leg_1::base_fixed_joint_lump__leg_1_visual_5_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1215,10 +1127,6 @@
             <normal_map>__default__</normal_map>
           </shader>
           <emissive>0 0 0 1</emissive>
-          <script>
-            <name>ModelPreview_20::leg_2::base_fixed_joint_lump__leg_2_visual_7_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1310,10 +1218,6 @@
             <normal_map>__default__</normal_map>
           </shader>
           <emissive>0 0 0 1</emissive>
-          <script>
-            <name>ModelPreview_20::leg_3::base_fixed_joint_lump__leg_3_visual_9_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1405,10 +1309,6 @@
             <normal_map>__default__</normal_map>
           </shader>
           <emissive>0 0 0 1</emissive>
-          <script>
-            <name>ModelPreview_20::leg_4::base_fixed_joint_lump__leg_4_visual_11_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1499,10 +1399,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_7::thruster_1::base_fixed_joint_lump__thruster_1_nozzle_visual_36_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1538,10 +1434,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_7::thruster_2::base_fixed_joint_lump__thruster_2_nozzle_visual_39_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1577,10 +1469,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_7::thruster_3::base_fixed_joint_lump__thruster_3_nozzle_visual_42_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1616,10 +1504,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_7::thruster_4::base_fixed_joint_lump__thruster_4_nozzle_visual_45_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
