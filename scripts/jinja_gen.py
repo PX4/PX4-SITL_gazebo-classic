@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     d = {'np': np, 'rospack': rospack, 'mavlink_tcp_port': args.mavlink_tcp_port, 'mavlink_udp_port': args.mavlink_udp_port}
     result = template.render(d)
-    filename_out = args.filename.replace('.sdf.jinja', '.sdf')
+    filename_out = args.filename.replace('.sdf.jinja', '-gen.sdf')
     with open(filename_out, 'w') as f_out:
         print(('{:s} -> {:s}'.format(args.filename, filename_out)))
         f_out.write(result)
