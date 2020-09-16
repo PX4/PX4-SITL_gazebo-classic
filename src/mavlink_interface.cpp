@@ -197,8 +197,6 @@ void MavlinkInterface::pollForMAVLinkMessages()
     return;
   }
 
-  bool received_actuator = false;
-
   do {
     int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
     int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
@@ -250,12 +248,12 @@ void MavlinkInterface::pollForMAVLinkMessages()
             if (hil_mode_) {
               send_mavlink_message(&msg);
             }
-            handle_message(&msg, received_actuator);
+            handle_message(&msg);
           }
         }
       }
     }
-  } while (!close_conn_ && received_first_actuator_ && !received_actuator && enable_lockstep_ && !gotSigInt_);
+  } while (!close_conn_ && received_first_actuator_ && !received_actuator_ && enable_lockstep_ && !gotSigInt_);
 }
 
 void MavlinkInterface::pollFromQgcAndSdk()
@@ -328,7 +326,7 @@ void MavlinkInterface::acceptConnections()
   fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
 }
 
-void MavlinkInterface::handle_message(mavlink_message_t *msg, bool &received_actuator)
+void MavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch (msg->msgid) {
   case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
@@ -349,7 +347,7 @@ void MavlinkInterface::handle_message(mavlink_message_t *msg, bool &received_act
       input_reference_[i] = controls.controls[i];
     }
 
-    received_actuator = true;
+    received_actuator_ = true;
     received_first_actuator_ = true;
     break;
   }
@@ -568,8 +566,7 @@ void MavlinkInterface::parse_buffer(const boost::system::error_code& err, std::s
       if (hil_mode_) {
         forward_mavlink_message(&message);
       }
-      bool not_used;
-      handle_message(&message, not_used);
+      handle_message(&message);
     }
   }
   do_read();
