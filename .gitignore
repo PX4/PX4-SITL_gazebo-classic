@@ -3,7 +3,7 @@ build/
 scripts/schemas
 .DS_Store
 *~
-models/iris/*.sdf
+models/*/*.sdf
 *.pyc
 .*.sw?
 *-gen.sdf
