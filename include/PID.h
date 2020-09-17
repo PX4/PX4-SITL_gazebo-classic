@@ -28,9 +28,9 @@ class PID{
       c[0] = (G + Ts/2);
       c[1] = 2*G;
       c[2] = (G - Ts/2);
-      c[3] = (G + Ts/2 + (G*Ts/(2*Ti)) + Ts*Ts/(4*Ti) + Td);
+      c[3] = (G - Ts/2 - Ts*G/(2*Ti) + Ts*Ts/(4*Ti) + Td);
       c[4] = (-2*G + Ts*Ts/(2*Ti) - 2*Td);
-      c[5] = (G - Ts/2 - Ts*G/(2*Ti) + Ts*Ts/(4*Ti) + Td);
+      c[5] = (G + Ts/2 + (G*Ts/(2*Ti)) + Ts*Ts/(4*Ti) + Td);
     }
     //double Update(double y_new, double y_bar_new);
     void print();

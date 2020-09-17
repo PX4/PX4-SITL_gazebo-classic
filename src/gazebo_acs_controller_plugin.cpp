@@ -483,8 +483,11 @@ void GimbalControllerPlugin::OnUpdate()
   //static actuator acs_cw[2] = {actuator("lander::acs_yaw_cw_1"), actuator("lander::acs_yaw_cw_2")};
   //static actuator acs_ccw[2] = {actuator("lander::acs_yaw_ccw_1"), actuator("lander::acs_yaw_ccw_2")};
 
-  static PID con_roll(-4,0,-120,1,1,100000,-10000);
-  static PID con_pitch(-4,0,-120,1,1,100000,-10000);
+  common::Time time_ = this->model->GetWorld()->SimTime();
+  double dt_ = (time_ - this->lastUpdateTime).Double();
+
+  static PID con_roll(200,0,100,dt_,1,100000,-10000);
+  static PID con_pitch(200,0,100,dt_,1,100000,-10000);
   //static PID con_yaw(1,1,1,1,1,100000,-10000);
 
   const std::lock_guard<std::mutex> lock(cmd_mutex);

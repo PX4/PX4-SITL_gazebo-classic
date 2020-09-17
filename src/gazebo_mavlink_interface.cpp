@@ -20,6 +20,9 @@
  */
 
 #include <gazebo_mavlink_interface.h>
+
+std::fstream myfile;
+
 namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
@@ -1158,6 +1161,8 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
+  static PID actuator_cont[2] = {PID(100, 100, 500,_dt, 10000,100000,-100000), PID(100, 100, 500,_dt, 10000,100000,-100000)};
+
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
       double target = input_reference_[i];
@@ -1177,17 +1182,32 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         double current = joints_[i]->GetAngle(0).Radian();
 #endif
 
-        double err = current - target;
-        if(joint_max_errors_[i]!=0.) {
-          err = std::max(std::min(err, joint_max_errors_[i]), -joint_max_errors_[i]);
-        }
+        //double err = current - target;
+        double force = actuator_cont[i].Update(current, target);
         /* ORIGINAL
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
         */
-        double ourKp = -20000;
-        double ourOffset = -18;
-        double force = err*ourKp + ourOffset;
+        double ourOffset = 0;//-28;
+        static int garSucks; 
+        //if(garSucks++%100 == 0){
+
+        myfile.open("data.csv", std::ios::app);
+        if(i == 0){
+            //std::cout << "use the force " << i << " :" << force << std::endl;
+            //std::cout << "use the target " << target << std::endl;
+            myfile << force << ", ";
+        }
+
+        /*else
+            myfile << force << std::endl;*/
+        
+        force += ourOffset;
+        if(i == 0)
+            myfile << force << std::endl;
+        
+        myfile.close();
+        //std::cout << "FORCE " << i << ": " << force << std::endl;
         joints_[i]->SetForce(0, force);
       }
       else if (joint_control_type_[i] == "position_gztopic")
@@ -1258,7 +1278,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           }
           gazebo::physics::LinkPtr link = model_->GetChildLink(path);
           //std::cout << "Thrust: " << target << "\n";
-          const ignition::math::v4::Vector3<double>& force = {0, 0, -target};
+          const ignition::math::v4::Vector3<double>& force = { 0, target, 0};
           //link->AddRelativeForce(force);
           link->AddLinkForce(force);
         }
