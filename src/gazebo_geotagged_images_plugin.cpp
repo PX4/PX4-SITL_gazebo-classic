@@ -227,7 +227,9 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
              " -gpsmeasuremode=3-d -gpssatellites=13 -gpsaltitude=%.3lf -overwrite_original %s &>/dev/null",
              north_south, east_west, lat, lon, _lastGpsPosition.Z(), file_name);
 
-    system(gps_tag_command);
+    if (system(gps_tag_command) != 0) {
+        gzwarn << "Unable to tag GPS to image: gps tag command returned 1" << endl;
+    }
 
     gzmsg << "Took picture: " << file_name << endl;
 
