@@ -7,3 +7,4 @@ models/iris/*.sdf
 *.pyc
 .*.sw?
 *-gen.sdf
+models/water_level/*
