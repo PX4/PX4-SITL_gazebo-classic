@@ -295,7 +295,7 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
   ignition::math::Vector3d vel_eps_v = LocalVelocity(linear_vel, angular_vel, ignition::math::Vector3d(param_eps_v_, 0, 0));
   double q0_eps_v = DynamicPressure(vel_eps_v);
   double gamma_eps_v = 0.0f;
-  if(fabsf(vel_eps_v[0]) > EPS) {
+  if(std::abs(vel_eps_v[0]) > EPS) {
     gamma_eps_v = atan2(sqrt(vel_eps_v[1]*vel_eps_v[1] + vel_eps_v[2]*vel_eps_v[2]), vel_eps_v[0]);
   }
   double force_visc_mag = q0_eps_v*(-param_f_hif_coeff_*sin(2*gamma_eps_v) + param_f_hvf_coeff_*sin(gamma_eps_v)*sin(gamma_eps_v));
@@ -319,31 +319,31 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
   ignition::math::Vector3d fin3_vel = LocalVelocity(linear_vel, angular_vel, ignition::math::Vector3d(param_dist_fin_x_, -param_dist_fin_quarter_chord_, 0)) + wind_vel_z;
   ignition::math::Vector3d fin4_vel = LocalVelocity(linear_vel, angular_vel, ignition::math::Vector3d(param_dist_fin_x_, param_dist_fin_quarter_chord_, 0)) + wind_vel_z;
   double angle_fin1 = 0.0f;
-  if(fabsf(fin1_vel[0]) > EPS) {
+  if(std::abs(fin1_vel[0]) > EPS) {
     angle_fin1 = atan2(fin1_vel[1], fin1_vel[0]);
   }
-  if(fabsf(angle_fin1) > param_fin_stall_angle_) {
+  if(std::abs(angle_fin1) > param_fin_stall_angle_) {
     angle_fin1 = Sign(angle_fin1)*param_fin_stall_angle_;
   }
   double angle_fin2 = 0.0f;
-  if(fabsf(fin2_vel[0]) > EPS) {
+  if(std::abs(fin2_vel[0]) > EPS) {
     angle_fin2 = atan2(fin2_vel[1], fin2_vel[0]);
   }
-  if(fabsf(angle_fin2) > param_fin_stall_angle_) {
+  if(std::abs(angle_fin2) > param_fin_stall_angle_) {
     angle_fin2 = Sign(angle_fin2)*param_fin_stall_angle_;
   }
   double angle_fin3 = 0.0f;
-  if(fabsf(fin3_vel[0]) > EPS) {
+  if(std::abs(fin3_vel[0]) > EPS) {
     angle_fin3 = atan2(fin3_vel[2], fin3_vel[0]);
   }
-  if(fabsf(angle_fin3) > param_fin_stall_angle_) {
+  if(std::abs(angle_fin3) > param_fin_stall_angle_) {
     angle_fin3 = Sign(angle_fin3)*param_fin_stall_angle_;
   }
   double angle_fin4 = 0.0f;
-  if(fabsf(fin4_vel[0]) > EPS) {
+  if(std::abs(fin4_vel[0]) > EPS) {
     angle_fin4 = atan2(fin4_vel[2], fin4_vel[0]);
   }
-  if(fabsf(angle_fin4) > param_fin_stall_angle_) {
+  if(std::abs(angle_fin4) > param_fin_stall_angle_) {
     angle_fin4 = Sign(angle_fin4)*param_fin_stall_angle_;
   }
   double h_angle = angle_fin3 + angle_fin4;
@@ -353,7 +353,7 @@ void GazeboLTADynamicsPlugin::UpdateForcesAndMoments() {
 
   // Axial drag
   double angle_of_attack = 0;
-  if(fabsf(linear_vel[0]) > EPS) {
+  if(std::abs(linear_vel[0]) > EPS) {
     angle_of_attack = atan2(linear_vel[2], linear_vel[0]);
   }
   ignition::math::Vector3d force_axial_drag = ignition::math::Vector3d(-q0*param_axial_drag_coeff_*cos(angle_of_attack)*cos(angle_of_attack), 0, 0);
