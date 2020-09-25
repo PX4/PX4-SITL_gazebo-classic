@@ -722,7 +722,7 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+    <plugin name="left_wing_lift" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -744,7 +744,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="right_wing" filename="libLiftDragPlugin.so">
+    <plugin name="right_wing_lift" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -766,7 +766,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="elevator" filename="libLiftDragPlugin.so">
+    <plugin name="elevator_lift" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -788,7 +788,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="rudder" filename="libLiftDragPlugin.so">
+    <plugin name="rudder_lift" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -874,7 +874,7 @@
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='puller' filename='libgazebo_motor_model.so'>
+    <plugin name='puller_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_puller_joint</jointName>
       <linkName>rotor_puller</linkName>
