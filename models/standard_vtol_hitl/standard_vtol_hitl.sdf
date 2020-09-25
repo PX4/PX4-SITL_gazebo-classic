@@ -144,7 +144,7 @@
       <velocity_decay/>
       <self_collide>0</self_collide>
     </link>
-    <link name='standard_vtol/imu_link'>
+    <link name='standard_vtol_hitl/imu_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -159,8 +159,8 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='standard_vtol/imu_joint' type='revolute'>
-      <child>standard_vtol/imu_link</child>
+    <joint name='standard_vtol_hitl/imu_joint' type='revolute'>
+      <child>standard_vtol_hitl/imu_link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -177,7 +177,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <link name='standard_vtol/airspeed_link'>
+    <link name='standard_vtol_hitl/airspeed_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -192,8 +192,8 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='standard_vtol/airspeed_joint' type='revolute'>
-      <child>standard_vtol/airspeed_link</child>
+    <joint name='standard_vtol_hitl/airspeed_joint' type='revolute'>
+      <child>standard_vtol_hitl/airspeed_link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -721,7 +721,7 @@
       <child>gps0::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+    <plugin name="left_wing_lift" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -743,7 +743,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="right_wing" filename="libLiftDragPlugin.so">
+    <plugin name="right_wing_lift" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -765,7 +765,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="elevator" filename="libLiftDragPlugin.so">
+    <plugin name="elevator_lift" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -787,7 +787,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="rudder" filename="libLiftDragPlugin.so">
+    <plugin name="rudder_lift" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -873,7 +873,7 @@
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='puller' filename='libgazebo_motor_model.so'>
+    <plugin name='puller_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
       <jointName>rotor_puller_joint</jointName>
       <linkName>rotor_puller</linkName>
@@ -892,7 +892,7 @@
     </plugin>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
-      <linkName>standard_vtol/imu_link</linkName>
+      <linkName>standard_vtol_hitl/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
       <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
       <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
@@ -921,7 +921,7 @@
     </plugin>
     <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
       <robotNamespace/>
-      <linkName>standard_vtol/airspeed_link</linkName>
+      <linkName>standard_vtol_hitl/airspeed_link</linkName>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace/>
