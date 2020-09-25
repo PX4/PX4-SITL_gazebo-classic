@@ -41,7 +41,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://rotors_description/meshes/${mesh_file}"
+          <mesh filename="model://iris/meshes/${mesh_file}"
             scale="${mesh_scale}" />
           <!-- <box size="${body_width} ${body_width} ${body_height}"/> --> <!-- [m] [m] [m] -->
         </geometry>
@@ -105,7 +105,7 @@
         <geometry>
           <!-- <cylinder length="0.005" radius="${radius_rotor}"/> --> <!-- [m] -->
           <!-- <mesh filename="package://rotors_description/meshes/propeller_${direction}.dae" -->
-          <mesh filename="package://rotors_description/meshes/${mesh}_${direction}.dae"
+          <mesh filename="model://iris/meshes/${mesh}_${direction}.dae"
             scale="${mesh_scale}" />
           <!-- <box size="${2*radius_rotor} 0.01 0.005"/> -->
         </geometry>

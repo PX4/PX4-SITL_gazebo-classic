@@ -221,7 +221,6 @@ set(enable_ground_truth "false")
 set(enable_logging "false")
 set(enable_camera "false")
 set(enable_wind "false")
-set(rotors_description_dir "${CMAKE_CURRENT_SOURCE_DIR}/models/rotors_description")
 set(scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 # set the vision estimation to be sent if set by the CMake option SEND_VISION_ESTIMATION_DATA
 set(send_vision_estimation "false")
