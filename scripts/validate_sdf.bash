@@ -53,7 +53,7 @@ if [ -d ${MODELS_DIR} ]; then
 	done <<<"$(find ${MODELS_DIR} -type f -name '*.sdf' \
 		! -name '3DR_gps_mag-gen.sdf' ! -name 'px4flow-gen.sdf' \
 		! -name 'pixhawk-gen.sdf' ! -name 'c920-gen.sdf' \
-		! -name 'iris.sdf' ! -name 'delta_wing.sdf' ! -name 'r1_rover.sdf' \
+		! -name 'iris.sdf' ! -name 'iris_hitl.sdf' ! -name 'delta_wing.sdf' ! -name 'r1_rover.sdf' \
 		! -name 'fpv_cam.sdf' ! -name 'iris_triple_depth_camera.sdf')"
 else
 	echo "${MODELS_DIR} doesn't exist!"

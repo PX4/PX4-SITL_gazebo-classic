@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-<!-- DO NOT EDIT: Generated from standard_vtol.sdf.jinja -->
 <sdf version='1.5'>
-  <model name='standard_vtol'>
+  <model name='standard_vtol_hitl'>
     <pose>0 0 0.246 0 0 0</pose>
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
@@ -145,7 +144,7 @@
       <velocity_decay/>
       <self_collide>0</self_collide>
     </link>
-    <link name='standard_vtol/imu_link'>
+    <link name='standard_vtol_hitl/imu_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -160,8 +159,8 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='standard_vtol/imu_joint' type='revolute'>
-      <child>standard_vtol/imu_link</child>
+    <joint name='standard_vtol_hitl/imu_joint' type='revolute'>
+      <child>standard_vtol_hitl/imu_link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -178,7 +177,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <link name='standard_vtol/airspeed_link'>
+    <link name='standard_vtol_hitl/airspeed_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -193,8 +192,8 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='standard_vtol/airspeed_joint' type='revolute'>
-      <child>standard_vtol/airspeed_link</child>
+    <joint name='standard_vtol_hitl/airspeed_joint' type='revolute'>
+      <child>standard_vtol_hitl/airspeed_link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -716,10 +715,10 @@
     <include>
       <uri>model://gps</uri>
       <pose>0 0 0 0 0 0</pose>
-      <name>gps</name>
+      <name>gps0</name>
     </include>
-    <joint name='gps_joint' type='fixed'>
-      <child>gps::link</child>
+    <joint name='gps0_joint' type='fixed'>
+      <child>gps0::link</child>
       <parent>base_link</parent>
     </joint>
     <plugin name="left_wing_lift" filename="libLiftDragPlugin.so">
@@ -893,7 +892,7 @@
     </plugin>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
-      <linkName>standard_vtol/imu_link</linkName>
+      <linkName>standard_vtol_hitl/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
       <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
       <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
@@ -922,27 +921,31 @@
     </plugin>
     <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
       <robotNamespace/>
-      <linkName>standard_vtol/airspeed_link</linkName>
+      <linkName>standard_vtol_hitl/airspeed_link</linkName>
     </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
-      <robotNamespace></robotNamespace>
+      <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
       <magSubTopic>/mag</magSubTopic>
+      <gpsSubTopic>/gps0</gpsSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
-      <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
-      <mavlink_udp_port>{{ mavlink_udp_port }}</mavlink_udp_port>
-      <serialEnabled>false</serialEnabled>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <mavlink_tcp_port>4560</mavlink_tcp_port>
+      <serialEnabled>1</serialEnabled>
       <serialDevice>/dev/ttyACM0</serialDevice>
       <baudRate>921600</baudRate>
       <qgc_addr>INADDR_ANY</qgc_addr>
       <qgc_udp_port>14550</qgc_udp_port>
       <sdk_addr>INADDR_ANY</sdk_addr>
       <sdk_udp_port>14540</sdk_udp_port>
-      <hil_mode>false</hil_mode>
-      <hil_state_level>false</hil_state_level>
-      <enable_lockstep>true</enable_lockstep>
-      <use_tcp>true</use_tcp>
+      <hil_mode>1</hil_mode>
+      <hil_state_level>0</hil_state_level>
+      <vehicle_is_tailsitter>0</vehicle_is_tailsitter>
+      <send_vision_estimation>0</send_vision_estimation>
+      <send_odometry>1</send_odometry>
+      <enable_lockstep>0</enable_lockstep>
+      <use_tcp>1</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name="rotor0">

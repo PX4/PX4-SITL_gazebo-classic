@@ -27,7 +27,7 @@ check_schemas() {
 		echo "No schemas found. Downloading..."
 		download_schemas ${SCHEMA_DIR}
 	else
-    		echo "Schemas folder not found. Creating and downloading schemas..."
+		echo "Schemas folder not found. Creating and downloading schemas..."
 		mkdir -p ${SCHEMA_DIR}
 		download_schemas ${SCHEMA_DIR}
 	fi
