@@ -867,6 +867,15 @@
         </ode>
       </physics>
     </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
@@ -1028,15 +1037,6 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
-    <include>
-      <uri>model://gps</uri>
-      <pose>0 0 0 0 0 0</pose>
-      <name>gps</name>
-    </include>
-    <joint name='gps_joint' type='fixed'>
-      <child>gps::link</child>
-      <parent>base_link</parent>
-    </joint>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
       <pubRate>100</pubRate>
