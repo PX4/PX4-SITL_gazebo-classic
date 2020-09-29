@@ -1,3 +1,4 @@
+<!-- DO NOT EDIT: Generated from standard_vtol.sdf.jinja -->
 <sdf version='1.5'>
   <model name='tiltrotor'>
     <pose>0 0 0.246 0 0 0</pose>
@@ -1060,7 +1061,8 @@
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
-      <mavlink_udp_port>14560</mavlink_udp_port>
+      <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
+      <mavlink_udp_port>{{ mavlink_udp_port }}</mavlink_udp_port>
       <serialEnabled>false</serialEnabled>
       <serialDevice>/dev/ttyACM0</serialDevice>
       <baudRate>921600</baudRate>
