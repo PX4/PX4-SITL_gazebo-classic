@@ -52,45 +52,6 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   //Get links
   link_base_ = _sdf->GetElement("baseLinkName")->Get<std::string>();
   baseLink_ = model_->GetLink(link_base_);
-  link_prop_0_ = _sdf->GetElement("prop0LinkName")->Get<std::string>();
-  prop0Link_ = model_->GetLink(link_prop_0_);
-  link_prop_1_ = _sdf->GetElement("prop1LinkName")->Get<std::string>();
-  prop1Link_ = model_->GetLink(link_prop_1_);
-  link_prop_2_ = _sdf->GetElement("prop2LinkName")->Get<std::string>();
-  prop2Link_ = model_->GetLink(link_prop_2_);
-  link_prop_3_ = _sdf->GetElement("prop3LinkName")->Get<std::string>();
-  prop3Link_ = model_->GetLink(link_prop_3_);
-
-  //Get turning directions
-  std::string turning_direction_0 = _sdf->GetElement("turningDirection0")->Get<std::string>();
-  if (turning_direction_0 == "cw") {
-      turning_directions_[0] = turning_direction::CW;
-  } else if (turning_direction_0 == "ccw") {
-      turning_directions_[0] = turning_direction::CCW;
-  }
-  std::string turning_direction_1 = _sdf->GetElement("turningDirection1")->Get<std::string>();
-  if (turning_direction_1 == "cw") {
-      turning_directions_[1] = turning_direction::CW;
-  } else if (turning_direction_1 == "ccw") {
-      turning_directions_[1] = turning_direction::CCW;
-  }
-  std::string turning_direction_2 = _sdf->GetElement("turningDirection2")->Get<std::string>();
-  if (turning_direction_2 == "cw") {
-      turning_directions_[2] = turning_direction::CW;
-  } else if (turning_direction_2 == "ccw") {
-      turning_directions_[2] = turning_direction::CCW;
-  }
-  std::string turning_direction_3 = _sdf->GetElement("turningDirection3")->Get<std::string>();
-  if (turning_direction_3 == "cw") {
-      turning_directions_[3] = turning_direction::CW;
-  } else if (turning_direction_3 == "ccw") {
-      turning_directions_[3] = turning_direction::CCW;
-  }
-
-  //Get force and moment constant
-  getSdfParam<double>(_sdf, "motorForceConstant", motor_force_constant_, motor_force_constant_);
-  getSdfParam<double>(_sdf, "motorTorqueConstant", motor_torque_constant_, motor_torque_constant_);
-  getSdfParam<double>(_sdf, "deadZone", dead_zone_, dead_zone_);
 
   //Get parameters for added mass and damping
   ignition::math::Vector3d added_mass_linear(0,0,0);
@@ -113,28 +74,16 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   K_p_ = damping_angular[0];
   M_q_ = damping_angular[1];
   N_r_ = damping_angular[2];
-  getSdfParam<std::string>(_sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboUUVPlugin::OnUpdate, this, _1));
-
-  command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboUUVPlugin::VelocityCallback, this);
   }
 
 // This gets called by the world update start event.
 void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
-  sampling_time_ = _info.simTime.Double() - prev_sim_time_;
-  prev_sim_time_ = _info.simTime.Double();
   UpdateForcesAndMoments(); // Hydrodynamics are computed here
   Publish();
-}
-
-void GazeboUUVPlugin::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
-  motor_commands_[0] = static_cast<double>(rot_velocities->motor_speed(0));
-  motor_commands_[1] = static_cast<double>(rot_velocities->motor_speed(1));
-  motor_commands_[2] = static_cast<double>(rot_velocities->motor_speed(2));
-  motor_commands_[3] = static_cast<double>(rot_velocities->motor_speed(3));
 }
 
 void GazeboUUVPlugin::UpdateForcesAndMoments() {
@@ -144,28 +93,6 @@ void GazeboUUVPlugin::UpdateForcesAndMoments() {
  *  - applies the Hydro effects  as forces/moments and are than applied to the vehicle
  *  - computes the forces/moments based on the motor commands
  */
-
-    //Calculate and apply rotor thrust and drag
-    double forces[4];
-    double torques[4];
-    double totalTorque = 0;
-    for(int i = 0; i < 4; i++){
-        if(std::abs(motor_commands_[i]) < dead_zone_){
-            forces[i] = 0.0;
-        } else {
-            forces[i] = motor_force_constant_ * motor_commands_[i] * std::abs(motor_commands_[i]);
-            //std::cout << "Force:" << i <<" , "<<  forces[i] << ", ";
-            //std::cout << "Motor Speed:" <<  motor_commands_[i] << "\n";
-        }
-
-        torques[i] = -turning_directions_[i] * forces[i] * motor_torque_constant_;
-        totalTorque = totalTorque + torques[i];
-    }
-    prop0Link_->AddRelativeForce(ignition::math::Vector3d(forces[0], 0, 0));
-    prop1Link_->AddRelativeForce(ignition::math::Vector3d(forces[1], 0, 0));
-    prop2Link_->AddRelativeForce(ignition::math::Vector3d(forces[2], 0, 0));
-    prop3Link_->AddRelativeForce(ignition::math::Vector3d(forces[3], 0, 0));
-    baseLink_->AddRelativeTorque(ignition::math::Vector3d(totalTorque, 0, 0));
 
     //Calculate and add hydrodynamic forces
     #if GAZEBO_MAJOR_VERSION >= 9
