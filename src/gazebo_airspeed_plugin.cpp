@@ -63,7 +63,7 @@ void AirspeedPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_wind_plugin] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_airspeed_plugin] Please specify a robotNamespace.\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());

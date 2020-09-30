@@ -53,7 +53,7 @@ void ParachutePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   if (sdf->HasElement("motorNumber"))
     motor_number_ = sdf->GetElement("motorNumber")->Get<int>();
   else
-    gzerr << "[gazebo_motor_model] Please specify a motorNumber.\n";
+    gzerr << "[gazebo_parachute_plugin] Please specify a motorNumber.\n";
 
   getSdfParam<std::string>(sdf, "commandSubTopic", trigger_sub_topic_, trigger_sub_topic_);
 
