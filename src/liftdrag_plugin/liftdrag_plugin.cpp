@@ -161,7 +161,7 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_wind_plugin] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_liftdrag_plugin] Please specify a robotNamespace.\n";
   }
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);

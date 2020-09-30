@@ -38,7 +38,7 @@ void GazeboControllerInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
-    gzerr << "[gazebo_motor_model] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_controller_interface] Please specify a robotNamespace.\n";
 
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);

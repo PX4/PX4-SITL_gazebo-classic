@@ -62,7 +62,7 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzwarn << "Please specify a robotNamespace.\n";
+    gzwarn << "[gazebo_irlock_plugin] Please specify a robotNamespace.\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());

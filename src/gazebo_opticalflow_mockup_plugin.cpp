@@ -57,14 +57,14 @@ void OpticalFlowMockupPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sd
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_gps_plugin] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_opticalflow_mockup_plugin] Please specify a robotNamespace.\n";
   }
 
 if (_sdf->HasElement("pubRate")) {
     pub_rate_ = _sdf->GetElement("pubRate")->Get<int>();
   } else {
     pub_rate_ = kDefaultPubRate;
-    gzwarn << "[gazebo_vision_plugin] Using default publication rate of " << pub_rate_ << " Hz\n";
+    gzwarn << "[gazebo_opticalflow_mockup_plugin] Using default publication rate of " << pub_rate_ << " Hz\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
