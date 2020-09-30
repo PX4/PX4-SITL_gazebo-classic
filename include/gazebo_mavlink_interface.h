@@ -159,21 +159,6 @@ private:
 
   physics::ModelPtr model_{};
   physics::WorldPtr world_{nullptr};
-  physics::JointPtr left_elevon_joint_{nullptr};
-  physics::JointPtr right_elevon_joint_{nullptr};
-  physics::JointPtr elevator_joint_{nullptr};
-  physics::JointPtr propeller_joint_{nullptr};
-  physics::JointPtr gimbal_yaw_joint_{nullptr};
-  physics::JointPtr gimbal_pitch_joint_{nullptr};
-  physics::JointPtr gimbal_roll_joint_{nullptr};
-  common::PID propeller_pid_;
-  common::PID elevator_pid_;
-  common::PID left_elevon_pid_;
-  common::PID right_elevon_pid_;
-  bool use_propeller_pid_{false};
-  bool use_elevator_pid_{false};
-  bool use_left_elevon_pid_{false};
-  bool use_right_elevon_pid_{false};
 
   bool send_vision_estimation_{false};
   bool send_odometry_{false};
