@@ -72,7 +72,7 @@ void GroundtruthPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (env_lat) {
     lat_home_ = std::stod(env_lat) * M_PI / 180.0;
-    gzmsg << "Home latitude is set to " << std::stod(env_lat) << ".\n";
+    gzmsg << "[gazebo_groundtruth_plugin] Home latitude is set to " << std::stod(env_lat) << ".\n";
   } else if (world_has_origin) {
     lat_home_ = world_latitude_;
     gzmsg << "[gazebo_groundtruth_plugin] Home latitude is set to " << lat_home_ << ".\n";
@@ -84,7 +84,7 @@ void GroundtruthPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (env_lon) {
     lon_home_ = std::stod(env_lon) * M_PI / 180.0;
-    gzmsg << "Home longitude is set to " << std::stod(env_lon) << ".\n";
+    gzmsg << "[gazebo_groundtruth_plugin] Home longitude is set to " << std::stod(env_lon) << ".\n";
   } else if (world_has_origin) {
     lon_home_ = world_longitude_;
     gzmsg << "[gazebo_groundtruth_plugin] Home longitude is set to " << lon_home_ << ".\n";
@@ -96,7 +96,7 @@ void GroundtruthPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (env_alt) {
     alt_home_ = std::stod(env_alt);
-    gzmsg << "Home altitude is set to " << alt_home_ << ".\n";
+    gzmsg << "[gazebo_groundtruth_plugin] Home altitude is set to " << alt_home_ << ".\n";
   } else if (world_has_origin) {
     alt_home_ = world_altitude_;
     gzmsg << "[gazebo_groundtruth_plugin] Home altitude is set to " << alt_home_ << ".\n";
