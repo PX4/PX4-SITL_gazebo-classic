@@ -741,12 +741,6 @@
           <joint_name>right_elevon_joint</joint_name>
         </channel>
       </control_channels>
-      <left_elevon_joint>
-        left_elevon_joint
-      </left_elevon_joint>
-      <right_elevon_joint>
-        right_elevon_joint
-      </right_elevon_joint>
     </plugin>
     <static>0</static>
   </model>
