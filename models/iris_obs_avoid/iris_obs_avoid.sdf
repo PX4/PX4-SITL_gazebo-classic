@@ -36,7 +36,7 @@
     <!--forward-facing lidar-->
     <include>
       <uri>model://lidar</uri>
-      <pose>0 0 -0.05 0 -1.57079633 0</pose>
+      <pose>0 0 -0.10 0 -1.57079633 0</pose>
       <name>lidar1</name>
     </include>
 
@@ -48,7 +48,7 @@
     <!--right-facing lidar-->
     <include>
       <uri>model://lidar</uri>
-      <pose>0 0 -0.05 -1.57079633 0 0</pose>
+      <pose>0 0 -0.10 -1.57079633 0 0</pose>
       <name>lidar2</name>
     </include>
 
@@ -60,7 +60,7 @@
     <!--left-facing lidar-->
     <include>
       <uri>model://lidar</uri>
-      <pose>0 0 -0.05 1.57079633 0 0</pose>
+      <pose>0 0 -0.10 1.57079633 0 0</pose>
       <name>lidar3</name>
     </include>
 
@@ -75,7 +75,7 @@
     <!--backward-facing lidar-->
     <!-- <include>
       <uri>model://lidar</uri>
-      <pose>0 0 -0.05 0 1.57079633 0</pose>
+      <pose>0 0 -0.10 0 1.57079633 0</pose>
       <name>lidar4</name>
     </include>
 
