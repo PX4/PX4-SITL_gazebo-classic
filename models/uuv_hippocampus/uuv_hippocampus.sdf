@@ -418,6 +418,7 @@
         <buoyancy>
           <origin>0 0 0.01</origin>
           <compensation>1.1</compensation>
+          <height_scale_limit>0.05</height_scale_limit>
         </buoyancy>
       </link>
       <robotNamespace/>

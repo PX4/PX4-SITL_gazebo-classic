@@ -53,6 +53,7 @@ void GazeboUUVPlugin::ParseBuoyancy(physics::ModelPtr _model) {
         buoyancy_link.link = link_ptr;
         buoyancy_link.buoyancy_force = ignition::math::Vector3d(0, 0, 0);
         buoyancy_link.cob = ignition::math::Vector3d(0, 0, 0);
+        buoyancy_link.height_scale_limit = 0.1;
         double compensation = 0.0;
 
         if (buoyancy_element->HasElement("origin")) {
@@ -61,8 +62,10 @@ void GazeboUUVPlugin::ParseBuoyancy(physics::ModelPtr _model) {
         if (buoyancy_element->HasElement("compensation")) {
           compensation = buoyancy_element->Get<double>("compensation");
         }
+        if (buoyancy_element->HasElement("height_scale_limit")) {
+          buoyancy_link.height_scale_limit = std::abs(buoyancy_element->Get<double>("height_scale_limit"));
+        }
         buoyancy_link.buoyancy_force = -compensation * link_ptr->GetInertial()->Mass() * model_->GetWorld()->Gravity();
-        buoyancy_link.height_scale_limit = 0.1;
         buoyancy_links_.push_back(buoyancy_link);
       }
     }
