@@ -31,7 +31,7 @@ if __name__ == "__main__":
     if args.output_file:
         filename_out = args.output_file
     else:
-        filename_out = args.filename.replace('.sdf.jinja', '-gen.sdf')
+        filename_out = args.filename.replace('.sdf.jinja', '.sdf')
 
     with open(filename_out, 'w') as f_out:
         print(('{:s} -> {:s}'.format(args.filename, filename_out)))
