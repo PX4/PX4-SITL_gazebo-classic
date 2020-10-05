@@ -257,7 +257,7 @@ function(glob_generate target file_glob)
 		set(in_file ${CMAKE_CURRENT_SOURCE_DIR}/${glob_file})
 		file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${file_dir})
 		set(out_file ${CMAKE_CURRENT_SOURCE_DIR}/${file_name})
-		string(REGEX REPLACE ".sdf" "-gen.sdf" out_file ${out_file})
+		string(REGEX REPLACE ".sdf" ".sdf" out_file ${out_file})
 		if (${file_ext} STREQUAL "jinja")
 			add_custom_command(OUTPUT ${out_file}
 				COMMAND
