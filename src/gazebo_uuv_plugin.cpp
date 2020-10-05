@@ -39,8 +39,40 @@ void GazeboUUVPlugin::InitializeParams() {}
 
 void GazeboUUVPlugin::Publish() {}
 
+void GazeboUUVPlugin::ParseBuoyancy(physics::ModelPtr _model) {
+  physics::LinkPtr link_ptr;
+  for (auto sdf_element = _model->GetSDF()->GetFirstElement(); sdf_element != 0; sdf_element = sdf_element->GetNextElement()) {
+    if (sdf_element->HasElement("link")) {
+      auto link = sdf_element->GetElement("link");
+      auto link_name = link->GetAttribute("name")->GetAsString();
+
+      for (auto buoyancy_element = link->GetElement("buoyancy"); buoyancy_element != NULL; buoyancy_element = buoyancy_element->GetNextElement()) {
+        link_ptr = _model->GetChildLink(link_name);
+        buoyancy_s buoyancy_link;
+        buoyancy_link.model_name = _model->GetName();
+        buoyancy_link.link = link_ptr;
+        buoyancy_link.buoyancy_force = ignition::math::Vector3d(0, 0, 0);
+        buoyancy_link.cob = ignition::math::Vector3d(0, 0, 0);
+        double compensation = 0.0;
+
+        if (buoyancy_element->HasElement("origin")) {
+          buoyancy_link.cob = buoyancy_element->Get<ignition::math::Vector3d>("origin");
+        }
+        if (buoyancy_element->HasElement("compensation")) {
+          compensation = buoyancy_element->Get<double>("compensation");
+        }
+        buoyancy_link.buoyancy_force = -compensation * link_ptr->GetInertial()->Mass() * model_->GetWorld()->Gravity();
+        buoyancy_link.height_scale_limit = 0.1;
+        buoyancy_links_.push_back(buoyancy_link);
+      }
+    }
+
+  }
+}
+
 void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   model_ = _model;
+  ParseBuoyancy(_model);
 
   namespace_.clear();
 
@@ -82,8 +114,25 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 // This gets called by the world update start event.
 void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
+  ApplyBuoyancy();
   UpdateForcesAndMoments(); // Hydrodynamics are computed here
   Publish();
+}
+
+void GazeboUUVPlugin::ApplyBuoyancy() {
+  ignition::math::Vector3d force, cob;
+  for (std::vector<buoyancy_s>::iterator entry = buoyancy_links_.begin(); entry != buoyancy_links_.end(); ++entry) {
+    cob = entry->link->WorldPose().Pos() + entry->link->WorldPose().Rot().RotateVector(entry->cob);
+    force = entry->buoyancy_force;
+    // apply linear scaling on buoyancy force if center of buoyancy z-coordinate
+    // is in range [-height_scale_limit, +height_scale limit].
+    double scale = std::abs((cob.Z()-entry->height_scale_limit) / (2*entry->height_scale_limit));
+    if (cob.Z() > entry->height_scale_limit)
+      scale = 0.0;
+    scale = ignition::math::clamp(scale, 0.0, 1.0);
+    force *= scale;
+    entry->link->AddForceAtWorldPosition(force, cob);
+  }
 }
 
 void GazeboUUVPlugin::UpdateForcesAndMoments() {
