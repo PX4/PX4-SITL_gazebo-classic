@@ -537,7 +537,6 @@
       <sdk_udp_port>14540</sdk_udp_port>
       <hil_mode>false</hil_mode>
       <hil_state_level>false</hil_state_level>
-      <vehicle_is_tailsitter>false</vehicle_is_tailsitter>
       <send_vision_estimation>true</send_vision_estimation>
       <send_odometry>false</send_odometry>
       <enable_lockstep>true</enable_lockstep>
