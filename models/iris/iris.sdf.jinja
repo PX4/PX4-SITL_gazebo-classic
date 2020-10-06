@@ -1,7 +1,8 @@
 <!-- DO NOT EDIT: Generated from iris.sdf.jinja -->
-<sdf version='1.7'>
+<sdf version='1.6'>
   <model name='iris'>
     <link name='base_link'>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>1.5</mass>
@@ -51,26 +52,8 @@
       <gravity>1</gravity>
       <velocity_decay/>
     </link>
-    <joint name='/imu_joint' type='revolute'>
-      <pose relative_to='base_link'>0 0 0 0 0 0</pose>
-      <parent>base_link</parent>
-      <child>/imu_link</child>
-      <axis>
-        <xyz>1 0 0</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0</upper>
-          <effort>0</effort>
-          <velocity>0</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
-    </joint>
     <link name='/imu_link'>
-      <pose relative_to='/imu_joint'>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.015</mass>
@@ -84,24 +67,26 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='rotor_0_joint' type='revolute'>
-      <pose relative_to='base_link'>0.13 -0.22 0.023 0 0 0</pose>
+    <joint name='/imu_joint' type='revolute'>
+      <child>/imu_link</child>
       <parent>base_link</parent>
-      <child>rotor_0</child>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>1 0 0</xyz>
         <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
     <link name='rotor_0'>
-      <pose relative_to='rotor_0_joint'>0 0 0 0 0 0</pose>
+      <pose>0.13 -0.22 0.023 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -149,10 +134,9 @@
       <gravity>1</gravity>
       <velocity_decay/>
     </link>
-    <joint name='rotor_1_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.13 0.2 0.023 0 0 0</pose>
+    <joint name='rotor_0_joint' type='revolute'>
+      <child>rotor_0</child>
       <parent>base_link</parent>
-      <child>rotor_1</child>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -163,10 +147,11 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
     <link name='rotor_1'>
-      <pose relative_to='rotor_1_joint'>0 0 0 0 0 0</pose>
+      <pose>-0.13 0.2 0.023 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -214,10 +199,9 @@
       <gravity>1</gravity>
       <velocity_decay/>
     </link>
-    <joint name='rotor_2_joint' type='revolute'>
-      <pose relative_to='base_link'>0.13 0.22 0.023 0 0 0</pose>
+    <joint name='rotor_1_joint' type='revolute'>
+      <child>rotor_1</child>
       <parent>base_link</parent>
-      <child>rotor_2</child>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -228,10 +212,11 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
     <link name='rotor_2'>
-      <pose relative_to='rotor_2_joint'>0 0 0 0 0 0</pose>
+      <pose>0.13 0.22 0.023 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -279,10 +264,9 @@
       <gravity>1</gravity>
       <velocity_decay/>
     </link>
-    <joint name='rotor_3_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.13 -0.2 0.023 0 0 0</pose>
+    <joint name='rotor_2_joint' type='revolute'>
+      <child>rotor_2</child>
       <parent>base_link</parent>
-      <child>rotor_3</child>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -293,10 +277,11 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
     <link name='rotor_3'>
-      <pose relative_to='rotor_3_joint'>0 0 0 0 0 0</pose>
+      <pose>-0.13 -0.2 0.023 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -344,6 +329,22 @@
       <gravity>1</gravity>
       <velocity_decay/>
     </link>
+    <joint name='rotor_3_joint' type='revolute'>
+      <child>rotor_3</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace/>
       <linkName>base_link</linkName>
