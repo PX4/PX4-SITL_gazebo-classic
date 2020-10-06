@@ -309,4 +309,16 @@ inline const bool checkWorldHomePosition(gazebo::physics::WorldPtr& world,
   return (world_latitude && world_latitude && world_latitude) ? true : false;
 }
 
+template <typename T>
+inline T degrees(T radians)
+{
+    return radians * static_cast<T>(180.0) / static_cast<T>(M_PI);
+}
+
+template <typename T>
+inline T radians(T degrees)
+{
+    return radians / static_cast<T>(180.0) * static_cast<T>(M_PI);
+}
+
 #endif  // SITL_GAZEBO_COMMON_H_
