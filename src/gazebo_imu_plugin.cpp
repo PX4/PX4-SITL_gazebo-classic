@@ -173,9 +173,9 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   double sigma_bon_g = imu_parameters_.gyroscope_turn_on_bias_sigma;
   double sigma_bon_a = imu_parameters_.accelerometer_turn_on_bias_sigma;
   for (int i = 0; i < 3; ++i) {
-      gyroscope_turn_on_bias_[i] =
+      gyroscope_bias_[i] =
           sigma_bon_g * standard_normal_distribution_(random_generator_);
-      accelerometer_turn_on_bias_[i] =
+      accelerometer_bias_[i] =
           sigma_bon_a * standard_normal_distribution_(random_generator_);
   }
 
@@ -211,8 +211,7 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
         sigma_b_g_d * standard_normal_distribution_(random_generator_);
     (*angular_velocity)[i] = (*angular_velocity)[i] +
         gyroscope_bias_[i] +
-        sigma_g_d * standard_normal_distribution_(random_generator_) +
-        gyroscope_turn_on_bias_[i];
+        sigma_g_d * standard_normal_distribution_(random_generator_);
   }
 
   // Accelerometer
@@ -234,8 +233,7 @@ void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
         sigma_b_a_d * standard_normal_distribution_(random_generator_);
     (*linear_acceleration)[i] = (*linear_acceleration)[i] +
         accelerometer_bias_[i] +
-        sigma_a_d * standard_normal_distribution_(random_generator_) +
-        accelerometer_turn_on_bias_[i];
+        sigma_a_d * standard_normal_distribution_(random_generator_);
   }
 
 }
