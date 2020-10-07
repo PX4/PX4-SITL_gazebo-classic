@@ -169,7 +169,7 @@
           <bounce>
             <restitution_coefficient>0</restitution_coefficient>
             <threshold>1e6</threshold>
-          </bounce>          
+          </bounce>
           <contact>
             <ode>
               <min_depth>0.001</min_depth>
@@ -425,7 +425,7 @@
           <bounce>
             <restitution_coefficient>0</restitution_coefficient>
             <threshold>1e6</threshold>
-          </bounce>          
+          </bounce>
           <contact>
             <ode>
               <min_depth>0.001</min_depth>
@@ -559,7 +559,8 @@
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
-      <mavlink_udp_port>14560</mavlink_udp_port>
+      <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
+      <mavlink_udp_port>{{ mavlink_udp_port }}</mavlink_udp_port>
       <serialEnabled>false</serialEnabled>
       <serialDevice>/dev/ttyACM0</serialDevice>
       <baudRate>921600</baudRate>
