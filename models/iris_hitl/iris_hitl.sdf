@@ -37,7 +37,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://rotors_description/meshes/iris.stl</uri>
+            <uri>model://iris/meshes/iris.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -200,7 +200,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://rotors_description/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://iris/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
