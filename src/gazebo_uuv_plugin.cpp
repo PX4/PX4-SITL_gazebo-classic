@@ -90,7 +90,6 @@ void GazeboUUVPlugin::ParseBuoyancy(sdf::ElementPtr _sdf) {
 
 void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   model_ = _model;
-  ParseBuoyancy(_model);
 
   namespace_.clear();
 
