@@ -39,6 +39,55 @@ void GazeboUUVPlugin::InitializeParams() {}
 
 void GazeboUUVPlugin::Publish() {}
 
+void GazeboUUVPlugin::ParseBuoyancy(sdf::ElementPtr _sdf) {
+  for (auto buoyancy_element = _sdf->GetFirstElement(); buoyancy_element != NULL; buoyancy_element = buoyancy_element->GetNextElement()) {
+    // skip element if it is not a buoyancy-element
+    if (buoyancy_element->GetName() != "buoyancy") {
+      continue;
+    }
+
+    physics::LinkPtr link_ptr;
+    std::string link_name = "";
+    // check if link_name is specified. Otherwise skip this buoyancy-element.
+    if (!getSdfParam(buoyancy_element, "link_name", link_name, link_name)) {
+      gzwarn << "Skipping buoyancy element with unspecified 'link_name' tag!\n";
+      continue;
+    }
+    link_ptr = model_->GetChildLink(link_name);
+    // Check if link with specified name exists. Otherwise skip this
+    // buoyancy-element.
+    if (link_ptr == NULL) {
+      gzerr << "Model has no link with name '" << link_name << "'!\n";
+      continue;
+    }
+    buoyancy_s buoyancy_link;
+    buoyancy_link.model_name = model_->GetName();
+    buoyancy_link.link = link_ptr;
+    buoyancy_link.buoyancy_force = ignition::math::Vector3d(0, 0, 0);
+    buoyancy_link.cob = ignition::math::Vector3d(0, 0, 0);
+    buoyancy_link.height_scale_limit = 0.1;
+    double compensation = 0.0;
+
+    if (buoyancy_element->HasElement("origin")) {
+      buoyancy_link.cob = buoyancy_element->Get<ignition::math::Vector3d>("origin");
+    }
+    if (buoyancy_element->HasElement("compensation")) {
+      compensation = buoyancy_element->Get<double>("compensation");
+    }
+    if (buoyancy_element->HasElement("height_scale_limit")) {
+      buoyancy_link.height_scale_limit = std::abs(buoyancy_element->Get<double>("height_scale_limit"));
+    }
+    #if GAZEBO_MAJOR_VERSION >= 9
+      buoyancy_link.buoyancy_force = -compensation * link_ptr->GetInertial()->Mass() * model_->GetWorld()->Gravity();
+    #else
+      buoyancy_link.buoyancy_force = -compensation * link_ptr->GetInertial()->GetMass() * model_->GetWorld()->Gravity();
+    #endif
+    buoyancy_links_.push_back(buoyancy_link);
+    gzmsg << "Added buoyancy element for link '" << model_->GetName() << "::" << link_name << "'.\n";
+  }
+
+}
+
 void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   model_ = _model;
 
@@ -52,6 +101,8 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   //Get links
   link_base_ = _sdf->GetElement("baseLinkName")->Get<std::string>();
   baseLink_ = model_->GetLink(link_base_);
+
+  ParseBuoyancy(_sdf);
 
   //Get parameters for added mass and damping
   ignition::math::Vector3d added_mass_linear(0,0,0);
@@ -82,8 +133,30 @@ void GazeboUUVPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 // This gets called by the world update start event.
 void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
+  ApplyBuoyancy();
   UpdateForcesAndMoments(); // Hydrodynamics are computed here
   Publish();
+}
+
+void GazeboUUVPlugin::ApplyBuoyancy() {
+  ignition::math::Vector3d force, cob;
+  for (std::vector<buoyancy_s>::iterator entry = buoyancy_links_.begin(); entry != buoyancy_links_.end(); ++entry) {
+    #if GAZEBO_MAJOR_VERSION >= 9
+      ignition::math::Pose3d pose = entry->link->WorldPose();
+    #else
+      ignition::math::Pose3d pose = ignitionFromGazeboMath(entry->link->GetWorldPose());
+    #endif
+    cob = pose.Pos() + pose.Rot().RotateVector(entry->cob);
+    force = entry->buoyancy_force;
+    // apply linear scaling on buoyancy force if center of buoyancy z-coordinate
+    // is in range [-height_scale_limit, +height_scale limit].
+    double scale = std::abs((cob.Z()-entry->height_scale_limit) / (2*entry->height_scale_limit));
+    if (cob.Z() > entry->height_scale_limit)
+      scale = 0.0;
+    scale = ignition::math::clamp(scale, 0.0, 1.0);
+    force *= scale;
+    entry->link->AddForceAtWorldPosition(force, cob);
+  }
 }
 
 void GazeboUUVPlugin::UpdateForcesAndMoments() {

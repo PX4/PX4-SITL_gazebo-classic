@@ -23,8 +23,6 @@
           values used to correct for hydrodynamic effects.
           Real values:  m = 1,47 kg; Ixx = 0,002408 kgm2; Iyy = Izz = 0.010717 kgm2
                         Xu = -1,11 kg; Yv = Zw = -2,8 kg; Kp = -0,00451 kgm2; Mq = Nr = -0,0163 kgm2
-
-          No gravity since weight and draft force are assumed to be equal for the hippocampus uuv
         -->
         <mass>1.47</mass>
         <inertia>
@@ -71,7 +69,6 @@
           </script>
         </material>
       </visual>
-      <gravity>0</gravity>
       <velocity_decay/>
     </link>
 
@@ -85,7 +82,6 @@
 <!-- IMU link -->
     <link name='uuv_hippocampus/imu_link'>
       <pose>0 0 0 0 0 0</pose>
-      <!--<pose>0 0 0 3.1415 0 0</pose>-->
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.015</mass>
@@ -98,7 +94,6 @@
           <izz>1e-05</izz>
         </inertia>
       </inertial>
-      <gravity>0</gravity>
     </link>
 
 <!-- IMU joint -->
@@ -173,7 +168,6 @@
           </script>
         </material>
       </visual>
-      <gravity>0</gravity>
       <velocity_decay/>
     </link>
 
@@ -243,7 +237,6 @@
           </script>
         </material>
       </visual>
-      <gravity>0</gravity>
       <velocity_decay/>
     </link>
 
@@ -313,7 +306,6 @@
           </script>
         </material>
       </visual>
-      <gravity>0</gravity>
       <velocity_decay/>
     </link>
 
@@ -383,7 +375,6 @@
           </script>
         </material>
       </visual>
-      <gravity>0</gravity>
       <velocity_decay/>
     </link>
 
@@ -423,6 +414,12 @@
     </plugin>
 
     <plugin name='uuv_forces' filename='libgazebo_uuv_plugin.so'>
+      <buoyancy>
+        <link_name>base_link</link_name>
+        <origin>0 0 0.01</origin>
+        <compensation>1.1</compensation>
+        <height_scale_limit>0.05</height_scale_limit>
+      </buoyancy>
       <robotNamespace/>
       <baseLinkName>base_link</baseLinkName>
       <addedMassLinear>1.11 2.8 2.8</addedMassLinear>

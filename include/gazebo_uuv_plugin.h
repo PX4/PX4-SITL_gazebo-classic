@@ -39,6 +39,8 @@ class GazeboUUVPlugin : public ModelPlugin {
 
   virtual ~GazeboUUVPlugin();
   virtual void InitializeParams();
+  void ParseBuoyancy(sdf::ElementPtr _sdf);
+  void ApplyBuoyancy();
   virtual void Publish();
  protected:
   virtual void UpdateForcesAndMoments();
@@ -46,6 +48,14 @@ class GazeboUUVPlugin : public ModelPlugin {
   virtual void OnUpdate(const common::UpdateInfo &);
 
  private:
+  struct buoyancy_s {
+    std::string model_name;
+    physics::LinkPtr link;
+    ignition::math::Vector3d buoyancy_force;
+    ignition::math::Vector3d cob;
+    double height_scale_limit;
+  };
+  std::vector<buoyancy_s> buoyancy_links_;
   std::string namespace_;
   std::string link_base_;
 
