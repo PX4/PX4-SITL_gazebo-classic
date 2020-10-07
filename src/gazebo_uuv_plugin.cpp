@@ -141,7 +141,12 @@ void GazeboUUVPlugin::OnUpdate(const common::UpdateInfo& _info) {
 void GazeboUUVPlugin::ApplyBuoyancy() {
   ignition::math::Vector3d force, cob;
   for (std::vector<buoyancy_s>::iterator entry = buoyancy_links_.begin(); entry != buoyancy_links_.end(); ++entry) {
-    cob = entry->link->WorldPose().Pos() + entry->link->WorldPose().Rot().RotateVector(entry->cob);
+    #if GAZEBO_MAJOR_VERSION >= 9
+      ignition::math::Pose3d pose = entry->link->WorldPose();
+    #else
+      ignition::math::Pose3d pose = ignitionFromGazeboMath(entry->link->GetWorldPose());
+    #endif
+    cob = pose.Pos() + pose.Rot().RotateVector(entry->cob);
     force = entry->buoyancy_force;
     // apply linear scaling on buoyancy force if center of buoyancy z-coordinate
     // is in range [-height_scale_limit, +height_scale limit].
