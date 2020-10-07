@@ -39,7 +39,7 @@ class GazeboUUVPlugin : public ModelPlugin {
 
   virtual ~GazeboUUVPlugin();
   virtual void InitializeParams();
-  void ParseBuoyancy(physics::ModelPtr _model);
+  void ParseBuoyancy(sdf::ElementPtr _sdf);
   void ApplyBuoyancy();
   virtual void Publish();
  protected:

@@ -414,13 +414,12 @@
     </plugin>
 
     <plugin name='uuv_forces' filename='libgazebo_uuv_plugin.so'>
-      <link name="base_link">
-        <buoyancy>
-          <origin>0 0 0.01</origin>
-          <compensation>1.1</compensation>
-          <height_scale_limit>0.05</height_scale_limit>
-        </buoyancy>
-      </link>
+      <buoyancy>
+        <link_name>base_link</link_name>
+        <origin>0 0 0.01</origin>
+        <compensation>1.1</compensation>
+        <height_scale_limit>0.05</height_scale_limit>
+      </buoyancy>
       <robotNamespace/>
       <baseLinkName>base_link</baseLinkName>
       <addedMassLinear>1.11 2.8 2.8</addedMassLinear>
