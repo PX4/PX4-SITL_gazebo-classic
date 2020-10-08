@@ -197,6 +197,8 @@ void MavlinkInterface::pollForMAVLinkMessages()
     return;
   }
 
+  received_actuator_ = false;
+
   do {
     int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
     int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
