@@ -98,7 +98,6 @@ GimbalControllerPlugin::GimbalControllerPlugin()
   this->pitchPid.Init(kPIDPitchP, kPIDPitchI, kPIDPitchD, kPIDPitchIMax, kPIDPitchIMin, kPIDPitchCmdMax, kPIDPitchCmdMin);
   this->rollPid.Init(kPIDRollP, kPIDRollI, kPIDRollD, kPIDRollIMax, kPIDRollIMin, kPIDRollCmdMax, kPIDRollCmdMin);
   this->yawPid.Init(kPIDYawP, kPIDYawI, kPIDYawD, kPIDYawIMax, kPIDYawIMin, kPIDYawCmdMax, kPIDYawCmdMin);
-  this->vehicleYaw = 0;
   this->rDir = kRollDir;
   this->pDir = kPitchDir;
   this->yDir = kYawDir;
@@ -368,20 +367,9 @@ void GimbalControllerPlugin::Init()
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&GimbalControllerPlugin::OnUpdate, this)));
 
-  imuSub = node->Subscribe("~/" + model->GetName() + "/groundtruth", &GimbalControllerPlugin::GroundTruthCallback, this);
-
   if (InitUdp()) {
     rxThread = std::make_unique<std::thread>(&GimbalControllerPlugin::RxThread, this);
   }
-}
-
-void GimbalControllerPlugin::GroundTruthCallback(GtPtr& msg)
-{
-  const std::lock_guard<std::mutex> lock(cmd_mutex);
-  this->vehicleYaw = ignition::math::Quaterniond(msg->attitude_q_w(),
-						 msg->attitude_q_x(),
-						 msg->attitude_q_y(),
-						 msg->attitude_q_z()).Euler()[2];
 }
 
 /////////////////////////////////////////////////
@@ -415,7 +403,7 @@ void GimbalControllerPlugin::OnUpdate()
       pitchSetpointLocal = -this->pitchSetpoint;
       // We want yaw to control in body frame, not in global.
       // Without this minus, the gimbal yaw is inverted.
-      yawSetpointLocal = -this->yawSetpoint + this->vehicleYaw;
+      yawSetpointLocal = -this->yawSetpoint + (this->yawLock ? M_PI/2.0 : this->vehicleYawRad);
     }
 
     // truncate command inside joint angle limits
@@ -687,6 +675,9 @@ void GimbalControllerPlugin::SendGimbalDeviceAttitudeStatus()
     static_cast<float>(q.Z())
   };
 
+  // auto e = q.Euler();
+  // gzdbg << "r: " << degrees(e[0]) << ", p: " << degrees(e[1]) << ", y: " << degrees(e[2]) << "\n";
+
   const auto angularVelocity = q_FLU_to_FRD.RotateVector(this->cameraImuSensor->AngularVelocity());
 
   const uint16_t failureFlags {0};
@@ -814,6 +805,7 @@ void GimbalControllerPlugin::HandleGimbalDeviceSetAttitude(const mavlink_message
   this->rollSetpoint = rollRad;
   this->pitchSetpoint = pitchRad;
   this->yawSetpoint = yawRad;
+  this->yawLock = (set_attitude.flags & GIMBAL_DEVICE_FLAGS_YAW_LOCK);
 }
 
 void GimbalControllerPlugin::HandleAutopilotStateForGimbalDevice(const mavlink_message_t& msg)
@@ -821,7 +813,10 @@ void GimbalControllerPlugin::HandleAutopilotStateForGimbalDevice(const mavlink_m
   mavlink_autopilot_state_for_gimbal_device_t autopilot_state;
   mavlink_msg_autopilot_state_for_gimbal_device_decode(&msg, &autopilot_state);
 
-  // TODO: use it
+  float rollRad, pitchRad, yawRad;
+  mavlink_quaternion_to_euler(&autopilot_state.q[0], &rollRad, &pitchRad, &yawRad);
+
+  this->vehicleYawRad = -yawRad + M_PI/2.0; // Convert from NED to ENU.
 }
 
 void GimbalControllerPlugin::HandleRequestMessage(uint8_t target_sysid, uint8_t target_compid, const mavlink_command_long_t& command_long)

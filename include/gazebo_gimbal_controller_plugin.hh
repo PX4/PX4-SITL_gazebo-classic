@@ -37,8 +37,6 @@
 #include <ignition/math.hh>
 #include <mavlink/v2.0/common/mavlink.h>
 
-#include "Groundtruth.pb.h"
-
 namespace gazebo
 {
   // Default PID gains
@@ -71,8 +69,6 @@ namespace gazebo
   static double kPitchDir = -1.0;
   static double kYawDir = 1.0;
 
-  typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
-
   class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
   {
     public: GimbalControllerPlugin();
@@ -83,8 +79,6 @@ namespace gazebo
     public: virtual void Init();
 
     private: void OnUpdate();
-
-    private: void GroundTruthCallback(GtPtr& imu_message);
 
     private: bool InitUdp();
     private: void SendHeartbeat();
@@ -106,8 +100,6 @@ namespace gazebo
 
     private: std::vector<event::ConnectionPtr> connections;
 
-    private: transport::SubscriberPtr imuSub;
-
     private: physics::ModelPtr model;
 
     /// \brief yaw camera
@@ -120,8 +112,7 @@ namespace gazebo
     private: physics::JointPtr pitchJoint;
 
     private: sensors::ImuSensorPtr cameraImuSensor;
-    private: double vehicleYaw;
-
+    private: double vehicleYawRad {0.0};
     private: std::string status;
 
     private: double rDir;
@@ -132,6 +123,7 @@ namespace gazebo
     private: double rollSetpoint {0.0};
     private: double pitchSetpoint {0.0};
     private: double yawSetpoint {0.0};
+    private: bool yawLock {false};
 
     private: transport::NodePtr node;
 
