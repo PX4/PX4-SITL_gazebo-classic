@@ -298,12 +298,12 @@
       <gpsSubTopic>/gps</gpsSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
       <mavlink_udp_port>14560</mavlink_udp_port>
-      <serialEnabled>false</serialEnabled>
-      <serialDevice>/dev/ttyACM0</serialDevice>
-      <baudRate>921600</baudRate>
+      <serialEnabled>{{ serial_enabled }}</serialEnabled>
+      <serialDevice>{{ serial_device }}</serialDevice>
+      <baudRate>{{ serial_baudrate }}</baudRate>
       <qgc_addr>INADDR_ANY</qgc_addr>
       <qgc_udp_port>14550</qgc_udp_port>
-      <hil_mode>false</hil_mode>
+      <hil_mode>{{ hil_mode }}</hil_mode>
       <hil_state_level>false</hil_state_level>
       <opticalFlowSubTopic>/px4flow/link/opticalFlow</opticalFlowSubTopic>
       <lidarSubTopic>/sf10a/link/lidar</lidarSubTopic>
