@@ -7,3 +7,16 @@ models/iris/*.sdf
 *.pyc
 .*.sw?
 *-gen.sdf
+
+models/3DR_gps_mag/3DR_gps_mag.sdf
+models/c920/c920.sdf
+models/cloudship/cloudship.sdf
+models/iris/iris.sdf
+models/matrice_100/matrice_100.sdf
+models/mb1240-xl-ez4/mb1240-xl-ez4.sdf
+models/pixhawk/pixhawk.sdf
+models/plane/plane.sdf
+models/px4flow/px4flow.sdf
+models/r200/r200.sdf
+models/sf10a/sf10a.sdf
+models/standard_vtol/standard_vtol.sdf
