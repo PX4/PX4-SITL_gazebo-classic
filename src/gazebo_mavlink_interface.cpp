@@ -615,9 +615,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
   mavlink_hil_sensor_t sensor_msg;
 #if GAZEBO_MAJOR_VERSION >= 9
-  sensor_msg.time_usec = world_->SimTime().Double() * 1e6;
+  sensor_msg.time_usec = std::round(world_->SimTime().Double() * 1e6);
 #else
-  sensor_msg.time_usec = world_->GetSimTime().Double() * 1e6;
+  sensor_msg.time_usec = std::round(world_->GetSimTime().Double() * 1e6);
 #endif
 
   // send always accel and gyro data (not dependent of the bitmask)
@@ -711,9 +711,9 @@ void GazeboMavlinkInterface::SendGroundTruth()
   // send ground truth
   mavlink_hil_state_quaternion_t hil_state_quat;
 #if GAZEBO_MAJOR_VERSION >= 9
-  hil_state_quat.time_usec = world_->SimTime().Double() * 1e6;
+  hil_state_quat.time_usec = std::round(world_->SimTime().Double() * 1e6);
 #else
-  hil_state_quat.time_usec = world_->GetSimTime().Double() * 1e6;
+  hil_state_quat.time_usec = std::round(world_->GetSimTime().Double() * 1e6);
 #endif
   hil_state_quat.attitude_quaternion[0] = q_nb.W();
   hil_state_quat.attitude_quaternion[1] = q_nb.X();
