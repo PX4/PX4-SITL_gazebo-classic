@@ -14,6 +14,7 @@ if __name__ == "__main__":
     parser.add_argument('--mavlink_tcp_port', default=4560, help="TCP port for PX4 SITL")
     parser.add_argument('--mavlink_udp_port', default=14560, help="Mavlink UDP port for mavlink access")
     parser.add_argument('--output-file', help="sdf output file")
+    parser.add_argument('--stdout', action='store_true', default=False, help="dump to stdout instead of file")
     args = parser.parse_args()
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.env_dir))
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
@@ -33,6 +34,9 @@ if __name__ == "__main__":
     else:
         filename_out = args.filename.replace('.sdf.jinja', '.sdf')
 
-    with open(filename_out, 'w') as f_out:
-        print(('{:s} -> {:s}'.format(args.filename, filename_out)))
-        f_out.write(result)
+    if args.stdout:
+        print(result)
+    else:
+        with open(filename_out, 'w') as f_out:
+            print(('{:s} -> {:s}'.format(args.filename, filename_out)))
+            f_out.write(result)
