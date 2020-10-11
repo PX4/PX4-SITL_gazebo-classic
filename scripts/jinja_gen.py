@@ -18,6 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('--serial_baudrate', default=921600, help="Baudrate of Serial device for FMU")
     parser.add_argument('--hil_mode', default=0, help="Enable HIL mode for HITL simulation")
     parser.add_argument('--output-file', help="sdf output file")
+    parser.add_argument('--stdout', action='store_true', default=False, help="dump to stdout instead of file")
     args = parser.parse_args()
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.env_dir))
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
@@ -44,6 +45,9 @@ if __name__ == "__main__":
     else:
         filename_out = args.filename.replace('.sdf.jinja', '.sdf')
 
-    with open(filename_out, 'w') as f_out:
-        print(('{:s} -> {:s}'.format(args.filename, filename_out)))
-        f_out.write(result)
+    if args.stdout:
+        print(result)
+    else:
+        with open(filename_out, 'w') as f_out:
+            print(('{:s} -> {:s}'.format(args.filename, filename_out)))
+            f_out.write(result)
