@@ -317,7 +317,7 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
 
   {
     // protect shared variables
-    std::scoped_lock lock(data_mutex_);
+    std::lock_guard<std::mutex> lock(data_mutex_);
 
     // add msg to buffer
     gps_delay_buffer_.push(gps_msg);
@@ -330,7 +330,7 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
 void GpsPlugin::OnSensorUpdate()
 {
   // protect shared variables
-  std::scoped_lock lock(data_mutex_);
+  std::lock_guard<std::mutex> lock(data_mutex_);
 
   sensor_msgs::msgs::SITLGps gps_msg;
   // apply GPS delay
