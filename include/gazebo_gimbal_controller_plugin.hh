@@ -26,6 +26,7 @@
 #include <vector>
 #include <mutex>
 #include <memory>
+#include <optional>
 #include <thread>
 
 #include <gazebo/common/PID.hh>
@@ -94,6 +95,8 @@ namespace gazebo
     private: void HandleRequestMessage(uint8_t target_sysid, uint8_t target_compid, const mavlink_command_long_t& command_long);
     private: void HandleSetMessageInterval(uint8_t target_sysid, uint8_t target_compid, const mavlink_command_long_t& command_long);
 
+    private: static std::optional<double> calcSetpoint(double dt, double lastSetpoint, double newSetpoint, double newRateSetpoint);
+
     private: std::mutex cmd_mutex;
 
     private: sdf::ElementPtr sdf;
@@ -120,10 +123,16 @@ namespace gazebo
     private: double yDir;
 
     private: std::mutex setpointMutex {};
+    private: double lastRollSetpoint {0.0};
+    private: double lastPitchSetpoint {0.0};
+    private: double lastYawSetpoint {0.0};
     private: double rollSetpoint {0.0};
     private: double pitchSetpoint {0.0};
     private: double yawSetpoint {0.0};
     private: bool yawLock {false};
+    private: double rollRateSetpoint {NAN};
+    private: double pitchRateSetpoint {NAN};
+    private: double yawRateSetpoint {NAN};
 
     private: transport::NodePtr node;
 

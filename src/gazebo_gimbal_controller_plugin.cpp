@@ -395,36 +395,49 @@ void GimbalControllerPlugin::OnUpdate()
   {
     double dt = (time - this->lastUpdateTime).Double();
 
-    double rollSetpointLocal, pitchSetpointLocal, yawSetpointLocal;
     {
       const std::lock_guard<std::mutex> lock(setpointMutex);
-      rollSetpointLocal = this->rollSetpoint;
-      // Without this minus, the gimbal pitch is inverted.
-      pitchSetpointLocal = -this->pitchSetpoint;
-      // We want yaw to control in body frame, not in global.
+
+      const auto maybeNewRollSetpoint = calcSetpoint(
+          dt, this->lastRollSetpoint, this->rollSetpoint, this->rollRateSetpoint);
+      if (maybeNewRollSetpoint) {
+        this->lastRollSetpoint = maybeNewRollSetpoint.value();
+      }
+
+      // Without the minus, the gimbal pitch is inverted.
+      const auto maybeNewPitchSetpoint = calcSetpoint(
+          dt, this->lastPitchSetpoint, -this->pitchSetpoint, -this->pitchRateSetpoint);
+      if (maybeNewPitchSetpoint) {
+        this->lastPitchSetpoint = maybeNewPitchSetpoint.value();
+      }
+
       // Without this minus, the gimbal yaw is inverted.
-      yawSetpointLocal = -this->yawSetpoint + (this->yawLock ? M_PI/2.0 : this->vehicleYawRad);
+      const auto maybeNewYawSetpoint = calcSetpoint(
+          dt, this->lastYawSetpoint, -this->yawSetpoint + (this->yawLock ? M_PI/2.0 : this->vehicleYawRad), -this->yawRateSetpoint);
+      if (maybeNewYawSetpoint) {
+        this->lastYawSetpoint = maybeNewYawSetpoint.value();
+      }
     }
 
     // truncate command inside joint angle limits
 #if GAZEBO_MAJOR_VERSION >= 9
-    double rollLimited = ignition::math::clamp(rollSetpointLocal,
+    double rollLimited = ignition::math::clamp(this->lastRollSetpoint,
       rDir*this->rollJoint->UpperLimit(0),
     rDir*this->rollJoint->LowerLimit(0));
-    double pitchLimited = ignition::math::clamp(pitchSetpointLocal,
+    double pitchLimited = ignition::math::clamp(this->lastPitchSetpoint,
       pDir*this->pitchJoint->UpperLimit(0),
       pDir*this->pitchJoint->LowerLimit(0));
-    double yawLimited = ignition::math::clamp(yawSetpointLocal,
+    double yawLimited = ignition::math::clamp(this->lastYawSetpoint,
       yDir*this->yawJoint->LowerLimit(0),
     yDir*this->yawJoint->UpperLimit(0));
 #else
-    double rollLimited = ignition::math::clamp(rollSetpointLocal,
+    double rollLimited = ignition::math::clamp(this->lastRollSetpoint,
       rDir*this->rollJoint->GetUpperLimit(0).Radian(),
     rDir*this->rollJoint->GetLowerLimit(0).Radian());
-    double pitchLimited = ignition::math::clamp(pitchSetpointLocal,
+    double pitchLimited = ignition::math::clamp(this->lastPitchSetpoint,
       pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
       pDir*this->pitchJoint->GetLowerLimit(0).Radian());
-    double yawLimited = ignition::math::clamp(yawSetpointLocal,
+    double yawLimited = ignition::math::clamp(this->lastYawSetpoint,
       yDir*this->yawJoint->GetLowerLimit(0).Radian(),
     yDir*this->yawJoint->GetUpperLimit(0).Radian());
 #endif
@@ -806,7 +819,12 @@ void GimbalControllerPlugin::HandleGimbalDeviceSetAttitude(const mavlink_message
   this->rollSetpoint = rollRad;
   this->pitchSetpoint = pitchRad;
   this->yawSetpoint = yawRad;
+
   this->yawLock = (set_attitude.flags & GIMBAL_DEVICE_FLAGS_YAW_LOCK);
+
+  this->rollRateSetpoint = set_attitude.angular_velocity_x;
+  this->pitchRateSetpoint = set_attitude.angular_velocity_y;
+  this->yawRateSetpoint = set_attitude.angular_velocity_z;
 }
 
 void GimbalControllerPlugin::HandleAutopilotStateForGimbalDevice(const mavlink_message_t& msg)
@@ -852,5 +870,37 @@ void GimbalControllerPlugin::HandleSetMessageInterval(uint8_t target_sysid, uint
     default:
       SendResult(target_sysid, target_compid, command_long.command, MAV_RESULT_DENIED);
       break;
+  }
+}
+
+std::optional<double> GimbalControllerPlugin::calcSetpoint(double dt, double lastSetpoint, double newSetpoint, double newRateSetpoint)
+{
+  const bool setpointValid = std::isfinite(newSetpoint);
+  const bool rateSetpointValid = std::isfinite(newRateSetpoint);
+
+  if (rateSetpointValid) {
+    const double rateDiff = dt * newRateSetpoint;
+    const double setpointFromRate = lastSetpoint + rateDiff;
+
+    if (setpointValid) {
+      // In this case angle and rate are valid, so we use the rate but constrain it by the angle.
+      if (rateDiff > 0.0) {
+        return {std::min(newSetpoint, setpointFromRate)};
+      } else {
+        return {std::max(newSetpoint, setpointFromRate)};
+      }
+
+    } else {
+      // Only the rate is valid, so we just use it.
+      return {setpointFromRate};
+    }
+
+  } else if (setpointValid) {
+    // Only the angle is valid.
+    return {newSetpoint};
+
+  } else {
+    // Neither is valid.
+    return {};
   }
 }
