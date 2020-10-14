@@ -413,7 +413,7 @@ void GimbalControllerPlugin::OnUpdate()
 
       // Without this minus, the gimbal yaw is inverted.
       const auto maybeNewYawSetpoint = calcSetpoint(
-          dt, this->lastYawSetpoint, -this->yawSetpoint + (this->yawLock ? M_PI/2.0 : this->vehicleYawRad), -this->yawRateSetpoint);
+          dt, this->lastYawSetpoint, -this->yawSetpoint, -this->yawRateSetpoint);
       if (maybeNewYawSetpoint) {
         this->lastYawSetpoint = maybeNewYawSetpoint.value();
       }
@@ -427,7 +427,7 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchLimited = ignition::math::clamp(this->lastPitchSetpoint,
       pDir*this->pitchJoint->UpperLimit(0),
       pDir*this->pitchJoint->LowerLimit(0));
-    double yawLimited = ignition::math::clamp(this->lastYawSetpoint,
+    double yawLimited = ignition::math::clamp(this->lastYawSetpoint + (this->yawLock ? M_PI/2.0 : this->vehicleYawRad),
       yDir*this->yawJoint->LowerLimit(0),
     yDir*this->yawJoint->UpperLimit(0));
 #else
@@ -437,7 +437,7 @@ void GimbalControllerPlugin::OnUpdate()
     double pitchLimited = ignition::math::clamp(this->lastPitchSetpoint,
       pDir*this->pitchJoint->GetUpperLimit(0).Radian(),
       pDir*this->pitchJoint->GetLowerLimit(0).Radian());
-    double yawLimited = ignition::math::clamp(this->lastYawSetpoint,
+    double yawLimited = ignition::math::clamp(this->lastYawSetpoint + (this->yawLock ? M_PI/2.0 : this->vehicleYawRad),
       yDir*this->yawJoint->GetLowerLimit(0).Radian(),
     yDir*this->yawJoint->GetUpperLimit(0).Radian());
 #endif
