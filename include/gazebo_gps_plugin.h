@@ -95,6 +95,8 @@ private:
   common::Time last_time_;
   common::Time current_time_;
   common::Time start_time_;
+  
+  std::mutex data_mutex_;
 
   // Home defaults to Zurich Irchel Park
   // @note The home position can be specified using the environment variables:
