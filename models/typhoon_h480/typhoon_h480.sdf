@@ -421,7 +421,7 @@
       <axis>
         <xyz>0 -1 0</xyz>
         <limit>
-          <lower>-1.05</lower>
+          <lower>-2.09</lower>
           <upper>2.09</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
