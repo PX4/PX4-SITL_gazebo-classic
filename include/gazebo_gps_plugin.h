@@ -97,6 +97,8 @@ private:
   common::Time current_time_;
   common::Time start_time_;
 
+  std::mutex data_mutex_;
+
   // Home defaults to Zurich Irchel Park
   // @note The home position can be specified using the environment variables:
   // PX4_HOME_LAT, PX4_HOME_LON, and PX4_HOME_ALT
@@ -108,20 +110,20 @@ private:
   double world_altitude_ = 0.0;
 
   // gps delay related
-  static constexpr double gps_delay = 0.12;           // 120 ms
-  static constexpr int gps_buffer_size_max = 1000;
-  std::queue<sensor_msgs::msgs::SITLGps> gps_delay_buffer;
+  static constexpr double gps_delay_ = 0.12;           // 120 ms
+  static constexpr int gps_buffer_size_max_ = 1000;
+  std::queue<sensor_msgs::msgs::SITLGps> gps_delay_buffer_;
 
-  ignition::math::Vector3d gps_bias;
-  ignition::math::Vector3d noise_gps_pos;
-  ignition::math::Vector3d noise_gps_vel;
-  ignition::math::Vector3d random_walk_gps;
+  ignition::math::Vector3d gps_bias_;
+  ignition::math::Vector3d noise_gps_pos_;
+  ignition::math::Vector3d noise_gps_vel_;
+  ignition::math::Vector3d random_walk_gps_;
   ignition::math::Vector3d gravity_W_;
   ignition::math::Vector3d velocity_prev_W_;
 
   // gps noise parameters
-  double std_xy;    // meters
-  double std_z;     // meters
+  double std_xy_;    // meters
+  double std_z_;     // meters
   std::default_random_engine rand_;
   std::normal_distribution<float> randn_;
   static constexpr const double gps_corellation_time_ = 60.0;    // s

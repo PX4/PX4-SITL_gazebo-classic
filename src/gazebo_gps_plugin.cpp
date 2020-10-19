@@ -69,7 +69,7 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   // get gps topic name
   if(_sdf->HasElement("topic")) {
-    gps_topic_ = parentSensor_->Topic();
+    gps_topic_ = _sdf->GetElement("topic")->Get<std::string>();
   } else {
     // if not set by parameter, get the topic name from the model name
     gps_topic_ = parentSensorModelName;
@@ -229,12 +229,14 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
     model_ = world_->GetModel(model_name_);
 #endif
 
+  common::Time current_time;
+
 #if GAZEBO_MAJOR_VERSION >= 9
-  current_time_ = world_->SimTime();
+  current_time = world_->SimTime();
 #else
-  current_time_ = world_->GetSimTime();
+  current_time = world_->GetSimTime();
 #endif
-  double dt = (current_time_ - last_time_).Double();
+  double dt = (current_time - last_time_).Double();
 
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d T_W_I = model_->WorldPose();
@@ -257,42 +259,42 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
 
   // update noise parameters if gps_noise_ is set
   if (gps_noise_) {
-    noise_gps_pos.X() = gps_xy_noise_density_ * sqrt(dt) * randn_(rand_);
-    noise_gps_pos.Y() = gps_xy_noise_density_ * sqrt(dt) * randn_(rand_);
-    noise_gps_pos.Z() = gps_z_noise_density_ * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.X() = gps_vxy_noise_density_ * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.Y() = gps_vxy_noise_density_ * sqrt(dt) * randn_(rand_);
-    noise_gps_vel.Z() = gps_vz_noise_density_ * sqrt(dt) * randn_(rand_);
-    random_walk_gps.X() = gps_xy_random_walk_ * sqrt(dt) * randn_(rand_);
-    random_walk_gps.Y() = gps_xy_random_walk_ * sqrt(dt) * randn_(rand_);
-    random_walk_gps.Z() = gps_z_random_walk_ * sqrt(dt) * randn_(rand_);
+    noise_gps_pos_.X() = gps_xy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_pos_.Y() = gps_xy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_pos_.Z() = gps_z_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_vel_.X() = gps_vxy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_vel_.Y() = gps_vxy_noise_density_ * sqrt(dt) * randn_(rand_);
+    noise_gps_vel_.Z() = gps_vz_noise_density_ * sqrt(dt) * randn_(rand_);
+    random_walk_gps_.X() = gps_xy_random_walk_ * sqrt(dt) * randn_(rand_);
+    random_walk_gps_.Y() = gps_xy_random_walk_ * sqrt(dt) * randn_(rand_);
+    random_walk_gps_.Z() = gps_z_random_walk_ * sqrt(dt) * randn_(rand_);
   }
   else {
-    noise_gps_pos.X() = 0.0;
-    noise_gps_pos.Y() = 0.0;
-    noise_gps_pos.Z() = 0.0;
-    noise_gps_vel.X() = 0.0;
-    noise_gps_vel.Y() = 0.0;
-    noise_gps_vel.Z() = 0.0;
-    random_walk_gps.X() = 0.0;
-    random_walk_gps.Y() = 0.0;
-    random_walk_gps.Z() = 0.0;
+    noise_gps_pos_.X() = 0.0;
+    noise_gps_pos_.Y() = 0.0;
+    noise_gps_pos_.Z() = 0.0;
+    noise_gps_vel_.X() = 0.0;
+    noise_gps_vel_.Y() = 0.0;
+    noise_gps_vel_.Z() = 0.0;
+    random_walk_gps_.X() = 0.0;
+    random_walk_gps_.Y() = 0.0;
+    random_walk_gps_.Z() = 0.0;
   }
 
   // gps bias integration
-  gps_bias.X() += random_walk_gps.X() * dt - gps_bias.X() / gps_corellation_time_;
-  gps_bias.Y() += random_walk_gps.Y() * dt - gps_bias.Y() / gps_corellation_time_;
-  gps_bias.Z() += random_walk_gps.Z() * dt - gps_bias.Z() / gps_corellation_time_;
+  gps_bias_.X() += random_walk_gps_.X() * dt - gps_bias_.X() / gps_corellation_time_;
+  gps_bias_.Y() += random_walk_gps_.Y() * dt - gps_bias_.Y() / gps_corellation_time_;
+  gps_bias_.Z() += random_walk_gps_.Z() * dt - gps_bias_.Z() / gps_corellation_time_;
 
   // reproject position with noise into geographic coordinates
-  auto pos_with_noise = pos_W_I + noise_gps_pos + gps_bias;
+  auto pos_with_noise = pos_W_I + noise_gps_pos_ + gps_bias_;
   auto latlon = reproject(pos_with_noise, lat_home_, lon_home_, alt_home_);
 
   // fill SITLGps msg
   sensor_msgs::msgs::SITLGps gps_msg;
 
-  gps_msg.set_time_usec(current_time_.Double() * 1e6);
-  gps_msg.set_time_utc_usec((current_time_.Double() + start_time_.Double()) * 1e6);
+  gps_msg.set_time_usec(current_time.Double() * 1e6);
+  gps_msg.set_time_utc_usec((current_time.Double() + start_time_.Double()) * 1e6);
 
   // @note Unfurtonately the Gazebo GpsSensor seems to provide bad readings,
   // starting to drift and leading to global position loss
@@ -301,45 +303,62 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
   // gps_msg.set_altitude(parentSensor_->Altitude());
   gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
   gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
-  gps_msg.set_altitude(pos_W_I.Z() + alt_home_ - noise_gps_pos.Z() + gps_bias.Z());
+  gps_msg.set_altitude(pos_W_I.Z() + alt_home_ - noise_gps_pos_.Z() + gps_bias_.Z());
 
-  std_xy = 1.0;
-  std_z = 1.0;
-  gps_msg.set_eph(std_xy);
-  gps_msg.set_epv(std_z);
+  std_xy_ = 1.0;
+  std_z_ = 1.0;
+  gps_msg.set_eph(std_xy_);
+  gps_msg.set_epv(std_z_);
 
-  gps_msg.set_velocity_east(velocity_current_W.X() + noise_gps_vel.Y());
+  gps_msg.set_velocity_east(velocity_current_W.X() + noise_gps_vel_.Y());
   gps_msg.set_velocity(velocity_current_W_xy.Length());
-  gps_msg.set_velocity_north(velocity_current_W.Y() + noise_gps_vel.X());
-  gps_msg.set_velocity_up(velocity_current_W.Z() - noise_gps_vel.Z());
+  gps_msg.set_velocity_north(velocity_current_W.Y() + noise_gps_vel_.X());
+  gps_msg.set_velocity_up(velocity_current_W.Z() - noise_gps_vel_.Z());
 
-  // add msg to buffer
-  gps_delay_buffer.push(gps_msg);
+  {
+    // protect shared variables
+    std::lock_guard<std::mutex> lock(data_mutex_);
 
-  last_time_ = current_time_;
+    // add msg to buffer
+    gps_delay_buffer_.push(gps_msg);
+    current_time_ = current_time;
+  }
+
+  last_time_ = current_time;
 }
 
 void GpsPlugin::OnSensorUpdate()
 {
+  // protect shared variables
+  std::lock_guard<std::mutex> lock(data_mutex_);
+
   sensor_msgs::msgs::SITLGps gps_msg;
   // apply GPS delay
   if ((current_time_ - last_gps_time_).Double() > 1 / parentSensor_->UpdateRate()) {
     last_gps_time_ = current_time_;
 
-    while (true) {
-      gps_msg = gps_delay_buffer.front();
-      double gps_current_delay = current_time_.Double() - gps_delay_buffer.front().time_usec() / 1e6f;
+    // do not sent empty msg
+    // abort if buffer is empty
+    if (gps_delay_buffer_.empty()) {
+      return;
+    }
 
-      if (gps_delay_buffer.empty()) {
+    while (true) {
+
+      if (gps_delay_buffer_.empty()) {
         // abort if buffer is empty already
         break;
       }
+
+      gps_msg = gps_delay_buffer_.front();
+      double gps_current_delay = current_time_.Double() - gps_delay_buffer_.front().time_usec() / 1e6f;
+
       // remove data that is too old or if buffer size is too large
-      if (gps_current_delay >= gps_delay) {
-        gps_delay_buffer.pop();
+      if (gps_current_delay >= gps_delay_) {
+        gps_delay_buffer_.pop();
       // remove data if buffer too large
-      } else if (gps_delay_buffer.size() > gps_buffer_size_max) {
-        gps_delay_buffer.pop();
+      } else if (gps_delay_buffer_.size() > gps_buffer_size_max_) {
+        gps_delay_buffer_.pop();
       } else {
         // if we get here, we have good data, stop
         break;
