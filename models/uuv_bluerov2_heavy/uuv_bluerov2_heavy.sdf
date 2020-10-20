@@ -546,7 +546,6 @@
         <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
             <robotNamespace />
             <imuSubTopic>/imu</imuSubTopic>
-            <gpsSubTopic>/gps</gpsSubTopic>
             <magSubTopic>/mag</magSubTopic>
             <baroSubTopic>/baro</baroSubTopic>
             <mavlink_addr>INADDR_ANY</mavlink_addr>
