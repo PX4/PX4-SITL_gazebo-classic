@@ -493,49 +493,6 @@
             <child>thruster8</child>
         </joint>
 
-        <plugin name="uuv_plugin" filename="libgazebo_uuv_plugin.so">
-            <robotNamespace/>
-            <baseLinkName>base_link</baseLinkName>
-            <addedMassLinear>1.11 2.8 2.8</addedMassLinear>
-            <addedMassAngular>0.00451 0.0163 0.0163</addedMassAngular>
-            <dampingLinear>5.39 17.36 17.36</dampingLinear>
-            <dampingAngular>0.00114 0.007 0.007</dampingAngular>
-            <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
-            <buoyancy>
-                <link_name>base_link</link_name>
-                <origin>0 0 0</origin>
-                <compensation>1</compensation>
-                <height_scale_limit>0.05</height_scale_limit>
-              </buoyancy>
-            <link name="base_link">
-                <!-- <buoyancy>
-                    <compensation>0.17</compensation>
-                    <origin>0.12585 0.111 0.1789</origin>
-                </buoyancy>
-                <buoyancy>
-                    <compensation>0.17</compensation>
-                    <origin>0.12585 -0.111 0.1789</origin>
-                </buoyancy>
-                <buoyancy>
-                    -
-                    <compensation>0.17</compensation>
-                    <origin>-0.12585 0.111 0.1789</origin>
-                </buoyancy>
-                <buoyancy>
-                    <compensation>0.17</compensation>
-                    <origin>-0.12585 -0.111 0.1789</origin>
-                </buoyancy> -->
-                <!-- <buoyancy>
-                    <compensation>0.505</compensation>
-                    <origin>0 0.111 0.1789</origin>
-                </buoyancy> -->
-                <buoyancy>
-                    <compensation>1.002</compensation>
-                    <origin>0 0 0</origin>
-                </buoyancy>
-            </link>
-        </plugin>
-
         <plugin name="thruster8_model" filename="libgazebo_motor_model.so">
             <robotNamespace />
             <reversible>true</reversible>
@@ -570,6 +527,21 @@
             <baroTopic>/baro</baroTopic>
         </plugin>
 
+        <plugin name="uuv_plugin" filename="libgazebo_uuv_plugin.so">
+            <robotNamespace />
+            <baseLinkName>base_link</baseLinkName>
+            <addedMassLinear>1.11 2.8 2.8</addedMassLinear>
+            <addedMassAngular>0.00451 0.0163 0.0163</addedMassAngular>
+            <dampingLinear>5.39 17.36 17.36</dampingLinear>
+            <dampingAngular>0.00114 0.007 0.007</dampingAngular>
+            <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+            <buoyancy>
+                <link_name>base_link</link_name>
+                <origin>0 0 0</origin>
+                <compensation>1</compensation>
+                <height_scale_limit>0.05</height_scale_limit>
+            </buoyancy>
+        </plugin>
 
         <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
             <robotNamespace />
