@@ -640,14 +640,12 @@ void GimbalControllerPlugin::SendGimbalDeviceInformation()
     GIMBAL_DEVICE_CAP_FLAGS_HAS_YAW_FOLLOW |
     GIMBAL_DEVICE_CAP_FLAGS_SUPPORTS_INFINITE_YAW;
 
-  const float tiltMax = this->pitchJoint->UpperLimit(0);
-  const float tiltMin = this->pitchJoint->LowerLimit(0);
-  const float panMax = this->yawJoint->LowerLimit(0);
-  const float panMin = this->yawJoint->UpperLimit(0);
-
-  // Somewhat arbitrary limits:
-  const float panRateMin = 60.0 / 180.0 * M_PI;
-  const float tiltRateMax = 60 / 180.0 * M_PI;
+  const float rollMax = this->rollJoint->UpperLimit(0);
+  const float rollMin = this->rollJoint->LowerLimit(0);
+  const float pitchMax = this->pitchJoint->UpperLimit(0);
+  const float pitchMin = this->pitchJoint->LowerLimit(0);
+  const float yawMax = this->yawJoint->LowerLimit(0);
+  const float yawMin = this->yawJoint->UpperLimit(0);
 
   mavlink_message_t msg;
   mavlink_msg_gimbal_device_information_pack_chan(
@@ -664,12 +662,12 @@ void GimbalControllerPlugin::SendGimbalDeviceInformation()
     uid,
     capFlags,
     0, // custom_cap_flags
-    tiltMax,
-    tiltMin,
-    tiltRateMax,
-    panMax,
-    panMin,
-    panRateMin);
+    rollMin,
+    rollMax,
+    pitchMin,
+    pitchMax,
+    yawMin,
+    yawMax);
   SendMavlinkMessage(msg);
 }
 
