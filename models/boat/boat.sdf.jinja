@@ -1,0 +1,582 @@
+<sdf version='1.6'>
+  <model name='boat'>
+    <link name='base_link'>
+      <pose>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose >0 0 0.124229 0 -0 0</pose>
+        <mass>227</mass>
+        <inertia>
+          <ixx>181.42</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>408.203</iyy>
+          <iyz>0</iyz>
+          <izz>495.037</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_fixed_joint_lump__left_float_collision'>
+        <pose >-0.4 1.03 0.2 3.14159 1.57079 3.14159</pose>
+        <geometry>
+          <cylinder>
+            <length>4</length>
+            <radius>0.2</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__left_mid_float_collision_1'>
+        <pose>1.85 1.03 0.3 0 1.38 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.5</length>
+            <radius>0.17</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__left_front_float_collision_2'>
+        <pose>2.3 1.03 0.4 0 1.3 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.12</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__front_left_beam_lower_collision_3'>
+        <pose>0.9 0.85 1 0.78 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.5</length>
+            <radius>0.04</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__front_left_beam_upper_collision_4'>
+        <pose>0.9 0.6 1.18 1.35 -0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.2</length>
+            <radius>0.04</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__mid_left_beam_lower_collision_5'>
+        <pose>-0.65 0.99 0.7 0.1 0.25 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__mid_left_beam_medium_collision_6'>
+        <pose>-0.57 0.87 1.05 0.75 0.25 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.32</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__mid_left_beam_upper_collision_7'>
+        <pose>-0.55 0.65 1.17 1.35 0.25 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.3</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_left_beam_lower_collision_8'>
+        <pose>-0.74 1.03 0.7 0 -0.15 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_left_beam_medium_collision_9'>
+        <pose>-0.79 0.91 1.05 0.75 -0.15 -0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.32</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_left_beam_upper_collision_10'>
+        <pose>-0.81 0.67 1.18 1.45 -0.15 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.3</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__left_joint_collision_11'>
+        <pose>0.58 1.03 0.6 0 -0.6 0</pose>
+        <geometry>
+          <box>
+            <size>0.65 0.2 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__right_float_collision_12'>
+        <pose>-0.4 -1.03 0.2 3.14159 1.57079 3.14159</pose>
+        <geometry>
+          <cylinder>
+            <length>4</length>
+            <radius>0.2</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__right_mid_float_collision_13'>
+        <pose>1.85 -1.03 0.3 0 1.38 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.5</length>
+            <radius>0.17</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__right_front_float_collision_14'>
+        <pose>2.3 -1.03 0.4 0 1.3 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.12</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__front_right_beam_lower_collision_15'>
+        <pose>0.9 -0.85 1 -0.78 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.5</length>
+            <radius>0.04</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__front_right_beam_upper_collision_16'>
+        <pose>0.9 -0.6 1.18 -1.35 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.2</length>
+            <radius>0.04</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__mid_right_beam_lower_collision_17'>
+        <pose>-0.65 -0.99 0.7 -0.1 0.25 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__mid_right_beam_medium_collision_18'>
+        <pose>-0.57 -0.87 1.05 -0.75 0.25 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.32</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__mid_right_beam_upper_collision_19'>
+        <pose>-0.55 -0.65 1.17 -1.35 0.25 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.3</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_right_beam_lower_collision_20'>
+        <pose>-0.74 -1.03 0.7 0 -0.15 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.45</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_right_beam_medium_collision_21'>
+        <pose>-0.79 -0.91 1.05 -0.75 -0.15 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.32</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__rear_right_beam_upper_collision_22'>
+        <pose>-0.81 -0.67 1.18 -1.45 -0.15 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.3</length>
+            <radius>0.03</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__right_joint_collision_23'>
+        <pose>0.58 -1.03 0.6 0 -0.6 0</pose>
+        <geometry>
+          <box>
+            <size>0.65 0.2 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__top_base_collision_24'>
+        <pose>0 0 1.25 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>1.85 1 0.1</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__left_battery_collision_collision_25'>
+        <pose>0 1 0.6 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.6 0.4 0.31</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='base_link_fixed_joint_lump__right_battery_collision_collision_26'>
+        <pose>0 -1 0.6 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.6 0.4 0.31</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='base_link_fixed_joint_lump__dummy_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes/body.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='base_link_fixed_joint_lump__left_battery_visual_visual_1'>
+        <pose>0 -0.03 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes/battery.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='base_link_fixed_joint_lump__right_battery_visual_visual_2'>
+        <pose>0 -2.03 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes/battery.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='right_engine_link_visual'>
+        <pose>-2.37378 -1.02713 0.318237 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes//engine.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='left_engine_link_visual'>
+        <pose>-2.37378 1.02713 0.318237 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes//engine.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <link name='left_propeller_link'>
+      <pose>-2.65193 1.02713 -0.191134 0 1.57079 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.008545</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.008545</iyy>
+          <iyz>0</iyz>
+          <izz>0.0144</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_propeller_link_fixed_joint_lump__left_propeller_collision_collision'>
+        <pose>-0.08 0 0 3.14159 0.0 3.14159</pose>
+        <geometry>
+          <cylinder>
+            <length>0.18</length>
+            <radius>0.24</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='left_propeller_link_visual'>
+        <pose>0 0 0 0 -1.57079 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes/propeller.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='left_engine_propeller_joint' type='revolute'>
+      <child>left_propeller_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <!-- <damping>0.05</damping>
+          <friction>0.05</friction> -->
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='right_propeller_link'>
+      <pose>-2.65193 -1.02713 -0.191134 0 1.57079 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.008545</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.008545</iyy>
+          <iyz>0</iyz>
+          <izz>0.0144</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_propeller_link_fixed_joint_lump__right_propeller_collision_collision'>
+        <pose>-0.08 0 0 3.14159 0.0 3.14159</pose>
+        <geometry>
+          <cylinder>
+            <length>0.18</length>
+            <radius>0.24</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='right_propeller_link_visual'>
+        <pose>0 0 0 0 -1.57079 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://boat/meshes/propeller.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <link name='boat/imu_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='right_engine_propeller_joint' type='revolute'>
+      <child>right_propeller_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <!-- <damping>0.05</damping>
+          <friction>0.05</friction> -->
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <joint name='boat/imu_joint' type='revolute'>
+      <child>boat/imu_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0.12 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+      <robotNamespace></robotNamespace>
+      <linkName>boat/imu_link</linkName>
+      <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>100</pubRate>
+      <noiseDensity>0.0004</noiseDensity>
+      <randomWalk>6.4e-06</randomWalk>
+      <biasCorrelationTime>600</biasCorrelationTime>
+      <magTopic>/mag</magTopic>
+    </plugin>
+    <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>50</pubRate>
+      <baroTopic>/baro</baroTopic>
+    </plugin>
+    <static>0</static>
+    <plugin name='left_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace></robotNamespace>
+      <jointName>left_engine_propeller_joint</jointName>
+      <linkName>left_propeller_link</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1100</maxRotVelocity>
+      <motorConstant>8.54858e-03</motorConstant>
+      <momentConstant>0.01</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin name='left_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace></robotNamespace>
+      <jointName>right_engine_propeller_joint</jointName>
+      <linkName>right_propeller_link</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1100</maxRotVelocity>
+      <motorConstant>8.54858e-03</motorConstant>
+      <momentConstant>0.01</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin name='usv_dynamics_wamv_dynamics_plugin' filename='libgazebo_usv_dynamics_plugin.so'>
+      <bodyName>base_link</bodyName>
+      <waterLevel>0</waterLevel>
+      <waterDensity>997.8</waterDensity>
+      <xDotU>0.0</xDotU>
+      <yDotV>0.0</yDotV>
+      <nDotR>0.0</nDotR>
+      <xU>51.3</xU>
+      <xUU>72.4</xUU>
+      <yV>40.0</yV>
+      <yVV>0.0</yVV>
+      <zW>500.0</zW>
+      <kP>50.0</kP>
+      <mQ>50.0</mQ>
+      <nR>400.0</nR>
+      <nRR>0.0</nRR>
+      <hullRadius>0.213</hullRadius>
+      <boatWidth>2.4</boatWidth>
+      <boatLength>4.9</boatLength>
+      <length_n>2</length_n>
+      <wave_model>ocean_waves</wave_model>
+    </plugin>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace></robotNamespace>
+      <imuSubTopic>/imu</imuSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
+      <mavlink_udp_port>{{ mavlink_udp_port }}</mavlink_udp_port>
+      <serialEnabled>{{ serial_enabled }}</serialEnabled>
+      <serialDevice>{{ serial_device }}</serialDevice>
+      <baudRate>{{ serial_baudrate }}</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <sdk_addr>INADDR_ANY</sdk_addr>
+      <sdk_udp_port>14540</sdk_udp_port>
+      <hil_mode>{{ hil_mode }}</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <control_channels>
+        <channel name="left_rotor">
+          <input_index>0</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>100</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>left_engine_propeller_joint</joint_name>
+        </channel>
+        <channel name="right_rotor">
+          <input_index>1</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>100</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>right_engine_propeller_joint</joint_name>
+        </channel>
+      </control_channels>
+    </plugin>
+  </model>
+</sdf>

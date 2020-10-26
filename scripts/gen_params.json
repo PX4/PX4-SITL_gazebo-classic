@@ -1,0 +1,38 @@
+{	"world_params": {
+		"sdf_version": "NotSet",
+		"sun_model": "sunSolarNoon",
+		"sun_utc_date": "1904_09_20_17_30",
+		"cloud_speed": "NoClouds",
+		"shadows": 1,
+		"video_widget": "NotSet",
+		"update_rate": 250,
+		"wind_speed": "NotSet",
+		"realtime_factor": 1.0,
+		"world_name": "empty",
+		"ambient_light": 0.5,
+		"background_light": 0.15,
+		"spherical_coords": "NotSet",
+		"latitude": 39.8039,
+		"longitude": -84.0606,
+		"altitude": 244,
+		"model_name": "NotSet",
+		"model_pose": "NotSet",
+		"irlock_beacon_pose": "NotSet",
+		"output_file": 0,
+		"ode_threads": 2
+	},
+	"model_params": {
+		"base_model": "NotSet",
+		"sdf_version": "NotSet",
+		"mavlink_tcp_port": 4560,
+		"mavlink_udp_port": 14560,
+		"serial_enabled": "NotSet",
+		"serial_device": "/dev/ttyACM0",
+		"serial_baudrate": 921600,
+		"enable_lockstep": "NotSet",
+		"hil_mode": 0,
+		"model_name": "NotSet",
+		"output_path": 0,
+		"config_file": 0
+	}
+}

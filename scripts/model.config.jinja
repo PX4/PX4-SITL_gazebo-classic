@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+{% set sdf_version = '1.5' if sdf_version == 'NotSet' else sdf_version %}
+<model>
+  <name>{{ model_name }}</name>
+  <version>1.0</version>
+  <sdf version='{{ sdf_version }}'>{{ model_name }}.sdf</sdf>
+
+  <author>
+   <name>Benjamin Perseghetti</name>
+   <email>bperseghetti@rudislabs.com</email>
+  </author>
+
+  <description>
+    Generated model file.
+  </description>
+</model>

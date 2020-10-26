@@ -202,7 +202,6 @@ link_libraries(
   ${Boost_TIMER_LIBRARY_RELEASE}
   ${GAZEBO_LIBRARIES}
   ${OpenCV_LIBRARIES}
-  ${PROTOBUF_LIBRARY}
   )
 
 if (GSTREAMER_FOUND)
@@ -411,7 +410,7 @@ if (GSTREAMER_FOUND)
   if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
     QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
     add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
+    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES})
     set(plugins
       ${plugins}
       gazebo_video_stream_widget
@@ -420,7 +419,7 @@ if (GSTREAMER_FOUND)
   else()
     QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
     add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
+    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Test_LIBRARIES})
     set(plugins
       ${plugins}
       gazebo_video_stream_widget
