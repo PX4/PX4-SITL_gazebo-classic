@@ -810,20 +810,31 @@ void GimbalControllerPlugin::HandleGimbalDeviceSetAttitude(const mavlink_message
   mavlink_gimbal_device_set_attitude_t set_attitude;
   mavlink_msg_gimbal_device_set_attitude_decode(&msg, &set_attitude);
 
-  float rollRad, pitchRad, yawRad;
-  mavlink_quaternion_to_euler(&set_attitude.q[0], &rollRad, &pitchRad, &yawRad);
+  if ((set_attitude.flags & GIMBAL_DEVICE_FLAGS_NEUTRAL) != 0) {
+    const std::lock_guard<std::mutex> lock(setpointMutex);
+    this->rollSetpoint = 0.0f;
+    this->pitchSetpoint = 0.0f;
+    this->yawSetpoint = 0.0f;
+    this->yawLock = false;
+    this->rollRateSetpoint = NAN;
+    this->pitchRateSetpoint = NAN;
+    this->yawRateSetpoint = NAN;
 
-  const std::lock_guard<std::mutex> lock(setpointMutex);
-  this->rollSetpoint = rollRad;
-  this->pitchSetpoint = pitchRad;
-  this->yawSetpoint = yawRad;
+  } else {
+    float rollRad, pitchRad, yawRad;
+    mavlink_quaternion_to_euler(&set_attitude.q[0], &rollRad, &pitchRad, &yawRad);
 
-  this->yawLock = (set_attitude.flags & GIMBAL_DEVICE_FLAGS_YAW_LOCK);
-
-  this->rollRateSetpoint = set_attitude.angular_velocity_x;
-  this->pitchRateSetpoint = set_attitude.angular_velocity_y;
-  this->yawRateSetpoint = set_attitude.angular_velocity_z;
+    const std::lock_guard<std::mutex> lock(setpointMutex);
+    this->rollSetpoint = rollRad;
+    this->pitchSetpoint = pitchRad;
+    this->yawSetpoint = yawRad;
+    this->yawLock = (set_attitude.flags & GIMBAL_DEVICE_FLAGS_YAW_LOCK);
+    this->rollRateSetpoint = set_attitude.angular_velocity_x;
+    this->pitchRateSetpoint = set_attitude.angular_velocity_y;
+    this->yawRateSetpoint = set_attitude.angular_velocity_z;
+  }
 }
+
 
 void GimbalControllerPlugin::HandleAutopilotStateForGimbalDevice(const mavlink_message_t& msg)
 {
