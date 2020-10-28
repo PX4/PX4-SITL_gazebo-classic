@@ -844,7 +844,7 @@ void GimbalControllerPlugin::HandleRequestMessage(uint8_t target_sysid, uint8_t 
       SendGimbalDeviceInformation();
       break;
     default:
-      SendResult(target_sysid, target_compid, command_long.command, MAV_RESULT_DENIED);
+      // Ignore messages that we don't support.
       break;
   }
 }
