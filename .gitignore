@@ -20,3 +20,6 @@ models/px4flow/px4flow.sdf
 models/r200/r200.sdf
 models/sf10a/sf10a.sdf
 models/standard_vtol/standard_vtol.sdf
+models/r1_rover/r1_rover.sdf
+models/rover/rover.sdf
+models/tiltrotor/tiltrotor.sdf
