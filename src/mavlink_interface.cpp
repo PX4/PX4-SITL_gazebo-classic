@@ -430,7 +430,7 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
         return;
       }
 
-      size_t len;
+      ssize_t len;
       if (use_tcp_) {
         len = send(fds_[CONNECTION_FD].fd, buffer, packetlen, 0);
       } else {
