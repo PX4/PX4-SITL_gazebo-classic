@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='plane_soaring'>
+    <include>
+      <uri>model://plane</uri>
+    </include>
+    <plugin name='thermal_plugin' filename='libgazebo_thermal_plugin.so'>
+      <thermalCenter>0 20 0</thermalCenter>
+      <thermalStrength>10.0</thermalStrength>
+    </plugin>
+  </model>
+</sdf>
