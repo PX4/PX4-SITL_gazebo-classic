@@ -426,6 +426,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
   baro_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + baro_sub_topic_, &GazeboMavlinkInterface::BarometerCallback, this);
   wind_sub_ = node_handle_->Subscribe("~/" + wind_sub_topic_, &GazeboMavlinkInterface::WindVelocityCallback, this);
+  battery_sub_ = node_handle_->Subscribe("~/" + battery_sub_topic_, &GazeboMavlinkInterface::BatteryStatusCallback, this);
 
   // Get the model joints
   auto joints = model_->GetJoints();
@@ -1092,6 +1093,17 @@ void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
   wind_vel_ = ignition::math::Vector3d(msg->velocity().x(),
             msg->velocity().y(),
             msg->velocity().z());
+}
+
+void GazeboMavlinkInterface::BatteryStatusCallback(WindPtr& msg) {
+
+  mavlink_battery_staus_t battery_status_msg; 
+
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_battery_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &battery_status_msg);
+    mavlink_interface_->send_mavlink_message(&msg);
+  }
 }
 
 void GazeboMavlinkInterface::handle_actuator_controls() {
