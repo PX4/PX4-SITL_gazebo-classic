@@ -49,21 +49,6 @@ class PID{
       u[1] = u[0];
 
       u[0] = (c[1]*u[1] + c[2]*u[2] + Kp * (c[3]*(y_bar[2] - y[2]) + c[4]*(y_bar[1] - y[1]) + c[5]*(y_bar[0] - y[0])))/c[0];
-      
-      if (1)
-      {
-        //std::cout << "C[1]: " << c[1] << "  ";
-        //std::cout << "C[2]: " << c[2] << "  ";
-        //std::cout << "U[1]: " << u[1] << "\n";
-      }
-      counter++;
-      
-      //std::cout << "TERM 1: " << c[1]*u[1] << "\n";
-      //std::cout << "U[1]: " << u[1] << "\n";
-      //std::cout << "TERM 2: " << c[2]*u[2] << "\n";
-      //std::cout << "TERM 3: " << Kp * c[3]*(y_bar[2] - y[2]) << "\n";
-      //std::cout << "TERM 4: " << Kp * c[4]*(y_bar[1] - y[1]) << "\n";
-      //std::cout << "TERM 5: " << Kp * c[5]*(y_bar[0] - y[0]) << "\n";
 
       if(u[0] > maxTh){
         u[0] = maxTh;

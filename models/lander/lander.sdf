@@ -1538,6 +1538,7 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
+
           <script>
             <name>ModelPreview_7::thruster_2::base_fixed_joint_lump__thruster_2_nozzle_visual_39_MATERIAL_</name>
             <uri>__default__</uri>
@@ -1577,10 +1578,6 @@
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
-          <script>
-            <name>ModelPreview_7::thruster_3::base_fixed_joint_lump__thruster_3_nozzle_visual_42_MATERIAL_</name>
-            <uri>__default__</uri>
-          </script>
         </material>
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
@@ -1596,6 +1593,60 @@
           <iyy>1</iyy>
           <iyz>0</iyz>
           <izz>1</izz>
+        </inertia>
+        <mass>.1</mass>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <pose frame=''>0 0.512953 0.289119 0 -0 0</pose>
+      <visual name='base_fixed_joint_lump__thruster_4_nozzle_visual_45'>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lander/meshes/thruster_4_nozzle.stl</uri>
+          </mesh>
+        </geometry>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <material>
+          <shader type='pixel'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+        <transparency>0</transparency>
+        <cast_shadows>1</cast_shadows>
+      </visual>
+    </link>
+
+    <link name='lander/airspeed_link'>
+      <pose>0 0 0.75 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+      <self_collide>0</self_collide>
+    </link>
+    <link name='lander/imu_link'>
+      <pose>0 0 0.75 -0 -0 -0.09</pose>
+      <inertial>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
         </inertia>
         <mass>.1</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1665,7 +1716,7 @@
     </link>
     <include>
       <uri>model://gps</uri>
-      <pose>0 0 0.5 0 0 0</pose>
+      <pose>0 0 0.75 0 0 0</pose>
       <name>gps</name>
     </include>
     <joint name='gps_joint' type='fixed'>
@@ -1724,7 +1775,7 @@
     </joint>
 
 
-    <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='fixed'>
+    <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='ball'>
       <parent>actuator_1_inner</parent>
       <child>actuator_1_mount_front</child>
       <pose frame=''>-0.02 0 0 0 -0 0</pose>
@@ -1741,7 +1792,7 @@
         </ode>
       </physics>
     </joint>
-    <joint name='actuator_1_mount_back_JOINT_0' type='fixed'>
+    <joint name='actuator_1_mount_back_JOINT_0' type='ball'>
       <parent>actuator_1_mount_back</parent>
       <child>actuator_1_outer</child>
       <pose frame=''>0.09 0 0.02 0 -0 0</pose>
@@ -2284,7 +2335,7 @@
       <robotNamespace/>
       <linkName>lander/airspeed_link</linkName>
     </plugin>
-    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+    <plugin name='mavlink_interface' filename='libgazebo_custom_mavlink_interface.so'>
       <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
       <magSubTopic>/mag</magSubTopic>
