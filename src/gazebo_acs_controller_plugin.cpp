@@ -483,8 +483,11 @@ void GimbalControllerPlugin::OnUpdate()
   //static actuator acs_cw[2] = {actuator("lander::acs_yaw_cw_1"), actuator("lander::acs_yaw_cw_2")};
   //static actuator acs_ccw[2] = {actuator("lander::acs_yaw_ccw_1"), actuator("lander::acs_yaw_ccw_2")};
 
-  static PID con_roll(-4,0,-120,1,1,100000,-10000);
-  static PID con_pitch(-4,0,-120,1,1,100000,-10000);
+  common::Time time_ = this->model->GetWorld()->SimTime();
+  double dt_ = (time_ - this->lastUpdateTime).Double();
+
+  static PID con_roll(100,1,50,dt_,0.05,100000,-10000);
+  static PID con_pitch(100,1,50,dt_,0.05,100000,-10000);
   //static PID con_yaw(1,1,1,1,1,100000,-10000);
 
   const std::lock_guard<std::mutex> lock(cmd_mutex);
@@ -495,7 +498,15 @@ void GimbalControllerPlugin::OnUpdate()
     //std::cout << "PITCH TARGET: " << pitchTarget << "\n";
     //double yawTarget = con_yaw.Update(-2, 0);
     //std::cout << "YAW TARGET: " << yawTarget << "\n";
-
+  
+  /**
+    thisVariableIsNotUsed++;
+    std::cout << thisVariableIsNotUsed << "\n";
+    if(thisVariableIsNotUsed > 10000)
+    {
+      rollTarget = -400;
+    }
+   */
     if(rollTarget < 0){
         const ignition::math::v4::Vector3<double>& force = {0, 0, -rollTarget};
         //std::cout << "SB: " << rollTarget << "\n";

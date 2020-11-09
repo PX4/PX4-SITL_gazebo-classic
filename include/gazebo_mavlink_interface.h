@@ -72,6 +72,7 @@
 
 #include "mavlink_interface.h"
 #include "msgbuffer.h"
+#include "PID.h"
 
 //! Default distance sensor model joint naming
 static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");
@@ -178,6 +179,7 @@ private:
   bool send_odometry_;
 
   std::vector<physics::JointPtr> joints_;
+  double thisVariableIsNotUsed = 0;
   std::vector<common::PID> pids_;
   std::vector<double> joint_max_errors_;
 
