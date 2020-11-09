@@ -1161,7 +1161,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
-  static PID actuator_cont[2] = {PID(100, 100, 500,_dt, 10000,100000,-100000), PID(100, 100, 500,_dt, 10000,100000,-100000)};
+  //static PID actuator_cont[2] = {PID(10000, 0, 10000000,_dt, 1000000000000,100000,-100000), PID(10000, 0, 10000000,_dt, 10000000000,100000,-100000)};
 
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
@@ -1182,8 +1182,19 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         double current = joints_[i]->GetAngle(0).Radian();
 #endif
 
+        target = 0;
+        //std::cout << "CURRENT: " << current << "\n";
+        //std::cout << "Target: " << target << "\n";
         //double err = current - target;
-        double force = actuator_cont[i].Update(current, target);
+        //double force = actuator_cont[i].Update(current, target);
+        /**
+        if(thisVariableIsNotUsed < 6000)
+        {
+          force = 0;
+        }
+        thisVariableIsNotUsed++;
+        std::cout << thisVariableIsNotUsed << "\n";
+        */
         /* ORIGINAL
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
@@ -1196,19 +1207,19 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         if(i == 0){
             //std::cout << "use the force " << i << " :" << force << std::endl;
             //std::cout << "use the target " << target << std::endl;
-            myfile << force << ", ";
+            //myfile << force << ", ";
         }
 
         /*else
             myfile << force << std::endl;*/
         
-        force += ourOffset;
+        //force += ourOffset;
         if(i == 0)
-            myfile << force << std::endl;
+            //myfile << force << std::endl;
         
         myfile.close();
         //std::cout << "FORCE " << i << ": " << force << std::endl;
-        joints_[i]->SetForce(0, force);
+        //joints_[i]->SetForce(0, force);
       }
       else if (joint_control_type_[i] == "position_gztopic")
       {
@@ -1230,6 +1241,9 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         /// really not ideal if your drone is moving at all,
         /// mixing kinematic updates with dynamics calculation is
         /// non-physical.
+        //input_reference_[i] = 0;
+        //std::cout << "TARGET: " << input_reference_[i] << "\n";
+        //input_reference_[i] = 0.2;
      #if GAZEBO_MAJOR_VERSION >= 6
         joints_[i]->SetPosition(0, input_reference_[i]);
      #else
@@ -1240,23 +1254,21 @@ void GazeboMavlinkInterface::handle_control(double _dt)
       {
       	std::string lander_name = "lander";
         std::string path = lander_name + "::" + link_names[i];
+        gazebo::physics::LinkPtr link = model_->GetChildLink(path);
         if ((link_names[i] == "thruster_1") && (target > 0))
         {
           //std::cout << "YAW_PO: " << target << "  ";
-          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
           const ignition::math::v4::Vector3<double>& force = {0, target, 0};
           link->AddLinkForce(force);
         }
         else if ((link_names[i] == "thruster_3") && (target > 0))
         {
-          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
           //std::cout << "YAW_SB: " << target << "  ";
           const ignition::math::v4::Vector3<double>& force = {0, -target, 0};
           link->AddLinkForce(force);
         }
         else if ((link_names[i] == "thruster_4") && (target < 0))
         {
-          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
           //std::cout << "YAW_BO: " << target << "  ";
           const ignition::math::v4::Vector3<double>& force = {target, 0, 0};
           link->AddLinkForce(force);
@@ -1264,7 +1276,6 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         }
         else if ((link_names[i] == "thruster_2") && (target < 0))
         {
-          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
           //std::cout << "YAW_AF: " << target << "\n";
           const ignition::math::v4::Vector3<double>& force = {-target, 0, 0};
           link->AddLinkForce(force);
@@ -1276,10 +1287,8 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           {
             target = 0;
           }
-          gazebo::physics::LinkPtr link = model_->GetChildLink(path);
           //std::cout << "Thrust: " << target << "\n";
-          const ignition::math::v4::Vector3<double>& force = { 0, target, 0};
-          //link->AddRelativeForce(force);
+          const ignition::math::v4::Vector3<double>& force = { 0, 0, target};
           link->AddLinkForce(force);
         }
       }

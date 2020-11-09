@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+  
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Initial Landing Zone -->
+    <include>
+      <uri>model://landing</uri>
+      <name>initial_landing_zone</name>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    
+    <!-- Final Landing Zone -->
+    <include>
+      <uri>model://landing</uri>
+      <name>final_landing_zone</name>
+      <pose>26 17 0 0 0 0</pose>
+    </include>
+    
+    <!--
+    <include>
+   	  <uri>model://lander</uri>
+   	  <pose>0 0 5 0 0 0</pose>
+   	</include>
+   	-->
+    
+    <!--
+    <model name="box0">
+      <link name="link">
+        <pose>0 0 5 0 0 0</pose>
+
+        <collision name="box0_collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <sensor name='my_contact' type='contact'>
+        <plugin name="my_plugin" filename="libcontact.so"/>
+          <contact>
+            <collision>box0_collision</collision>
+          </contact>
+        </sensor>
+        
+      </link>
+    </model>
+	-->
+  </world>
+</sdf>

@@ -1,0 +1,119 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+  <model name="landing_zone">
+  <static>true</static>
+		
+  <link name='outer_ring'>
+    <pose>0 0 0 0 0 0</pose>		
+      <collision name='outer_ring_collision'>
+        <geometry>
+	  <cylinder>
+	    <radius>5</radius>
+	    <length>0.2</length>
+	  </cylinder>
+        </geometry>
+      </collision>
+			
+      <visual name='outer_ring_visual'>
+	<geometry>
+	  <cylinder>
+	    <radius>5</radius>
+	    <length>0.2</length>
+	  </cylinder>
+	</geometry>
+	
+	<material>
+	  <lighting>1</lighting>
+	    <script>
+	      <uri>file://media/materials/scripts/gazebo.material</uri>
+	      <name>Gazebo/Red</name>
+	    </script>
+	</material>
+      </visual>
+			
+      <sensor name='outer_ring_contact' type='contact'>
+        <plugin name="outer_ring_plugin" filename="libgazebo_contact_plugin.so"/>
+	  <contact>
+	    <collision>outer_ring_collision</collision>
+	  </contact>
+	  <robotNamespace></robotNamespace>
+        </plugin>
+      </sensor>
+  </link>
+		
+  <link name='middle_ring'>
+    <pose>0 0 0.2 0 0 0</pose>
+    <collision name='middle_ring_collision'>
+	<geometry>
+	  <cylinder>
+	    <radius>3</radius>
+	    <length>0.2</length>
+	  </cylinder>
+	</geometry>
+    </collision>
+	
+    <visual name='middle_ring_visual'>
+	<geometry>
+		<cylinder>
+			<radius>3</radius>
+			<length>0.2</length>
+		</cylinder>
+	</geometry>
+	<material>
+	  <lighting>1</lighting>
+		<script>
+			<uri>file://media/materials/scripts/gazebo.material</uri>
+			<name>Gazebo/Blue</name>
+		</script>
+	</material>
+    </visual>
+	
+    <sensor name='middle_ring_contact' type='contact'>
+      <plugin name="middle_ring_plugin" filename="libgazebo_contact_plugin.so"/>
+	<contact>
+	  <collision>middle_ring_collision</collision>
+	</contact>
+	<robotNamespace></robotNamespace>
+      </plugin>
+    </sensor>
+  </link>
+
+  <link name='inner_ring'>
+	<pose>0 0 0.4 0 0 0</pose>
+	
+	<collision name='inner_ring_collision'>
+		<geometry>
+			<cylinder>
+				<radius>1</radius>
+				<length>0.2</length>
+			</cylinder>
+		</geometry>
+	</collision>
+	
+	<visual name='inner_ring_visual'>
+		<geometry>
+			<cylinder>
+				<radius>1</radius>
+				<length>0.2</length>
+			</cylinder>
+		</geometry>
+		<material>
+			<lighting>1</lighing>
+			<script>
+				<uri>file://media/materials/scripts/gazebo.material</uri>
+				<name>Gazebo/Green</name>
+			</script>
+		</material>
+	</visual>		
+  </link>
+		
+  <sensor name='inner_ring_contact' type='contact'>
+    <plugin name="inner_ring_plugin" filename="libgazebo_contact_plugin.so"/>
+	<contact>
+	  <collision>inner_ring_collision</collision>
+	</contact>
+	<robotNamespace></robotNamespace>
+    </plugin>
+  </sensor>
+  </model>
+</sdf>
