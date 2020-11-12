@@ -22,7 +22,12 @@
         </attenuation>
         <direction>-0.001 0.001 -0.9</direction>
     </light>
-
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>47.333439</latitude_deg>
+      <longitude_deg>8.547097</longitude_deg>
+      <elevation>1.7</elevation>
+    </spherical_coordinates>
     <!-- Add World Coordinate Frame -->
     <scene>
      <origin_visual>false</origin_visual>
@@ -78,7 +83,10 @@
       </visual>
       </link>
     </model>
-
+    <include>
+      <uri>model://ocean</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
     <!-- Add physics -->
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
