@@ -537,9 +537,9 @@ void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, s
 {
     gzdbg << "Send camera info" << endl;
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-    static const char* vendor = "PX4.io";
-    static const char* model  = "Gazebo";
-    char uri[128] = {};
+    static const char vendor[MAVLINK_MSG_CAMERA_INFORMATION_FIELD_VENDOR_NAME_LEN] = "PX4.io";
+    static const char model[MAVLINK_MSG_CAMERA_INFORMATION_FIELD_MODEL_NAME_LEN] = "Gazebo";
+    static const char uri[MAVLINK_MSG_CAMERA_INFORMATION_FIELD_CAM_DEFINITION_URI_LEN] = {};
     uint32_t camera_capabilities = CAMERA_CAP_FLAGS_CAPTURE_IMAGE | CAMERA_CAP_FLAGS_CAPTURE_VIDEO |
             CAMERA_CAP_FLAGS_HAS_MODES | CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM |
             CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM;
