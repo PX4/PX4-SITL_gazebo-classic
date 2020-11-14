@@ -1608,7 +1608,7 @@
     </joint>
 
 
-    <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='ball'>
+    <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='fixed'>
       <parent>actuator_1_inner</parent>
       <child>actuator_1_mount_front</child>
       <pose frame=''>-0.02 0 0 0 -0 0</pose>
@@ -1625,7 +1625,7 @@
         </ode>
       </physics>
     </joint>
-    <joint name='actuator_1_mount_back_JOINT_0' type='ball'>
+    <joint name='actuator_1_mount_back_JOINT_0' type='fixed'>
       <parent>actuator_1_mount_back</parent>
       <child>actuator_1_outer</child>
       <pose frame=''>0.09 0 0.02 0 -0 0</pose>
