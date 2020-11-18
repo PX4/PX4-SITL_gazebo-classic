@@ -15,14 +15,16 @@ jobs:
       fail-fast: false
       matrix:
         container:
-        - 'px4io/px4-dev-simulation-focal:2020-08-14' # Gazebo 11
-        - 'px4io/px4-dev-simulation-bionic:2020-08-14' # Gazebo 9
-        - 'px4io/px4-dev-simulation-xenial:2020-06-20' # Gazebo 7
+        - 'px4io/px4-dev-simulation-focal:2020-11-18' # Gazebo 11
+        - 'px4io/px4-dev-simulation-bionic:2020-11-18' # Gazebo 9
+        - 'px4io/px4-dev-simulation-xenial:2020-11-18' # Gazebo 7
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v1
     - name: submodule update
       run: git submodule update --init --recursive
+    - name: Install latest mavlink
+      run: git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0 && rm -rf /usr/local/include/mavlink/v2.0/.git
     - name: Cmake Build
       run: |
         mkdir build
