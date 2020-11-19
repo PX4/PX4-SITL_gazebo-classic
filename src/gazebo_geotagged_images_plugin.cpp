@@ -734,6 +734,7 @@ void GeotaggedImagesPlugin::_handle_storage_info(const mavlink_message_t *pMsg, 
     float total_mib     = 0.0f;
     float available_mib = 0.0f;
     boost::filesystem::space_info si = boost::filesystem::space(".");
+    const std::string storage_name = "SITL Camera Storage";
     available_mib = (float)((double)si.available / (1024.0 * 1024.0));
     total_mib     = (float)((double)si.capacity  / (1024.0 * 1024.0));
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_STORAGE_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
@@ -751,7 +752,9 @@ void GeotaggedImagesPlugin::_handle_storage_info(const mavlink_message_t *pMsg, 
         total_mib - available_mib,          // used_capacity,
         available_mib,
         NAN,                                // read_speed,
-        NAN                                 // write_speed
+        NAN,                                // write_speed
+        STORAGE_TYPE_OTHER,                 // storage type
+        storage_name.c_str()                // storage name
     );
     _send_mavlink_message(&msg, srcaddr);
 }
