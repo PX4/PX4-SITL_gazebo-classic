@@ -615,5 +615,76 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+
+    <!-- CAMERA START -->
+    <link name="/camera_link">
+         <inertial>
+           <mass>0.1</mass>
+           <inertia>
+             <ixx>0.000166667</ixx>
+             <iyy>0.000166667</iyy>
+             <izz>0.000166667</izz>
+           </inertia>
+         </inertial>
+         <collision name="collision">
+           <geometry>
+             <box>
+               <size>0.1 0.1 0.1</size>
+             </box>
+           </geometry>
+         </collision>
+         <visual name="visual">
+           <geometry>
+             <box>
+               <size>0.1 0.1 0.1</size>
+             </box>
+           </geometry>
+         </visual>
+         <sensor name="camera" type="camera">
+           <camera>
+             <horizontal_fov>1.047</horizontal_fov>
+             <image>
+               <width>320</width>
+               <height>240</height>
+             </image>
+             <clip>
+               <near>0.1</near>
+               <far>100</far>
+             </clip>
+           </camera>
+           <always_on>1</always_on>
+           <update_rate>10</update_rate>
+           <visualize>true</visualize>
+           <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
+            <robotNamespace/>
+            <alwaysOn>true</alwaysOn>
+            <updateRate>10.0</updateRate>
+            <cameraName>camera</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>/camera_link</frameName>
+           </plugin>
+         </sensor>
+    </link>
+    <joint name='/camera_joint' type='fixed'>
+          <child>/camera_link</child>
+          <parent>base_link</parent>
+          <axis>
+            <xyz>1 0 0</xyz>
+            <limit>
+              <lower>0</lower>
+              <upper>0</upper>
+              <effort>0</effort>
+              <velocity>0</velocity>
+            </limit>
+            <dynamics>
+              <spring_reference>0</spring_reference>
+              <spring_stiffness>0</spring_stiffness>
+            </dynamics>
+            <use_parent_model_frame>1</use_parent_model_frame>
+          </axis>
+    </joint>
+    <!-- CAMERA END -->
+        
   </model>
 </sdf>
