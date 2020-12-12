@@ -4,7 +4,7 @@
  * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
- * Copyright 2015-2018 PX4 Development Team
+ * Copyright 2015-2020 PX4 Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 GazeboMavlinkInterface::GazeboMavlinkInterface() : ModelPlugin(){
       mavlink_interface_ = std::make_unique<MavlinkInterface>();
 
+  mavlink_interface_->addMavlinkRxHandler(std::bind(&GazeboMavlinkInterface::handle_message, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
@@ -42,7 +43,6 @@ T our_any_cast(const boost::any &val) {
   return boost::any_cast<T>(val);
 #endif
 }
-
 
 /// \brief      A helper class that provides storage for additional parameters that are inserted into the callback.
 /// \details    GazeboMsgT  The type of the message that will be subscribed to the Gazebo framework.
@@ -91,7 +91,7 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
         // get the sensor id by getting the (last) numbers on the joint name (ex. lidar10_joint, gets id 10)
         sensor_id = std::stoi(sensor_name.substr(sensor_name.find_last_not_of("0123456789") + 1));
       } catch(...) {
-        gzwarn << "No identifier on joint. Using 0 as default sensor ID" << std::endl;
+        gzwarn << "No identifier on joint. Using 0 as default sensor ID for " << sensor_name << std::endl;
       }
 
       // Get the sensor link orientation with respect to the base_link
@@ -550,6 +550,21 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   }
 
   last_time_ = current_time;
+}
+
+//Called from mavlink receiver context
+void GazeboMavlinkInterface::handle_message(mavlink_message_t *msg, bool *received_actuator)
+{
+  const std::lock_guard<std::mutex> lock(mavlink_mutex_);
+  *received_actuator = false;
+
+  switch (msg->msgid) {
+  case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
+
+    mavlink_msg_hil_actuator_controls_decode(msg, &last_mavlink_hil_actuator_controls_);
+    *received_actuator = true;
+    break;
+  }
 }
 
 template <class T>
@@ -1075,8 +1090,13 @@ void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
             msg->velocity().z());
 }
 
-void GazeboMavlinkInterface::handle_actuator_controls() {
-  bool armed = mavlink_interface_->GetArmedState();
+void GazeboMavlinkInterface::handle_actuator_controls()
+{
+  const std::lock_guard<std::mutex> lock(mavlink_mutex_);
+
+  if (last_mavlink_hil_actuator_controls_.time_usec == 0) return;
+
+  bool armed =  last_mavlink_hil_actuator_controls_.mode & MAV_MODE_FLAG_SAFETY_ARMED;
 
   #if GAZEBO_MAJOR_VERSION >= 9
       last_actuator_time_ = world_->SimTime();
@@ -1087,14 +1107,10 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
   for (unsigned i = 0; i < n_out_max; i++) {
     input_index_[i] = i;
   }
-  // Read Input References
-  input_reference_.resize(n_out_max);
 
-  Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
-  if (actuator_controls.size() < n_out_max) return; //TODO: Handle this properly
   for (int i = 0; i < input_reference_.size(); i++) {
     if (armed) {
-      input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
+      input_reference_[i] = (last_mavlink_hil_actuator_controls_.controls[input_index_[i]] + input_offset_[i])
           * input_scaling_[i] + zero_position_armed_[i];
       // std::cout << input_reference_ << ", ";
     } else {
@@ -1103,7 +1119,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
     }
   }
   // std::cout << "Input Reference: " << input_reference_.transpose() << std::endl;
-  received_first_actuator_ = mavlink_interface_->GetReceivedFirstActuator();
+  received_first_actuator_ = true;
 }
 
 void GazeboMavlinkInterface::handle_control(double _dt)

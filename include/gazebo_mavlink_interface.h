@@ -4,7 +4,7 @@
  * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
- * Copyright 2015-2018 PX4 Pro Development Team
+ * Copyright 2015-2020 PX4 Pro Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#pragma once
+
 #include <vector>
 #include <regex>
 #include <thread>
@@ -135,12 +138,15 @@ public:
   ~GazeboMavlinkInterface();
 
   void Publish();
+  void handle_message(mavlink_message_t *msg, bool *received_actuator);
 
 protected:
   void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
 private:
+  std::mutex mavlink_mutex_;
+
   bool received_first_actuator_{false};
   Eigen::VectorXd input_reference_;
 
@@ -251,6 +257,9 @@ private:
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
+
+  //Copy of last messages recieved from the PX4 mavlink:
+  mavlink_hil_actuator_controls_t last_mavlink_hil_actuator_controls_{};
 
   bool mag_updated_{false};
   bool baro_updated_{false};

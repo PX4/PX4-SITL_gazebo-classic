@@ -18,6 +18,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#pragma once
+
 #include <vector>
 #include <regex>
 #include <thread>
@@ -34,6 +37,7 @@
 #include <boost/bind.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/system/system_error.hpp>
+#include <functional>
 
 #include <iostream>
 #include <random>
@@ -70,6 +74,8 @@ enum class Framing : uint8_t {
 	bad_signature = MAVLINK_FRAMING_BAD_SIGNATURE,
 };
 
+typedef std::function<void(mavlink_message_t *msg, bool *received_actuator)> FuncMavlinkRxHandler;
+
 //! Enumeration to use on the bitmask in HIL_SENSOR
 enum class SensorSource {
   ACCEL		= 0b111,
@@ -83,6 +89,9 @@ class MavlinkInterface {
 public:
     MavlinkInterface();
     ~MavlinkInterface();
+
+    void addMavlinkRxHandler(FuncMavlinkRxHandler callback);
+
     void pollForMAVLinkMessages();
     void pollFromQgcAndSdk();
     void send_mavlink_message(const mavlink_message_t *message);
@@ -91,9 +100,7 @@ public:
     void close();
     void Load();
     Eigen::VectorXd GetActuatorControls();
-    bool GetArmedState();
     void onSigInt();
-    inline bool GetReceivedFirstActuator() {return received_first_actuator_;}
     inline void SetBaudrate(int baudrate) {baudrate_ = baudrate;}
     inline void SetSerialEnabled(bool serial_enabled) {serial_enabled_ = serial_enabled;}
     inline void SetUseTcp(bool use_tcp) {use_tcp_ = use_tcp;}
@@ -110,14 +117,11 @@ public:
     inline void SetHILStateLevel(bool hil_state_level) {hil_state_level_ = hil_state_level;}
 
 private:
-    bool received_actuator_{false};
-    bool received_first_actuator_{false};
-    bool armed_;
-    Eigen::VectorXd input_reference_;
-
-    void handle_message(mavlink_message_t *msg);
+    FuncMavlinkRxHandler mavlinkRxHandlerCallback_;
     void acceptConnections();
-    
+
+    bool received_first_actuator_{false};
+
     // Serial interface
     void do_read();
     void parse_buffer(const boost::system::error_code& err, std::size_t bytes_t);
@@ -126,10 +130,6 @@ private:
     }
     void do_write(bool check_tx_state);
 
-    static const unsigned n_out_max = 16;
-
-    int input_index_[n_out_max];
-    
     struct sockaddr_in local_simulator_addr_;
     socklen_t local_simulator_addr_len_;
     struct sockaddr_in remote_simulator_addr_;
@@ -183,7 +183,6 @@ private:
     std::string device_{kDefaultDevice};
     
     std::recursive_mutex mutex_;
-    std::mutex actuator_mutex_;
 
     std::array<uint8_t, MAX_SIZE> rx_buf_{};
     unsigned int baudrate_{kDefaultBaudRate};

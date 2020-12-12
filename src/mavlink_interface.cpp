@@ -1,3 +1,24 @@
+/*
+ * Copyright 2015 Fadri Furrer, ASL, ETH Zurich, Switzerland
+ * Copyright 2015 Michael Burri, ASL, ETH Zurich, Switzerland
+ * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
+ * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
+ * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+ * Copyright 2015-2020 PX4 Development Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "mavlink_interface.h"
 
 MavlinkInterface::MavlinkInterface() :
@@ -7,6 +28,11 @@ MavlinkInterface::MavlinkInterface() :
 
 MavlinkInterface::~MavlinkInterface() {
   close();
+}
+
+void MavlinkInterface::addMavlinkRxHandler(FuncMavlinkRxHandler callback)
+{
+  mavlinkRxHandlerCallback_ = callback;
 }
 
 void MavlinkInterface::Load()
@@ -197,7 +223,7 @@ void MavlinkInterface::pollForMAVLinkMessages()
     return;
   }
 
-  received_actuator_ = false;
+  bool received_actuator = false;
 
   do {
     int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
@@ -250,12 +276,17 @@ void MavlinkInterface::pollForMAVLinkMessages()
             if (hil_mode_) {
               send_mavlink_message(&msg);
             }
-            handle_message(&msg);
+
+            mavlinkRxHandlerCallback_(&msg, &received_actuator);
+
+            if (received_actuator) {
+              received_first_actuator_ = true;
+            }
           }
         }
       }
     }
-  } while (!close_conn_ && received_first_actuator_ && !received_actuator_ && enable_lockstep_ && !gotSigInt_);
+  } while (!close_conn_ && received_first_actuator_ && !received_actuator && enable_lockstep_ && !gotSigInt_);
 }
 
 void MavlinkInterface::pollFromQgcAndSdk()
@@ -326,33 +357,6 @@ void MavlinkInterface::acceptConnections()
   // assign socket to connection descriptor on success
   fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
   fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
-}
-
-void MavlinkInterface::handle_message(mavlink_message_t *msg)
-{
-  switch (msg->msgid) {
-  case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
-    const std::lock_guard<std::mutex> lock(actuator_mutex_);
-
-    mavlink_hil_actuator_controls_t controls;
-    mavlink_msg_hil_actuator_controls_decode(msg, &controls);
-
-    armed_ = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
-
-    for (unsigned i = 0; i < n_out_max; i++) {
-      input_index_[i] = i;
-    }
-
-    // set rotor speeds, controller targets
-    input_reference_.resize(n_out_max);
-    for (int i = 0; i < input_reference_.size(); i++) {
-      input_reference_[i] = controls.controls[i];
-    }
-
-    received_actuator_ = true;
-    received_first_actuator_ = true;
-    break;
-  }
 }
 
 void MavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
@@ -568,7 +572,7 @@ void MavlinkInterface::parse_buffer(const boost::system::error_code& err, std::s
       if (hil_mode_) {
         forward_mavlink_message(&message);
       }
-      handle_message(&message);
+      mavlinkRxHandlerCallback_(&message, nullptr);
     }
   }
   do_read();
@@ -577,14 +581,4 @@ void MavlinkInterface::parse_buffer(const boost::system::error_code& err, std::s
 void MavlinkInterface::onSigInt() {
   gotSigInt_ = true;
   close();
-}
-
-Eigen::VectorXd MavlinkInterface::GetActuatorControls() {
-  const std::lock_guard<std::mutex> lock(actuator_mutex_);
-  return input_reference_;
-}
-
-bool MavlinkInterface::GetArmedState() {
-  const std::lock_guard<std::mutex> lock(actuator_mutex_);
-  return armed_;
 }
