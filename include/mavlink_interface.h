@@ -18,6 +18,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#pragma once
+
 #include <vector>
 #include <regex>
 #include <thread>
@@ -119,12 +122,13 @@ private:
     void acceptConnections();
     
     // Serial interface
-    void do_read();
-    void parse_buffer(const boost::system::error_code& err, std::size_t bytes_t);
-    inline bool is_open(){
+    void open_serial();
+    void do_serial_read();
+    void parse_serial_buffer(const boost::system::error_code& err, std::size_t bytes_t);
+    inline bool is_serial_open(){
         return serial_dev_.is_open();
     }
-    void do_write(bool check_tx_state);
+    void do_serial_write(bool check_tx_state);
 
     static const unsigned n_out_max = 16;
 
@@ -164,8 +168,6 @@ private:
     int mavlink_udp_port_{kDefaultMavlinkUdpPort}; // MAVLink refers to the PX4 simulator interface here
     int mavlink_tcp_port_{kDefaultMavlinkTcpPort}; // MAVLink refers to the PX4 simulator interface here
 
-    boost::asio::io_service io_service_{};
-    boost::asio::serial_port serial_dev_;
 
     int simulator_socket_fd_{0};
     int simulator_tcp_client_fd_{0};
@@ -176,9 +178,12 @@ private:
     bool enable_lockstep_{false};
 
     // Serial interface
+    boost::asio::io_service io_service_{};
+    boost::asio::serial_port serial_dev_;
+    bool serial_enabled_{false};
+
     mavlink_status_t m_status_{};
     mavlink_message_t m_buffer_{};
-    bool serial_enabled_{false};
     std::thread io_thread_;
     std::string device_{kDefaultDevice};
     
