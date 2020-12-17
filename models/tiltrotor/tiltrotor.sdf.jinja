@@ -26,13 +26,15 @@
         <surface>
           <contact>
             <ode>
-              <max_vel>10</max_vel>
-              <min_depth>0.01</min_depth>
+              <kp>100000</kp>
+              <kd>1.0</kd>
+              <max_vel>0.1</max_vel>
+              <min_depth>0.001</min_depth>
             </ode>
           </contact>
-          <!--<friction>
+          <friction>
             <ode/>
-          </friction>-->
+          </friction>
         </surface>
       </collision>
       <visual name='base_link_visual'>
@@ -877,9 +879,6 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
-      <robotNamespace/>
-    </plugin>
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
@@ -898,8 +897,9 @@
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
@@ -919,8 +919,9 @@
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="elevator" filename="libLiftDragPlugin.so">
       <a0>-0.2</a0>
@@ -940,8 +941,9 @@
       <control_joint_name>
         elevator_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-12.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="rudder" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
@@ -959,6 +961,7 @@
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
       <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
@@ -1040,6 +1043,9 @@
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
     </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
