@@ -48,10 +48,10 @@
         </material>
       </visual>
 	<visual name=’rear_beam_visual’>
-	  <pose frame=’’>-0.2 0 0 0 -0 0</pose>
+	  <pose frame=’’>-0.12 0 0 0 -0 0</pose>
    	  <geometry>
 	    <box>
-		<size>0.5 0.02 0.02</size>
+		<size>0.34 0.02 0.02</size>
 	    </box>
 	  </geometry>
 	    <material>
@@ -420,10 +420,10 @@
       </axis>
     </joint>
 <link name='motor_2'>
-      <pose>-0.46 0 0 0 0 0</pose>
+      <pose>-0.30 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.088</mass>
+        <mass>0.188</mass>
         <inertia>
           <ixx>0.0166704</ixx>
           <ixy>0</ixy>
@@ -488,7 +488,7 @@
       </axis>
     </joint>
     <link name='rotor_2'>
-      <pose frame=''>-0.46 0 -0.023 0 -0 0</pose>
+      <pose frame=''>-0.30 0 -0.023 0 -0 0</pose>
       <inertial>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <mass>0.01</mass>
@@ -564,7 +564,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>5390</maxRotVelocity>
+      <maxRotVelocity>2390</maxRotVelocity>
       <motorConstant>1.6492e-05</motorConstant>
       <momentConstant>0.0213</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -581,7 +581,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>5390</maxRotVelocity>
+      <maxRotVelocity>2390</maxRotVelocity>
       <motorConstant>1.6492e-05</motorConstant>
       <momentConstant>0.0213</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -598,9 +598,9 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>12130</maxRotVelocity>
-      <motorConstant>1.13545e-06</motorConstant>
-      <momentConstant>0.0094</momentConstant>
+      <maxRotVelocity>2390</maxRotVelocity>
+      <motorConstant>.8369e-05</motorConstant>
+      <momentConstant>0.0213</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>2</motorNumber>
       <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
