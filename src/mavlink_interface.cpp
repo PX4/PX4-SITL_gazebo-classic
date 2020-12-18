@@ -191,6 +191,122 @@ void MavlinkInterface::Load()
   }
 }
 
+void MavlinkInterface::SendSensorMessages(int time_usec) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+
+  mavlink_hil_sensor_t sensor_msg;
+
+  sensor_msg.time_usec = time_usec;
+
+  if (imu_updated_) {
+    sensor_msg.xacc = accel_b_[0];
+    sensor_msg.yacc = accel_b_[1];
+    sensor_msg.zacc = accel_b_[2];
+    sensor_msg.xgyro = gyro_b_[0];
+    sensor_msg.ygyro = gyro_b_[1];
+    sensor_msg.zgyro = gyro_b_[2];
+
+    sensor_msg.fields_updated = (uint16_t)SensorSource::ACCEL | (uint16_t)SensorSource::GYRO;
+
+    imu_updated_ = false;
+  }
+
+  // send only mag data
+  if (mag_updated_) {
+    sensor_msg.xmag = mag_b_[0];
+    sensor_msg.ymag = mag_b_[1];
+    sensor_msg.zmag = mag_b_[2];
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::MAG;
+
+    mag_updated_ = false;
+  }
+
+  // send only baro data
+  if (baro_updated_) {
+    sensor_msg.temperature = temperature_;
+    sensor_msg.abs_pressure = abs_pressure_;
+    sensor_msg.pressure_alt = pressure_alt_;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::BARO;
+
+    baro_updated_ = false;
+  }
+
+  // send only diff pressure data
+  if (diff_press_updated_) {
+    sensor_msg.diff_pressure = diff_pressure_;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::DIFF_PRESS;
+
+    diff_press_updated_ = false;
+  }
+
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+    send_mavlink_message(&msg);
+  }
+}
+
+void MavlinkInterface::SendGpsMessages(const SensorData::Gps &data) {
+  // fill HIL GPS Mavlink msg
+  mavlink_hil_gps_t hil_gps_msg;
+  hil_gps_msg.time_usec = data.time_utc_usec;
+  hil_gps_msg.fix_type = data.fix_type;
+  hil_gps_msg.lat = data.latitude_deg;
+  hil_gps_msg.lon = data.longitude_deg;
+  hil_gps_msg.alt = data.altitude;
+  hil_gps_msg.eph = data.eph;
+  hil_gps_msg.epv = data.epv;
+  hil_gps_msg.vel = data.velocity;
+  hil_gps_msg.vn = data.velocity_north;
+  hil_gps_msg.ve = data.velocity_east;
+  hil_gps_msg.vd = data.velocity_down;
+  hil_gps_msg.cog = data.cog;
+  hil_gps_msg.satellites_visible = data.satellites_visible;
+  hil_gps_msg.id = data.id;
+
+  // send HIL_GPS Mavlink msg
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
+    send_mavlink_message(&msg);
+  }
+}
+
+void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+
+  temperature_ = data.temperature;
+  abs_pressure_ = data.abs_pressure;
+  pressure_alt_ = data.pressure_alt;
+
+  baro_updated_ = true;
+}
+
+void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+
+  diff_pressure_ = data.diff_pressure;
+
+  diff_press_updated_ = true;
+}
+
+void MavlinkInterface::UpdateIMU(const SensorData::Imu &data) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+
+  accel_b_ = data.accel_b;
+  gyro_b_ = data.gyro_b;
+
+  imu_updated_ = true;
+}
+
+void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+
+  mag_b_ = data.mag_b;
+
+  mag_updated_ = true;
+}
+
 void MavlinkInterface::pollForMAVLinkMessages()
 {
   if (gotSigInt_) {

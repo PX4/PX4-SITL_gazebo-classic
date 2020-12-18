@@ -82,6 +82,44 @@ enum class SensorSource {
   DIFF_PRESS	= 0b10000000000,
 };
 
+namespace SensorData {
+    struct Imu {
+        Eigen::Vector3d accel_b;
+        Eigen::Vector3d gyro_b;
+    };
+
+    struct Barometer {
+        double temperature;
+        double abs_pressure;
+        double pressure_alt;
+    };
+
+    struct Magnetometer {
+        Eigen::Vector3d mag_b;
+    };
+
+    struct Airspeed {
+        double diff_pressure;
+    };
+
+    struct Gps {
+        int time_utc_usec;
+        int fix_type;
+        double latitude_deg;
+        double longitude_deg;
+        double altitude;
+        double eph;
+        double epv;
+        double velocity;
+        double velocity_north;
+        double velocity_east;
+        double velocity_down;
+        double cog;
+        double satellites_visible;
+        int id;
+    };
+}
+
 class MavlinkInterface {
 public:
     MavlinkInterface();
@@ -93,6 +131,12 @@ public:
     void open();
     void close();
     void Load();
+    void SendSensorMessages(int time_usec);
+    void SendGpsMessages(const SensorData::Gps &data);
+    void UpdateBarometer(const SensorData::Barometer &data);
+    void UpdateAirspeed(const SensorData::Airspeed &data);
+    void UpdateIMU(const SensorData::Imu &data);
+    void UpdateMag(const SensorData::Magnetometer &data);
     Eigen::VectorXd GetActuatorControls();
     bool GetArmedState();
     void onSigInt();
@@ -189,6 +233,7 @@ private:
     
     std::recursive_mutex mutex_;
     std::mutex actuator_mutex_;
+    std::mutex sensor_msg_mutex_;
 
     std::array<uint8_t, MAX_SIZE> rx_buf_{};
     unsigned int baudrate_{kDefaultBaudRate};
@@ -197,6 +242,19 @@ private:
 
     bool hil_mode_;
     bool hil_state_level_;
+
+    bool baro_updated_;
+    bool diff_press_updated_;
+    bool mag_updated_;
+    bool imu_updated_;
+
+    double temperature_;
+    double pressure_alt_;
+    double abs_pressure_;
+    double diff_pressure_;
+    Eigen::Vector3d mag_b_;
+    Eigen::Vector3d accel_b_;
+    Eigen::Vector3d gyro_b_;
 
     std::atomic<bool> gotSigInt_ {false};
 };
