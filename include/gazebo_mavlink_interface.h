@@ -252,10 +252,6 @@ private:
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
 
-  bool mag_updated_{false};
-  bool baro_updated_{false};
-  bool diff_press_updated_{false};
-
   double groundtruth_lat_rad_{0.0};
   double groundtruth_lon_rad_{0.0};
   double groundtruth_altitude_{0.0};
@@ -263,17 +259,12 @@ private:
   double imu_update_interval_{0.004}; ///< Used for non-lockstep
 
   ignition::math::Vector3d velocity_prev_W_;
-  ignition::math::Vector3d mag_n_;
   ignition::math::Vector3d wind_vel_;
-
-  double temperature_{25.0};
-  double pressure_alt_{0.0};
-  double abs_pressure_{0.0};
 
   bool close_conn_{false};
 
   double optflow_distance_{0.0};
-  double diff_pressure_{0.0};
+  double sonar_distance;
 
   bool enable_lockstep_{false};
   double speed_factor_{1.0};

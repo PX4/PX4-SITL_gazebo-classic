@@ -613,11 +613,10 @@ void GazeboMavlinkInterface::SendSensorMessages()
     }
   }
 
-  mavlink_hil_sensor_t sensor_msg;
 #if GAZEBO_MAJOR_VERSION >= 9
-  sensor_msg.time_usec = std::round(world_->SimTime().Double() * 1e6);
+  int time_usec = std::round(world_->SimTime().Double() * 1e6);
 #else
-  sensor_msg.time_usec = std::round(world_->GetSimTime().Double() * 1e6);
+  int time_usec = std::round(world_->GetSimTime().Double() * 1e6);
 #endif
 
   // send always accel and gyro data (not dependent of the bitmask)
@@ -627,58 +626,18 @@ void GazeboMavlinkInterface::SendSensorMessages()
     last_imu_message_.linear_acceleration().x(),
     last_imu_message_.linear_acceleration().y(),
     last_imu_message_.linear_acceleration().z()));
-
+  
   ignition::math::Vector3d gyro_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
     last_imu_message_.angular_velocity().x(),
     last_imu_message_.angular_velocity().y(),
     last_imu_message_.angular_velocity().z()));
 
-  sensor_msg.xacc = accel_b.X();
-  sensor_msg.yacc = accel_b.Y();
-  sensor_msg.zacc = accel_b.Z();
-  sensor_msg.xgyro = gyro_b.X();
-  sensor_msg.ygyro = gyro_b.Y();
-  sensor_msg.zgyro = gyro_b.Z();
+  SensorData::Imu imu_data;
+  imu_data.accel_b = Eigen::Vector3d(accel_b.X(), accel_b.Y(), accel_b.Z());
+  imu_data.gyro_b = Eigen::Vector3d(gyro_b.X(), gyro_b.Y(), gyro_b.Z());
+  mavlink_interface_->UpdateIMU(imu_data);
 
-  sensor_msg.fields_updated = SensorSource::ACCEL | SensorSource::GYRO;
-
-  // send only mag data
-  if (mag_updated_) {
-    ignition::math::Quaterniond q_body_to_world = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
-
-    ignition::math::Vector3d mag_b = q_body_to_world.RotateVectorReverse(mag_n_);
-
-    sensor_msg.xmag = mag_b.X();
-    sensor_msg.ymag = mag_b.Y();
-    sensor_msg.zmag = mag_b.Z();
-    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::MAG;
-
-    mag_updated_ = false;
-  }
-
-  // send only baro data
-  if (baro_updated_) {
-    sensor_msg.temperature = temperature_;
-    sensor_msg.abs_pressure = abs_pressure_;
-    sensor_msg.pressure_alt = pressure_alt_;
-    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::BARO;
-
-    baro_updated_ = false;
-  }
-
-  // send only diff pressure data
-  if (diff_press_updated_) {
-    sensor_msg.diff_pressure = diff_pressure_;
-    sensor_msg.fields_updated = sensor_msg.fields_updated | SensorSource::DIFF_PRESS;
-
-    diff_press_updated_ = false;
-  }
-
-  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
-    mavlink_message_t msg;
-    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-    mavlink_interface_->send_mavlink_message(&msg);
-  }
+  mavlink_interface_->SendSensorMessages(time_usec);
 }
 
 void GazeboMavlinkInterface::SendGroundTruth()
@@ -753,32 +712,26 @@ void GazeboMavlinkInterface::SendGroundTruth()
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg, const int& id) {
-  // fill HIL GPS Mavlink msg
-  mavlink_hil_gps_t hil_gps_msg;
-  hil_gps_msg.time_usec = gps_msg->time_utc_usec();
-  hil_gps_msg.fix_type = 3;
-  hil_gps_msg.lat = gps_msg->latitude_deg() * 1e7;
-  hil_gps_msg.lon = gps_msg->longitude_deg() * 1e7;
-  hil_gps_msg.alt = gps_msg->altitude() * 1000.0;
-  hil_gps_msg.eph = gps_msg->eph() * 100.0;
-  hil_gps_msg.epv = gps_msg->epv() * 100.0;
-  hil_gps_msg.vel = gps_msg->velocity() * 100.0;
-  hil_gps_msg.vn = gps_msg->velocity_north() * 100.0;
-  hil_gps_msg.ve = gps_msg->velocity_east() * 100.0;
-  hil_gps_msg.vd = -gps_msg->velocity_up() * 100.0;
+  SensorData::Gps gps_data;
+  gps_data.time_utc_usec = gps_msg->time_utc_usec();
+  gps_data.fix_type = 3;
+  gps_data.latitude_deg = gps_msg->latitude_deg() * 1e7;
+  gps_data.longitude_deg = gps_msg->longitude_deg() * 1e7;
+  gps_data.altitude = gps_msg->altitude() * 1000.0;
+  gps_data.eph = gps_msg->eph() * 100.0;
+  gps_data.epv = gps_msg->epv() * 100.0;
+  gps_data.velocity = gps_msg->velocity() * 100.0;
+  gps_data.velocity_north = gps_msg->velocity_north() * 100.0;
+  gps_data.velocity_east = gps_msg->velocity_east() * 100.0;
+  gps_data.velocity_down = -gps_msg->velocity_up() * 100.0;
   // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
   ignition::math::Angle cog(atan2(gps_msg->velocity_east(), gps_msg->velocity_north()));
   cog.Normalize();
-  hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
-  hil_gps_msg.satellites_visible = 10;
-  hil_gps_msg.id = id;
+  gps_data.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
+  gps_data.satellites_visible = 10;
+  gps_data.id = id;
 
-  // send HIL_GPS Mavlink msg
-  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
-    mavlink_message_t msg;
-    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
-    mavlink_interface_->send_mavlink_message(&msg);
-  }
+  mavlink_interface_->SendGpsMessages(gps_data);
 }
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
@@ -1046,27 +999,24 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
 }
 
 void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
-  // update groundtruth magnetometer NED components
-  mag_n_ = ignition::math::Vector3d(
-    mag_msg->magnetic_field().x(),
-    mag_msg->magnetic_field().y(),
-    mag_msg->magnetic_field().z());
-
-  mag_updated_ = true;
+  SensorData::Magnetometer mag_data;
+  mag_data.mag_b = Eigen::Vector3d(mag_msg->magnetic_field().x(), 
+    mag_msg->magnetic_field().y(), mag_msg->magnetic_field().z());
+  mavlink_interface_->UpdateMag(mag_data);
 }
 
 void GazeboMavlinkInterface::AirspeedCallback(AirspeedPtr& airspeed_msg) {
-  diff_pressure_ = airspeed_msg->diff_pressure();
-
-  diff_press_updated_ = true;
+  SensorData::Airspeed airspeed_data;
+  airspeed_data.diff_pressure = airspeed_msg->diff_pressure();
+  mavlink_interface_->UpdateAirspeed(airspeed_data);
 }
 
 void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
-  temperature_ = baro_msg->temperature();
-  pressure_alt_ = baro_msg->pressure_altitude();
-  abs_pressure_ = baro_msg->absolute_pressure();
-
-  baro_updated_ = true;
+  SensorData::Barometer baro_data;
+  baro_data.temperature = baro_msg->temperature();
+  baro_data.abs_pressure = baro_msg->absolute_pressure();
+  baro_data.pressure_alt = baro_msg->pressure_altitude();
+  mavlink_interface_->UpdateBarometer(baro_data);
 }
 
 void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
