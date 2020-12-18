@@ -695,7 +695,7 @@ void GazeboMavlinkInterface::SendSensorMessages()
     last_imu_message_.linear_acceleration().x(),
     last_imu_message_.linear_acceleration().y(),
     last_imu_message_.linear_acceleration().z()));
-  
+
   ignition::math::Vector3d gyro_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
     last_imu_message_.angular_velocity().x(),
     last_imu_message_.angular_velocity().y(),
@@ -1069,7 +1069,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
 
 void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg) {
   SensorData::Magnetometer mag_data;
-  mag_data.mag_b = Eigen::Vector3d(mag_msg->magnetic_field().x(), 
+  mag_data.mag_b = Eigen::Vector3d(mag_msg->magnetic_field().x(),
     mag_msg->magnetic_field().y(), mag_msg->magnetic_field().z());
   mavlink_interface_->UpdateMag(mag_data);
 }

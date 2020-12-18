@@ -120,6 +120,21 @@ namespace SensorData {
     };
 }
 
+struct HILData {
+    int id;
+    bool baro_updated{false};
+    bool diff_press_updated{false};
+    bool mag_updated{false};
+    bool imu_updated{false};
+    double temperature;
+    double pressure_alt;
+    double abs_pressure;
+    double diff_pressure;
+    Eigen::Vector3d mag_b;
+    Eigen::Vector3d accel_b;
+    Eigen::Vector3d gyro_b;
+};
+
 class MavlinkInterface {
 public:
     MavlinkInterface();
@@ -131,12 +146,13 @@ public:
     void open();
     void close();
     void Load();
-    void SendSensorMessages(int time_usec);
+    void SendSensorMessages(const int &time_usec);
+    void SendSensorMessages(const int &time_usec, HILData &hil_data);
     void SendGpsMessages(const SensorData::Gps &data);
-    void UpdateBarometer(const SensorData::Barometer &data);
-    void UpdateAirspeed(const SensorData::Airspeed &data);
-    void UpdateIMU(const SensorData::Imu &data);
-    void UpdateMag(const SensorData::Magnetometer &data);
+    void UpdateBarometer(const SensorData::Barometer &data, const int id = 0);
+    void UpdateAirspeed(const SensorData::Airspeed &data, const int id = 0);
+    void UpdateIMU(const SensorData::Imu &data, const int id = 0);
+    void UpdateMag(const SensorData::Magnetometer &data, const int id = 0);
     Eigen::VectorXd GetActuatorControls();
     bool GetArmedState();
     void onSigInt();
@@ -164,7 +180,7 @@ private:
 
     void handle_message(mavlink_message_t *msg);
     void acceptConnections();
-    
+
     // Serial interface
     void open_serial();
     void do_serial_read();
@@ -177,7 +193,7 @@ private:
     static const unsigned n_out_max = 16;
 
     int input_index_[n_out_max];
-    
+
     struct sockaddr_in local_simulator_addr_;
     socklen_t local_simulator_addr_len_;
     struct sockaddr_in remote_simulator_addr_;
@@ -230,7 +246,7 @@ private:
     mavlink_message_t m_buffer_{};
     std::thread io_thread_;
     std::string device_{kDefaultDevice};
-    
+
     std::recursive_mutex mutex_;
     std::mutex actuator_mutex_;
     std::mutex sensor_msg_mutex_;
@@ -243,18 +259,7 @@ private:
     bool hil_mode_;
     bool hil_state_level_;
 
-    bool baro_updated_;
-    bool diff_press_updated_;
-    bool mag_updated_;
-    bool imu_updated_;
-
-    double temperature_;
-    double pressure_alt_;
-    double abs_pressure_;
-    double diff_pressure_;
-    Eigen::Vector3d mag_b_;
-    Eigen::Vector3d accel_b_;
-    Eigen::Vector3d gyro_b_;
+    std::vector<HILData> hil_data_;
 
     std::atomic<bool> gotSigInt_ {false};
 };

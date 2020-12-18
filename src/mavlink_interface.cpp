@@ -189,54 +189,64 @@ void MavlinkInterface::Load()
       fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
     }
   }
+  hil_data_.resize(1);
 }
 
-void MavlinkInterface::SendSensorMessages(int time_usec) {
+void MavlinkInterface::SendSensorMessages(const int &time_usec) {
+  for (auto& data : hil_data_) {
+    if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated) {
+      SendSensorMessages(time_usec, data);
+    }
+  }
+}
+
+void MavlinkInterface::SendSensorMessages(const int &time_usec, HILData &hil_data) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
 
+  HILData* data = &hil_data;
   mavlink_hil_sensor_t sensor_msg;
-
+  sensor_msg.id = data->id;
   sensor_msg.time_usec = time_usec;
-
-  if (imu_updated_) {
-    sensor_msg.xacc = accel_b_[0];
-    sensor_msg.yacc = accel_b_[1];
-    sensor_msg.zacc = accel_b_[2];
-    sensor_msg.xgyro = gyro_b_[0];
-    sensor_msg.ygyro = gyro_b_[1];
-    sensor_msg.zgyro = gyro_b_[2];
+  if (data->imu_updated) {
+    sensor_msg.xacc = data->accel_b[0];
+    sensor_msg.yacc = data->accel_b[1];
+    sensor_msg.zacc = data->accel_b[2];
+    sensor_msg.xgyro = data->gyro_b[0];
+    sensor_msg.ygyro = data->gyro_b[1];
+    sensor_msg.zgyro = data->gyro_b[2];
+    // std::cout <<data->gyro_b[2] << std::endl;
 
     sensor_msg.fields_updated = (uint16_t)SensorSource::ACCEL | (uint16_t)SensorSource::GYRO;
 
-    imu_updated_ = false;
+    data->imu_updated = false;
   }
 
   // send only mag data
-  if (mag_updated_) {
-    sensor_msg.xmag = mag_b_[0];
-    sensor_msg.ymag = mag_b_[1];
-    sensor_msg.zmag = mag_b_[2];
+  if (data->mag_updated) {
+    sensor_msg.xmag = data->mag_b[0];
+    sensor_msg.ymag = data->mag_b[1];
+    sensor_msg.zmag = data->mag_b[2];
     sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::MAG;
 
-    mag_updated_ = false;
+    data->mag_updated = false;
   }
 
   // send only baro data
-  if (baro_updated_) {
-    sensor_msg.temperature = temperature_;
-    sensor_msg.abs_pressure = abs_pressure_;
-    sensor_msg.pressure_alt = pressure_alt_;
+  if (data->baro_updated) {
+    sensor_msg.temperature = data->temperature;
+    sensor_msg.abs_pressure = data->abs_pressure;
+    sensor_msg.pressure_alt = data->pressure_alt;
     sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::BARO;
 
-    baro_updated_ = false;
+    data->baro_updated = false;
   }
 
   // send only diff pressure data
-  if (diff_press_updated_) {
-    sensor_msg.diff_pressure = diff_pressure_;
+  if (data->diff_press_updated) {
+    sensor_msg.diff_pressure = data->diff_pressure;
     sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::DIFF_PRESS;
 
-    diff_press_updated_ = false;
+    data->diff_press_updated = false;
   }
 
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
@@ -272,39 +282,50 @@ void MavlinkInterface::SendGpsMessages(const SensorData::Gps &data) {
   }
 }
 
-void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data) {
+void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data, int id) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
-
-  temperature_ = data.temperature;
-  abs_pressure_ = data.abs_pressure;
-  pressure_alt_ = data.pressure_alt;
-
-  baro_updated_ = true;
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.temperature = data.temperature;
+      instance.abs_pressure = data.abs_pressure;
+      instance.pressure_alt = data.pressure_alt;
+      instance.baro_updated = true;
+    }
+  }
 }
 
-void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data) {
+void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
-
-  diff_pressure_ = data.diff_pressure;
-
-  diff_press_updated_ = true;
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.diff_pressure = data.diff_pressure;
+      instance.diff_press_updated = true;
+      break;
+    }
+  }
 }
 
-void MavlinkInterface::UpdateIMU(const SensorData::Imu &data) {
+void MavlinkInterface::UpdateIMU(const SensorData::Imu &data, int id) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
-
-  accel_b_ = data.accel_b;
-  gyro_b_ = data.gyro_b;
-
-  imu_updated_ = true;
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.accel_b = data.accel_b;
+      instance.gyro_b = data.gyro_b;
+      instance.imu_updated = true;
+      break;
+    }
+  }
 }
 
-void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data) {
+void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data, int id) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
-
-  mag_b_ = data.mag_b;
-
-  mag_updated_ = true;
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.mag_b = data.mag_b;
+      instance.mag_updated = true;
+      break;
+    }
+  }
 }
 
 void MavlinkInterface::pollForMAVLinkMessages()
