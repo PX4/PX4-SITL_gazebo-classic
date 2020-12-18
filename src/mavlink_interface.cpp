@@ -189,7 +189,7 @@ void MavlinkInterface::Load()
       fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
     }
   }
-  hil_data_.resize(1);
+  // hil_data_.resize(1);
 }
 
 void MavlinkInterface::SendSensorMessages(const int &time_usec) {
@@ -290,8 +290,11 @@ void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data, int id
       instance.abs_pressure = data.abs_pressure;
       instance.pressure_alt = data.pressure_alt;
       instance.baro_updated = true;
+      return;
     }
   }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
 }
 
 void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) {
@@ -300,9 +303,11 @@ void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) 
     if (instance.id == id) {
       instance.diff_pressure = data.diff_pressure;
       instance.diff_press_updated = true;
-      break;
+      return;
     }
   }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
 }
 
 void MavlinkInterface::UpdateIMU(const SensorData::Imu &data, int id) {
@@ -312,9 +317,11 @@ void MavlinkInterface::UpdateIMU(const SensorData::Imu &data, int id) {
       instance.accel_b = data.accel_b;
       instance.gyro_b = data.gyro_b;
       instance.imu_updated = true;
-      break;
+      return;
     }
   }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
 }
 
 void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data, int id) {
@@ -323,9 +330,17 @@ void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data, int id) {
     if (instance.id == id) {
       instance.mag_b = data.mag_b;
       instance.mag_updated = true;
-      break;
+      return;
     }
   }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
+}
+
+void MavlinkInterface::RegisterNewHILSensorInstance(int id) {
+  HILData new_instance;
+  new_instance.id = id;
+  hil_data_.push_back(new_instance);
 }
 
 void MavlinkInterface::pollForMAVLinkMessages()

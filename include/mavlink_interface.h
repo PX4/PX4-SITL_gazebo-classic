@@ -121,7 +121,7 @@ namespace SensorData {
 }
 
 struct HILData {
-    int id;
+    int id=-1;
     bool baro_updated{false};
     bool diff_press_updated{false};
     bool mag_updated{false};
@@ -180,6 +180,7 @@ private:
 
     void handle_message(mavlink_message_t *msg);
     void acceptConnections();
+    void RegisterNewHILSensorInstance(int id);
 
     // Serial interface
     void open_serial();
