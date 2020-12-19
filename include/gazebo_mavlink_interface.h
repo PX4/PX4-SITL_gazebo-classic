@@ -77,6 +77,7 @@
 static const std::regex kDefaultLidarModelNaming(".*(lidar|sf10a)(.*)");
 static const std::regex kDefaultSonarModelNaming(".*(sonar|mb1240-xl-ez4)(.*)");
 static const std::regex kDefaultGPSModelNaming(".*(gps|ublox-neo-7M)(.*)");
+static const std::regex kDefaultAirspeedModelJointNaming(".*(airspeed)(.*_joint)");
 
 namespace gazebo {
 
@@ -109,7 +110,6 @@ static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultVisionTopic = "/vision_odom";
 static const std::string kDefaultMagTopic = "/mag";
-static const std::string kDefaultAirspeedTopic = "/airspeed";
 static const std::string kDefaultBarometerTopic = "/baro";
 static const std::string kDefaultWindTopic = "/world_wind";
 static const std::string kDefaultGroundtruthTopic = "/groundtruth";
@@ -176,11 +176,11 @@ private:
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg, const int& id);
   void SonarCallback(SonarPtr& sonar_msg, const int& id);
+  void AirspeedCallback(AirspeedPtr& airspeed_msg, const int& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
   void MagnetometerCallback(MagnetometerPtr& mag_msg);
-  void AirspeedCallback(AirspeedPtr& airspeed_msg);
   void BarometerCallback(BarometerPtr& baro_msg);
   void WindVelocityCallback(WindPtr& msg);
   void SendSensorMessages();
@@ -229,7 +229,6 @@ private:
   transport::SubscriberPtr groundtruth_sub_{nullptr};
   transport::SubscriberPtr vision_sub_{nullptr};
   transport::SubscriberPtr mag_sub_{nullptr};
-  transport::SubscriberPtr airspeed_sub_{nullptr};
   transport::SubscriberPtr baro_sub_{nullptr};
   transport::SubscriberPtr wind_sub_{nullptr};
 
@@ -241,7 +240,6 @@ private:
   std::string groundtruth_sub_topic_{kDefaultGroundtruthTopic};
   std::string vision_sub_topic_{kDefaultVisionTopic};
   std::string mag_sub_topic_{kDefaultMagTopic};
-  std::string airspeed_sub_topic_{kDefaultAirspeedTopic};
   std::string baro_sub_topic_{kDefaultBarometerTopic};
   std::string wind_sub_topic_{kDefaultWindTopic};
 
