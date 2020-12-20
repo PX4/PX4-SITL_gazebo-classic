@@ -113,8 +113,8 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("cma_stall"))
     this->cmaStall = _sdf->Get<double>("cma_stall");
 
-    if (_sdf->HasElement("cm_delta"))
-        this->cm_delta = _sdf->Get<double>("cm_delta");
+  if (_sdf->HasElement("cm_delta"))
+      this->cm_delta = _sdf->Get<double>("cm_delta");
 
   if (_sdf->HasElement("cp"))
     this->cp = _sdf->Get<ignition::math::Vector3d>("cp");
@@ -154,9 +154,9 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
           boost::bind(&LiftDragPlugin::OnUpdate, this));
     }
 
-    
+
   }
-  
+
   if (_sdf->HasElement("robotNamespace"))
   {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -263,24 +263,24 @@ void LiftDragPlugin::OnUpdate()
   dragDirection.Normalize();
 
   // get direction of lift
-  ignition::math::Vector3d liftI = spanwiseI.Cross(velInLDPlane);
-  liftI.Normalize();
+  ignition::math::Vector3d liftDirection = spanwiseI.Cross(velInLDPlane);
+  liftDirection.Normalize();
 
   // get direction of moment
   ignition::math::Vector3d momentDirection = spanwiseI;
 
-  // compute angle between upwardI and liftI
+  // compute angle between upwardI and liftDirection
   // in general, given vectors a and b:
-  //   cos(theta) = a.Dot(b)/(a.Length()*b.Lenghth())
-  // given upwardI and liftI are both unit vectors, we can drop the denominator
-  //   cos(theta) = a.Dot(b)
-  double cosAlpha = ignition::math::clamp(liftI.Dot(upwardI), minRatio, maxRatio);
+  //   cos(alpha) = a.Dot(b)/(a.Length()*b.Lenghth())
+  // given upwardI and liftDirection are both unit vectors, we can drop the denominator
+  //   cos(alpha) = a.Dot(b)
+  double cosAlpha = ignition::math::clamp(liftDirection.Dot(upwardI), minRatio, maxRatio);
 
   // Is alpha positive or negative? Test:
   // forwardI points toward zero alpha
   // if forwardI is in the same direction as lift, alpha is positive.
-  // liftI is in the same direction as forwardI?
-  if (liftI.Dot(forwardI) >= 0.0)
+  // liftDirection is in the same direction as forwardI?
+  if (liftDirection.Dot(forwardI) >= 0.0)
     this->alpha = this->alpha0 + acos(cosAlpha);
   else
     this->alpha = this->alpha0 - acos(cosAlpha);
@@ -329,7 +329,7 @@ void LiftDragPlugin::OnUpdate()
   }
 
   // compute lift force at cp
-  ignition::math::Vector3d lift = cl * q * this->area * liftI;
+  ignition::math::Vector3d lift = cl * q * this->area * liftDirection;
 
   // compute cd at cp, check for stall, correct for sweep
   double cd;
@@ -381,12 +381,6 @@ void LiftDragPlugin::OnUpdate()
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
 
-#if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d cog = this->link->GetInertial()->CoG();
-#else
-  ignition::math::Vector3d cog = ignitionFromGazeboMath(this->link->GetInertial()->GetCoG());
-#endif
-
   // force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag;
 
@@ -409,7 +403,7 @@ void LiftDragPlugin::OnUpdate()
           << "] vel : [" << velInLDPlane << "]\n";
     gzdbg << "forward (inertial): " << forwardI << "\n";
     gzdbg << "upward (inertial): " << upwardI << "\n";
-    gzdbg << "lift dir (inertial): " << liftI << "\n";
+    gzdbg << "lift dir (inertial): " << liftDirection << "\n";
     gzdbg << "Span direction (normal to LD plane): " << spanwiseI << "\n";
     gzdbg << "sweep: " << this->sweep << "\n";
     gzdbg << "alpha: " << this->alpha << "\n";
