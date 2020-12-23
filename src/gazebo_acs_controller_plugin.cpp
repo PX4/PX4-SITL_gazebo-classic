@@ -514,7 +514,7 @@ void GimbalControllerPlugin::OnUpdate()
         const ignition::math::v4::Vector3<double>& force = {0, 0, -rollTarget};
         //std::cout << "SB: " << rollTarget << "\n";
         acs_sb.link = this->model->GetChildLink(acs_sb.path);
-        myfile << force[2] << ", ";
+        myfile << rollTarget << ", ";
         acs_sb.link->AddLinkForce(force);
     }
     thisVariableIsNotUsed++;
@@ -523,7 +523,7 @@ void GimbalControllerPlugin::OnUpdate()
         const ignition::math::v4::Vector3<double>& force = {0, 0, rollTarget};
         //std::cout << "PO: " << rollTarget << "\n";
         acs_po.link = this->model->GetChildLink(acs_po.path);
-        myfile << force[2] << ", ";
+        myfile << pitchTarget << ", ";
         acs_po.link->AddLinkForce(force);
     }
 
@@ -531,7 +531,7 @@ void GimbalControllerPlugin::OnUpdate()
         const ignition::math::v4::Vector3<double>& force = {0, 0, pitchTarget};
         //std::cout << "BO: " << pitchTarget << "\n";
         acs_bo.link = this->model->GetChildLink(acs_bo.path);
-        myfile << force[2] << ",\n";
+        myfile << rollTarget << ",\n";
         acs_bo.link->AddLinkForce(force);
     }
 
@@ -539,7 +539,7 @@ void GimbalControllerPlugin::OnUpdate()
         const ignition::math::v4::Vector3<double>& force = {0, 0, -pitchTarget};
         //std::cout << "AF: " << pitchTarget << "\n";
         acs_st.link = this->model->GetChildLink(acs_st.path);
-        myfile << force[2] << ",\n";
+        myfile << pitchTarget << ",\n";
         acs_st.link->AddLinkForce(force);
     }
     myfile.close();
