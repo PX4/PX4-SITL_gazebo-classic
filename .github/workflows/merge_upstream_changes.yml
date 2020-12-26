@@ -1,5 +1,4 @@
 # This workflow will pull an upstream branch and attempt to merge it with the target branch
-# its merge options are set to --no-rebase and -s recursive 
 # change the target branch, upstream url, and upstream branch as needed
 # it can also resolve conflicts that come from forking your own version of a submodule
 # by using `git reset HEAD <submodule dir>`
@@ -38,14 +37,14 @@ jobs:
          git remote add upstream "$upstream_url"
          git fetch upstream
          
-         PULL_OUTPUT=$(git pull --ff-only -s recursive upstream "$upstream_branch")   #pull from upstream
+         PULL_OUTPUT=$(git pull --no-rebase -s recursive upstream "$upstream_branch")   #pull from upstream
          
          if [ "$PULL_OUTPUT" != "Already up to date." ]; then
            #ignore commits that changed forked submodules 
            git reset HEAD Tools/sitl_gazebo
            
            #set commit message
-           #git commit --amend -m "Merge changes from upstream" -m "Upstream: $upstream_url \n Upstream branch: $upstream_branch"
+           git commit --amend -m "Merge changes from upstream" -m "Upstream: $upstream_url Upstream branch: $upstream_branch"
            #push changes to origin 
            git push origin "$target_branch"
          else
