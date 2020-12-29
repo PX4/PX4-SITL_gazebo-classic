@@ -7,6 +7,7 @@ models/iris/*.sdf
 *.pyc
 .*.sw?
 *-gen.sdf
+*.sdf.last_generated
 
 models/3DR_gps_mag/3DR_gps_mag.sdf
 models/c920/c920.sdf
