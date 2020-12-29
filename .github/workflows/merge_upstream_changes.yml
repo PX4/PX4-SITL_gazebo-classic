@@ -1,7 +1,9 @@
 # This workflow will pull an upstream branch and attempt to merge it with the target branch
 # change the target branch, upstream url, and upstream branch as needed
 # it can also resolve conflicts that come from forking your own version of a submodule
-# by using `git reset HEAD <submodule dir>`
+# by sometimes using the 'ours' merge driver which will always choose our version in the event of a conflict.
+# define which files / folders should use this merge driver in the .gitattributes file in the root of the repo
+# ex: Tools/sitl_gazebo merge=ours
 
 name: Merge Upstream Changes
 on:
@@ -16,8 +18,9 @@ jobs:
     steps:
      - uses: actions/checkout@v2
        with:
-        ref: master                     #target branch
-        fetch-depth: ''                 #fetch all history  
+        ref: master                          #target branch
+        token: ${{ secrets.ACTIONS_TOKEN }}  #using personal auth token to allow modification of workflows
+        fetch-depth: ''                      #fetch all history  
         #submodules: 'recursive'     # possibly needed in your situation  
      - name: Merge Upstream
        run: |
@@ -28,21 +31,24 @@ jobs:
          git config --global user.name 'Actions Bot'
          git config --global user.email '<>'
          
+         #enable 'ours' merge driver, will favor our changes in a merge conflict for specified files in the .gitattributes file where merge=ours
+         git config --global merge.ours.driver true
+         
          # "git checkout master" is unnecessary, set by ref: above ^
          git pull --ff-only --unshallow  # unshallow option is very important, you would get
                                # complaints about unrelated histories without it.
                                # (but actions/checkout@v2 can also be instructed
                                # to fetch all git depth right from the start)
                                
+         #init forked submodules
+         #git submodule update --init <submodule>
+         
          git remote add upstream "$upstream_url"
          git fetch upstream
          
-         PULL_OUTPUT=$(git pull --no-rebase -s recursive upstream "$upstream_branch")   #pull from upstream
+         PULL_OUTPUT=$(git pull --no-rebase --no-edit upstream "$upstream_branch")   #pull from upstream
          
-         if [ "$PULL_OUTPUT" != "Already up to date." ]; then
-           #ignore commits that changed forked submodules 
-           git reset HEAD Tools/sitl_gazebo
-           
+         if [ "$PULL_OUTPUT" != "Already up to date." ]; then           
            #set commit message
            git commit --amend -m "Merge changes from upstream" -m "Upstream: $upstream_url Upstream branch: $upstream_branch"
            #push changes to origin 
