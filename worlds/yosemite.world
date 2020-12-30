@@ -7,6 +7,9 @@
           <speed>12</speed>
         </clouds>
       </sky>
+      <ambient>0.95 0.95 0.95 1</ambient>
+      <background>0.3 0.3 0.3 1</background>
+      <shadows>true</shadows>
     </scene>
     <!-- A global light source -->
     <include>
