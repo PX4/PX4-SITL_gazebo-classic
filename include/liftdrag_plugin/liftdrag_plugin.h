@@ -107,9 +107,6 @@ namespace gazebo
     /// \brief effective planeform surface area
     protected: double area;
 
-    /// \brief angle of sweep
-    protected: double sweep;
-
     /// \brief angle of attack at which the lift is zero
     protected: double alpha0;
 

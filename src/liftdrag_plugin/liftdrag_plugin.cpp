@@ -43,7 +43,6 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
   this->cm_alpha0 = 0.0;
 
   this->alpha = 0.0;
-  this->sweep = 0.0;
   this->velocityStall = 0.0;
 
   // 90 deg stall
@@ -243,20 +242,6 @@ void LiftDragPlugin::OnUpdate()
   // spanwiseI: a vector normal to lift-drag-plane described in inertial frame
   ignition::math::Vector3d spanwiseI = forwardI.Cross(upwardI).Normalize();
 
-  const double minRatio = -1.0;
-  const double maxRatio = 1.0;
-  // check sweep (angle between velI and lift-drag-plane)
-  double sinSweepAngle = ignition::math::clamp(
-      spanwiseI.Dot(velI), minRatio, maxRatio);
-
-  this->sweep = asin(sinSweepAngle);
-
-  // truncate sweep to within +/-90 deg
-  while (fabs(this->sweep) > 0.5 * M_PI)
-    this->sweep = this->sweep > 0 ? this->sweep - M_PI
-                                  : this->sweep + M_PI;
-  // get cos from trig identity
-  double cosSweepAngle = sqrt(1.0 - sin(this->sweep) * sin(this->sweep));
 
   // angle of attack is the angle between
   // velI projected into lift-drag plane
@@ -285,7 +270,7 @@ void LiftDragPlugin::OnUpdate()
   //   cos(alpha) = a.Dot(b)/(a.Length()*b.Lenghth())
   // given upwardI and liftDirection are both unit vectors, we can drop the denominator
   //   cos(alpha) = a.Dot(b)
-  double cosAlpha = ignition::math::clamp(liftDirection.Dot(upwardI), minRatio, maxRatio);
+  double cosAlpha = ignition::math::clamp(liftDirection.Dot(upwardI), -1.0, 1.0);
 
   // Is alpha positive or negative? Test:
   // forwardI points toward zero alpha
@@ -316,26 +301,26 @@ void LiftDragPlugin::OnUpdate()
 #endif
   }
 
-  // compute cl at cp, check for stall, correct for sweep
+  // compute cl at cp, check for stall
   double cl;
   if (this->alpha > this->alphaStall)
   {
-    cl = (this->cla * this->alphaStall +
-          this->claStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
+    cl = this->cla * this->alphaStall +
+         this->claStall * (this->alpha - this->alphaStall);
     // make sure cl is still great than 0
     cl = std::max(0.0, cl);
   }
   else if (this->alpha < -this->alphaStall)
   {
-    cl = (-this->cla * this->alphaStall +
-          this->claStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
+    cl = -this->cla * this->alphaStall +
+         this->claStall * (this->alpha + this->alphaStall);
     // make sure cl is still less than 0
     cl = std::min(0.0, cl);
   }
   else
-    cl = this->cla * this->alpha * cosSweepAngle;
+  {
+    cl = this->cla * this->alpha;
+  }
 
   // modify cl per control joint value
   cl = cl + this->controlJointRadToCL * controlAngle;
@@ -343,17 +328,16 @@ void LiftDragPlugin::OnUpdate()
   // compute lift force at cp
   ignition::math::Vector3d lift = cl * q * this->area * liftDirection;
 
-  // compute cd at cp, check for stall, correct for sweep
+  // compute cd at cp, check for stall
   double cd;
   if (fabs(this->alpha) > this->alphaStall)
   {
-    cd = (this->cd_alpha0 + this->cda * this->alphaStall +
-          this->cdaStall * (fabs(this->alpha) - this->alphaStall))
-         * cosSweepAngle;
+    cd = this->cd_alpha0 + this->cda * this->alphaStall +
+         this->cdaStall * (this->alpha - this->alphaStall);
   }
   else
   {
-    cd = (this->cd_alpha0 + this->cda * fabs(this->alpha)) * cosSweepAngle;
+    cd = this->cd_alpha0 + this->cda * fabs(this->alpha);
   }
 
   // make sure drag is positive
@@ -365,26 +349,26 @@ void LiftDragPlugin::OnUpdate()
   // drag at cp
   ignition::math::Vector3d drag = cd * q * this->area * dragDirection;
 
-  // compute cm at cp, check for stall, correct for sweep
+  // compute cm at cp, check for stall
   double cm;
   if (this->alpha > this->alphaStall)
   {
-    cm = (this->cm_alpha0 + this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
+    cm = this->cm_alpha0 + this->cma * this->alphaStall +
+         this->cmaStall * (this->alpha - this->alphaStall);
     // make sure cm is still greater than 0
     cm = std::max(0.0, cm);
   }
   else if (this->alpha < -this->alphaStall)
   {
-    cm = (this->cm_alpha0 - this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
+    cm = this->cm_alpha0 - this->cma * this->alphaStall +
+         this->cmaStall * (this->alpha + this->alphaStall);
     // make sure cm is still less than 0
     cm = std::min(0.0, cm);
   }
   else
-    cm = this->cm_alpha0 + this->cma * this->alpha * cosSweepAngle;
+  {
+    cm = this->cm_alpha0 + this->cma * this->alpha;
+  }
 
   // Take into account the effect of control surface deflection angle to Cm
   cm += this->cm_delta * controlAngle;
@@ -416,7 +400,6 @@ void LiftDragPlugin::OnUpdate()
     gzdbg << "upward (inertial): " << upwardI << "\n";
     gzdbg << "lift dir (inertial): " << liftDirection << "\n";
     gzdbg << "Span direction (normal to LD plane): " << spanwiseI << "\n";
-    gzdbg << "sweep: " << this->sweep << "\n";
     gzdbg << "alpha: " << this->alpha << "\n";
     gzdbg << "lift: " << lift << "\n";
     gzdbg << "drag: " << drag << " cd: "
