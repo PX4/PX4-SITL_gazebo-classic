@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
         if os.path.exists(filename_out) and os.path.exists(filename_out_last_generated):
             # Check whether the target file is still unmodified.
-            if get_file_contents(filename_out) != get_file_contents(filename_out_last_generated):
+            if get_file_contents(filename_out).strip() != get_file_contents(filename_out_last_generated).strip():
                 raise Exception("ERROR: generation would overwrite changes to `{}`. ".format(filename_out) + \
                                 "Changes should only be made to the template file `{}`. ".format(args.filename) + \
                                 "Remove `{}` ".format(os.path.basename(filename_out)) + \
