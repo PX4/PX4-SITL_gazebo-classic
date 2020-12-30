@@ -619,7 +619,7 @@
     <!-- CAMERA START -->
     <link name="camera_link">
          <inertial>
-           <mass>0.1</mass>
+           <mass>0.01</mass>
            <inertia>
              <ixx>0.000166667</ixx>
              <iyy>0.000166667</iyy>
@@ -629,20 +629,20 @@
          <collision name="collision">
            <geometry>
              <box>
-               <size>0.1 0.1 0.1</size>
+               <size>0.01 0.01 0.01</size>
              </box>
            </geometry>
          </collision>
          <visual name="visual">
            <geometry>
              <box>
-               <size>0.1 0.1 0.1</size>
+               <size>0.01 0.01 0.01</size>
              </box>
            </geometry>
          </visual>
          <sensor type="camera" name="camera">
             <always_on>0</always_on>
-            <update_rate>1</update_rate>
+            <update_rate>10</update_rate>
 
             <visualize>true</visualize>
 
@@ -653,11 +653,10 @@
                     <height>480</height>
                 </image>
             </camera>
-            <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
-                <ros>
-                    <namespace>need_namespace</namespace>
-                </ros>
-                <hack_baseline>0.07</hack_baseline>
+            <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
+                <robotNamespace></robotNamespace>
+                <udpHost>{{ gstudphost }}</udpHost>
+                <udpPort>5600</udpPort>
             </plugin>
          </sensor>
 
@@ -682,6 +681,6 @@
     </joint>
 
     <!-- CAMERA END -->
-        
+
   </model>
 </sdf>
