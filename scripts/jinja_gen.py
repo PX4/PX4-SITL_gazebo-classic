@@ -56,8 +56,8 @@ if __name__ == "__main__":
             filename_out = args.output_file
         else:
             if not args.filename.endswith('.sdf.jinja'):
-                raise Exception("ERROR: Output file can only be determined automatically for input"
-                                " files with the .sdf.jinja extension")
+                raise Exception("ERROR: Output file can only be determined automatically for " + \
+                                "input files with the .sdf.jinja extension")
             filename_out = args.filename.replace('.sdf.jinja', '.sdf')
             assert filename_out != args.filename, "Not allowed to overwrite template"
 
@@ -68,10 +68,10 @@ if __name__ == "__main__":
         if os.path.exists(filename_out) and os.path.exists(filename_out_last_generated):
             # Check whether the target file is still unmodified.
             if get_file_contents(filename_out) != get_file_contents(filename_out_last_generated):
-                raise Exception(f"ERROR: generation would overwrite changes to `{filename_out}`. "
-                                f"Changes should only be made to the template file `{args.filename}`. "
-                                f"Remove `{os.path.basename(filename_out)}` (after extracting your "
-                                 "changes) to disable this overwrite protection.")
+                raise Exception("ERROR: generation would overwrite changes to `{}`. ".format(filename_out) + \
+                                "Changes should only be made to the template file `{}`. ".format(args.filename) + \
+                                "Remove `{}` ".format(os.path.basename(filename_out)) + \
+                                "(after extracting your changes) to disable this overwrite protection.")
 
         with open(filename_out, 'w') as f_out:
             print(('{:s} -> {:s}'.format(args.filename, filename_out)))
