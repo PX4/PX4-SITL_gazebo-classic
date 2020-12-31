@@ -488,8 +488,8 @@ void GimbalControllerPlugin::OnUpdate()
   common::Time time_ = this->model->GetWorld()->SimTime();
   double dt_ = (time_ - this->lastUpdateTime).Double();
 
-  static PID con_roll(150,1,100,dt_,0.05,100000,-10000);
-  static PID con_pitch(150,1,100,dt_,0.05,100000,-10000);
+  static PID con_roll(100,1,50,dt_,0.05,100000,-10000);
+  static PID con_pitch(100,1,50,dt_,0.05,100000,-10000);
   //static PID con_yaw(1,1,1,1,1,100000,-10000);
 
   const std::lock_guard<std::mutex> lock(cmd_mutex);
