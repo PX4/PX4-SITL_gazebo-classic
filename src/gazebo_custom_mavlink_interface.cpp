@@ -20,6 +20,7 @@
  */
 
 #include <gazebo_custom_mavlink_interface.h>
+#include <PID.h>
 
 namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
@@ -1159,7 +1160,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
-  //static PID actuator_cont[2] = {PID(10000, 0, 10000000,_dt, 1000000000000,100000,-100000), PID(10000, 0, 10000000,_dt, 10000000000,100000,-100000)};
+  static PID actuator_cont[2] = {PID(100, 1, 50, _dt, 1,100000,-100000), PID(100, 1, 50 ,_dt, 1 ,100000,-100000)};
 
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
@@ -1180,11 +1181,11 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         double current = joints_[i]->GetAngle(0).Radian();
 #endif
 
-        target = 0;
+        //target = 0;
         //std::cout << "CURRENT: " << current << "\n";
         //std::cout << "Target: " << target << "\n";
-        //double err = current - target;
-        //double force = actuator_cont[i].Update(current, target);
+        double err = current - target;
+        double force = actuator_cont[i].Update(current, target);
         /**
         if(thisVariableIsNotUsed < 6000)
         {
@@ -1193,10 +1194,8 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         thisVariableIsNotUsed++;
         std::cout << thisVariableIsNotUsed << "\n";
         */
-        /* ORIGINAL
-        double force = pids_[i].Update(err, _dt);
+        //double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
-        */
         double ourOffset = 0;//-28;
         static int garSucks; 
         //if(garSucks++%100 == 0){
