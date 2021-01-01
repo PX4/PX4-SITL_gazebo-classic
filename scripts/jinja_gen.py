@@ -4,8 +4,15 @@
 import jinja2
 import argparse
 import os
+import shutil
 import fnmatch
 import numpy as np
+
+
+def get_file_contents(filepath):
+    with open(filepath, 'rb') as f:
+        return f.read()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -40,14 +47,35 @@ if __name__ == "__main__":
          'hil_mode': args.hil_mode}
 
     result = template.render(d)
-    if args.output_file:
-        filename_out = args.output_file
-    else:
-        filename_out = args.filename.replace('.sdf.jinja', '.sdf')
 
     if args.stdout:
         print(result)
+
     else:
+        if args.output_file:
+            filename_out = args.output_file
+        else:
+            if not args.filename.endswith('.sdf.jinja'):
+                raise Exception("ERROR: Output file can only be determined automatically for " + \
+                                "input files with the .sdf.jinja extension")
+            filename_out = args.filename.replace('.sdf.jinja', '.sdf')
+            assert filename_out != args.filename, "Not allowed to overwrite template"
+
+        # Overwrite protection mechanism: after generation, the file will be copied to a "last_generated" file.
+        # In the next run, we can check whether the target file is still unmodified.
+        filename_out_last_generated = filename_out + '.last_generated'
+
+        if os.path.exists(filename_out) and os.path.exists(filename_out_last_generated):
+            # Check whether the target file is still unmodified.
+            if get_file_contents(filename_out).strip() != get_file_contents(filename_out_last_generated).strip():
+                raise Exception("ERROR: generation would overwrite changes to `{}`. ".format(filename_out) + \
+                                "Changes should only be made to the template file `{}`. ".format(args.filename) + \
+                                "Remove `{}` ".format(os.path.basename(filename_out)) + \
+                                "(after extracting your changes) to disable this overwrite protection.")
+
         with open(filename_out, 'w') as f_out:
             print(('{:s} -> {:s}'.format(args.filename, filename_out)))
             f_out.write(result)
+
+        # Copy the contents to a "last_generated" file for overwrite protection check next time.
+        shutil.copy(filename_out, filename_out_last_generated)
