@@ -33,5 +33,15 @@
       <real_time_update_rate>250</real_time_update_rate>
       <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
     </physics>
+    <gui fullscreen='0'>
+      <camera name='gzclient_camera'>
+        <view_controller>fps</view_controller>
+        <track_visual>
+          <name>standard_vtol</name>
+          <use_model_name>true</use_model_name>
+        </track_visual>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
   </world>
 </sdf>
