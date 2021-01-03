@@ -5,6 +5,11 @@
       <plugin name="video_widget" filename="libgazebo_video_stream_widget.so"/>
     </gui>
     <!-- A global light source -->
+    <scene>
+      <ambient>0.95 0.95 0.95 1</ambient>
+      <background>0.3 0.3 0.3 1</background>
+      <shadows>true</shadows>
+    </scene>
     <include>
       <uri>model://sun</uri>
     </include>

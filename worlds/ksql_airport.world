@@ -2,6 +2,9 @@
 <sdf version="1.4">
   <world name="default">
     <scene>
+      <ambient>0.95 0.95 0.95 1</ambient>
+      <background>0.3 0.3 0.3 1</background>
+      <shadows>true</shadows>
       <sky>
         <clouds>
           <speed>12</speed>
@@ -11,8 +14,6 @@
       <background>0.3 0.3 0.3 1</background>
       <shadows>true</shadows>
     </scene>
-
-    <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>

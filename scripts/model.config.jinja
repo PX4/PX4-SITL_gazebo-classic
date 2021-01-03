@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
+{% set sdf_version = '1.5' if sdf_version == 'NotSet' else sdf_version %}
 <model>
-  <name>iris_hitl</name>
+  <name>{{ model_name }}</name>
   <version>1.0</version>
-  <sdf version='1.5'>iris_hitl.sdf</sdf>
+  <sdf version='{{ sdf_version }}'>{{ model_name }}.sdf</sdf>
 
   <author>
    <name>Benjamin Perseghetti</name>
@@ -10,6 +11,6 @@
   </author>
 
   <description>
-    This is a model of the 3DR Iris Quadrotor simplified for use with HITL.
+    Generated model file.
   </description>
 </model>

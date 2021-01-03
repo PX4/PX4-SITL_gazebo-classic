@@ -1,0 +1,215 @@
+<?xml version="1.0" ?>
+<!--
+Generated with jinja_world_gen.py
+@author: Benjamin Perseghetti
+@email: bperseghetti@rudislabs.com
+-->
+{%- set sdf_version = '1.5' if sdf_version == 'NotSet' else sdf_version -%}
+<sdf version="{{ sdf_version }}">
+  <world name="{{ world_name }}">
+    <scene>
+    {%- if sun_model == 'sunNight' -%}
+      {%- set ambient_light='0.1' -%}
+      {%- set background_light='0.05' -%}
+    {% endif %}
+    {%- if sun_model == 'sunNone' -%}
+      {%- set ambient_light='0.95' -%}
+      {%- set background_light='0.3' -%}
+    {% endif %}
+      <ambient>{{ ambient_light }} {{ ambient_light }} {{ ambient_light }} 1</ambient>
+      <background>{{ background_light }} {{ background_light }} {{ background_light }} 1</background>
+      <shadows>{{ shadows }}</shadows>
+    {%- if cloud_speed != "NoClouds" -%}
+      <sky>
+        <clouds>
+          <speed>{{ cloud_speed }}</speed>
+        </clouds>
+      </sky>
+    {% endif %}
+    </scene>
+  {%- if ((sun_model == 'sunHighShadow')  or (sun_model == 'sunSolarNoon') or (sun_model == 'sunUTC')) -%}
+    {%- if sun_model == 'sunHighShadow' -%}
+      {%- set sun_pose='0 0 10 0 0 0' -%}
+      {%- set sun_diffuse='0.8 0.8 0.8 1' -%}
+      {%- set sun_specular='0.2 0.2 0.2 1' -%}
+      {%- set sun_attenuation_range='1000' -%}
+      {%- set sun_attenuation_constant='0.9' -%}
+      {%- set sun_attenuation_linear='0.01' -%}
+      {%- set sun_attenuation_quadratic='0.001' -%}
+      {%- set sun_vector='-0.5 0.1 -0.9' -%}
+    {% endif %}
+    {%- if sun_model == 'sunSolarNoon' -%}
+      {%- set sun_pose='0 0 500 0 0 0' -%}
+      {%- set sun_diffuse='0.95 0.95 0.95 1' -%}
+      {%- set sun_specular='0.3 0.3 0.3 1' -%}
+      {%- set sun_attenuation_range='2000' -%}
+      {%- set sun_attenuation_constant='1.0' -%}
+      {%- set sun_attenuation_linear='0.0' -%}
+      {%- set sun_attenuation_quadratic='0.0' -%}
+      {%- set sun_vector='-0.01 0.01 -1.0' -%}
+    {% endif %}
+    {%- if sun_model == 'sunUTC' -%}
+      {%- set sun_pose='0 0 500 0 0 0' -%}
+      {%- set sun_attenuation_range='2000' -%}
+      {%- set sun_attenuation_constant='1.0' -%}
+      {%- set sun_attenuation_linear='0.0' -%}
+      {%- set sun_attenuation_quadratic='0.0' -%}
+    {% endif %}
+    <light type="directional" name="{{ sun_model }}">
+      <cast_shadows>true</cast_shadows>
+      <pose>{{ sun_pose }}</pose>
+      <diffuse>{{ sun_diffuse }}</diffuse>
+      <specular>{{ sun_specular }}</specular>
+      <attenuation>
+        <range>{{ sun_attenuation_range }}</range>
+        <constant>{{ sun_attenuation_constant }}</constant>
+        <linear>{{ sun_attenuation_linear }}</linear>
+        <quadratic>{{ sun_attenuation_quadratic }}</quadratic>
+      </attenuation>
+      <direction>{{ sun_vector }}</direction>
+    </light>
+  {% endif %}
+  {%- if ((world_name == 'empty') or (world_name == 'irlock') or (world_name == 'windy') or (world_name == 'typhoon') or (world_name == 'warehouse')) -%}
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://asphalt_plane</uri>
+    </include>
+  {% endif %}
+  {%- if world_name == 'mcmillan' -%}
+    <include>
+      <uri>model://mcmillan_airfield</uri>
+    </include>
+    {%- if spherical_coords=='NotSet' -%}
+      {%- set latitude='35.7222542' -%}
+      {%- set longitude='-120.7665102' -%}
+      {%- set altitude='280' -%}
+      {%- set spherical_coords='1' -%}
+    {% endif %}
+  {% endif %}
+  {%- if world_name == 'ksql' -%}
+    <include>
+      <uri>model://ksql_airport</uri>
+    </include>
+    {%- if spherical_coords=='NotSet' -%}
+      {%- set latitude='37.523640' -%}
+      {%- set longitude='-122.255122' -%}
+      {%- set altitude='1.7' -%}
+      {%- set spherical_coords='1' -%}
+    {% endif %}
+  {% endif %}
+  {%- if world_name == 'irlock' -%}
+    {%- set irlock_beacon_pose='0 0 0 0 0 0' if irlock_beacon_pose=='NotSet' else irlock_beacon_pose -%}
+  {% endif %}
+  {%- if world_name == 'boat' -%}
+    <include>
+      <uri>model://water_level</uri>
+    </include>
+  {% endif %}
+  {%- if world_name == 'baylands' -%}
+    <include>
+      <uri>model://baylands</uri>
+    </include>
+    {%- if spherical_coords=='NotSet' -%}
+      {%- set latitude='37.413534' -%}
+      {%- set longitude='-121.996561' -%}
+      {%- set altitude='1.3' -%}
+      {%- set spherical_coords='1' -%}
+    {% endif %}
+  {% endif %}
+  {%- if world_name == 'yosemite' -%}
+    </include>
+      <uri>model://yosemite</uri>
+    </include>
+    {%- if spherical_coords=='NotSet' -%}
+      {%- set latitude='37.7332531' -%}
+      {%- set longitude='-119.5616378' -%}
+      {%- set altitude='2800.4' -%}
+      {%- set spherical_coords='1' -%}
+    {% endif %}
+  {% endif %}
+  {%- if world_name == 'warehouse' -%}
+    <include>
+      <uri>model://warehouse</uri>
+    </include>
+  {% endif %}
+  {%- if world_name == 'raceway' -%}
+    <include>
+      <uri>model://sonoma_raceway</uri>
+      <pose>-295 150 -7 0 0 0</pose>
+    </include>
+    {%- if spherical_coords=='NotSet' -%}
+      {%- set latitude='38.161479' -%}
+      {%- set longitude='-122.454630' -%}
+      {%- set altitude='488.0' -%}
+      {%- set spherical_coords='1' -%}
+    {% endif %}
+  {% endif %}
+  {%- set wind_speed = '4.0' if ((world_name == 'windy') and (wind_speed == 'NotSet')) else wind_speed -%}
+  {%- set video_widget = '1' if ((world_name == 'typhoon') and (video_widget == 'NotSet')) else video_widget -%}
+  {%- if wind_speed != 'NotSet' -%}
+    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
+      <frameId>base_link</frameId>
+      <robotNamespace/>
+      <xyzOffset>1 0 0</xyzOffset>
+      <windDirectionMean>0 1 0</windDirectionMean>
+      <windVelocityMean>{{ wind_speed }}</windVelocityMean>
+      <windGustDirection>0 0 0</windGustDirection>
+      <windGustDuration>0</windGustDuration>
+      <windGustStart>0</windGustStart>
+      <windGustVelocityMean>0</windGustVelocityMean>
+      <windPubTopic>world_wind</windPubTopic>
+    </plugin>
+  {% endif %}
+  {%- if video_widget == '1' -%}
+    <gui>
+      <plugin name="video_widget" filename="libgazebo_video_stream_widget.so"/>
+    </gui>
+  {% endif %}
+  {%- if spherical_coords == '1' -%}
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>{{ latitude }}</latitude_deg>
+      <longitude_deg>{{ longitude }}</longitude_deg>
+      <elevation>{{ altitude }}</elevation>
+    </spherical_coordinates>
+  {% endif %}
+  {%- if irlock_beacon_pose != 'NotSet' -%}
+    <include>
+      <uri>model://irlock_beacon</uri>
+      <pose>{{ irlock_beacon_pose  }}</pose>
+    </include>
+  {% endif %}
+    <physics name='default_physics' default='0' type='ode'>
+      <gravity>0 0 -9.8066</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>10</iters>
+          <sor>1.3</sor>
+          <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
+          <thread_position_correction>1</thread_position_correction>
+          <island_threads>{{ ode_threads }}</island_threads>
+        </solver>
+        <constraints>
+          <cfm>0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>100</contact_max_correcting_vel>
+          <contact_surface_layer>0.001</contact_surface_layer>
+        </constraints>
+      </ode>
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>{{ realtime_factor }}</real_time_factor>
+      <real_time_update_rate>{{ update_rate }}</real_time_update_rate>
+      <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
+    </physics>
+  {%- if model_name != 'NotSet' -%}
+    {%- set model_pose='0 0 .25 0 0 0' if model_pose=='NotSet' else model_pose -%}
+    <include>
+      <uri>model://{{ model_name }}</uri>
+      <pose>{{ model_pose }}</pose>
+    </include>
+  {% endif %}
+  </world>
+</sdf>
