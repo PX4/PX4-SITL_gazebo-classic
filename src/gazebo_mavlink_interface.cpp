@@ -500,6 +500,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   // Always run at 250 Hz. At 500 Hz, the skip factor should be 2, at 1000 Hz 4.
   if (!(previous_imu_seq_ % update_skip_factor_ == 0)) {
+    gzerr << "Aborting, skip factor mismatch" << std::endl;
     return;
   }
 

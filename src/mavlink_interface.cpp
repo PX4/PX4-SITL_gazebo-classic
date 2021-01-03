@@ -194,14 +194,21 @@ void MavlinkInterface::Load()
 void MavlinkInterface::pollForMAVLinkMessages()
 {
   if (gotSigInt_) {
+    std::cerr << "MAVLink interface: shutting down" << std::endl << std::flush;
     return;
   }
 
   received_actuator_ = false;
+  unsigned counter = 0;
 
   do {
-    int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
+    int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 100 : 0;
     int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
+    counter++
+
+    if (counter > 5) {
+      std::cerr << "Poll busy loop" << std::endl << std::flush;
+    }
 
     if (ret < 0) {
       std::cerr << "poll error: " << strerror(errno) << "\n";
@@ -236,7 +243,7 @@ void MavlinkInterface::pollForMAVLinkMessages()
 
         // client closed the connection orderly, only makes sense on tcp
         if (use_tcp_ && ret == 0) {
-          std::cerr << "Connection closed by client." << "\n";
+          std::cerr << "Gazebo simulation: Connection closed by client." << std::endl << std::flush;
           close_conn_ = true;
           continue;
         }
@@ -255,7 +262,7 @@ void MavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
-  } while (!close_conn_ && received_first_actuator_ && !received_actuator_ && enable_lockstep_ && !gotSigInt_);
+  } while (counter < 10 && !close_conn_ && received_first_actuator_ && !received_actuator_ && enable_lockstep_ && !gotSigInt_);
 }
 
 void MavlinkInterface::pollFromQgcAndSdk()
