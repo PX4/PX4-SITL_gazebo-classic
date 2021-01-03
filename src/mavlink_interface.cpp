@@ -201,21 +201,38 @@ void MavlinkInterface::pollForMAVLinkMessages()
 
   do {
     int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
-    int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
+    int poll_ret = ::poll(&fds_[0], N_FDS, timeout_ms);
 
-    if (ret < 0) {
+    if (poll_ret < 0) {
       std::cerr << "poll error: " << strerror(errno) << "\n";
       return;
     }
 
-    if (ret == 0 && timeout_ms > 0) {
+    if (poll_ret == 0 && timeout_ms > 0) {
       std::cerr << "poll timeout\n";
       return;
     }
 
     for (int i = 0; i < N_FDS; i++) {
       if(fds_[i].revents == 0) {
+        if (i == CONNECTION_FD) {
+          std::cerr << "poll fd " << i << " revents == 0" << std::endl;
+        }
         continue;
+      }
+
+      if (!(fds_[i].revents & POLLIN)) {
+        if (fds_[i].revents & POLLERR) {
+          std::cerr << "poll fd " << i << " revents POLLERR: " << fds_[i].revents << std::endl;
+        }
+        if (fds_[i].revents & POLLHUP) {
+          std::cerr << "poll fd " << i << " revents POLLHUP: " << fds_[i].revents << std::endl;
+
+          int error = 0;
+          socklen_t errlen = sizeof(error);
+          getsockopt(fds_[i].fd, SOL_SOCKET, SO_ERROR, (void *)&error, &errlen);
+          std::cerr << "SO_ERROR " << error << std::endl;
+        }
       }
 
       if (!(fds_[i].revents & POLLIN)) {
@@ -226,18 +243,19 @@ void MavlinkInterface::pollForMAVLinkMessages()
         acceptConnections();
       } else { // if event is raised on connection socket
         int ret = recvfrom(fds_[i].fd, buf_, sizeof(buf_), 0, (struct sockaddr *)&remote_simulator_addr_, &remote_simulator_addr_len_);
-        if (ret < 0) {
-          // all data is read if EWOULDBLOCK is raised
-          if (errno != EWOULDBLOCK) { // disconnected from client
-            std::cerr << "recvfrom error: " << strerror(errno) << "\n";
-          }
-          continue;
-        }
 
         // client closed the connection orderly, only makes sense on tcp
         if (use_tcp_ && ret == 0) {
           std::cerr << "Connection closed by client." << "\n";
           close_conn_ = true;
+          continue;
+        }
+
+        if (ret < 0) {
+          // all data is read if EWOULDBLOCK is raised
+          //if (errno != EWOULDBLOCK) { // disconnected from client
+            std::cerr << "recvfrom error: " << strerror(errno) << "\n";
+          //}
           continue;
         }
 
@@ -436,7 +454,7 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
       } else {
         len = sendto(fds_[CONNECTION_FD].fd, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
       }
-      if (len < 0) {
+      if (len <= 0) {
         std::cerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
         if (errno == ECONNRESET || errno == EPIPE) {
           if (use_tcp_) { // udp socket remains alive
