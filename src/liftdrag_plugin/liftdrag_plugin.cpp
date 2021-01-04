@@ -56,7 +56,7 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
   this->cmaStall = 0.0;
 
   /// how much to change CL, CD and CM per every radian of the control joint value
-  this->controlJointRadToCL = 4.0;
+  this->cl_delta = 4.0;
   this->cd_delta = 0.0;
   this->cm_delta = 0.0;
 }
@@ -90,8 +90,12 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("radial_symmetry"))
     this->radialSymmetry = _sdf->Get<bool>("radial_symmetry");
 
-  if (_sdf->HasElement("a0"))
+  if (_sdf->HasElement("alpha0"))
+    this->alpha0 = _sdf->Get<double>("alpha0");
+  else if (_sdf->HasElement("a0")) {
+    // a0 is deprecated, but still allowed
     this->alpha0 = _sdf->Get<double>("a0");
+  }
 
   if (_sdf->HasElement("cd_alpha0"))
     this->cd_alpha0 = _sdf->Get<double>("cd_alpha0");
@@ -185,8 +189,12 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     }
   }
 
-  if (_sdf->HasElement("control_joint_rad_to_cl"))
-    this->controlJointRadToCL = _sdf->Get<double>("control_joint_rad_to_cl");
+  if (_sdf->HasElement("cl_delta"))
+    this->cl_delta = _sdf->Get<double>("cl_delta");
+  else if (_sdf->HasElement("control_joint_rad_to_cl")) {
+    // control_joint_rad_to_cl is deprecated, but still allowed
+    this->cl_delta = _sdf->Get<double>("control_joint_rad_to_cl");
+  }
 
   if (_sdf->HasElement("cd_delta"))
     this->cd_delta = _sdf->Get<double>("cd_delta");
@@ -323,7 +331,7 @@ void LiftDragPlugin::OnUpdate()
   }
 
   // modify cl per control joint value
-  cl = cl + this->controlJointRadToCL * controlAngle;
+  cl = cl + this->cl_delta * controlAngle;
 
   // compute lift force at cp
   ignition::math::Vector3d lift = cl * q * this->area * liftDirection;

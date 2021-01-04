@@ -84,12 +84,6 @@ namespace gazebo
     /// \brief Cm-alpha rate after stall
     protected: double cmaStall;
 
-    /// \brief Coefficient of Drag / control surface deflection angle slope
-    protected: double cd_delta;
-
-    /// \brief Coefficient of Moment / control surface deflection angle slope
-    protected: double cm_delta;
-
     /// \brief: \TODO: make a stall velocity curve
     protected: double velocityStall;
 
@@ -138,9 +132,14 @@ namespace gazebo
     /// this lifting body
     protected: physics::JointPtr controlJoint;
 
-    /// \brief how much to change CL per radian of control surface joint
-    /// value.
-    protected: double controlJointRadToCL;
+    /// \brief How much to change CL per radian of control surface deflection
+    protected: double cl_delta;
+
+    /// \brief How much to change CD per radian of control surface deflection
+    protected: double cd_delta;
+
+    /// \brief How much to change CM per radian of control surface deflection
+    protected: double cm_delta;
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
