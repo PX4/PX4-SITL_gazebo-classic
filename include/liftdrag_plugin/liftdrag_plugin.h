@@ -72,7 +72,7 @@ namespace gazebo
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     protected: double cma;
 
-    /// \brief angle of attack when airfoil stalls
+    /// \brief angle of attack when airfoil stalls, relative to alpha0
     protected: double alphaStall;
 
     /// \brief Cl-alpha rate after stall
@@ -84,7 +84,10 @@ namespace gazebo
     /// \brief Cm-alpha rate after stall
     protected: double cmaStall;
 
-    /// \breif Coefficient of Moment / control surface deflection angle slope
+    /// \brief Coefficient of Drag / control surface deflection angle slope
+    protected: double cd_delta;
+
+    /// \brief Coefficient of Moment / control surface deflection angle slope
     protected: double cm_delta;
 
     /// \brief: \TODO: make a stall velocity curve
@@ -107,10 +110,16 @@ namespace gazebo
     /// \brief angle of sweep
     protected: double sweep;
 
-    /// \brief initial angle of attack
+    /// \brief angle of attack at which the lift is zero
     protected: double alpha0;
 
-    /// \brief angle of attack
+    /// \brief Cd at zero lift (zero-lift drag coefficient)
+    protected: double cd_alpha0;
+
+    /// \brief Cm at zero lift (zero-lift moment coefficient)
+    protected: double cm_alpha0;
+
+    /// \brief angle of attack, relative to alpha0
     protected: double alpha;
 
     /// \brief center of pressure in link local coordinates
