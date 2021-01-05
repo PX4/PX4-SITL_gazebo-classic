@@ -24,6 +24,8 @@ jobs:
         #submodules: 'recursive'     # possibly needed in your situation  
      - name: Merge Upstream
        run: |
+         set -x
+         
          upstream_url="https://github.com/PX4/PX4-SITL_gazebo.git"
          upstream_branch="master"
          target_branch="master"
