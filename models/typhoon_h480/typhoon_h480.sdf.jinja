@@ -404,7 +404,7 @@
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
             <udpHost>127.0.0.1</udpHost>
-            <udpPort>5600</udpPort>
+            <udpPort>{{ gst_udp_port }}</udpPort>
         </plugin>
         <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
             <robotNamespace>typhoon_h480</robotNamespace>
@@ -412,6 +412,10 @@
             <width>3840</width>
             <height>2160</height>
             <maximum_zoom>8.0</maximum_zoom>
+            <video_uri>{{ video_uri }}</video_uri>
+            <system_id>{{ mavlink_id }}</system_id>
+            <cam_component_id>{{ cam_component_id }}</cam_component_id>
+            <mavlink_cam_udp_port>{{ mavlink_cam_udp_port }}</mavlink_cam_udp_port>
         </plugin>
       </sensor>
     </link>
