@@ -114,17 +114,17 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
         _maxZoom = sdf->GetElement("maximum_zoom")->Get<float>();
     }
 
-    if (sdf->HasElement(" video_uri")) {
-        _streamURI = sdf->GetElement(" video_uri")->Get<int>();
+    if (sdf->HasElement("video_uri")) {
+        _videoURI = sdf->GetElement("video_uri")->Get<int>();
     }
     if (sdf->HasElement("system_id")) {
         _systemID = sdf->GetElement("system_id")->Get<int>();
     }
-    if (sdf->HasElement("component_id")) {
-        _componentID = sdf->GetElement("component_id")->Get<int>();
+    if (sdf->HasElement("cam_component_id")) {
+        _componentID = sdf->GetElement("cam_component_id")->Get<int>();
     }
-    if (sdf->HasElement("cam_port")) {
-        _camPort = sdf->GetElement("cam_port")->Get<int>();
+    if (sdf->HasElement("mavlink_cam_udp_port")) {
+        _mavlinkCamPort = sdf->GetElement("mavlink_cam_udp_port")->Get<int>();
     }
 
     //check if exiftool exists
@@ -469,7 +469,7 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     _myaddr.sin_family = AF_INET;
     _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     // Choose the default cam port
-    _myaddr.sin_port = htons(_camPort);
+    _myaddr.sin_port = htons(_mavlinkCamPort);
     if (::bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
         gzerr << "Bind failed for camera UDP plugin" << endl;
         return false;
@@ -481,7 +481,7 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     _fds[0].events = POLLIN;
     mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
     chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
-    gzmsg << "[Camera manager plugin]: Camera on udp port " + std::to_string(_camPort) + "\n";
+    gzmsg << "[Camera manager plugin]: Camera on udp port " + std::to_string(_mavlinkCamPort) + "\n";
     return true;
 }
 
@@ -654,7 +654,7 @@ void GeotaggedImagesPlugin::_handle_request_video_stream_information(const mavli
 
     // ACK command received and accepted
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-    std::string uri = std::to_string(_streamURI);
+    std::string uri = std::to_string(_videoURI);
 
     mavlink_message_t msg;
     mavlink_msg_video_stream_information_pack_chan(
