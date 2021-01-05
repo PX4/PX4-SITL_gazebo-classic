@@ -114,8 +114,8 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
         _maxZoom = sdf->GetElement("maximum_zoom")->Get<float>();
     }
 
-    if (sdf->HasElement("stream_uri")) {
-        _streamURI = sdf->GetElement("stream_uri")->Get<int>();
+    if (sdf->HasElement(" video_uri")) {
+        _streamURI = sdf->GetElement(" video_uri")->Get<int>();
     }
     if (sdf->HasElement("system_id")) {
         _systemID = sdf->GetElement("system_id")->Get<int>();
