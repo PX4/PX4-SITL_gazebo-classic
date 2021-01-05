@@ -123,7 +123,7 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     if (sdf->HasElement("component_id")) {
         _componentID = sdf->GetElement("component_id")->Get<int>();
     }
-    if (sdf->HasElement("component_id")) {
+    if (sdf->HasElement("cam_port")) {
         _camPort = sdf->GetElement("cam_port")->Get<int>();
     }
 
