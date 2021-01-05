@@ -481,8 +481,7 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     _fds[0].events = POLLIN;
     mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
     chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
-    std::string debug_msg = "[Camera manager plugin]: Camera on udp port " + std::to_string(_camPort) + "\n";
-    gzmsg << debug_msg;
+    gzmsg << "[Camera manager plugin]: Camera on udp port " + std::to_string(_camPort) + "\n";
     return true;
 }
 
