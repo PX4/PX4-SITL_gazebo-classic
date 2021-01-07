@@ -363,15 +363,16 @@ void LiftDragPlugin::OnUpdate()
   {
     cm = this->cm_alpha0 + this->cma * this->alphaStall +
          this->cmaStall * (this->alpha - this->alphaStall);
-    // make sure cm is still greater than 0
-    cm = std::max(0.0, cm);
+    // Past stall, cm_alpha tends to drop sharply, so it cannot be larger than cm_alpha0
+    // See e.g. https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/fluid-mechanics/f19_fall.pdf, page 3
+    cm = std::min(this->cm_alpha0, cm);
   }
   else if (this->alpha < -this->alphaStall)
   {
     cm = this->cm_alpha0 - this->cma * this->alphaStall +
          this->cmaStall * (this->alpha + this->alphaStall);
     // make sure cm is still less than 0
-    cm = std::min(0.0, cm);
+    cm = std::max(this->cm_alpha0, cm);
   }
   else
   {
