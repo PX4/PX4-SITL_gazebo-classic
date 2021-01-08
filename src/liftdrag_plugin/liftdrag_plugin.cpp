@@ -341,7 +341,7 @@ void LiftDragPlugin::OnUpdate()
   if (fabs(this->alpha) > this->alphaStall)
   {
     cd = this->cd_alpha0 + this->cda * this->alphaStall +
-         this->cdaStall * (this->alpha - this->alphaStall);
+         this->cdaStall * (fabs(this->alpha) - this->alphaStall);
   }
   else
   {
