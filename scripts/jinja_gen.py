@@ -26,6 +26,11 @@ if __name__ == "__main__":
     parser.add_argument('--hil_mode', default=0, help="Enable HIL mode for HITL simulation")
     parser.add_argument('--output-file', help="sdf output file")
     parser.add_argument('--stdout', action='store_true', default=False, help="dump to stdout instead of file")
+    parser.add_argument('--mavlink_id', default=1, help="Mavlink system ID")
+    parser.add_argument('--cam_component_id', default=100, help="Mavlink camera component ID")
+    parser.add_argument('--gst_udp_port', default=5600, help="Gstreamer UDP port for SITL")
+    parser.add_argument('--video_uri', default=5600, help="Mavlink camera URI for SITL")
+    parser.add_argument('--mavlink_cam_udp_port', default=14530, help="Mavlink camera UDP port for SITL")
     args = parser.parse_args()
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.env_dir))
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
@@ -44,6 +49,11 @@ if __name__ == "__main__":
          'serial_enabled': args.serial_enabled, \
          'serial_device': args.serial_device, \
          'serial_baudrate': args.serial_baudrate, \
+         'mavlink_id': args.mavlink_id, \
+         'cam_component_id': args.cam_component_id, \
+         'gst_udp_port': args.gst_udp_port, \
+         'video_uri': args.video_uri, \
+         'mavlink_cam_udp_port': args.mavlink_cam_udp_port, \
          'hil_mode': args.hil_mode}
 
     result = template.render(d)
