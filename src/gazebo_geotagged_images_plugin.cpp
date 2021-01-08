@@ -114,6 +114,19 @@ void GeotaggedImagesPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
         _maxZoom = sdf->GetElement("maximum_zoom")->Get<float>();
     }
 
+    if (sdf->HasElement("video_uri")) {
+        _videoURI = sdf->GetElement("video_uri")->Get<int>();
+    }
+    if (sdf->HasElement("system_id")) {
+        _systemID = sdf->GetElement("system_id")->Get<int>();
+    }
+    if (sdf->HasElement("cam_component_id")) {
+        _componentID = sdf->GetElement("cam_component_id")->Get<int>();
+    }
+    if (sdf->HasElement("mavlink_cam_udp_port")) {
+        _mavlinkCamPort = sdf->GetElement("mavlink_cam_udp_port")->Get<int>();
+    }
+
     //check if exiftool exists
     if (system("exiftool -ver &>/dev/null") != 0) {
         gzerr << "exiftool not found. geotagging_images plugin will be disabled" << endl;
@@ -237,8 +250,8 @@ void GeotaggedImagesPlugin::OnNewFrame(const unsigned char * image)
     // Send indication to GCS
     mavlink_message_t msg;
     mavlink_msg_camera_image_captured_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,
+        _systemID,
+        _componentID,
         MAVLINK_COMM_1,
         &msg,
         currentTime.Double() * 1e3, // time boot ms
@@ -290,7 +303,7 @@ void GeotaggedImagesPlugin::_handle_message(mavlink_message_t *msg, struct socka
         mavlink_command_long_t cmd;
         mavlink_msg_command_long_decode(msg, &cmd);
         mavlink_command_long_t digicam_ctrl_cmd;
-        if (cmd.target_component == MAV_COMP_ID_CAMERA) {
+        if (cmd.target_component == _componentID) {
             switch (cmd.command) {
             case MAV_CMD_IMAGE_START_CAPTURE:
                 _handle_take_photo(msg, srcaddr);
@@ -359,8 +372,8 @@ void GeotaggedImagesPlugin::_send_cmd_ack(uint8_t target_sysid, uint8_t target_c
 {
     mavlink_message_t msg;
     mavlink_msg_command_ack_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,
+        _systemID,
+        _componentID,
         MAVLINK_COMM_1,
         &msg,
         cmd,
@@ -375,7 +388,7 @@ void GeotaggedImagesPlugin::_send_cmd_ack(uint8_t target_sysid, uint8_t target_c
 void GeotaggedImagesPlugin::_send_heartbeat()
 {
     mavlink_message_t msg;
-    mavlink_msg_heartbeat_pack_chan(1, MAV_COMP_ID_CAMERA, MAVLINK_COMM_1, &msg, MAV_TYPE_GENERIC, MAV_AUTOPILOT_GENERIC, 0, 0, 0);
+    mavlink_msg_heartbeat_pack_chan(_systemID, _componentID, MAVLINK_COMM_1, &msg, MAV_TYPE_GENERIC, MAV_AUTOPILOT_GENERIC, 0, 0, 0);
     // Send to GCS port directly
     _send_mavlink_message(&msg);
     // Gazebo log output is using buffered IO for some reason
@@ -456,7 +469,7 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     _myaddr.sin_family = AF_INET;
     _myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     // Choose the default cam port
-    _myaddr.sin_port = htons(14530);
+    _myaddr.sin_port = htons(_mavlinkCamPort);
     if (::bind(_fd, (struct sockaddr *)&_myaddr, sizeof(_myaddr)) < 0) {
         gzerr << "Bind failed for camera UDP plugin" << endl;
         return false;
@@ -468,7 +481,7 @@ bool GeotaggedImagesPlugin::_init_udp(sdf::ElementPtr sdf) {
     _fds[0].events = POLLIN;
     mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_1);
     chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
-    gzmsg << "Camera on udp port 14530\n";
+    gzmsg << "[Camera manager plugin]: Camera on udp port " + std::to_string(_mavlinkCamPort) + "\n";
     return true;
 }
 
@@ -546,8 +559,8 @@ void GeotaggedImagesPlugin::_handle_camera_info(const mavlink_message_t *pMsg, s
 
     mavlink_message_t msg;
     mavlink_msg_camera_information_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,
+        _systemID,
+        _componentID,
         MAVLINK_COMM_1,
         &msg,
         0,                         // time_boot_ms
@@ -582,8 +595,8 @@ void GeotaggedImagesPlugin::_handle_request_camera_settings(const mavlink_messag
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_CAMERA_SETTINGS, MAV_RESULT_ACCEPTED, srcaddr);
     mavlink_message_t msg;
     mavlink_msg_camera_settings_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,
+        _systemID,
+        _componentID,
         MAVLINK_COMM_1,
         &msg,
         0,                      // time_boot_ms
@@ -609,8 +622,8 @@ void GeotaggedImagesPlugin::_handle_request_video_stream_status(const mavlink_me
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_STATUS, MAV_RESULT_ACCEPTED, srcaddr);
     mavlink_message_t msg;
     mavlink_msg_video_stream_status_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,                                     // Component ID
+        _systemID,
+        _componentID,                                     // Component ID
         MAVLINK_COMM_1,
         &msg,
         static_cast<uint8_t>(sid),                              // Stream ID
@@ -641,12 +654,12 @@ void GeotaggedImagesPlugin::_handle_request_video_stream_information(const mavli
 
     // ACK command received and accepted
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-    std::string uri = "5600";
+    std::string uri = std::to_string(_videoURI);
 
     mavlink_message_t msg;
     mavlink_msg_video_stream_information_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,                         // Component ID
+        _systemID,
+        _componentID,                         // Component ID
         MAVLINK_COMM_1,
         &msg,
         1,                                          // Stream ID
@@ -714,8 +727,8 @@ void GeotaggedImagesPlugin::_send_capture_status(struct sockaddr* srcaddr)
 
     mavlink_message_t msg;
     mavlink_msg_camera_capture_status_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,
+        _systemID,
+        _componentID,
         MAVLINK_COMM_1,
         &msg,
         current_time.Double() * 1e3,
@@ -740,8 +753,8 @@ void GeotaggedImagesPlugin::_handle_storage_info(const mavlink_message_t *pMsg, 
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_STORAGE_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
     mavlink_message_t msg;
     mavlink_msg_storage_information_pack_chan(
-        1,
-        MAV_COMP_ID_CAMERA,
+        _systemID,
+        _componentID,
         MAVLINK_COMM_1,
         &msg,
         0,                                  // time_boot_ms
