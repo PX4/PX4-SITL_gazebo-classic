@@ -113,7 +113,7 @@ namespace gazebo
     /// \brief angle of attack, relative to alpha0
     protected: double alpha;
 
-    /// \brief center of pressure in link local coordinates
+    /// \brief center of pressure relative to the center of gravity of the link, in link local orientation
     protected: ignition::math::Vector3d cp;
 
     /// \brief Normally, this is taken as a direction parallel to the chord
