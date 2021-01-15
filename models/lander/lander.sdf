@@ -1527,7 +1527,8 @@
       <self_collide>0</self_collide>
     </link>
     <link name='lander/imu_link'>
-      <pose>0 0 0.75 -0 -0 0.6954</pose>
+    <!-- 0.6954-->
+      <pose>0 0 0.8 -0 -0 0.7854</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.015</mass>
@@ -1607,7 +1608,6 @@
       </physics>
     </joint>
 
-<!--
     <joint name='actuator_1_inner__actuator_1_mount_front__ball' type='ball'>
       <parent>actuator_1_inner</parent>
       <child>actuator_1_mount_front</child>
@@ -1625,7 +1625,7 @@
         </ode>
       </physics>
     </joint>
--->
+
     <joint name='actuator_1_mount_back_JOINT_0' type='fixed'>
       <parent>actuator_1_mount_back</parent>
       <child>actuator_1_outer</child>
@@ -1693,7 +1693,7 @@
         </ode>
       </physics>
     </joint>
-    <!--
+
     <joint name='actuator_2_inner__actuator_2_mount_front__ball' type='ball'>
       <parent>actuator_2_inner</parent>
       <child>actuator_2_mount_front</child>
@@ -1711,7 +1711,7 @@
         </ode>
       </physics>
     </joint>
-    -->
+
     <joint name='actuator_2_mount_back_JOINT_1' type='fixed'>
       <parent>actuator_2_mount_back</parent>
       <child>actuator_2_outer</child>
@@ -2197,8 +2197,8 @@
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position_kinematic</joint_control_type>
-          <joint_name>gimbal_ring_mid__gimbal_mid_rotate_1__revolute</joint_name>
+          <joint_control_type>position</joint_control_type>
+          <joint_name>actuator_1_outer__actuator_1_inner__prismatic</joint_name>
         </channel>
         <channel name="pitch">
           <input_index>1</input_index>
@@ -2206,8 +2206,8 @@
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position_kinematic</joint_control_type>
-          <joint_name>gimbal_ring_outer__gimbal_outer_rotate_1__revolute</joint_name>
+          <joint_control_type>position</joint_control_type>
+          <joint_name>actuator_2_outer__actuator_2_inner__prismatic</joint_name>
         </channel>
         <channel name="yaw_po">
           <input_index>2</input_index>

@@ -478,6 +478,19 @@ void GimbalControllerPlugin::OnUpdate()
       //std::cout << "X: " << currentAnglePRYVariable.X() << "  ";
       //std::cout << "Y: " << currentAnglePRYVariable.Y() << "  ";
       //std::cout << "Z: " << currentAnglePRYVariable.Z() << "\n";
+      
+    double coord_theta = 0;
+      
+    double old_x_comp = sin(currentAnglePRYVariable.Y());
+    double old_y_comp = sin(currentAnglePRYVariable.X());
+    double new_x_comp = old_x_comp*cos(coord_theta) + old_y_comp*-sin(coord_theta);
+    double new_y_comp = old_x_comp*sin(coord_theta) + old_y_comp*cos(coord_theta);
+    double new_vec_length = sqrt(pow(new_x_comp,2) + pow(cos(currentAnglePRYVariable.Y()),2));
+    //double my_insanity = sqrt(100);
+    double new_y = asin(new_x_comp/new_vec_length);
+    double new_x = asin(new_y_comp/new_vec_length);
+    
+    //std::cout << "new_x: " << new_x << "   old_x: " << currentAnglePRYVariable.X() << "\n";
   static actuator acs_sb("lander::thruster_3");
   static actuator acs_po("lander::thruster_1");
   static actuator acs_bo("lander::thruster_4");
@@ -488,15 +501,18 @@ void GimbalControllerPlugin::OnUpdate()
   common::Time time_ = this->model->GetWorld()->SimTime();
   double dt_ = (time_ - this->lastUpdateTime).Double();
 
-  static PID con_roll(100,1,50,dt_,0.05,100000,-10000);
-  static PID con_pitch(100,1,50,dt_,0.05,100000,-10000);
+  static PID con_roll(100,1,75,dt_,0.5,100000,-10000);
+  static PID con_pitch(100,1,75,dt_,0.5,100000,-10000);
   //static PID con_yaw(1,1,1,1,1,100000,-10000);
 
   const std::lock_guard<std::mutex> lock(cmd_mutex);
 
-  double rollTarget = con_roll.Update(currentAnglePRYVariable.X(), 0);
-    //std::cout << "ROLL TARGET: " << rollTarget << "  ";
-    double pitchTarget = con_pitch.Update(currentAnglePRYVariable.Y(), 0);
+
+  //double rollTarget = con_roll.Update(currentAnglePRYVariable.X(), 0);
+    //std::cout << "ROLL TARGET OLD: " << rollTarget << "  ";
+  double rollTarget = con_roll.Update(new_x, 0);
+    //std::cout << "ROLL TARGET NEW: " << rollTarget << "\n";
+  double pitchTarget = con_pitch.Update(new_y, 0);
     //std::cout << "PITCH TARGET: " << pitchTarget << "\n";
     //double yawTarget = con_yaw.Update(-2, 0);
     //std::cout << "YAW TARGET: " << yawTarget << "\n";

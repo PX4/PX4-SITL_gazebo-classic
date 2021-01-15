@@ -1160,7 +1160,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
-  static PID actuator_cont[2] = {PID(50, 0, 10, _dt, 1,100000,-100000), PID(50, 0, 10 ,_dt, 1 ,100000,-100000)};
+  static PID actuator_cont[2] = {PID(500, 0, 0, _dt, 0.1,100000,-100000), PID(500, 0, 0 ,_dt, 0.1 ,100000,-100000)};
 
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
@@ -1181,9 +1181,9 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         double current = joints_[i]->GetAngle(0).Radian();
 #endif
 
-        //target = 0;
-        //std::cout << "CURRENT: " << current << "\n";
-        //std::cout << "Target: " << target << "\n";
+        //target = 10;
+        std::cout << "CURRENT: " << current << "\n";
+        std::cout << "Target: " << target << "\n";
         
         /*
         thisVariableIsNotUsed++;
@@ -1201,13 +1201,14 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           }
         }
         
+        
         if(my_switch)
         {
-          target = 2;
+          target = 5;
         }
         else
         {
-          target = -2;
+          target = -5;
         }
         */
         double err = current - target;
