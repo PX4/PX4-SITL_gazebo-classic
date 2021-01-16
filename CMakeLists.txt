@@ -439,6 +439,14 @@ if (GSTREAMER_FOUND)
   endif()
 endif()
 
+QT5_WRAP_CPP(headers_MOC2 include/gazebo_user_camera_plugin.h)
+add_library(gazebo_user_camera_plugin SHARED ${headers_MOC2} src/gazebo_user_camera_plugin.cpp)
+target_link_libraries(gazebo_user_camera_plugin ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Test_LIBRARIES})
+set(plugins
+  ${plugins}
+  gazebo_user_camera_plugin
+)
+
 # Linux is not consistent with plugin availability, even on Gazebo 7
 #if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
   add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
