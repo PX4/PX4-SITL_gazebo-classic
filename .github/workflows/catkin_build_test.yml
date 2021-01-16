@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {rosdistro: 'kinetic', container: 'px4io/px4-dev-ros-kinetic:2020-11-18'} 
           - {rosdistro: 'melodic', container: 'px4io/px4-dev-ros-melodic:2020-11-18'}
           - {rosdistro: 'noetic', container: 'px4io/px4-dev-ros-noetic:2020-11-18'}
     container: ${{ matrix.config.container }}
