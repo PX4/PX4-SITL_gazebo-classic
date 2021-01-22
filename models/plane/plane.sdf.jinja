@@ -497,10 +497,12 @@
       <parent>base_link</parent>
     </joint>
     <plugin name="left_wing_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>0.05984281113</alpha0>
+      <alpha0>-0.009519322</alpha0>
+      <cd_alpha0>0.003</cd_alpha0>
+      <cm_alpha0>0.002072715</cm_alpha0>
       <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
+      <cda>0.35</cda>
+      <cma>0.02</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -515,14 +517,18 @@
         left_aileron_joint
       </control_joint_name>
       <cl_delta>-0.5</cl_delta>
+      <cd_delta>0.05</cd_delta>
+      <cm_delta>0.005</cm_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>0.05984281113</alpha0>
+      <alpha0>-0.009519322</alpha0>
+      <cd_alpha0>0.003</cd_alpha0>
+      <cm_alpha0>0.002072715</cm_alpha0>
       <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
+      <cda>0.35</cda>
+      <cma>0.02</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -537,14 +543,18 @@
         right_aileron_joint
       </control_joint_name>
       <cl_delta>-0.5</cl_delta>
+      <cd_delta>0.05</cd_delta>
+      <cm_delta>0.005</cm_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="left_flap_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>0.05984281113</alpha0>
+      <alpha0>-0.009519322</alpha0>
+      <cd_alpha0>0.003</cd_alpha0>
+      <cm_alpha0>0.002072715</cm_alpha0>
       <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
+      <cda>0.35</cda>
+      <cma>0.02</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -559,14 +569,18 @@
         left_flap_joint
       </control_joint_name>
       <cl_delta>-0.5</cl_delta>
+      <cd_delta>0.05</cd_delta>
+      <cm_delta>0.005</cm_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_flap_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>0.05984281113</alpha0>
+      <alpha0>-0.009519322</alpha0>
+      <cd_alpha0>0.003</cd_alpha0>
+      <cm_alpha0>0.002072715</cm_alpha0>
       <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
+      <cda>0.35</cda>
+      <cma>0.02</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -581,6 +595,8 @@
         right_flap_joint
       </control_joint_name>
       <cl_delta>-0.5</cl_delta>
+      <cd_delta>0.05</cd_delta>
+      <cm_delta>0.005</cm_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
