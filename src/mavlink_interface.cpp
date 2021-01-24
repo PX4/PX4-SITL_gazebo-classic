@@ -255,6 +255,9 @@ void MavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
+    if(!received_actuator_) {
+      usleep(100);
+    }
   } while (!close_conn_ && received_first_actuator_ && !received_actuator_ && enable_lockstep_ && !gotSigInt_);
 }
 
