@@ -722,7 +722,7 @@
       <parent>base_link</parent>
     </joint>
     <plugin name="left_wing_lift" filename="libLiftDragPlugin.so">
-      <alpha0>0.05984281113</alpha0>
+      <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -739,12 +739,12 @@
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
-      <cl_delta>-1.0</cl_delta>
+      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing_lift" filename="libLiftDragPlugin.so">
-      <alpha0>0.05984281113</alpha0>
+      <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -761,12 +761,12 @@
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
-      <cl_delta>-1.0</cl_delta>
+      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="elevator_lift" filename="libLiftDragPlugin.so">
-      <alpha0>-0.2</alpha0>
+      <a0>-0.2</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -783,12 +783,12 @@
       <control_joint_name>
         elevator_joint
       </control_joint_name>
-      <cl_delta>-12.0</cl_delta>
+      <control_joint_rad_to_cl>-12.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="rudder_lift" filename="libLiftDragPlugin.so">
-      <alpha0>0.0</alpha0>
+      <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0.</cma>
