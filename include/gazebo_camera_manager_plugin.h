@@ -38,15 +38,15 @@ namespace gazebo
 typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 
 /**
- * @class GeotaggedImagesPlugin
+ * @class CameraManagerPlugin
  * Gazebo plugin that saves geotagged camera images to disk.
  */
-class GAZEBO_VISIBLE GeotaggedImagesPlugin : public SensorPlugin
+class GAZEBO_VISIBLE CameraManagerPlugin : public SensorPlugin
 {
 public:
-    GeotaggedImagesPlugin();
+    CameraManagerPlugin();
 
-    virtual ~GeotaggedImagesPlugin();
+    virtual ~CameraManagerPlugin();
     virtual void Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf);
 
     void OnNewFrame(const unsigned char *image);
