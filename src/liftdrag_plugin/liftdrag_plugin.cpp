@@ -39,8 +39,10 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
   this->wind_vel_ = ignition::math::Vector3d(0.0, 0.0, 0.0);
   this->area = 1.0;
   this->alpha0 = 0.0;
+  this->cd_alpha0 = 0.0;
+  this->cm_alpha0 = 0.0;
+
   this->alpha = 0.0;
-  this->sweep = 0.0;
   this->velocityStall = 0.0;
 
   // 90 deg stall
@@ -53,10 +55,9 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
   this->cdaStall = 1.0;
   this->cmaStall = 0.0;
 
-  /// how much to change CL per every radian of the control joint value
-  this->controlJointRadToCL = 4.0;
-
-  // How much Cm changes with a change in control surface deflection angle
+  /// how much to change CL, CD and CM per every radian of the control joint value
+  this->cl_delta = 4.0;
+  this->cd_delta = 0.0;
   this->cm_delta = 0.0;
 }
 
@@ -89,8 +90,18 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("radial_symmetry"))
     this->radialSymmetry = _sdf->Get<bool>("radial_symmetry");
 
-  if (_sdf->HasElement("a0"))
+  if (_sdf->HasElement("alpha0"))
+    this->alpha0 = _sdf->Get<double>("alpha0");
+  else if (_sdf->HasElement("a0")) {
+    // a0 is deprecated, but still allowed
     this->alpha0 = _sdf->Get<double>("a0");
+  }
+
+  if (_sdf->HasElement("cd_alpha0"))
+    this->cd_alpha0 = _sdf->Get<double>("cd_alpha0");
+
+  if (_sdf->HasElement("cm_alpha0"))
+    this->cm_alpha0 = _sdf->Get<double>("cm_alpha0");
 
   if (_sdf->HasElement("cla"))
     this->cla = _sdf->Get<double>("cla");
@@ -112,9 +123,6 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
 
   if (_sdf->HasElement("cma_stall"))
     this->cmaStall = _sdf->Get<double>("cma_stall");
-
-    if (_sdf->HasElement("cm_delta"))
-        this->cm_delta = _sdf->Get<double>("cm_delta");
 
   if (_sdf->HasElement("cp"))
     this->cp = _sdf->Get<ignition::math::Vector3d>("cp");
@@ -154,9 +162,9 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
           boost::bind(&LiftDragPlugin::OnUpdate, this));
     }
 
-    
+
   }
-  
+
   if (_sdf->HasElement("robotNamespace"))
   {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -181,8 +189,18 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     }
   }
 
-  if (_sdf->HasElement("control_joint_rad_to_cl"))
-    this->controlJointRadToCL = _sdf->Get<double>("control_joint_rad_to_cl");
+  if (_sdf->HasElement("cl_delta"))
+    this->cl_delta = _sdf->Get<double>("cl_delta");
+  else if (_sdf->HasElement("control_joint_rad_to_cl")) {
+    // control_joint_rad_to_cl is deprecated, but still allowed
+    this->cl_delta = _sdf->Get<double>("control_joint_rad_to_cl");
+  }
+
+  if (_sdf->HasElement("cd_delta"))
+    this->cd_delta = _sdf->Get<double>("cd_delta");
+
+  if (_sdf->HasElement("cm_delta"))
+    this->cm_delta = _sdf->Get<double>("cm_delta");
 }
 
 /////////////////////////////////////////////////
@@ -232,20 +250,6 @@ void LiftDragPlugin::OnUpdate()
   // spanwiseI: a vector normal to lift-drag-plane described in inertial frame
   ignition::math::Vector3d spanwiseI = forwardI.Cross(upwardI).Normalize();
 
-  const double minRatio = -1.0;
-  const double maxRatio = 1.0;
-  // check sweep (angle between velI and lift-drag-plane)
-  double sinSweepAngle = ignition::math::clamp(
-      spanwiseI.Dot(velI), minRatio, maxRatio);
-
-  this->sweep = asin(sinSweepAngle);
-
-  // truncate sweep to within +/-90 deg
-  while (fabs(this->sweep) > 0.5 * M_PI)
-    this->sweep = this->sweep > 0 ? this->sweep - M_PI
-                                  : this->sweep + M_PI;
-  // get cos from trig identity
-  double cosSweepAngle = sqrt(1.0 - sin(this->sweep) * sin(this->sweep));
 
   // angle of attack is the angle between
   // velI projected into lift-drag plane
@@ -263,24 +267,24 @@ void LiftDragPlugin::OnUpdate()
   dragDirection.Normalize();
 
   // get direction of lift
-  ignition::math::Vector3d liftI = spanwiseI.Cross(velInLDPlane);
-  liftI.Normalize();
+  ignition::math::Vector3d liftDirection = spanwiseI.Cross(velInLDPlane);
+  liftDirection.Normalize();
 
   // get direction of moment
   ignition::math::Vector3d momentDirection = spanwiseI;
 
-  // compute angle between upwardI and liftI
+  // compute angle between upwardI and liftDirection
   // in general, given vectors a and b:
-  //   cos(theta) = a.Dot(b)/(a.Length()*b.Lenghth())
-  // given upwardI and liftI are both unit vectors, we can drop the denominator
-  //   cos(theta) = a.Dot(b)
-  double cosAlpha = ignition::math::clamp(liftI.Dot(upwardI), minRatio, maxRatio);
+  //   cos(alpha) = a.Dot(b)/(a.Length()*b.Lenghth())
+  // given upwardI and liftDirection are both unit vectors, we can drop the denominator
+  //   cos(alpha) = a.Dot(b)
+  double cosAlpha = ignition::math::clamp(liftDirection.Dot(upwardI), -1.0, 1.0);
 
   // Is alpha positive or negative? Test:
   // forwardI points toward zero alpha
   // if forwardI is in the same direction as lift, alpha is positive.
-  // liftI is in the same direction as forwardI?
-  if (liftI.Dot(forwardI) >= 0.0)
+  // liftDirection is in the same direction as forwardI?
+  if (liftDirection.Dot(forwardI) >= 0.0)
     this->alpha = this->alpha0 + acos(cosAlpha);
   else
     this->alpha = this->alpha0 - acos(cosAlpha);
@@ -294,29 +298,8 @@ void LiftDragPlugin::OnUpdate()
   double speedInLDPlane = velInLDPlane.Length();
   double q = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
 
-  // compute cl at cp, check for stall, correct for sweep
-  double cl;
-  if (this->alpha > this->alphaStall)
-  {
-    cl = (this->cla * this->alphaStall +
-          this->claStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
-    // make sure cl is still great than 0
-    cl = std::max(0.0, cl);
-  }
-  else if (this->alpha < -this->alphaStall)
-  {
-    cl = (-this->cla * this->alphaStall +
-          this->claStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
-    // make sure cl is still less than 0
-    cl = std::min(0.0, cl);
-  }
-  else
-    cl = this->cla * this->alpha * cosSweepAngle;
-
-  // modify cl per control joint value
-  double controlAngle;
+  // determine controlAngle
+  double controlAngle = 0;
   if (this->controlJoint)
   {
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -324,68 +307,83 @@ void LiftDragPlugin::OnUpdate()
 #else
     controlAngle = this->controlJoint->GetAngle(0).Radian();
 #endif
-    cl = cl + this->controlJointRadToCL * controlAngle;
-    /// \TODO: also change cd
   }
 
-  // compute lift force at cp
-  ignition::math::Vector3d lift = cl * q * this->area * liftI;
-
-  // compute cd at cp, check for stall, correct for sweep
-  double cd;
+  // compute cl at cp, check for stall
+  double cl;
   if (this->alpha > this->alphaStall)
   {
-    cd = (this->cda * this->alphaStall +
-          this->cdaStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
+    cl = this->cla * this->alphaStall +
+         this->claStall * (this->alpha - this->alphaStall);
+    // make sure cl is still great than 0
+    cl = std::max(0.0, cl);
   }
   else if (this->alpha < -this->alphaStall)
   {
-    cd = (-this->cda * this->alphaStall +
-          this->cdaStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
+    cl = -this->cla * this->alphaStall +
+         this->claStall * (this->alpha + this->alphaStall);
+    // make sure cl is still less than 0
+    cl = std::min(0.0, cl);
   }
   else
-    cd = (this->cda * this->alpha) * cosSweepAngle;
+  {
+    cl = this->cla * this->alpha;
+  }
+
+  // modify cl per control joint value
+  cl = cl + this->cl_delta * controlAngle;
+
+  // compute lift force at cp
+  ignition::math::Vector3d lift = cl * q * this->area * liftDirection;
+
+  // compute cd at cp, check for stall
+  double cd;
+  if (fabs(this->alpha) > this->alphaStall)
+  {
+    cd = this->cd_alpha0 + this->cda * this->alphaStall +
+         this->cdaStall * (fabs(this->alpha) - this->alphaStall);
+  }
+  else
+  {
+    cd = this->cd_alpha0 + this->cda * fabs(this->alpha);
+  }
 
   // make sure drag is positive
   cd = fabs(cd);
 
+  // Take into account the effect of control surface deflection angle to Cd. Contribution must be positive.
+  cd += fabs(this->cd_delta * controlAngle);
+
   // drag at cp
   ignition::math::Vector3d drag = cd * q * this->area * dragDirection;
 
-  // compute cm at cp, check for stall, correct for sweep
+  // compute cm at cp, check for stall
   double cm;
   if (this->alpha > this->alphaStall)
   {
-    cm = (this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha - this->alphaStall))
-         * cosSweepAngle;
-    // make sure cm is still great than 0
-    cm = std::max(0.0, cm);
+    cm = this->cm_alpha0 + this->cma * this->alphaStall +
+         this->cmaStall * (this->alpha - this->alphaStall);
+    // Past stall, cm_alpha tends to drop sharply, so it cannot be larger than cm_alpha0
+    // See e.g. https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/fluid-mechanics/f19_fall.pdf, page 3
+    cm = std::min(this->cm_alpha0, cm);
   }
   else if (this->alpha < -this->alphaStall)
   {
-    cm = (-this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha + this->alphaStall))
-         * cosSweepAngle;
+    cm = this->cm_alpha0 - this->cma * this->alphaStall +
+         this->cmaStall * (this->alpha + this->alphaStall);
     // make sure cm is still less than 0
-    cm = std::min(0.0, cm);
+    cm = std::max(this->cm_alpha0, cm);
   }
   else
-    cm = this->cma * this->alpha * cosSweepAngle;
+  {
+    cm = this->cm_alpha0 + this->cma * this->alpha;
+  }
 
   // Take into account the effect of control surface deflection angle to Cm
   cm += this->cm_delta * controlAngle;
 
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
-
-#if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d cog = this->link->GetInertial()->CoG();
-#else
-  ignition::math::Vector3d cog = ignitionFromGazeboMath(this->link->GetInertial()->GetCoG());
-#endif
 
   // force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag;
@@ -409,9 +407,8 @@ void LiftDragPlugin::OnUpdate()
           << "] vel : [" << velInLDPlane << "]\n";
     gzdbg << "forward (inertial): " << forwardI << "\n";
     gzdbg << "upward (inertial): " << upwardI << "\n";
-    gzdbg << "lift dir (inertial): " << liftI << "\n";
+    gzdbg << "lift dir (inertial): " << liftDirection << "\n";
     gzdbg << "Span direction (normal to LD plane): " << spanwiseI << "\n";
-    gzdbg << "sweep: " << this->sweep << "\n";
     gzdbg << "alpha: " << this->alpha << "\n";
     gzdbg << "lift: " << lift << "\n";
     gzdbg << "drag: " << drag << " cd: "
