@@ -1182,8 +1182,8 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 #endif
 
         //target = 10;
-        std::cout << "CURRENT: " << current << "\n";
-        std::cout << "Target: " << target << "\n";
+        //std::cout << "CURRENT: " << current << "\n";
+        //td::cout << "Target: " << target << "\n";
         
         /*
         thisVariableIsNotUsed++;
@@ -1215,14 +1215,15 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         double force = actuator_cont[i].Update(current, target);
         
         
-        /**
-        if(thisVariableIsNotUsed < 6000)
+        
+        if(thisVariableIsNotUsed > 10000)
         {
-          force = 0;
+          //force = 200;
         }
         thisVariableIsNotUsed++;
-        std::cout << thisVariableIsNotUsed << "\n";
-        */
+        //std::cout << thisVariableIsNotUsed << "\n";
+        
+        
         //double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
         double ourOffset = 0;//-28;
@@ -1284,10 +1285,10 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         if ((link_names[i] == "thruster_1") && (target >= 0))
         {
           //std::cout << "YAW_PO: " << target << "  ";
-          const ignition::math::v4::Vector3<double>& force = {0, -target, 0};
-          link->AddLinkForce(force);
+          const ignition::math::v4::Vector3<double>& force = {0, target, 0};
+          link->AddLinkForce(force);  //USE
         }
-        else if ((link_names[i] == "thruster_3") && (target > 0))
+        else if ((link_names[i] == "thruster_3") && (target < 0))
         {
           //std::cout << "YAW_SB: " << target << "  ";
           const ignition::math::v4::Vector3<double>& force = {0, -target, 0};
@@ -1300,11 +1301,11 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           //link->AddLinkForce(force);
           //counter++;
         }
-        else if ((link_names[i] == "thruster_2") && (target <= 0))
+        else if ((link_names[i] == "thruster_2") && (target >= 0))
         {
           //std::cout << "YAW_AF: " << target << "\n";
-          const ignition::math::v4::Vector3<double>& force = {target, 0, 0};
-          link->AddLinkForce(force);
+          const ignition::math::v4::Vector3<double>& force = {-target, 0, 0};
+          link->AddLinkForce(force);   //USE
         }
         else if (link_names[i] == "gimbal_ring_inner")
         {

@@ -479,7 +479,7 @@ void GimbalControllerPlugin::OnUpdate()
       //std::cout << "Y: " << currentAnglePRYVariable.Y() << "  ";
       //std::cout << "Z: " << currentAnglePRYVariable.Z() << "\n";
       
-    double coord_theta = 0;
+    double coord_theta = 0.785;
       
     double old_x_comp = sin(currentAnglePRYVariable.Y());
     double old_y_comp = sin(currentAnglePRYVariable.X());
@@ -490,7 +490,8 @@ void GimbalControllerPlugin::OnUpdate()
     double new_y = asin(new_x_comp/new_vec_length);
     double new_x = asin(new_y_comp/new_vec_length);
     
-    //std::cout << "new_x: " << new_x << "   old_x: " << currentAnglePRYVariable.X() << "\n";
+    //std::cout << "new_x: " << new_x << "\n";
+    //std::cout << "new_y: " << new_y << "\n";
   static actuator acs_sb("lander::thruster_3");
   static actuator acs_po("lander::thruster_1");
   static actuator acs_bo("lander::thruster_4");
@@ -501,8 +502,8 @@ void GimbalControllerPlugin::OnUpdate()
   common::Time time_ = this->model->GetWorld()->SimTime();
   double dt_ = (time_ - this->lastUpdateTime).Double();
 
-  static PID con_roll(100,1,75,dt_,0.5,100000,-10000);
-  static PID con_pitch(100,1,75,dt_,0.5,100000,-10000);
+  static PID con_roll(50,5,75,dt_,0.1,100000,-10000);
+  static PID con_pitch(50,5,75,dt_,0.1,100000,-10000);
   //static PID con_yaw(1,1,1,1,1,100000,-10000);
 
   const std::lock_guard<std::mutex> lock(cmd_mutex);
@@ -511,20 +512,20 @@ void GimbalControllerPlugin::OnUpdate()
   //double rollTarget = con_roll.Update(currentAnglePRYVariable.X(), 0);
     //std::cout << "ROLL TARGET OLD: " << rollTarget << "  ";
   double rollTarget = con_roll.Update(new_x, 0);
-    //std::cout << "ROLL TARGET NEW: " << rollTarget << "\n";
+    std::cout << "ROLL TARGET: " << rollTarget << "\n";
   double pitchTarget = con_pitch.Update(new_y, 0);
-    //std::cout << "PITCH TARGET: " << pitchTarget << "\n";
+    std::cout << "PITCH TARGET: " << pitchTarget << "\n";
     //double yawTarget = con_yaw.Update(-2, 0);
     //std::cout << "YAW TARGET: " << yawTarget << "\n";
   
-  /**
+  
     thisVariableIsNotUsed++;
-    std::cout << thisVariableIsNotUsed << "\n";
+    //std::cout << thisVariableIsNotUsed << "\n";
     if(thisVariableIsNotUsed > 10000)
     {
-      rollTarget = -400;
+      //pitchTarget = -300;
     }
-   */
+   
     myfile.open("data.csv", std::ios::app);
     if(rollTarget < 0){
         const ignition::math::v4::Vector3<double>& force = {0, 0, -rollTarget};
