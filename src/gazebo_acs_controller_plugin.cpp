@@ -512,9 +512,9 @@ void GimbalControllerPlugin::OnUpdate()
   //double rollTarget = con_roll.Update(currentAnglePRYVariable.X(), 0);
     //std::cout << "ROLL TARGET OLD: " << rollTarget << "  ";
   double rollTarget = con_roll.Update(new_x, 0);
-    std::cout << "ROLL TARGET: " << rollTarget << "\n";
+    //std::cout << "ROLL TARGET: " << rollTarget << "\n";
   double pitchTarget = con_pitch.Update(new_y, 0);
-    std::cout << "PITCH TARGET: " << pitchTarget << "\n";
+    //std::cout << "PITCH TARGET: " << pitchTarget << "\n";
     //double yawTarget = con_yaw.Update(-2, 0);
     //std::cout << "YAW TARGET: " << yawTarget << "\n";
   
