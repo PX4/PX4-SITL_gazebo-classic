@@ -34,7 +34,7 @@ jobs:
         popd
         popd
         brew install gstreamer gst-plugins-base gst-plugins-good glib python
-        brew cask install xquartz
+        brew install --cask xquartz
         brew tap PX4/px4
         brew install px4-dev
         brew install px4-sim
