@@ -29,7 +29,7 @@
         <always_on>0</always_on>
         <update_rate>20</update_rate>
         <camera name="camera_name">
-          <horizontal_fov>1.2211</horizontal_fov>
+          <horizontal_fov>1.02974</horizontal_fov>
           <image>
             <format>R8G8B8</format>
             <width>64</width>
@@ -40,18 +40,18 @@
             <far>18</far>
           </clip>
           <distortion>
-            <k1>0.1</k1>
-            <k2>0.2</k2>
-            <k3>0.3</k3>
-            <p1>0.4</p1>
-            <p2>0.5</p2>
+            <k1>0.0</k1>
+            <k2>0.0</k2>
+            <k3>0.0</k3>
+            <p1>0.0</p1>
+            <p2>0.0</p2>
             <center>0.5 0.5</center>
           </distortion>
         </camera>
 
         <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
           <camera_name>camera</camera_name>
-          <frame_name>camera_frame</frame_name>
+          <frame_name>camera_link</frame_name>
           <hack_baseline>0.07</hack_baseline>
           <min_depth>0.1</min_depth>
           <max_depth>12</max_depth>
