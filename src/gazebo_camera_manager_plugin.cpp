@@ -344,6 +344,14 @@ void CameraManagerPlugin::_handle_message(mavlink_message_t *msg, struct sockadd
                 // Just ACK and ignore
                 _send_cmd_ack(msg->sysid, msg->compid, MAV_CMD_STORAGE_FORMAT, MAV_RESULT_ACCEPTED, srcaddr);
                 break;
+            case MAV_CMD_VIDEO_START_STREAMING:
+                // Just ACK and ignore
+                _send_cmd_ack(msg->sysid, msg->compid, MAV_CMD_VIDEO_START_STREAMING, MAV_RESULT_ACCEPTED, srcaddr);
+                break;
+            case MAV_CMD_VIDEO_STOP_STREAMING:
+                // Just ACK and ignore
+                _send_cmd_ack(msg->sysid, msg->compid, MAV_CMD_VIDEO_STOP_STREAMING, MAV_RESULT_ACCEPTED, srcaddr);
+                break;
             }
         }
         break;

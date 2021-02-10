@@ -21,9 +21,13 @@
 #ifndef _GAZEBO_GIMBAL_CONTROLLER_PLUGIN_HH_
 #define _GAZEBO_GIMBAL_CONTROLLER_PLUGIN_HH_
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <mutex>
+#include <memory>
+#include <optional>
+#include <thread>
 
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
@@ -32,8 +36,7 @@
 #include <gazebo/util/system.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <ignition/math.hh>
-
-#include "Groundtruth.pb.h"
+#include <mavlink/v2.0/common/mavlink.h>
 
 namespace gazebo
 {
@@ -67,12 +70,10 @@ namespace gazebo
   static double kPitchDir = -1.0;
   static double kYawDir = 1.0;
 
-  typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
-
   class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
   {
-    /// \brief Constructor
     public: GimbalControllerPlugin();
+    public: ~GimbalControllerPlugin();
 
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
@@ -80,32 +81,27 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: void GroundTruthCallback(GtPtr& imu_message);
+    private: bool InitUdp();
+    private: void SendHeartbeat();
+    private: void SendGimbalDeviceInformation();
+    private: void SendGimbalDeviceAttitudeStatus();
+    private: void SendResult(uint8_t target_sysid, uint8_t target_compid, uint16_t command, MAV_RESULT result);
+    private: void SendMavlinkMessage(const mavlink_message_t& msg);
+    private: void RxThread();
+    private: void HandleMessage(const mavlink_message_t& msg);
+    private: void HandleCommandLong(const mavlink_message_t& msg);
+    private: void HandleGimbalDeviceSetAttitude(const mavlink_message_t& msg);
+    private: void HandleAutopilotStateForGimbalDevice(const mavlink_message_t& msg);
+    private: void HandleRequestMessage(uint8_t target_sysid, uint8_t target_compid, const mavlink_command_long_t& command_long);
+    private: void HandleSetMessageInterval(uint8_t target_sysid, uint8_t target_compid, const mavlink_command_long_t& command_long);
 
-#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
-    /// only gazebo 7.4 and above support Any
-    private: void OnPitchStringMsg(ConstAnyPtr &_msg);
-    private: void OnRollStringMsg(ConstAnyPtr &_msg);
-    private: void OnYawStringMsg(ConstAnyPtr &_msg);
-#else
-    private: void OnPitchStringMsg(ConstGzStringPtr &_msg);
-    private: void OnRollStringMsg(ConstGzStringPtr &_msg);
-    private: void OnYawStringMsg(ConstGzStringPtr &_msg);
-#endif
+    private: static std::optional<double> calcSetpoint(double dt, double lastSetpoint, double newSetpoint, double newRateSetpoint);
+
     private: std::mutex cmd_mutex;
 
     private: sdf::ElementPtr sdf;
 
     private: std::vector<event::ConnectionPtr> connections;
-
-    private: transport::SubscriberPtr imuSub;
-    private: transport::SubscriberPtr pitchSub;
-    private: transport::SubscriberPtr rollSub;
-    private: transport::SubscriberPtr yawSub;
-
-    private: transport::PublisherPtr pitchPub;
-    private: transport::PublisherPtr rollPub;
-    private: transport::PublisherPtr yawPub;
 
     private: physics::ModelPtr model;
 
@@ -119,17 +115,24 @@ namespace gazebo
     private: physics::JointPtr pitchJoint;
 
     private: sensors::ImuSensorPtr cameraImuSensor;
-    private: double vehicleYaw;
-
+    private: double vehicleYawRad {0.0};
     private: std::string status;
 
     private: double rDir;
     private: double pDir;
     private: double yDir;
 
-    private: double pitchCommand;
-    private: double yawCommand;
-    private: double rollCommand;
+    private: std::mutex setpointMutex {};
+    private: double lastRollSetpoint {0.0};
+    private: double lastPitchSetpoint {0.0};
+    private: double lastYawSetpoint {0.0};
+    private: double rollSetpoint {0.0};
+    private: double pitchSetpoint {0.0};
+    private: double yawSetpoint {0.0};
+    private: bool yawLock {false};
+    private: double rollRateSetpoint {NAN};
+    private: double pitchRateSetpoint {NAN};
+    private: double yawRateSetpoint {NAN};
 
     private: transport::NodePtr node;
 
@@ -137,6 +140,22 @@ namespace gazebo
     private: common::PID rollPid;
     private: common::PID yawPid;
     private: common::Time lastUpdateTime;
+
+    private: std::unique_ptr<std::thread> rxThread {};
+    private: std::atomic<bool> shouldExit {false};
+    private: int sock;
+    private: struct sockaddr_in myaddr;
+    private: common::Time lastHeartbeatSentTime;
+    private: const double heartbeatIntervalS {1.0};
+    private: common::Time lastAttitudeStatusSentTime;
+
+    private: const double defaultAttitudeStatusIntervalS {0.1};
+    private: double attitudeStatusIntervalS {defaultAttitudeStatusIntervalS};
+    private: bool sendingAttitudeStatus {true};
+
+    private: static constexpr uint8_t ourSysid {1};
+    private: static constexpr uint8_t ourCompid {MAV_COMP_ID_GIMBAL};
+    private: static constexpr uint8_t mavlinkChannel {MAVLINK_COMM_3};
   };
 }
 #endif
