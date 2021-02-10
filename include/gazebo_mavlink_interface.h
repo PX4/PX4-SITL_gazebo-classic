@@ -74,9 +74,9 @@
 #include "msgbuffer.h"
 
 //! Default distance sensor model joint naming
-static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");
-static const std::regex kDefaultSonarModelJointNaming(".*(sonar|mb1240-xl-ez4)(.*_joint)");
-static const std::regex kDefaultGPSModelJointNaming(".*(gps|ublox-neo-7M)(.*_joint)");
+static const std::regex kDefaultLidarModelNaming(".*(lidar|sf10a)(.*)");
+static const std::regex kDefaultSonarModelNaming(".*(sonar|mb1240-xl-ez4)(.*)");
+static const std::regex kDefaultGPSModelNaming(".*(gps|ublox-neo-7M)(.*)");
 
 namespace gazebo {
 
@@ -210,7 +210,7 @@ private:
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
       void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-      GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model);
+      GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, physics::ModelPtr& nested_model, const std::regex& model);
 
   static const unsigned n_out_max = 16;
 
