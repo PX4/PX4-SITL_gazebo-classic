@@ -4,7 +4,7 @@
  * Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
  * Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
- * Copyright 2015-2018 PX4 Development Team
+ * Copyright 2015-2021 PX4 Development Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,11 +68,63 @@ struct SensorHelperStorage {
 template <typename GazeboMsgT>
 void GazeboMavlinkInterface::CreateSensorSubscription(
     void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-    GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model) {
+    GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, physics::ModelPtr& nested_model, const std::regex& model) {
+
+  // Get nested sensors on included models
+  std::string nested_sensor_name;
+  if (nested_model != nullptr && std::regex_match(nested_model->GetName(), model)) {
+    const std::string model_name = model_->GetName();
+
+    if (nested_model->GetName().find("::") != std::string::npos) {
+      nested_sensor_name = nested_model->GetName().substr(nested_model->GetName().find("::") + 2);
+    } else {
+      nested_sensor_name = nested_model->GetName();
+    }
+
+    // Get sensor ID sensor name
+    int sensor_id = 0;
+    try {
+      // get the sensor id by getting the (last) numbers on the sensor name (ex. lidar10, gets id 10)
+      sensor_id = std::stoi(nested_sensor_name.substr(nested_sensor_name.find_last_not_of("0123456789") + 1));
+    } catch(...) {
+      gzwarn << "No identifier on joint. Using 0 as default sensor ID" << std::endl;
+    }
+
+    // Get the sensor link orientation with respect to the base_link
+#if GAZEBO_MAJOR_VERSION >= 9
+    const auto sensor_orientation = nested_model->RelativePose().Rot();
+#else
+    const auto sensor_orientation = nested_model->GetChild()->GetRelativePose()).Rot();
+#endif
+
+    // One map will be created for each Gazebo message type
+    static std::map<std::string, SensorHelperStorage<GazeboMsgT> > callback_map;
+
+    // Store the callback entries
+    auto callback_entry = callback_map.emplace(
+        "~/" + model_name + "/link/" + nested_sensor_name,
+        SensorHelperStorage<GazeboMsgT>{ptr, fp, sensor_id});
+
+    // Check if element was already present
+    if (!callback_entry.second)
+      gzerr << "Tried to add element to map but the gazebo topic name was already present in map."
+            << std::endl;
+
+    // Create the subscriber for the sensors
+    auto subscriberPtr = node_handle_->Subscribe("~/" + model_name + "/link/" + nested_sensor_name,
+                                                 &SensorHelperStorage<GazeboMsgT>::callback,
+                                                 &callback_entry.first->second);
+
+    // Store the SubscriberPtr, sensor ID and sensor orientation
+    sensor_map_.insert(std::pair<transport::SubscriberPtr, SensorIdRot_P>(subscriberPtr,
+                                                                          SensorIdRot_P(sensor_id, sensor_orientation))
+                                                                         );
+  }
 
   // Verify if the sensor joint exists
   for (physics::Joint_V::const_iterator it = joints.begin(); it != joints.end(); ++it) {
-    if (std::regex_match ((*it)->GetName(), model)) {
+    // std::cout << (*it)->GetName() << std::endl;
+    if (std::regex_match((*it)->GetName(), model)) {
       // Get sensor joint name (without the ''::joint' suffix)
       const std::string joint_name = (*it)->GetName().substr(0, (*it)->GetName().size() - 6);
 
@@ -83,6 +135,12 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
       std::string sensor_name = joint_name;
       if (pos != std::string::npos) {
         sensor_name = joint_name.substr(pos + 2);
+      }
+
+      // If a nested sensor was already registered with this name
+      // ignore it
+      if (nested_sensor_name == sensor_name) {
+        break;
       }
 
       // Get sensor ID from joint name
@@ -376,10 +434,21 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // Get the model joints
   auto joints = model_->GetJoints();
 
+  // Get the base nested model, if nested model exist.
+  // Note: this will only capture the first nested model found on the base model
+  //       which is usually the GPS model of the aircraft (ex: iris_dual_gps
+  //       includes iris and the nested model is iris::gps0).
+  //       As an improvement, this can be made more generic by going through all
+  //       the nested models present in the base model
+  physics::ModelPtr nested_model;
+  if (!model_->NestedModels().empty()) {
+    nested_model = model_->NestedModels()[0];
+  }
+
   // Create subscriptions to the distance sensors
-  CreateSensorSubscription(&GazeboMavlinkInterface::LidarCallback, this, joints, kDefaultLidarModelJointNaming);
-  CreateSensorSubscription(&GazeboMavlinkInterface::SonarCallback, this, joints, kDefaultSonarModelJointNaming);
-  CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, joints, kDefaultGPSModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::LidarCallback, this, joints, nested_model, kDefaultLidarModelNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::SonarCallback, this, joints, nested_model, kDefaultSonarModelNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, joints, nested_model, kDefaultGPSModelNaming);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
