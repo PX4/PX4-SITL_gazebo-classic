@@ -31,9 +31,20 @@ if __name__ == "__main__":
     parser.add_argument('--gst_udp_port', default=5600, help="Gstreamer UDP port for SITL")
     parser.add_argument('--video_uri', default=5600, help="Mavlink camera URI for SITL")
     parser.add_argument('--mavlink_cam_udp_port', default=14530, help="Mavlink camera UDP port for SITL")
+    parser.add_argument('--ros2-distro', default='', dest='ros2_distro', type=str,
+                    help="ROS2 distro, only required if generating the agent for usage with ROS2 nodes, by default empty")
     args = parser.parse_args()
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.env_dir))
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
+
+    # get ROS 2 version, if exists
+    ros2_distro = ''
+    ros_version = os.environ.get('ROS_VERSION')
+    if ros_version == '2':
+        if args.ros2_distro != '':
+            ros2_distro = args.ros2_distro
+        else:
+            ros2_distro = os.environ.get('ROS_DISTRO')
 
     # create dictionary with useful modules etc.
     try:
@@ -54,7 +65,8 @@ if __name__ == "__main__":
          'gst_udp_port': args.gst_udp_port, \
          'video_uri': args.video_uri, \
          'mavlink_cam_udp_port': args.mavlink_cam_udp_port, \
-         'hil_mode': args.hil_mode}
+         'hil_mode': args.hil_mode, \
+         'ros2_distro': ros2_distro}
 
     result = template.render(d)
 
