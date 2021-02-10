@@ -335,7 +335,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>0.45</mass>
+        <!-- <mass>0.45</mass> -->
+        <mass>0.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -368,7 +369,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -460,7 +462,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -493,7 +496,8 @@
           <iyz>0</iyz>
           <izz>0</izz>
         </inertia>
-        <mass>.5835</mass>
+        <!-- <mass>.5835</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -585,7 +589,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.45</mass>
+        <!-- <mass>.45</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -618,7 +623,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -652,7 +658,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -685,7 +692,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.5835</mass>
+        <!-- <mass>.5835</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -719,7 +727,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -752,7 +761,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
