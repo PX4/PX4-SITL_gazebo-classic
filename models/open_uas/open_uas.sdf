@@ -35,6 +35,64 @@
           </friction>-->
         </surface>
       </collision>
+      <collision name='left_wing_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>-0.04 0.32 0.07 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.18 0.47 0.08</size>
+          </box>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>10</max_vel>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <collision name='right_wing_collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose frame=''>-0.04 -0.32 0.07 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.18 0.47 0.08</size>
+          </box>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>10</max_vel>
+              <min_depth>0.01</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
       <visual name='base_link_visual'>
         <pose>0.07 0 -0.08 0 0 0</pose>
         <geometry>
