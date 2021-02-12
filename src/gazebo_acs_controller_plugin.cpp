@@ -478,9 +478,9 @@ void GimbalControllerPlugin::OnUpdate()
       //std::cout << "X: " << currentAnglePRYVariable.X() << "  ";
       //std::cout << "Y: " << currentAnglePRYVariable.Y() << "  ";
       //std::cout << "Z: " << currentAnglePRYVariable.Z() << "\n";
-      
+
     double coord_theta = 0.785;
-      
+
     double old_x_comp = sin(currentAnglePRYVariable.Y());
     double old_y_comp = sin(currentAnglePRYVariable.X());
     double new_x_comp = old_x_comp*cos(coord_theta) + old_y_comp*-sin(coord_theta);
@@ -489,7 +489,7 @@ void GimbalControllerPlugin::OnUpdate()
     //double my_insanity = sqrt(100);
     double new_y = asin(new_x_comp/new_vec_length);
     double new_x = asin(new_y_comp/new_vec_length);
-    
+
     //std::cout << "new_x: " << new_x << "\n";
     //std::cout << "new_y: " << new_y << "\n";
   static actuator acs_sb("lander::thruster_3");
@@ -502,8 +502,8 @@ void GimbalControllerPlugin::OnUpdate()
   common::Time time_ = this->model->GetWorld()->SimTime();
   double dt_ = (time_ - this->lastUpdateTime).Double();
 
-  static PID con_roll(50,5,75,dt_,0.1,100000,-10000);
-  static PID con_pitch(50,5,75,dt_,0.1,100000,-10000);
+  static PID con_roll(100,20,60,dt_,0.02,100000,-10000);
+  static PID con_pitch(100,20,60,dt_,0.02,100000,-10000);
   //static PID con_yaw(1,1,1,1,1,100000,-10000);
 
   const std::lock_guard<std::mutex> lock(cmd_mutex);
@@ -517,30 +517,31 @@ void GimbalControllerPlugin::OnUpdate()
     //std::cout << "PITCH TARGET: " << pitchTarget << "\n";
     //double yawTarget = con_yaw.Update(-2, 0);
     //std::cout << "YAW TARGET: " << yawTarget << "\n";
-  
-  
+
+
     thisVariableIsNotUsed++;
     //std::cout << thisVariableIsNotUsed << "\n";
     if(thisVariableIsNotUsed > 10000)
     {
       //pitchTarget = -300;
     }
-   
-    myfile.open("data.csv", std::ios::app);
+
+    //myfile.open("data.csv", std::ios::app);
     if(rollTarget < 0){
         const ignition::math::v4::Vector3<double>& force = {0, 0, -rollTarget};
         //std::cout << "SB: " << rollTarget << "\n";
         acs_sb.link = this->model->GetChildLink(acs_sb.path);
-        myfile << rollTarget << ", ";
+        //myfile << rollTarget << ", ";
         acs_sb.link->AddLinkForce(force);
     }
+
     thisVariableIsNotUsed++;
 
     if(rollTarget > 0){
         const ignition::math::v4::Vector3<double>& force = {0, 0, rollTarget};
         //std::cout << "PO: " << rollTarget << "\n";
         acs_po.link = this->model->GetChildLink(acs_po.path);
-        myfile << pitchTarget << ", ";
+        //myfile << pitchTarget << ", ";
         acs_po.link->AddLinkForce(force);
     }
 
@@ -548,7 +549,7 @@ void GimbalControllerPlugin::OnUpdate()
         const ignition::math::v4::Vector3<double>& force = {0, 0, pitchTarget};
         //std::cout << "BO: " << pitchTarget << "\n";
         acs_bo.link = this->model->GetChildLink(acs_bo.path);
-        myfile << rollTarget << ",\n";
+        //myfile << rollTarget << ",\n";
         acs_bo.link->AddLinkForce(force);
     }
 
@@ -556,10 +557,10 @@ void GimbalControllerPlugin::OnUpdate()
         const ignition::math::v4::Vector3<double>& force = {0, 0, -pitchTarget};
         //std::cout << "AF: " << pitchTarget << "\n";
         acs_st.link = this->model->GetChildLink(acs_st.path);
-        myfile << pitchTarget << ",\n";
+        //myfile << pitchTarget << ",\n";
         acs_st.link->AddLinkForce(force);
     }
-    myfile.close();
+    //myfile.close();
   //std::cout << "check_1";
   if (!this->pitchJoint || !this->rollJoint || !this->yawJoint)
     return;

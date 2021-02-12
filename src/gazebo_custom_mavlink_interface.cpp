@@ -21,6 +21,8 @@
 
 #include <gazebo_custom_mavlink_interface.h>
 #include <PID.h>
+#include <iostream>
+std::fstream myfile;
 
 namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
@@ -1160,7 +1162,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
-  static PID actuator_cont[2] = {PID(500, 0, 0, _dt, 0.1,100000,-100000), PID(500, 0, 0 ,_dt, 0.1 ,100000,-100000)};
+  static PID actuator_cont[2] = {PID(100, 25, 400, _dt, 0.05,100000,-100000), PID(100, 25, 400,_dt, 0.05 ,100000,-100000)};
 
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
@@ -1181,53 +1183,78 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         double current = joints_[i]->GetAngle(0).Radian();
 #endif
 
-        //target = 10;
+        //target = -10;
         //std::cout << "CURRENT: " << current << "\n";
-        //td::cout << "Target: " << target << "\n";
-        
-        /*
-        thisVariableIsNotUsed++;
-        if(thisVariableIsNotUsed%1000 == 0)
+        if (link_names[i] == "roll_ls")
         {
+          //std::cout << "Roll: " << "Target: " << target << "\n";
+
+        }
+        else if (link_names[i] == "pitch_ls")
+        {
+          //std::cout << "Pitch: " << "Target: " << target << "\n";
+        }
+
+        /*
+        if (link_names[i] == "roll_ls")
+        {
+          thisVariableIsNotUsed++;
+          if(thisVariableIsNotUsed%5000 == 0)
+          {
+            if(my_switch)
+            {
+              std::cout << "-" << "\n";
+              my_switch = false;
+            }
+            else
+            {
+              std::cout << "+" << "\n";
+              my_switch = true;
+            }
+          }
+
+
           if(my_switch)
           {
-            std::cout << "-" << "\n";
-            my_switch = false;
+            target = 0.01;
           }
           else
           {
-            std::cout << "+" << "\n";
-            my_switch = true;
+            target = -0.01;
           }
         }
-        
-        
-        if(my_switch)
-        {
-          target = 5;
-        }
-        else
-        {
-          target = -5;
-        }
         */
+
+
+        //target = -1;
         double err = current - target;
         double force = actuator_cont[i].Update(current, target);
-        
-        
-        
-        if(thisVariableIsNotUsed > 10000)
+        //std::cout << "force: " << force << "\n";
+
+        if (link_names[i] == "roll_ls")
         {
-          //force = 200;
+          myfile.open("data.csv", std::ios::app);
+          if(link_names[i] == "roll_ls"){
+            myfile << current << ", ";
+            myfile << target << ",";
+            myfile << force << ",\n";
+          }
+          myfile.close();
         }
-        thisVariableIsNotUsed++;
+
+
+        if(thisVariableIsNotUsed > 15000)
+        {
+          //force = 1000;
+        }
+        //thisVariableIsNotUsed++;
         //std::cout << thisVariableIsNotUsed << "\n";
-        
-        
+
+
         //double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
         double ourOffset = 0;//-28;
-        static int garSucks; 
+        static int garSucks;
         //if(garSucks++%100 == 0){
 
         if(i == 0){
@@ -1238,7 +1265,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
 
         /*else
             myfile << force << std::endl;*/
-        
+
         //force += ourOffset;
         if(i == 0)
         {
@@ -1301,7 +1328,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
           //link->AddLinkForce(force);
           //counter++;
         }
-        else if ((link_names[i] == "thruster_2") && (target >= 0))
+        else if ((link_names[i] == "thruster_2") && (target <= 0))
         {
           //std::cout << "YAW_AF: " << target << "\n";
           const ignition::math::v4::Vector3<double>& force = {-target, 0, 0};
