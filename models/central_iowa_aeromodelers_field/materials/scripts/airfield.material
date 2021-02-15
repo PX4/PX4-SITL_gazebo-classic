@@ -1,0 +1,10 @@
+material airfieldMat/Diffuse{
+    receive_shadows on
+    technique{
+        pass{
+            texture_unit{
+                texture ESRI_AERIAL_WM.jpg
+            }
+        }
+    }
+}
