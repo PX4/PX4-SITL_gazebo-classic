@@ -1,12 +1,30 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
   <world name="default">
+    <!--camera-->
+    <gui fullscreen='0'>
+      <camera name="gzclient_camera">
+        <track_visual>
+          <static>true</static>
+          <!--change use_model_frame to switch between chase and stationary camera-->
+          <!--To fix camera controls after exiting follow mode, follow a static object,
+              like the ground. In the properties manager on the left side, select GUI
+              then set the camera's pose's roll, pitch, and yaw, to 0. Exit follow mode from here.
+              The camera controls should be fixed-->
+          <use_model_frame>false</use_model_frame> 
+          <!--<xyz>-5 0 0</xyz>--><!--chase camera offset-->
+          <xyz>-10 0 3</xyz> <!--stationary camera offset-->
+          <inherit_yaw>true</inherit_yaw>
+        </track_visual>
+      </camera>
+    </gui>
+    <!--control weather and time of day-->
     <scene>
       <sky>
       <time>12</time>
         <clouds>
           <speed>8</speed>
-          <mean_size>0.2</mean_size>
+          <mean_size>0.5</mean_size>
         </clouds>
       </sky>
     </scene>
@@ -14,16 +32,19 @@
     <include>
       <uri>model://sun</uri>
     </include>
+    <!--terrain-->
     <include>
       <uri>model://central_iowa_aeromodelers_field</uri>
       <pose>0 0 0 0 0 0</pose>
     </include>
+    <!--gps location-->
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
       <latitude_deg>41.925855</latitude_deg>
       <longitude_deg>-93.539990</longitude_deg>
       <elevation>259.0</elevation>
     </spherical_coordinates>
+    <!--physics-->
     <gravity>0 0 -9.8066</gravity>
     <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
     <physics name='default_physics' default='0' type='ode'>
