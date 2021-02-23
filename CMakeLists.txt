@@ -272,7 +272,7 @@ function(glob_generate target file_glob)
 		if (${file_ext} STREQUAL "jinja")
 			add_custom_command(OUTPUT ${out_file}
 				COMMAND
-					${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR}
+					${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR} --ros_distro $ENV{ROS_DISTRO}
 				DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file}
 				VERBATIM
 				)
