@@ -13,6 +13,13 @@ def get_file_contents(filepath):
     with open(filepath, 'rb') as f:
         return f.read()
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -31,11 +38,18 @@ if __name__ == "__main__":
     parser.add_argument('--gst_udp_port', default=5600, help="Gstreamer UDP port for SITL")
     parser.add_argument('--video_uri', default=5600, help="Mavlink camera URI for SITL")
     parser.add_argument('--mavlink_cam_udp_port', default=14530, help="Mavlink camera UDP port for SITL")
-    parser.add_argument('--ros_distro', default='', dest='ros_distro', type=str,
-                    help="ROS distro, only required if generating the agent for usage with ROS nodes, by default empty")
+    parser.add_argument('--build_ros_interface', default=False, dest='build_ros_interface', type=str2bool,
+                    help="required if generating the agent for usage with ROS nodes, by default false")
     args = parser.parse_args()
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.env_dir))
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
+
+    # get ROS 2 version, if exists
+    ros_distro = ''
+    if args.build_ros_interface:
+        ros_version = os.environ.get('ROS_VERSION')
+        if ros_version == '2':
+            ros_distro = os.environ.get('ROS_DISTRO')
 
     # create dictionary with useful modules etc.
     try:
@@ -57,7 +71,7 @@ if __name__ == "__main__":
          'video_uri': args.video_uri, \
          'mavlink_cam_udp_port': args.mavlink_cam_udp_port, \
          'hil_mode': args.hil_mode, \
-         'ros_distro': args.ros_distro}
+         'ros_distro': ros_distro}
 
     result = template.render(d)
 
