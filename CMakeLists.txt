@@ -52,29 +52,29 @@ if (NOT CATKIN_DEVEL_PREFIX)
 else()
 	find_package(PythonInterp REQUIRED)
 endif()
-#find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(TinyXML REQUIRED)
-#if (BUILD_GSTREAMER_PLUGIN)
-#  set(GStreamer_FIND_VERSION "1.0")
-#  find_package(GStreamer REQUIRED)
-#  if (GSTREAMER_FOUND)
-#    if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-#      find_package (Qt4)
-#      include (${QT_USE_FILE})
-#    else()
-#      # In order to find Qt5 in macOS, the Qt5 path needs to be added to the CMake prefix path.
-#      if(APPLE)
-#        execute_process(COMMAND brew --prefix qt5
-#                        ERROR_QUIET
-#                        OUTPUT_VARIABLE QT5_PREFIX_PATH
-#                        OUTPUT_STRIP_TRAILING_WHITESPACE
-#                       )
-#        list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}/lib/cmake")
-#      endif()
-#      find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
-#    endif()
-#  endif()
-#endif()
+if (BUILD_GSTREAMER_PLUGIN)
+ set(GStreamer_FIND_VERSION "1.0")
+ find_package(GStreamer REQUIRED)
+ if (GSTREAMER_FOUND)
+   if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+     find_package (Qt4)
+     include (${QT_USE_FILE})
+   else()
+     # In order to find Qt5 in macOS, the Qt5 path needs to be added to the CMake prefix path.
+     if(APPLE)
+       execute_process(COMMAND brew --prefix qt5
+                       ERROR_QUIET
+                       OUTPUT_VARIABLE QT5_PREFIX_PATH
+                       OUTPUT_STRIP_TRAILING_WHITESPACE
+                      )
+       list(APPEND CMAKE_PREFIX_PATH "${QT5_PREFIX_PATH}/lib/cmake")
+     endif()
+     find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+   endif()
+ endif()
+endif()
 
 pkg_check_modules(OGRE OGRE)
 
@@ -86,8 +86,8 @@ endif()
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
-#add_subdirectory( external/OpticalFlow OpticalFlow )
-#set( OpticalFlow_LIBS "OpticalFlow" )
+add_subdirectory( external/OpticalFlow OpticalFlow )
+set( OpticalFlow_LIBS "OpticalFlow" )
 
 # for ROS subscribers and publishers
 if (BUILD_ROS_INTERFACE)
@@ -177,8 +177,8 @@ include_directories(
   ${MAVLINK_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}/Paging		# Workaround for "fatal error: OgrePagedWorldSection.h: No such file or directory"
-  #${OpenCV_INCLUDE_DIRS}
-  #${OpticalFlow_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  ${OpticalFlow_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
   )
 
@@ -193,17 +193,17 @@ link_libraries(
   ${Boost_THREAD_LIBRARY_RELEASE}
   ${Boost_TIMER_LIBRARY_RELEASE}
   ${GAZEBO_LIBRARIES}
-  #${OpenCV_LIBRARIES}
+  ${OpenCV_LIBRARIES}
   ${PROTOBUF_LIBRARY}
   )
 
-#if (GSTREAMER_FOUND)
-#  link_libraries(
-#    ${GSTREAMER_LIBRARIES}
-#    glib-2.0
-#    gobject-2.0
-#  )
-#endif()
+if (GSTREAMER_FOUND)
+ link_libraries(
+   ${GSTREAMER_LIBRARIES}
+   glib-2.0
+   gobject-2.0
+ )
+endif()
 
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
@@ -218,7 +218,7 @@ link_directories(
 set(enable_mavlink_interface "true")
 set(enable_ground_truth "false")
 set(enable_logging "false")
-#set(enable_camera "false")
+set(enable_camera "false")
 set(enable_wind "false")
 set(rotors_description_dir "${CMAKE_CURRENT_SOURCE_DIR}/models/rotors_description")
 set(scripts_dir "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
@@ -292,9 +292,9 @@ set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
   # custom messages ------------------------------------------------------------
-  # msgs/NewXYStatus.proto
-  # msgs/RollPitchStatus.proto
-  # msgs/ThrusterStatus.proto
+  msgs/NewXYStatus.proto
+  msgs/RollPitchStatus.proto
+  msgs/ThrusterStatus.proto
   # ----------------------------------------------------------------------------
   msgs/Airspeed.proto
   msgs/Imu.proto
@@ -303,7 +303,7 @@ set(sensor_msgs
   msgs/Groundtruth.proto
   msgs/Range.proto
   msgs/SITLGps.proto
-  #msgs/OpticalFlow.proto
+  msgs/OpticalFlow.proto
   msgs/MagneticField.proto
   msgs/Pressure.proto
   )
@@ -333,30 +333,30 @@ add_library(gazebo_contact_plugin SHARED src/gazebo_contact_plugin.cc)
 add_library(gazebo_custom_mavlink_interface SHARED src/gazebo_custom_mavlink_interface.cpp src/mavlink_interface.cpp)
 # ------------------------------------------------------------------------------
 
-#add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
-#add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
+add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
+add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
-#add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
-#add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
-#add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
-#add_library(gazebo_opticalflow_mockup_plugin SHARED src/gazebo_opticalflow_mockup_plugin.cpp)
-#add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
-#add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
-#add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
-#add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
-#add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
-#add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
+add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
+add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
+add_library(gazebo_lidar_plugin SHARED src/gazebo_lidar_plugin.cpp)
+add_library(gazebo_opticalflow_mockup_plugin SHARED src/gazebo_opticalflow_mockup_plugin.cpp)
+add_library(gazebo_opticalflow_plugin SHARED src/gazebo_opticalflow_plugin.cpp)
+add_library(gazebo_sonar_plugin SHARED src/gazebo_sonar_plugin.cpp)
+add_library(gazebo_uuv_plugin SHARED src/gazebo_uuv_plugin.cpp)
+add_library(gazebo_vision_plugin SHARED src/gazebo_vision_plugin.cpp)
+add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
+add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
 #add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/mavlink_interface.cpp)
-#add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
-#add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
+add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
+add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
-#add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
-#add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
-#add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
-#add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
+add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
+add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
+add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
+add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 
 set(plugins
   # custom plugins -------------------------------------------------------------
@@ -365,36 +365,36 @@ set(plugins
   gazebo_custom_mavlink_interface
   # ----------------------------------------------------------------------------
 
-  #gazebo_airspeed_plugin
-  #gazebo_geotagged_images_plugin
+  gazebo_airspeed_plugin
+  gazebo_geotagged_images_plugin
   gazebo_gps_plugin
-  #gazebo_groundtruth_plugin
-  #gazebo_irlock_plugin
-  #gazebo_lidar_plugin
-  #gazebo_opticalflow_mockup_plugin
-  #gazebo_opticalflow_plugin
-  #gazebo_sonar_plugin
-  #gazebo_uuv_plugin
-  #gazebo_vision_plugin
-  #gazebo_controller_interface
-  #gazebo_gimbal_controller_plugin
+  gazebo_groundtruth_plugin
+  gazebo_irlock_plugin
+  gazebo_lidar_plugin
+  gazebo_opticalflow_mockup_plugin
+  gazebo_opticalflow_plugin
+  gazebo_sonar_plugin
+  gazebo_uuv_plugin
+  gazebo_vision_plugin
+  gazebo_controller_interface
+  gazebo_gimbal_controller_plugin
   gazebo_imu_plugin
-  #gazebo_mavlink_interface
-  #gazebo_motor_model
-  #gazebo_multirotor_base_plugin
+  # gazebo_mavlink_interface
+  gazebo_motor_model
+  gazebo_multirotor_base_plugin
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
-  #gazebo_catapult_plugin
-  #gazebo_usv_dynamics_plugin
-  #gazebo_parachute_plugin
-  #gazebo_airship_dynamics_plugin
+  gazebo_catapult_plugin
+  gazebo_usv_dynamics_plugin
+  gazebo_parachute_plugin
+  gazebo_airship_dynamics_plugin
   )
 
 foreach(plugin ${plugins})
   target_link_libraries(${plugin} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
 endforeach()
-#target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
+target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
 # If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
@@ -417,39 +417,39 @@ if (BUILD_ROS_INTERFACE)
   )
 endif()
 
-#if (GSTREAMER_FOUND)
-#  add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
-#  set(plugins
-#    ${plugins}
-#    gazebo_gst_camera_plugin
-#  )
-#  message(STATUS "Found GStreamer: adding gst_camera_plugin")
-#  if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
-#    QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
-#    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-#    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
-#    set(plugins
-#      ${plugins}
-#      gazebo_video_stream_widget
-#    )
-#    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
-#  else()
-#    QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
-#    add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
-#    target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
-#    set(plugins
-#      ${plugins}
-#      gazebo_video_stream_widget
-#    )
-#    message(STATUS "Found GStreamer: adding gst_video_stream_widget")
-#  endif()
-#endif()
+if (GSTREAMER_FOUND)
+ add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)
+ set(plugins
+   ${plugins}
+   gazebo_gst_camera_plugin
+ )
+ message(STATUS "Found GStreamer: adding gst_camera_plugin")
+ if("${GAZEBO_VERSION}" VERSION_LESS "8.0")
+   QT4_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
+   add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
+   target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
+   set(plugins
+     ${plugins}
+     gazebo_video_stream_widget
+   )
+   message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+ else()
+   QT5_WRAP_CPP(headers_MOC include/gazebo_video_stream_widget.h)
+   add_library(gazebo_video_stream_widget SHARED ${headers_MOC} src/gazebo_video_stream_widget.cpp)
+   target_link_libraries(gazebo_video_stream_widget ${GAZEBO_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Qt5Test_LIBRARIES})
+   set(plugins
+     ${plugins}
+     gazebo_video_stream_widget
+   )
+   message(STATUS "Found GStreamer: adding gst_video_stream_widget")
+ endif()
+endif()
 
 # Linux is not consistent with plugin availability, even on Gazebo 7
-#if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
-  #add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
-  #list(APPEND plugins LiftDragPlugin)
-#endif()
+if("${GAZEBO_VERSION}" VERSION_LESS "7.0")
+  add_library(LiftDragPlugin SHARED src/liftdrag_plugin/liftdrag_plugin.cpp)
+  list(APPEND plugins LiftDragPlugin)
+endif()
 
 foreach(plugin ${plugins})
   add_dependencies(${plugin} mav_msgs nav_msgs std_msgs sensor_msgs)
