@@ -115,6 +115,13 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->sdf = _sdf;
+  namespace_.clear();
+
+  if (_sdf->HasElement("robotNamespace")) {
+    namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
+  } else {
+    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+  }
 
   // Create axis name -> pid map. It may be empty or not fully defined
   std::map<std::string, common::PID> pids_;
