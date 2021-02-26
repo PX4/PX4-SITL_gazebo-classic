@@ -1,0 +1,8 @@
+syntax = "proto2";
+package sensor_msgs.msgs;
+
+message NewXYStatus
+{
+  required float   new_x  = 1;
+  required float   new_y  = 2;
+}

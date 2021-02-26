@@ -70,6 +70,12 @@
 #include <Pressure.pb.h>
 #include <Wind.pb.h>
 
+// custom compiled messages ----------------------------------------------------
+#include "NewXYStatus.pb.h"
+#include "RollPitchStatus.pb.h"
+#include "ThrusterStatus.pb.h"
+// -----------------------------------------------------------------------------
+
 #include "mavlink_interface.h"
 #include "msgbuffer.h"
 
@@ -93,6 +99,15 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::SITLGps> GpsPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::MagneticField> MagnetometerPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Pressure> BarometerPtr;
 typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
+
+// custom types ----------------------------------------------------------------
+typedef const boost::shared_ptr<const sensor_msgs::msgs::NewXYStatus>
+    NewXYStatusPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::RollPitchStatus>
+    RollPitchStatusPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::ThrusterStatus>
+    ThrusterStatusPtr;
+// -----------------------------------------------------------------------------
 
 typedef std::pair<const int, const ignition::math::Quaterniond> SensorIdRot_P;
 typedef std::map<transport::SubscriberPtr, SensorIdRot_P > Sensor_M;
@@ -211,6 +226,29 @@ private:
   bool IsRunning();
   void onSigInt();
 
+  // ---------------------------------------------------------------------------
+  // Custom Mesage callbacks
+  void NewXYStatusCallback(NewXYStatusPtr &msg);
+  void RollPitchStatusCallback(RollPitchStatusPtr &msg);
+  void ThrusterStatusCallback(ThrusterStatusPtr &msg);
+
+  // send status as mavlink messages
+  void SendActuatorStatus();
+  void SendNewXYStatus();
+  void SendRollPitchStatus();
+  void SendThrusterStatus();
+  void SendThrusterYawStatus();
+
+  // status variables to store new parameters to send
+  std::vector<double> _actuator_status = {0, 0};
+  double _newX;
+  double _newY;
+  double _rollTarget;
+  double _pitchTarget;
+  std::vector<double> _thrusterStatus = {0, 0, 0, 0};
+  std::vector<double> _thruster_yaw_status = {0, 0};
+  // ---------------------------------------------------------------------------
+
   /**
    * @brief Set the MAV_SENSOR_ORIENTATION enum value based on the sensor orientation
    *
@@ -253,6 +291,12 @@ private:
   transport::SubscriberPtr airspeed_sub_;
   transport::SubscriberPtr baro_sub_;
   transport::SubscriberPtr wind_sub_;
+
+  // custom subscribers --------------------------------------------------------
+  transport::SubscriberPtr new_xy_status_sub_;
+  transport::SubscriberPtr roll_pitch_status_sub_;
+  transport::SubscriberPtr thruster_status_sub_;
+  // ---------------------------------------------------------------------------
 
   Sensor_M sensor_map_; // Map of sensor SubscriberPtr, IDs and orientations
 

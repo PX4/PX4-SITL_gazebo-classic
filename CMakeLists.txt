@@ -291,6 +291,11 @@ set(nav_msgs msgs/Odometry.proto)
 set(physics_msgs msgs/Wind.proto)
 set(std_msgs msgs/Int32.proto)
 set(sensor_msgs
+  # custom messages ------------------------------------------------------------
+  # msgs/NewXYStatus.proto
+  # msgs/RollPitchStatus.proto
+  # msgs/ThrusterStatus.proto
+  # ----------------------------------------------------------------------------
   msgs/Airspeed.proto
   msgs/Imu.proto
   msgs/IRLock.proto
@@ -322,8 +327,12 @@ add_library(sensor_msgs SHARED ${SEN_PROTO_SRCS})
 link_libraries(mav_msgs nav_msgs std_msgs sensor_msgs)
 link_libraries(physics_msgs)
 
-add_library(gazebo_contact_plugin SHARED src/gazebo_contact_plugin.cc)
+# custom libraries -------------------------------------------------------------
 add_library(gazebo_acs_controller_plugin SHARED src/gazebo_acs_controller_plugin.cpp)
+add_library(gazebo_contact_plugin SHARED src/gazebo_contact_plugin.cc)
+add_library(gazebo_custom_mavlink_interface SHARED src/gazebo_custom_mavlink_interface.cpp src/mavlink_interface.cpp)
+# ------------------------------------------------------------------------------
+
 #add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
 #add_library(gazebo_geotagged_images_plugin SHARED src/gazebo_geotagged_images_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
@@ -338,7 +347,6 @@ add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
 #add_library(gazebo_controller_interface SHARED src/gazebo_controller_interface.cpp)
 #add_library(gazebo_gimbal_controller_plugin SHARED src/gazebo_gimbal_controller_plugin.cpp)
 add_library(gazebo_imu_plugin SHARED src/gazebo_imu_plugin.cpp)
-add_library(gazebo_custom_mavlink_interface SHARED src/gazebo_custom_mavlink_interface.cpp src/mavlink_interface.cpp)
 #add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src/mavlink_interface.cpp)
 #add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 #add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
@@ -351,8 +359,12 @@ add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 #add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 
 set(plugins
-  gazebo_contact_plugin
+  # custom plugins -------------------------------------------------------------
   gazebo_acs_controller_plugin
+  gazebo_contact_plugin
+  gazebo_custom_mavlink_interface
+  # ----------------------------------------------------------------------------
+
   #gazebo_airspeed_plugin
   #gazebo_geotagged_images_plugin
   gazebo_gps_plugin
@@ -367,7 +379,6 @@ set(plugins
   #gazebo_controller_interface
   #gazebo_gimbal_controller_plugin
   gazebo_imu_plugin
-  gazebo_custom_mavlink_interface
   #gazebo_mavlink_interface
   #gazebo_motor_model
   #gazebo_multirotor_base_plugin
