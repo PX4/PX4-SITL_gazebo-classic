@@ -38,6 +38,12 @@
 #include <iostream>
 #include <time.h>
 
+// custom compiled messages ----------------------------------------------------
+#include "NewXYStatus.pb.h"
+#include "RollPitchStatus.pb.h"
+#include "ThrusterStatus.pb.h"
+// -----------------------------------------------------------------------------
+
 namespace gazebo {
 // Default PID gains
 static double kPIDPitchP = 5.0;
@@ -72,10 +78,10 @@ static double kYawDir = 1.0;
 
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
-class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin {
+class GAZEBO_VISIBLE ACSControllerPlugin : public ModelPlugin {
   /// \brief Constructor
 public:
-  GimbalControllerPlugin();
+  ACSControllerPlugin();
 
 public:
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
@@ -92,6 +98,7 @@ private:
   void OnRollStringMsg(ConstAnyPtr &_msg);
   void OnYawStringMsg(ConstAnyPtr &_msg);
 #else
+private:
   void OnPitchStringMsg(ConstGzStringPtr &_msg);
   void OnRollStringMsg(ConstGzStringPtr &_msg);
   void OnYawStringMsg(ConstGzStringPtr &_msg);
