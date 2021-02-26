@@ -45,41 +45,9 @@
 // -----------------------------------------------------------------------------
 
 namespace gazebo {
-// Default PID gains
-static double kPIDPitchP = 5.0;
-static double kPIDPitchI = 0.0;
-static double kPIDPitchD = 0.0;
-
-static double kPIDPitchIMax = 0.0;
-static double kPIDPitchIMin = 0.0;
-static double kPIDPitchCmdMax = 0.3;
-static double kPIDPitchCmdMin = -0.3;
-
-static double kPIDRollP = 5.0;
-static double kPIDRollI = 0.0;
-static double kPIDRollD = 0.0;
-static double kPIDRollIMax = 0.0;
-static double kPIDRollIMin = 0.0;
-static double kPIDRollCmdMax = 0.3;
-static double kPIDRollCmdMin = -0.3;
-
-static double kPIDYawP = 1.0;
-static double kPIDYawI = 0.0;
-static double kPIDYawD = 0.0;
-static double kPIDYawIMax = 0.0;
-static double kPIDYawIMin = 0.0;
-static double kPIDYawCmdMax = 1.0;
-static double kPIDYawCmdMin = -1.0;
-
-// Default rotation directions
-static double kRollDir = -1.0;
-static double kPitchDir = -1.0;
-static double kYawDir = 1.0;
-
-typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
 class GAZEBO_VISIBLE ACSControllerPlugin : public ModelPlugin {
-  /// \brief Constructor
+
 public:
   ACSControllerPlugin();
 
@@ -89,67 +57,18 @@ public:
 
 private:
   void OnUpdate();
-  void GroundTruthCallback(GtPtr &imu_message);
 
-#if GAZEBO_MAJOR_VERSION > 7 ||                                                \
-    (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
-  /// only gazebo 7.4 and above support Any
-  void OnPitchStringMsg(ConstAnyPtr &_msg);
-  void OnRollStringMsg(ConstAnyPtr &_msg);
-  void OnYawStringMsg(ConstAnyPtr &_msg);
-#else
-private:
-  void OnPitchStringMsg(ConstGzStringPtr &_msg);
-  void OnRollStringMsg(ConstGzStringPtr &_msg);
-  void OnYawStringMsg(ConstGzStringPtr &_msg);
-#endif
+  physics::ModelPtr _model;
+  sdf::ElementPtr _sdf;
 
-  std::mutex cmd_mutex;
-  sdf::ElementPtr sdf;
   std::vector<event::ConnectionPtr> connections;
 
-  transport::SubscriberPtr imuSub;
-  transport::SubscriberPtr pitchSub;
-  transport::SubscriberPtr rollSub;
-  transport::SubscriberPtr yawSub;
-  transport::PublisherPtr pitchPub;
-  transport::PublisherPtr rollPub;
-  transport::PublisherPtr yawPub;
+  sensors::ImuSensorPtr imuSensor;
 
-  physics::ModelPtr model;
+  transport::NodePtr node_handle_;
 
-  /// \brief yaw camera
-  physics::JointPtr yawJoint;
-
-  /// \brief camera roll joint
-  physics::JointPtr rollJoint;
-
-  /// \brief camera pitch joint
-  physics::JointPtr pitchJoint;
-
-  sensors::ImuSensorPtr cameraImuSensor;
-
-  double vehicleYaw;
-
-  std::string status;
-
-  double rDir;
-  double pDir;
-  double yDir;
-
-  // control commands
-  double pitchCommand;
-  double yawCommand;
-  double rollCommand;
-
-  transport::NodePtr node;
-
-  common::PID pitchPid;
-  common::PID rollPid;
-  common::PID yawPid;
-
-  // Custom Properties ---------------------------------------------------------
   // update time used for PID controller
+  std::string namespace_;
   common::Time lastUpdateTime;
 
   // status variables to keep track of outputs
@@ -168,7 +87,6 @@ private:
   transport::PublisherPtr new_xy_status_pub_;
   transport::PublisherPtr roll_pitch_status_pub_;
   transport::PublisherPtr thruster_status_pub_;
-  // ---------------------------------------------------------------------------
 };
 
 class actuator {
