@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: A basic gimbal controller
  * Author: John Hsu
  */
@@ -21,137 +21,80 @@
 #ifndef _GAZEBO_ACS_CONTROLLER_PLUGIN_HH_
 #define _GAZEBO_ACS_CONTROLLER_PLUGIN_HH_
 
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
 
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/util/system.hh>
-#include <gazebo/sensors/sensors.hh>
 #include <ignition/math.hh>
 
 #include "Groundtruth.pb.h"
 #include "PID.h"
-#include <time.h>
 #include <iostream>
+#include <time.h>
 
-namespace gazebo
-{
-  // Default PID gains
-  static double kPIDPitchP = 5.0;
-  static double kPIDPitchI = 0.0;
-  static double kPIDPitchD = 0.0;
-  static double kPIDPitchIMax = 0.0;
-  static double kPIDPitchIMin = 0.0;
-  static double kPIDPitchCmdMax = 0.3;
-  static double kPIDPitchCmdMin = -0.3;
+// custom compiled messages ----------------------------------------------------
+#include "NewXYStatus.pb.h"
+#include "RollPitchStatus.pb.h"
+#include "ThrusterStatus.pb.h"
+// -----------------------------------------------------------------------------
 
-  static double kPIDRollP = 5.0;
-  static double kPIDRollI = 0.0;
-  static double kPIDRollD = 0.0;
-  static double kPIDRollIMax = 0.0;
-  static double kPIDRollIMin = 0.0;
-  static double kPIDRollCmdMax = 0.3;
-  static double kPIDRollCmdMin = -0.3;
+namespace gazebo {
 
-  static double kPIDYawP = 1.0;
-  static double kPIDYawI = 0.0;
-  static double kPIDYawD = 0.0;
-  static double kPIDYawIMax = 0.0;
-  static double kPIDYawIMin = 0.0;
-  static double kPIDYawCmdMax = 1.0;
-  static double kPIDYawCmdMin = -1.0;
+class GAZEBO_VISIBLE ACSControllerPlugin : public ModelPlugin {
 
-  // Default rotation directions
-  static double kRollDir = -1.0;
-  static double kPitchDir = -1.0;
-  static double kYawDir = 1.0;
+public:
+  ACSControllerPlugin();
 
-  typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
+public:
+  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  virtual void Init();
 
-  class GAZEBO_VISIBLE GimbalControllerPlugin : public ModelPlugin
-  {
-    /// \brief Constructor
-    public: GimbalControllerPlugin();
+private:
+  void OnUpdate();
 
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  physics::ModelPtr _model;
+  sdf::ElementPtr _sdf;
 
-    public: virtual void Init();
+  std::vector<event::ConnectionPtr> connections;
 
-    private: void OnUpdate();
+  sensors::ImuSensorPtr imuSensor;
 
-    private: void GroundTruthCallback(GtPtr& imu_message);
+  transport::NodePtr node_handle_;
 
-#if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
-    /// only gazebo 7.4 and above support Any
-    private: void OnPitchStringMsg(ConstAnyPtr &_msg);
-    private: void OnRollStringMsg(ConstAnyPtr &_msg);
-    private: void OnYawStringMsg(ConstAnyPtr &_msg);
-#else
-    private: void OnPitchStringMsg(ConstGzStringPtr &_msg);
-    private: void OnRollStringMsg(ConstGzStringPtr &_msg);
-    private: void OnYawStringMsg(ConstGzStringPtr &_msg);
-#endif
-    private: std::mutex cmd_mutex;
+  // update time used for PID controller
+  std::string namespace_;
+  common::Time lastUpdateTime;
 
-    private: sdf::ElementPtr sdf;
+  // status variables to keep track of outputs
+  std::vector<double> _thrusterStatus = {0, 0, 0, 0};
+  double _newX;
+  double _newY;
+  double _rollTarget;
+  double _pitchTarget;
 
-    private: std::vector<event::ConnectionPtr> connections;
+  // status topics
+  std::string new_xy_pub_topic_;
+  std::string roll_pitch_pub_topic_;
+  std::string thruster_pub_topic_;
 
-    private: transport::SubscriberPtr imuSub;
-    private: transport::SubscriberPtr pitchSub;
-    private: transport::SubscriberPtr rollSub;
-    private: transport::SubscriberPtr yawSub;
+  // status publishers
+  transport::PublisherPtr new_xy_status_pub_;
+  transport::PublisherPtr roll_pitch_status_pub_;
+  transport::PublisherPtr thruster_status_pub_;
+};
 
-    private: transport::PublisherPtr pitchPub;
-    private: transport::PublisherPtr rollPub;
-    private: transport::PublisherPtr yawPub;
-
-    private: physics::ModelPtr model;
-
-    /// \brief yaw camera
-    private: physics::JointPtr yawJoint;
-
-    /// \brief camera roll joint
-    private: physics::JointPtr rollJoint;
-
-    /// \brief camera pitch joint
-    private: physics::JointPtr pitchJoint;
-
-    private: sensors::ImuSensorPtr cameraImuSensor;
-    private: double vehicleYaw;
-
-    private: std::string status;
-
-    private: double rDir;
-    private: double pDir;
-    private: double yDir;
-
-    private: double pitchCommand;
-    private: double yawCommand;
-    private: double rollCommand;
-
-    private: transport::NodePtr node;
-
-    private: common::PID pitchPid;
-    private: common::PID rollPid;
-    private: common::PID yawPid;
-    private: common::Time lastUpdateTime;
-
-    private: double thisVariableIsNotUsed = 0;
-  };
-  class actuator{
-    public:
-     gazebo::physics::LinkPtr link;
-     const ignition::math::Vector3<double>& force = {0, 0, 0};
-     std::string path;
-     actuator(std::string name_actuator){
-       path = name_actuator;
-     }
-
-  };
-}
+class actuator {
+public:
+  gazebo::physics::LinkPtr link;
+  const ignition::math::Vector3<double> &force = {0, 0, 0};
+  std::string path;
+  actuator(std::string name_actuator) { path = name_actuator; }
+};
+} // namespace gazebo
 #endif

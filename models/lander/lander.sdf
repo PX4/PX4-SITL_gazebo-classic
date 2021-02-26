@@ -2274,6 +2274,7 @@
       </control_channels>
     </plugin>
     <plugin name='acs_controller' filename='libgazebo_acs_controller_plugin.so'>
+      <robotNamespace/>
       <joint_yaw></joint_yaw>
       <joint_roll></joint_roll>
       <joint_pitch></joint_pitch>
