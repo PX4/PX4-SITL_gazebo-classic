@@ -589,6 +589,13 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   // Send groudntruth at full rate
   SendGroundTruth();
 
+  // Send custom status messages
+  SendActuatorStatus();
+  SendNewXYStatus();
+  SendRollPitchStatus();
+  SendThrusterStatus();
+  SendThrusterYawStatus();
+
   if (close_conn_) { // close connection if required
     mavlink_interface_->close();
   }
