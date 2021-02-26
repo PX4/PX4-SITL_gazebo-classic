@@ -310,6 +310,12 @@ private:
   std::string baro_sub_topic_;
   std::string wind_sub_topic_;
 
+  // custom topic names --------------------------------------------------------
+  std::string thruster_sub_topic_;
+  std::string roll_pitch_sub_topic_;
+  std::string new_xy_sub_topic_;
+  // ---------------------------------------------------------------------------
+
   std::mutex last_imu_message_mutex_ {};
   std::condition_variable last_imu_message_cond_ {};
   sensor_msgs::msgs::Imu last_imu_message_;
