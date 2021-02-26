@@ -21,6 +21,8 @@
 
 #include <gazebo_custom_mavlink_interface.h>
 #include <PID.h>
+#include <iostream>
+std::fstream myfile;
 
 namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
@@ -1201,7 +1203,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
-  static PID actuator_cont[2] = {PID(500, 0, 0, _dt, 0.1,100000,-100000), PID(500, 0, 0 ,_dt, 0.1 ,100000,-100000)};
+  static PID actuator_cont[2] = {PID(100, 25, 400, _dt, 0.05,100000,-100000), PID(100, 25, 400,_dt, 0.05 ,100000,-100000)};
 
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
@@ -1261,7 +1263,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         std::string path = lander_name + "::" + link_names[i];
         gazebo::physics::LinkPtr link = model_->GetChildLink(path);
 
-        ignition::math::v6::Vector3d force;
+        ignition::math::Vector3d force;
 
         // yaw thrusters
         // Determine force vector based off thruster

@@ -78,6 +78,7 @@
 
 #include "mavlink_interface.h"
 #include "msgbuffer.h"
+#include <fstream>
 
 //! Default distance sensor model joint naming
 static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");

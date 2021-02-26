@@ -335,7 +335,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>0.45</mass>
+        <!-- <mass>0.45</mass> -->
+        <mass>0.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -368,7 +369,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -460,7 +462,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -493,7 +496,8 @@
           <iyz>0</iyz>
           <izz>0</izz>
         </inertia>
-        <mass>.5835</mass>
+        <!-- <mass>.5835</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -585,7 +589,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.45</mass>
+        <!-- <mass>.45</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -618,7 +623,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -652,7 +658,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -685,7 +692,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.5835</mass>
+        <!-- <mass>.5835</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -719,7 +727,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -752,7 +761,8 @@
           <iyz>0</iyz>
           <izz>1</izz>
         </inertia>
-        <mass>.1</mass>
+        <!-- <mass>.1</mass> -->
+        <mass>.0001</mass>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <enable_wind>0</enable_wind>
@@ -2194,20 +2204,22 @@
         <channel name="roll">
           <input_index>0</input_index>
           <input_offset>-0.5</input_offset>
-          <input_scaling>1</input_scaling>
+          <input_scaling>0.5</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>actuator_1_outer__actuator_1_inner__prismatic</joint_name>
+          <link_name>roll_ls</link_name>
         </channel>
         <channel name="pitch">
           <input_index>1</input_index>
           <input_offset>-0.5</input_offset>
-          <input_scaling>1</input_scaling>
+          <input_scaling>-0.5</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>actuator_2_outer__actuator_2_inner__prismatic</joint_name>
+          <link_name>pitch_ls</link_name>
         </channel>
         <channel name="yaw_po">
           <input_index>2</input_index>
@@ -2252,7 +2264,7 @@
         <channel name="thrust">
           <input_index>6</input_index>
           <input_offset>0</input_offset>
-          <input_scaling>450</input_scaling>
+          <input_scaling>300</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>force</joint_control_type>
