@@ -202,9 +202,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   groundtruth_sub_topic_ = "/groundtruth";
 
   // custom topics -------------------------------------------------------------
-  thruster_sub_topic_ = "/thruster_status";
-  roll_pitch_sub_topic_ = "/roll_pitch_status";
-  new_xy_sub_topic_ = "/new_xy_status";
+  new_xy_sub_topic_ = "~/" + model_->GetName() + "/new_xy_status";
+  roll_pitch_sub_topic_ = "~/" + model_->GetName() + "/roll_pitch_status";
+  thruster_sub_topic_ = "~/" + model_->GetName() + "/thruster_status";
   // ---------------------------------------------------------------------------
 
   // set input_reference_ from inputs.control
@@ -432,15 +432,10 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // Custom Subscribers --------------------------------------------------------
   // subsribe to messages sent from ACS controller
-  new_xy_status_sub_ = node_handle_->Subscribe(
-      "~/" + model_->GetName() + new_xy_sub_topic_,
-      &GazeboMavlinkInterface::NewXYStatusCallback, this);
-  roll_pitch_status_sub_ = node_handle_->Subscribe(
-      "~/" + model_->GetName() + roll_pitch_sub_topic_,
-      &GazeboMavlinkInterface::RollPitchStatusCallback, this);
-  thruster_status_sub_ = node_handle_->Subscribe(
-      "~/" + model_->GetName() + thruster_sub_topic_,
-      &GazeboMavlinkInterface::ThrusterStatusCallback, this);
+  new_xy_status_sub_ = node_handle_->Subscribe<sensor_msgs::msgs::NewXYStatus>(
+    new_xy_sub_topic_, &GazeboMavlinkInterface::NewXYStatusCallback, this);
+  roll_pitch_status_sub_ = node_handle_->Subscribe(roll_pitch_sub_topic_, &GazeboMavlinkInterface::RollPitchStatusCallback, this);
+  thruster_status_sub_ = node_handle_->Subscribe(thruster_sub_topic_, &GazeboMavlinkInterface::ThrusterStatusCallback, this);
   // ---------------------------------------------------------------------------
 
   // Get the model joints

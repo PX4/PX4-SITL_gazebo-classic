@@ -39,11 +39,11 @@ ignition::math::Vector3d QtoZXY(const ignition::math::Quaterniond &_q) {
   // http://bediyap.com/programming/convert-quaternion-to-euler-rotations/
   // case zxy:
   ignition::math::Vector3d result = detail::ThreeAxisRot(
-    -2*(_q.X()*_q.Y() - _q.W()*_q.Z()),
-    _q.W()*_q.W() - _q.X()*_q.X() + _q.Y()*_q.Y() - _q.Z()*_q.Z(),
-    2*(_q.Y()*_q.Z() + _q.W()*_q.X()),
-    -2*(_q.X()*_q.Z() - _q.W()*_q.Y()),
-    _q.W()*_q.W() - _q.X()*_q.X() - _q.Y()*_q.Y() + _q.Z()*_q.Z());
+      -2 * (_q.X() * _q.Y() - _q.W() * _q.Z()),
+      _q.W() * _q.W() - _q.X() * _q.X() + _q.Y() * _q.Y() - _q.Z() * _q.Z(),
+      2 * (_q.Y() * _q.Z() + _q.W() * _q.X()),
+      -2 * (_q.X() * _q.Z() - _q.W() * _q.Y()),
+      _q.W() * _q.W() - _q.X() * _q.X() - _q.Y() * _q.Y() + _q.Z() * _q.Z());
   return result;
 }
 } // namespace detail
@@ -57,13 +57,17 @@ void ACSControllerPlugin::Load(physics::ModelPtr _model,
   this->_model = _model;
   this->_sdf = _sdf;
 
+  // default params
   namespace_.clear();
 
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_acs_controller] Please specify a robotNamespace.\n";
   }
+
+  node_handle_ = transport::NodePtr(new transport::Node());
+  node_handle_->Init(namespace_);
 
   // Create axis name -> pid map. It may be empty or not fully defined
   std::map<std::string, common::PID> pids_;
@@ -134,17 +138,14 @@ void ACSControllerPlugin::Load(physics::ModelPtr _model,
   thruster_pub_topic_ = "~/" + _model->GetName() + "/thruster_status";
 
   // publishers
-  // new_xy_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::NewXYStatus>(new_xy_pub_topic_, 10);
-  // roll_pitch_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::RollPitchStatus>(roll_pitch_pub_topic_, 10);
-  // thruster_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::ThrusterStatus>(thruster_pub_topic_, 10);
+  new_xy_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::NewXYStatus>(new_xy_pub_topic_, 10);
+  roll_pitch_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::RollPitchStatus>(roll_pitch_pub_topic_, 10);
+  thruster_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::ThrusterStatus>(thruster_pub_topic_, 10);
   // ---------------------------------------------------------------------------
 }
 
 /////////////////////////////////////////////////
 void ACSControllerPlugin::Init() {
-
-  node_handle_ = transport::NodePtr(new transport::Node());
-  node_handle_->Init(namespace_);
 
   lastUpdateTime = _model->GetWorld()->SimTime();
 
@@ -223,30 +224,30 @@ void ACSControllerPlugin::OnUpdate() {
     _thrusterStatus[3] = _pitchTarget;
   }
 
-  // // fill NewXYStatus msg
-  // sensor_msgs::msgs::NewXYStatus new_xy_status_msg;
+  // fill NewXYStatus msg
+  sensor_msgs::msgs::NewXYStatus new_xy_status_msg;
 
-  // new_xy_status_msg.set_new_x(_newX);
-  // new_xy_status_msg.set_new_y(_newY);
+  new_xy_status_msg.set_new_x(_newX);
+  new_xy_status_msg.set_new_y(_newY);
 
-  // // fill RollPitchStatus msg
-  // sensor_msgs::msgs::RollPitchStatus roll_pitch_status_msg;
+  // fill RollPitchStatus msg
+  sensor_msgs::msgs::RollPitchStatus roll_pitch_status_msg;
 
-  // roll_pitch_status_msg.set_roll_target(_rollTarget);
-  // roll_pitch_status_msg.set_pitch_target(_pitchTarget);
+  roll_pitch_status_msg.set_roll_target(_rollTarget);
+  roll_pitch_status_msg.set_pitch_target(_pitchTarget);
 
-  // // fill ThrusterStatus msg
-  // sensor_msgs::msgs::ThrusterStatus thruster_status_msg;
+  // fill ThrusterStatus msg
+  sensor_msgs::msgs::ThrusterStatus thruster_status_msg;
 
-  // thruster_status_msg.set_thruster_1(_thrusterStatus[0]);
-  // thruster_status_msg.set_thruster_2(_thrusterStatus[1]);
-  // thruster_status_msg.set_thruster_3(_thrusterStatus[2]);
-  // thruster_status_msg.set_thruster_4(_thrusterStatus[3]);
+  thruster_status_msg.set_thruster_1(_thrusterStatus[0]);
+  thruster_status_msg.set_thruster_2(_thrusterStatus[1]);
+  thruster_status_msg.set_thruster_3(_thrusterStatus[2]);
+  thruster_status_msg.set_thruster_4(_thrusterStatus[3]);
 
   // Publish status msgs to gazebo_custom_mavlink_interface
-  // new_xy_status_pub_->Publish(new_xy_status_msg);
-  // roll_pitch_status_pub_->Publish(roll_pitch_status_msg);
-  // thruster_status_pub_->Publish(thruster_status_msg);
+  new_xy_status_pub_->Publish(new_xy_status_msg);
+  roll_pitch_status_pub_->Publish(roll_pitch_status_msg);
+  thruster_status_pub_->Publish(thruster_status_msg);
 
   common::Time time = _model->GetWorld()->SimTime();
   lastUpdateTime = time;
