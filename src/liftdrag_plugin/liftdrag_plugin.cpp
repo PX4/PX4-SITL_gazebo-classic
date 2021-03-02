@@ -229,11 +229,6 @@ void LiftDragPlugin::OnUpdate()
   // rotate forward and upward vectors into inertial frame
   ignition::math::Vector3d forwardI = pose.Rot().RotateVector(this->forward);
 
-  if (forwardI.Dot(vel) <= 0.0){
-    // Only calculate lift or drag if the wind relative velocity is in the same direction
-    return;
-  }
-
   ignition::math::Vector3d upwardI;
   if (this->radialSymmetry)
   {
@@ -289,10 +284,10 @@ void LiftDragPlugin::OnUpdate()
   else
     this->alpha = this->alpha0 - acos(cosAlpha);
 
-  // normalize to within +/-90 deg
-  while (fabs(this->alpha) > 0.5 * M_PI)
-    this->alpha = this->alpha > 0 ? this->alpha - M_PI
-                                  : this->alpha + M_PI;
+  // normalize to within +/- 180 deg
+  while (fabs(this->alpha) > M_PI)
+    this->alpha = this->alpha > 0 ? this->alpha - 2 * M_PI
+                                  : this->alpha + 2 * M_PI;
 
   // compute dynamic pressure
   double speedInLDPlane = velInLDPlane.Length();
@@ -311,19 +306,22 @@ void LiftDragPlugin::OnUpdate()
 
   // compute cl at cp, check for stall
   double cl;
+  // make simulation more realistic by assuming some losses due to the finite nature of
+  // the wing. The value is chosen arbitrarily.
+  const double finite_plate_cl_factor = 0.7;
+  // See http://groups.csail.mit.edu/robotics-center/public_papers/Hoburg09a.pdf
+  double cl_plate = finite_plate_cl_factor * 2 * sin(this->alpha) * cos(this->alpha);
   if (this->alpha > this->alphaStall)
   {
     cl = this->cla * this->alphaStall +
          this->claStall * (this->alpha - this->alphaStall);
-    // make sure cl is still great than 0
-    cl = std::max(0.0, cl);
+    cl = std::max(cl, cl_plate);
   }
   else if (this->alpha < -this->alphaStall)
   {
     cl = -this->cla * this->alphaStall +
          this->claStall * (this->alpha + this->alphaStall);
-    // make sure cl is still less than 0
-    cl = std::min(0.0, cl);
+    cl = std::min(cl, cl_plate);
   }
   else
   {
@@ -342,6 +340,8 @@ void LiftDragPlugin::OnUpdate()
   {
     cd = this->cd_alpha0 + this->cda * this->alphaStall +
          this->cdaStall * (fabs(this->alpha) - this->alphaStall);
+    double cd_plate = this->cd_alpha0 + 2 * pow(sin(this->alpha), 2);
+    cd = std::min(cd, cd_plate);
   }
   else
   {
@@ -359,20 +359,24 @@ void LiftDragPlugin::OnUpdate()
 
   // compute cm at cp, check for stall
   double cm;
-  if (this->alpha > this->alphaStall)
+  if (abs(this->alpha) > 90)
+  {
+    // cma and cmaStall are not suited to describe the cm at angles far past stall.
+    // Instead, we just prevent a discontinuity at +/- 180 deg, by using a sine function which connects
+    // the cm at 90 degrees to the cm at -90 degrees, so that the simulation is somewhat realistic.
+    double cm_pi2_delta = this->cma * this->alphaStall +
+                          this->cmaStall * (M_PI/2 - this->alphaStall);
+    cm = this->cm_alpha0 + cm_pi2_delta * sin(this->alpha);
+  }
+  else if (this->alpha > this->alphaStall)
   {
     cm = this->cm_alpha0 + this->cma * this->alphaStall +
          this->cmaStall * (this->alpha - this->alphaStall);
-    // Past stall, cm_alpha tends to drop sharply, so it cannot be larger than cm_alpha0
-    // See e.g. https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/fluid-mechanics/f19_fall.pdf, page 3
-    cm = std::min(this->cm_alpha0, cm);
   }
   else if (this->alpha < -this->alphaStall)
   {
     cm = this->cm_alpha0 - this->cma * this->alphaStall +
          this->cmaStall * (this->alpha + this->alphaStall);
-    // make sure cm is still less than 0
-    cm = std::max(this->cm_alpha0, cm);
   }
   else
   {
