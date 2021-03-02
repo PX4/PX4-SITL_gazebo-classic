@@ -274,7 +274,7 @@ function(glob_generate target file_glob)
 			if(GENERATE_ROS_MODELS)
 				add_custom_command(OUTPUT ${out_file}
         	                	COMMAND
-                	                        ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR} --build_ros_interface true
+                	                        ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR} --generate_ros_models true
                         	        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file}
                                 	VERBATIM
 	                                )
