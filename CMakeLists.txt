@@ -294,6 +294,7 @@ set(sensor_msgs
   # custom messages ------------------------------------------------------------
   msgs/NewXYStatus.proto
   msgs/RollPitchStatus.proto
+  msgs/RollPitchSetpoint.proto
   msgs/ThrusterStatus.proto
   # ----------------------------------------------------------------------------
   msgs/Airspeed.proto

@@ -1,0 +1,8 @@
+syntax = "proto2";
+package sensor_msgs.msgs;
+
+message RollPitchSetpoint
+{
+  required float   roll_setpoint  = 1;
+  required float   pitch_setpoint  = 2;
+}

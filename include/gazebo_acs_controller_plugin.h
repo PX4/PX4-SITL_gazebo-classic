@@ -41,6 +41,7 @@
 // custom compiled messages ----------------------------------------------------
 #include "NewXYStatus.pb.h"
 #include "RollPitchStatus.pb.h"
+#include "RollPitchSetpoint.pb.h"
 #include "ThrusterStatus.pb.h"
 // -----------------------------------------------------------------------------
 
@@ -77,15 +78,19 @@ private:
   double _newY;
   double _rollTarget;
   double _pitchTarget;
+  double _rollSetpoint;
+  double _pitchSetpoint;
 
   // status topics
   std::string new_xy_pub_topic_;
   std::string roll_pitch_pub_topic_;
+  std::string roll_pitch_setpoint_pub_topic_;
   std::string thruster_pub_topic_;
 
   // status publishers
   transport::PublisherPtr new_xy_status_pub_;
   transport::PublisherPtr roll_pitch_status_pub_;
+  transport::PublisherPtr roll_pitch_setpoint_pub_;
   transport::PublisherPtr thruster_status_pub_;
 };
 
