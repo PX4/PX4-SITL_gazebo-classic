@@ -135,11 +135,13 @@ void ACSControllerPlugin::Load(physics::ModelPtr _model,
   // topics
   new_xy_pub_topic_ = "~/" + _model->GetName() + "/new_xy_status";
   roll_pitch_pub_topic_ = "~/" + _model->GetName() + "/roll_pitch_status";
+  roll_pitch_setpoint_pub_topic_ = "~/" + _model->GetName() + "/roll_pitch_setpoint";
   thruster_pub_topic_ = "~/" + _model->GetName() + "/thruster_status";
 
   // publishers
   new_xy_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::NewXYStatus>(new_xy_pub_topic_, 10);
   roll_pitch_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::RollPitchStatus>(roll_pitch_pub_topic_, 10);
+  roll_pitch_setpoint_pub_ = node_handle_->Advertise<sensor_msgs::msgs::RollPitchSetpoint>(roll_pitch_setpoint_pub_topic_, 10);
   thruster_status_pub_ = node_handle_->Advertise<sensor_msgs::msgs::ThrusterStatus>(thruster_pub_topic_, 10);
   // ---------------------------------------------------------------------------
 }
@@ -236,6 +238,12 @@ void ACSControllerPlugin::OnUpdate() {
   roll_pitch_status_msg.set_roll_target(_rollTarget);
   roll_pitch_status_msg.set_pitch_target(_pitchTarget);
 
+  // fill RollPitchSetpoint msg
+  sensor_msgs::msgs::RollPitchSetpoint roll_pitch_setpoint_msg;
+
+  roll_pitch_setpoint_msg.set_roll_setpoint(_rollSetpoint);
+  roll_pitch_setpoint_msg.set_pitch_setpoint(_pitchSetpoint);
+
   // fill ThrusterStatus msg
   sensor_msgs::msgs::ThrusterStatus thruster_status_msg;
 
@@ -247,6 +255,7 @@ void ACSControllerPlugin::OnUpdate() {
   // Publish status msgs to gazebo_custom_mavlink_interface
   new_xy_status_pub_->Publish(new_xy_status_msg);
   roll_pitch_status_pub_->Publish(roll_pitch_status_msg);
+  roll_pitch_setpoint_pub_->Publish(roll_pitch_setpoint_msg);
   thruster_status_pub_->Publish(thruster_status_msg);
 
   common::Time time = _model->GetWorld()->SimTime();
