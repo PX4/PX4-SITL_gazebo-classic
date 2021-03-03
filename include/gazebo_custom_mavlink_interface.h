@@ -73,6 +73,7 @@
 // custom compiled messages ----------------------------------------------------
 #include "NewXYStatus.pb.h"
 #include "RollPitchStatus.pb.h"
+#include "RollPitchSetpoint.pb.h"
 #include "ThrusterStatus.pb.h"
 // -----------------------------------------------------------------------------
 
@@ -106,6 +107,8 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::NewXYStatus>
     NewXYStatusPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::RollPitchStatus>
     RollPitchStatusPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::RollPitchSetpoint>
+    RollPitchSetpointPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::ThrusterStatus>
     ThrusterStatusPtr;
 // -----------------------------------------------------------------------------
@@ -231,12 +234,14 @@ private:
   // Custom Mesage callbacks
   void NewXYStatusCallback(NewXYStatusPtr &msg);
   void RollPitchStatusCallback(RollPitchStatusPtr &msg);
+  void RollPitchSetpointCallback(RollPitchSetpointPtr &msg);
   void ThrusterStatusCallback(ThrusterStatusPtr &msg);
 
   // send status as mavlink messages
   void SendActuatorStatus();
   void SendNewXYStatus();
   void SendRollPitchStatus();
+  void SendRollPitchSetpoint();
   void SendThrusterStatus();
   void SendThrusterYawStatus();
 
@@ -246,6 +251,8 @@ private:
   double _newY;
   double _rollTarget;
   double _pitchTarget;
+  double _rollSetpoint;
+  double _pitchSetpoint;
   std::vector<double> _thrusterStatus = {0, 0, 0, 0};
   std::vector<double> _thruster_yaw_status = {0, 0};
   // ---------------------------------------------------------------------------
@@ -296,6 +303,7 @@ private:
   // custom subscribers --------------------------------------------------------
   transport::SubscriberPtr new_xy_status_sub_;
   transport::SubscriberPtr roll_pitch_status_sub_;
+  transport::SubscriberPtr roll_pitch_setpoint_sub_;
   transport::SubscriberPtr thruster_status_sub_;
   // ---------------------------------------------------------------------------
 
@@ -314,6 +322,7 @@ private:
   // custom topic names --------------------------------------------------------
   std::string thruster_sub_topic_;
   std::string roll_pitch_sub_topic_;
+  std::string roll_pitch_setpoint_sub_topic_;
   std::string new_xy_sub_topic_;
   // ---------------------------------------------------------------------------
 

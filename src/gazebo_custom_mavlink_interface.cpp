@@ -206,6 +206,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // custom topics -------------------------------------------------------------
   new_xy_sub_topic_ = "~/" + model_->GetName() + "/new_xy_status";
   roll_pitch_sub_topic_ = "~/" + model_->GetName() + "/roll_pitch_status";
+  roll_pitch_setpoint_sub_topic_ = "~/" + model_->GetName() + "/roll_pitch_setpoint";
   thruster_sub_topic_ = "~/" + model_->GetName() + "/thruster_status";
   // ---------------------------------------------------------------------------
 
@@ -437,6 +438,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   new_xy_status_sub_ = node_handle_->Subscribe<sensor_msgs::msgs::NewXYStatus>(
     new_xy_sub_topic_, &GazeboMavlinkInterface::NewXYStatusCallback, this);
   roll_pitch_status_sub_ = node_handle_->Subscribe(roll_pitch_sub_topic_, &GazeboMavlinkInterface::RollPitchStatusCallback, this);
+  roll_pitch_setpoint_sub_ = node_handle_->Subscribe(roll_pitch_setpoint_sub_topic_, &GazeboMavlinkInterface::RollPitchSetpointCallback, this);
   thruster_status_sub_ = node_handle_->Subscribe(thruster_sub_topic_, &GazeboMavlinkInterface::ThrusterStatusCallback, this);
   // ---------------------------------------------------------------------------
 
@@ -595,6 +597,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   SendActuatorStatus();
   SendNewXYStatus();
   SendRollPitchStatus();
+  SendRollPitchSetpoint();
   SendThrusterStatus();
   SendThrusterYawStatus();
 
@@ -1161,6 +1164,12 @@ void GazeboMavlinkInterface::RollPitchStatusCallback(RollPitchStatusPtr &msg)
   _pitchTarget = msg->pitch_target();
 }
 
+void GazeboMavlinkInterface::RollPitchSetpointCallback(RollPitchSetpointPtr &msg)
+{
+  _rollSetpoint = msg->roll_setpoint();
+  _pitchSetpoint = msg->pitch_setpoint();
+}
+
 void GazeboMavlinkInterface::ThrusterStatusCallback(ThrusterStatusPtr &msg) {
   _thrusterStatus[0] = msg->thruster_1();
   _thrusterStatus[1] = msg->thruster_2();
@@ -1334,6 +1343,20 @@ void GazeboMavlinkInterface::SendRollPitchStatus() {
   status_msg.pitch_target = _pitchTarget;
 
   mavlink_msg_roll_pitch_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg,
+                                            &status_msg);
+  mavlink_interface_->send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::SendRollPitchSetpoint() {
+  // Send mavlink message to be read in simulator_mavlink
+  mavlink_message_t msg;
+  mavlink_roll_pitch_setpoint_t status_msg;
+
+  // roll and pitch setpoint
+  status_msg.roll_setpoint = _rollSetpoint;
+  status_msg.pitch_setpoint = _pitchSetpoint;
+
+  mavlink_msg_roll_pitch_setpoint_encode_chan(1, 200, MAVLINK_COMM_0, &msg,
                                             &status_msg);
   mavlink_interface_->send_mavlink_message(&msg);
 }
