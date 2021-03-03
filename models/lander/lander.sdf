@@ -2177,6 +2177,9 @@
       <robotNamespace/>
       <linkName>lander/airspeed_link</linkName>
     </plugin>
+    <plugin name='cg_plugin' filename='libgazebo_cg_plugin.so'>
+      <robotNamespace/>
+    </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_custom_mavlink_interface.so'>
       <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>

@@ -331,6 +331,7 @@ link_libraries(physics_msgs)
 # custom libraries -------------------------------------------------------------
 add_library(gazebo_acs_controller_plugin SHARED src/gazebo_acs_controller_plugin.cpp)
 add_library(gazebo_contact_plugin SHARED src/gazebo_contact_plugin.cc)
+add_library(gazebo_cg_plugin SHARED src/gazebo_cg_plugin.cpp)
 add_library(gazebo_custom_mavlink_interface SHARED src/gazebo_custom_mavlink_interface.cpp src/mavlink_interface.cpp)
 # ------------------------------------------------------------------------------
 
@@ -363,6 +364,7 @@ set(plugins
   # custom plugins -------------------------------------------------------------
   gazebo_acs_controller_plugin
   gazebo_contact_plugin
+  gazebo_cg_plugin
   gazebo_custom_mavlink_interface
   # ----------------------------------------------------------------------------
 
