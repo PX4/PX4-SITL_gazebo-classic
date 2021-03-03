@@ -188,11 +188,14 @@ void ACSControllerPlugin::OnUpdate() {
   common::Time time_ = _model->GetWorld()->SimTime();
   double dt_ = (time_ - lastUpdateTime).Double();
 
-  static PID con_roll(100, 20, 60, dt_, 0.02, 100000, -10000);
-  static PID con_pitch(100, 20, 60, dt_, 0.02, 100000, -10000);
+  static PID con_roll(100, 20, 60, dt_, 0.03, 100000, -10000);
+  static PID con_pitch(100, 20, 60, dt_, 0.03, 100000, -10000);
 
   _rollTarget = con_roll.Update(_newX, 0);
   _pitchTarget = con_pitch.Update(_newY, 0);
+
+  _rollSetpoint = 0;
+  _pitchSetpoint = 0;
 
   if (_rollTarget > 0) {
     // thruster 1
