@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="parachute_package">
+    <include>
+      <uri>model://parachute_small</uri>
+      <pose>0 0 0.2 0 0 0</pose>
+    </include>
+    <link name="base_link">
+      <pose>0 0 0  0 0 0</pose>
+      <inertial>
+        <pose>0 0 0  0 0 0</pose>
+        <mass>1.00</mass>
+        <inertia>
+          <ixx>0.010000</ixx>
+          <ixy>0.000000</ixy>
+          <ixz>0.000000</ixz>
+          <iyy>0.010000</iyy>
+          <iyz>0.000000</iyz>
+          <izz>0.010000</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0 0.3  0 0 0</pose>
+        <geometry>
+          <box>
+              <size>0.15 0.1 0.18</size>
+          </box>
+        </geometry>
+	      <surface>
+          <contact>
+            <ode>
+              <max_vel>0.1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 0.3  0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.125 0.125 0.125</scale>
+            <uri>model://big_box/meshes/big_box.dae</uri>
+          </mesh>
+	      </geometry>
+      </visual>
+    </link>
+    <joint name='parachute_joint' type='revolute'>
+      <child>base_link</child>
+      <parent>parachute_small::chute</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    </model>
+</sdf>
