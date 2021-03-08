@@ -75,6 +75,7 @@ namespace gazebo
       double max_distance_;
       double low_signal_strength_;
       double high_signal_strength_;
+      bool simulate_fog_;
 
       gazebo::msgs::Quaternion orientation_;
 
