@@ -89,6 +89,7 @@
           <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
             <udpPort>5600</udpPort>
+            <useCuda>true</useCuda>
           </plugin>
         </sensor>
         <self_collide>0</self_collide>
