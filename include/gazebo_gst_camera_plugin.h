@@ -70,6 +70,7 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
     int udpPort;
     bool useRtmp;
     std::string rtmpLocation;
+    bool useCuda;
 
   protected: sensors::CameraSensorPtr parentSensor;
   protected: rendering::CameraPtr camera;

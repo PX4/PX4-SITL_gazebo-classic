@@ -98,17 +98,18 @@ void GstCameraPlugin::startGstThread() {
   GstElement* testSrc = gst_element_factory_make("videotestsrc", "FileSrc");
   GstElement* conv  = gst_element_factory_make("videoconvert", "Convert");
 
-  GstElement* encoder = gst_element_factory_make("nvh264enc", "AvcEncoder");
-  if (!encoder) {
+  GstElement* encoder;
+  if (useCuda) {
+    encoder = gst_element_factory_make("nvh264enc", "AvcEncoder");
+    g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
+    g_object_set(G_OBJECT(encoder), "preset", 1, NULL); //lower = faster, 6=medium
+  } else {
     encoder = gst_element_factory_make("x264enc", "AvcEncoder");
     g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
     g_object_set(G_OBJECT(encoder), "speed-preset", 2, NULL); //lower = faster, 6=medium
     //g_object_set(G_OBJECT(encoder), "tune", "zerolatency", NULL);
     //g_object_set(G_OBJECT(encoder), "low-latency", 1, NULL);
     //g_object_set(G_OBJECT(encoder), "control-rate", 2, NULL);
-  } else {
-    g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
-    g_object_set(G_OBJECT(encoder), "preset", 1, NULL); //lower = faster, 6=medium
   }
   GstElement* parser  = gst_element_factory_make("h264parse", "Parser");
   GstElement* payload;
@@ -278,6 +279,13 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     this->useRtmp = true;
   } else {
     this->useRtmp = false;
+  }
+
+  // Use CUDA for video encoding
+  if (sdf->HasElement("useCuda")) {
+    this->useCuda = sdf->GetElement("useCuda")->Get<bool>();
+  } else {
+    this->useCuda = false;
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
