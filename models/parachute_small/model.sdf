@@ -40,7 +40,7 @@
     </link>
 
     <plugin name="parachute_drag" filename="libLiftDragPlugin.so">
-      <alpha0>0</alpha0>
+      <a0>0</a0>
       <cla>0</cla>
       <cda>1.114</cda>  <!-- Such that Cd = 1.75 at alpha = 90deg (= upright parachute) -->
       <cma>0</cma>

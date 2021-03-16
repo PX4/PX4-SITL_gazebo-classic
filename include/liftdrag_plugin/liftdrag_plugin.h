@@ -72,7 +72,7 @@ namespace gazebo
     /// where q (dynamic pressure) = 0.5 * rho * v^2
     protected: double cma;
 
-    /// \brief angle of attack when airfoil stalls, relative to alpha0
+    /// \brief angle of attack when airfoil stalls
     protected: double alphaStall;
 
     /// \brief Cl-alpha rate after stall
@@ -83,6 +83,9 @@ namespace gazebo
 
     /// \brief Cm-alpha rate after stall
     protected: double cmaStall;
+
+    /// \breif Coefficient of Moment / control surface deflection angle slope
+    protected: double cm_delta;
 
     /// \brief: \TODO: make a stall velocity curve
     protected: double velocityStall;
@@ -101,19 +104,16 @@ namespace gazebo
     /// \brief effective planeform surface area
     protected: double area;
 
-    /// \brief angle of attack at which the lift is zero
+    /// \brief angle of sweep
+    protected: double sweep;
+
+    /// \brief initial angle of attack
     protected: double alpha0;
 
-    /// \brief Cd at zero lift (zero-lift drag coefficient)
-    protected: double cd_alpha0;
-
-    /// \brief Cm at zero lift (zero-lift moment coefficient)
-    protected: double cm_alpha0;
-
-    /// \brief angle of attack, relative to alpha0
+    /// \brief angle of attack
     protected: double alpha;
 
-    /// \brief center of pressure relative to the center of gravity of the link, in link local orientation
+    /// \brief center of pressure in link local coordinates
     protected: ignition::math::Vector3d cp;
 
     /// \brief Normally, this is taken as a direction parallel to the chord
@@ -132,14 +132,9 @@ namespace gazebo
     /// this lifting body
     protected: physics::JointPtr controlJoint;
 
-    /// \brief How much to change CL per radian of control surface deflection
-    protected: double cl_delta;
-
-    /// \brief How much to change CD per radian of control surface deflection
-    protected: double cd_delta;
-
-    /// \brief How much to change CM per radian of control surface deflection
-    protected: double cm_delta;
+    /// \brief how much to change CL per radian of control surface joint
+    /// value.
+    protected: double controlJointRadToCL;
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
