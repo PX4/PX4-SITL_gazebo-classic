@@ -11,9 +11,9 @@
               like the ground. In the properties manager on the left side, select GUI
               then set the camera's pose's roll, pitch, and yaw, to 0. Exit follow mode from here.
               The camera controls should be fixed-->
-          <use_model_frame>false</use_model_frame> 
-          <!--<xyz>-5 0 0</xyz>--><!--chase camera offset-->
-          <xyz>-10 0 3</xyz> <!--stationary camera offset-->
+          <use_model_frame>true</use_model_frame>
+          <xyz>-5 0 1</xyz> <!--chase camera offset-->
+          <!--<xyz>-10 0 3</xyz>--> <!--stationary camera offset-->
           <inherit_yaw>true</inherit_yaw>
         </track_visual>
       </camera>
