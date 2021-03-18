@@ -97,10 +97,39 @@ void GstCameraPlugin::startGstThread() {
   GstElement* dataSrc = gst_element_factory_make("appsrc", "AppSrc");
   GstElement* testSrc = gst_element_factory_make("videotestsrc", "FileSrc");
   GstElement* conv  = gst_element_factory_make("videoconvert", "Convert");
-  GstElement* encoder = gst_element_factory_make("x264enc", "AvcEncoder");
+
+  GstElement* encoder;
+  if (useCuda) {
+    encoder = gst_element_factory_make("nvh264enc", "AvcEncoder");
+    g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
+    g_object_set(G_OBJECT(encoder), "preset", 1, NULL); //lower = faster, 6=medium
+  } else {
+    encoder = gst_element_factory_make("x264enc", "AvcEncoder");
+    g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
+    g_object_set(G_OBJECT(encoder), "speed-preset", 2, NULL); //lower = faster, 6=medium
+    //g_object_set(G_OBJECT(encoder), "tune", "zerolatency", NULL);
+    //g_object_set(G_OBJECT(encoder), "low-latency", 1, NULL);
+    //g_object_set(G_OBJECT(encoder), "control-rate", 2, NULL);
+  }
   GstElement* parser  = gst_element_factory_make("h264parse", "Parser");
-  GstElement* payload = gst_element_factory_make("rtph264pay", "PayLoad");
-  GstElement* sink  = gst_element_factory_make("udpsink", "UdpSink");
+  GstElement* payload;
+  GstElement* sink;
+ 
+  if (useRtmp) {
+    g_object_set(G_OBJECT(parser), "config-interval", 1, NULL);
+    payload = gst_element_factory_make("flvmux", "FLVMux");
+    sink = gst_element_factory_make("rtmpsink", "RtmpSink");
+    g_object_set(G_OBJECT(sink), "location", this->rtmpLocation.c_str(), NULL);
+  } else {
+    payload = gst_element_factory_make("rtph264pay", "PayLoad");
+    g_object_set(G_OBJECT(payload), "config-interval", 1, NULL);
+    sink  = gst_element_factory_make("udpsink", "UdpSink");
+    g_object_set(G_OBJECT(sink), "host", this->udpHost.c_str(), NULL);
+    g_object_set(G_OBJECT(sink), "port", this->udpPort, NULL);
+    //g_object_set(G_OBJECT(sink), "sync", false, NULL);
+    //g_object_set(G_OBJECT(sink), "async", false, NULL);
+  }
+
   if (!dataSrc || !testSrc || !conv || !encoder || !parser || !payload || !sink) {
     gzerr << "ERR: Create elements failed. \n";
     return;
@@ -120,22 +149,6 @@ void GstCameraPlugin::startGstThread() {
       NULL),
       "is-live", TRUE,
       NULL);
-
-  // Config encoder
-  g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
-  g_object_set(G_OBJECT(encoder), "speed-preset", 2, NULL); //lower = faster, 6=medium
-  //g_object_set(G_OBJECT(encoder), "tune", "zerolatency", NULL);
-  //g_object_set(G_OBJECT(encoder), "low-latency", 1, NULL);
-  //g_object_set(G_OBJECT(encoder), "control-rate", 2, NULL);
-
-  // Config payload
-  g_object_set(G_OBJECT(payload), "config-interval", 1, NULL);
-
-  // Config udpsink
-  g_object_set(G_OBJECT(sink), "host", this->udpHost.c_str(), NULL);
-  g_object_set(G_OBJECT(sink), "port", this->udpPort, NULL);
-  //g_object_set(G_OBJECT(sink), "sync", false, NULL);
-  //g_object_set(G_OBJECT(sink), "async", false, NULL);
 
   // Connect all elements to pipeline
   gst_bin_add_many(GST_BIN(pipeline), dataSrc, conv, encoder, parser, payload, sink, NULL);
@@ -253,12 +266,26 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
 
   this->udpHost = "127.0.0.1";
   if (sdf->HasElement("udpHost")) {
-	this->udpHost = sdf->GetElement("udpHost")->Get<string>();
+    this->udpHost = sdf->GetElement("udpHost")->Get<string>();
   }
 	
   this->udpPort = 5600;
   if (sdf->HasElement("udpPort")) {
-	this->udpPort = sdf->GetElement("udpPort")->Get<int>();
+    this->udpPort = sdf->GetElement("udpPort")->Get<int>();
+  }
+
+  if (sdf->HasElement("rtmpLocation")) {
+    this->rtmpLocation = sdf->GetElement("rtmpLocation")->Get<string>();
+    this->useRtmp = true;
+  } else {
+    this->useRtmp = false;
+  }
+
+  // Use CUDA for video encoding
+  if (sdf->HasElement("useCuda")) {
+    this->useCuda = sdf->GetElement("useCuda")->Get<bool>();
+  } else {
+    this->useCuda = false;
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());

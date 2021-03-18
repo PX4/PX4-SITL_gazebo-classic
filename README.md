@@ -127,6 +127,34 @@ make install
 
 When writing test it’s important to be careful which API functions of Gazebo are called. As no Gazebo server is running during the tests some functions can produce undefined behaviour (e.g. segfaults).
 
+## CUDA Hardware Accelerated H264 encoding (optional)
+
+1. Download CUDA 10.0 from https://developer.nvidia.com/cuda-toolkit-archive.
+2. Download Video Codec SDK 9.0 from https://developer.nvidia.com/video-codec-sdk-archive.
+3. Install both archives:
+
+```bash
+wget https://raw.githubusercontent.com/jackersson/env-setup/master/gst-nvidia-docker/install_video_codec_sdk.sh
+chmod +x install_video_codec_sdk.sh
+sudo ./install_video_codec_sdk.sh
+sudo dpkg -i cuda-repo-ubuntu*.deb
+sudo apt-key add /var/cuda-repo-<version>/7fa2af80.pub
+sudo apt-get update
+sudo apt-get install cuda
+```
+
+4. Reboot your system and run the command `nvidia-smi` to verify the successul installation of CUDA.
+5. Install GStreamer 1.18.3:
+
+```bash
+git clone https://github.com/GStreamer/gst-build -b 1.18.3
+cd gst-build
+meson -Dbuildtype=release -Dstrip=true -Dgst-plugins-bad:introspection=enabled -Dgst-plugins-bad:nvcodec=enabled builddir
+ninja -C builddir
+sudo meson install -C builddir
+```
+
+6. Add `<useCuda>true</useCuda>` to any `gazebo_gst_camera_plugin` in a SDF file. For example `./models/fpv_cam/fpv_cam.sdf`.
 
 #### *catkin tools*
 
