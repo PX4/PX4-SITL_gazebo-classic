@@ -555,12 +555,10 @@
       <parent>base_link</parent>
     </joint>
     <plugin name="left_wing_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>-0.009519322</alpha0>
-      <cd_alpha0>0.003</cd_alpha0>
-      <cm_alpha0>0.002072715</cm_alpha0>
+      <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
-      <cda>0.35</cda>
-      <cma>0.02</cma>
+      <cda>0.6417112299</cda>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -574,19 +572,15 @@
       <control_joint_name>
         left_aileron_joint
       </control_joint_name>
-      <cl_delta>-0.5</cl_delta>
-      <cd_delta>0.05</cd_delta>
-      <cm_delta>0.005</cm_delta>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>-0.009519322</alpha0>
-      <cd_alpha0>0.003</cd_alpha0>
-      <cm_alpha0>0.002072715</cm_alpha0>
+      <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
-      <cda>0.35</cda>
-      <cma>0.02</cma>
+      <cda>0.6417112299</cda>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -600,19 +594,15 @@
       <control_joint_name>
         right_aileron_joint
       </control_joint_name>
-      <cl_delta>-0.5</cl_delta>
-      <cd_delta>0.05</cd_delta>
-      <cm_delta>0.005</cm_delta>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="left_flap_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>-0.009519322</alpha0>
-      <cd_alpha0>0.003</cd_alpha0>
-      <cm_alpha0>0.002072715</cm_alpha0>
+      <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
-      <cda>0.35</cda>
-      <cma>0.02</cma>
+      <cda>0.6417112299</cda>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -626,19 +616,15 @@
       <control_joint_name>
         left_flap_joint
       </control_joint_name>
-      <cl_delta>-0.5</cl_delta>
-      <cd_delta>0.05</cd_delta>
-      <cm_delta>0.005</cm_delta>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_flap_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>-0.009519322</alpha0>
-      <cd_alpha0>0.003</cd_alpha0>
-      <cm_alpha0>0.002072715</cm_alpha0>
+      <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
-      <cda>0.35</cda>
-      <cma>0.02</cma>
+      <cda>0.6417112299</cda>
+      <cma>0.0</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -652,14 +638,12 @@
       <control_joint_name>
         right_flap_joint
       </control_joint_name>
-      <cl_delta>-0.5</cl_delta>
-      <cd_delta>0.05</cd_delta>
-      <cm_delta>0.005</cm_delta>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="elevator_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>-0.2</alpha0>
+      <a0>-0.2</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -676,12 +660,12 @@
       <control_joint_name>
         elevator_joint
       </control_joint_name>
-      <cl_delta>-4.0</cl_delta>
+      <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="rudder_liftdrag" filename="libLiftDragPlugin.so">
-      <alpha0>0.0</alpha0>
+      <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -698,7 +682,7 @@
       <control_joint_name>
          rudder_joint
       </control_joint_name>
-      <cl_delta>4.0</cl_delta>
+      <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
