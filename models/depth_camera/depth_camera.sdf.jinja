@@ -25,7 +25,7 @@
         </geometry>
       </visual>
       <sensor name="depth_camera" type="depth">
-        {% if ros2_distro in ['dashing', 'eloquent', 'foxy'] %}
+        {% if ros_version == 2 %}
         <always_on>0</always_on>
         <update_rate>20</update_rate>
         <camera name="camera_name">

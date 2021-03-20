@@ -37,7 +37,8 @@ include(GNUInstallDirs)
 #######################
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
-option(BUILD_ROS_INTERFACE "Enable building ROS dependent plugins" OFF)
+option(BUILD_ROS_PLUGINS "Enable building ROS dependent plugins" OFF)
+option(GENERATE_ROS_MODELS "Generate model sdf for ROS environment" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
 option(SEND_ODOMETRY_DATA "Send Mavlink ODOMETRY msgs" OFF)
@@ -103,7 +104,7 @@ add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
 # for ROS subscribers and publishers
-if (BUILD_ROS_INTERFACE)
+if (BUILD_ROS_PLUGINS)
   find_package(geometry_msgs REQUIRED)
   find_package(roscpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
@@ -270,12 +271,21 @@ function(glob_generate target file_glob)
 		set(out_file ${CMAKE_CURRENT_SOURCE_DIR}/${file_name})
 		string(REGEX REPLACE ".sdf" ".sdf" out_file ${out_file})
 		if (${file_ext} STREQUAL "jinja")
-			add_custom_command(OUTPUT ${out_file}
-				COMMAND
-					${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR}
-				DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file}
-				VERBATIM
-				)
+			if(GENERATE_ROS_MODELS)
+				add_custom_command(OUTPUT ${out_file}
+        	                	COMMAND
+                	                        ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR} --generate_ros_models true
+                        	        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file}
+                                	VERBATIM
+	                                )
+			else()
+				add_custom_command(OUTPUT ${out_file}
+	                                COMMAND
+        	                                ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file} ${CMAKE_CURRENT_SOURCE_DIR}
+                	                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/jinja_gen.py ${in_file}
+                        	        VERBATIM
+                                	)
+			endif()
 			list(APPEND gen_files_${target} ${out_file})
 			string(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" gitignore_str ${in_file})
 			string(REGEX REPLACE ".jinja" "" gitignore_str ${gitignore_str})
@@ -392,9 +402,9 @@ foreach(plugin ${plugins})
 endforeach()
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
-# If BUILD_ROS_INTERFACE set to ON, build plugins that have ROS dependencies
+# If BUILD_ROS_PLUGINS set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
-if (BUILD_ROS_INTERFACE)
+if (BUILD_ROS_PLUGINS)
   add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
   target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
   list(APPEND plugins gazebo_motor_failure_plugin)
