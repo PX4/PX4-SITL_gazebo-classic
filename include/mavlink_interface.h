@@ -185,6 +185,7 @@ private:
 
     void handle_message(mavlink_message_t *msg);
     void acceptConnections();
+    void RegisterNewHILSensorInstance(int id);
 
     // Serial interface
     void open_serial();
