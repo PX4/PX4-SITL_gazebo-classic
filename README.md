@@ -162,7 +162,7 @@ With *catkin*, the unit tests are enabled by default.
 
 ```bash
 # After setting up the catkin workspace
-catkin build -j4 -l4 -DBUILD_ROS_INTERFACE=ON
+catkin build -j4 -l4 -DBUILD_ROS_PLUGINS=ON
 cd build/mavlink_sitl_gazebo/
 catkin run_tests
 ```
