@@ -59,6 +59,9 @@
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
 
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/Sensor.hh>
+
 #include <Airspeed.pb.h>
 #include <Wind.pb.h>
 
@@ -67,15 +70,16 @@ namespace gazebo
 
 typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
-class GAZEBO_VISIBLE AirspeedPlugin : public ModelPlugin
+class GAZEBO_VISIBLE AirspeedPlugin : public SensorPlugin
 {
 public:
   AirspeedPlugin();
   virtual ~AirspeedPlugin();
 
 protected:
-  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo&);
+  virtual void OnSensorUpdate();
 
 private:
   void WindVelocityCallback(WindPtr& msg);
@@ -83,17 +87,22 @@ private:
   physics::ModelPtr model_;
   physics::WorldPtr world_;
   physics::LinkPtr link_;
+  sensors::SensorPtr parentSensor_;
 
   transport::NodePtr node_handle_;
   transport::SubscriberPtr wind_sub_;
   transport::PublisherPtr airspeed_pub_;
   event::ConnectionPtr updateConnection_;
+  event::ConnectionPtr updateSensorConnection_;
 
   common::Time last_time_;
   std::string namespace_;
   std::string link_name_;
+  std::string model_name_;
+  std::string airspeed_topic_;
 
   ignition::math::Vector3d wind_vel_;
+  ignition::math::Vector3d vel_a_;
 
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
