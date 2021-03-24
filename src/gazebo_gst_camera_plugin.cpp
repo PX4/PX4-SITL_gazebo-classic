@@ -66,15 +66,54 @@ void GstCameraPlugin::startGstThread() {
   GstElement* queue = gst_element_factory_make("queue", nullptr);
   GstElement* converter  = gst_element_factory_make("videoconvert", nullptr);
 
+  GstElement* filterNV12;
   GstElement* encoder;
   if (useCuda) {
-    encoder = gst_element_factory_make("nvh264enc", nullptr);
-    g_object_set(G_OBJECT(encoder), "bitrate", 800, "preset", 1, nullptr);
+    encoder = gst_element_factory_make("nvh264enc", "AvcEncoder");
+    if (useCudaCustomParams) {
+      g_object_set(G_OBJECT(encoder), "bitrate", 2000, nullptr);
+      // rc-mode: 0 = default; 1 = constqp; 2 = cbr; 3 = vbr; 4 = vbr-minqp
+      g_object_set(G_OBJECT(encoder), "rc-mode", 2, nullptr);
+      g_object_set(G_OBJECT(encoder), "qos", true, nullptr);
+      g_object_set(G_OBJECT(encoder), "gop-size", 60, nullptr);
+    } else {
+      g_object_set(G_OBJECT(encoder), "bitrate", 800, nullptr);
+      g_object_set(G_OBJECT(encoder), "preset", 1, nullptr); //lower = faster, 6=medium
+    }
+    gzmsg << "[gazebo_gst_camera_plugin] use nvh264enc." << endl;
+  } else if (useVaapi) {
+    encoder = gst_element_factory_make("vaapih264enc", "AvcEncoder");
+    g_object_set(G_OBJECT(encoder), "bitrate", 2000, nullptr);
+    gzmsg << "[gazebo_gst_camera_plugin] use vaapih264enc." << endl;
+    filterNV12 = gst_element_factory_make("capsfilter", "FilterNV12");
+    if (!filterNV12) {
+      gzerr << "[gazebo_gst_camera_plugin] ERR: NV12 filter element failed." << endl;
+      return;
+    }
+    g_object_set(G_OBJECT(filterNV12), "caps",
+        gst_caps_new_simple ("video/x-raw",
+          "format", G_TYPE_STRING, "NV12",
+          "width", G_TYPE_INT, this->width,
+          "height", G_TYPE_INT, this->height,
+          "framerate", GST_TYPE_FRACTION, (unsigned int)this->rate, 1, nullptr),
+        nullptr);
   } else {
     encoder = gst_element_factory_make("x264enc", nullptr);
     g_object_set(G_OBJECT(encoder), "bitrate", 800, "speed-preset", 6, "tune", 4, "key-int-max", 10, nullptr);
   }
 
+  GstElement* filterH264 = gst_element_factory_make("capsfilter", "FilterH264");
+  if (!filterH264) {
+    gzerr << "[gazebo_gst_camera_plugin] ERR: H264 filter element failed." << endl;
+    return;
+  }
+  g_object_set(G_OBJECT(filterH264), "caps",
+      gst_caps_new_simple ("video/x-h264",
+        "profile", G_TYPE_STRING, "main",
+        "stream-format", G_TYPE_STRING, "byte-stream", nullptr),
+      nullptr);
+
+  GstElement* parser  = gst_element_factory_make("h264parse", "Parser");
   GstElement* payloader;
   GstElement* sink;
 
@@ -98,24 +137,38 @@ void GstCameraPlugin::startGstThread() {
   // gzerr <<"rate"<< this->rate<<"\n";
 
   // Configure source element
+  GString *appSrcFormat = g_string_new("I420");
+  if (!this->convFbImgToI420) {
+    appSrcFormat = g_string_assign(appSrcFormat, "RGB");
+  }
   g_object_set(G_OBJECT(source), "caps",
       gst_caps_new_simple ("video/x-raw",
-        "format", G_TYPE_STRING, "I420",
+        "format", G_TYPE_STRING, appSrcFormat->str,
         "width", G_TYPE_INT, this->width,
         "height", G_TYPE_INT, this->height,
         "framerate", GST_TYPE_FRACTION, (unsigned int)this->rate, 1, nullptr),
-      "is-live", TRUE,
-      "do-timestamp", TRUE,
-      "stream-type", GST_APP_STREAM_TYPE_STREAM,
-      "format", GST_FORMAT_TIME, nullptr);
+        "is-live", TRUE,
+      nullptr);
+  g_string_free(appSrcFormat, false);
 
   // Connect all elements to pipeline
-  gst_bin_add_many(GST_BIN(pipeline), source, queue, converter, encoder, payloader, sink, nullptr);
+  if (useVaapi) {
+    gst_bin_add_many(GST_BIN(pipeline), source, converter, filterNV12, encoder, filterH264, parser, payloader, sink, NULL);
+  } else {
+    gst_bin_add_many(GST_BIN(pipeline), source, converter, encoder, filterH264, parser, payloader, sink, nullptr);
+  }
 
   // Link all elements
-  if (gst_element_link_many(source, queue, converter, encoder, payloader, sink, nullptr) != TRUE) {
-    gzerr << "ERR: Link all the elements failed. \n";
-    return;
+  if (useVaapi) {
+    if (gst_element_link_many(source, converter, filterNV12, encoder, filterH264, parser, payloader, sink, nullptr) != TRUE) {
+      gzerr << "ERR: Link all the elements failed. \n";
+      return;
+    }
+  } else {
+    if (gst_element_link_many(source, converter, encoder, filterH264, parser, payloader, sink, nullptr) != TRUE) {
+      gzerr << "ERR: Link all the elements failed. \n";
+      return;
+    }
   }
 
   this->source = source;
@@ -245,6 +298,29 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     this->useCuda = false;
   }
 
+  // Needed when using CUDA and custom parameters for encoder.
+  if (sdf->HasElement("useCudaCustomParams")) {
+    this->useCudaCustomParams = sdf->GetElement("useCudaCustomParams")->Get<bool>();
+  } else {
+    this->useCudaCustomParams = false;
+  }
+
+  // Use VAAPI for video encoding.
+  // GST_VAAPI_ALL_DRIVERS environmental variable needs to be set to 1.
+  if (sdf->HasElement("useVaapi")) {
+    this->useVaapi = sdf->GetElement("useVaapi")->Get<bool>();
+  } else {
+    this->useVaapi = false;
+  }
+
+  // Eliminates one conversion of framebuffer image from RGB to
+  // I420 when it is set to false.
+  if (sdf->HasElement("convFbImgToI420")) {
+    this->convFbImgToI420 = sdf->GetElement("convFbImgToI420")->Get<bool>();
+  } else {
+    this->convFbImgToI420 = true;
+  }
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -314,7 +390,10 @@ void GstCameraPlugin::OnNewFrame(const unsigned char * image,
 #endif
 
   // Alloc buffer
-  const guint size = width * height * 1.5;
+  guint size = width * height * 1.5;
+  if (!this->convFbImgToI420) {
+    size = width * height * 3;
+  }
   GstBuffer* buffer = gst_buffer_new_allocate(NULL, size, NULL);
 
   if (!buffer) {
@@ -329,13 +408,17 @@ void GstCameraPlugin::OnNewFrame(const unsigned char * image,
     return;
   }
 
-  // Color Conversion from RGB to YUV
-  Mat frame = Mat(height, width, CV_8UC3);
-  Mat frameYUV = Mat(height, width, CV_8UC3);
-  frame.data = (uchar*)image;
+  if (this->convFbImgToI420) {
+    // Color Conversion from RGB to YUV
+    Mat frame = Mat(height, width, CV_8UC3);
+    Mat frameYUV = Mat(height, width, CV_8UC3);
+    frame.data = (uchar*)image;
+    cvtColor(frame, frameYUV, COLOR_RGB2YUV_I420);
+    memcpy(map.data, frameYUV.data, size);
+  } else {
+    memcpy(map.data, (uchar *)image, size);
+  }
 
-  cvtColor(frame, frameYUV, COLOR_RGB2YUV_I420);
-  memcpy(map.data, frameYUV.data, size);
   gst_buffer_unmap(buffer, &map);
 
   GstFlowReturn ret = gst_app_src_push_buffer(GST_APP_SRC(this->source), buffer);

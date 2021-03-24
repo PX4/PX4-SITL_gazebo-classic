@@ -71,6 +71,9 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
     bool useRtmp;
     std::string rtmpLocation;
     bool useCuda;
+    bool useCudaCustomParams;
+    bool useVaapi;
+    bool convFbImgToI420;
 
   protected: sensors::CameraSensorPtr parentSensor;
   protected: rendering::CameraPtr camera;
