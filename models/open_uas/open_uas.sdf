@@ -154,6 +154,16 @@
       <child>airspeed::link</child>
       <parent>base_link</parent>
     </joint>
+    <!--lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>0 0 -0.07 0 0 0</pose>
+    </include>
+
+    <joint name="lidar_joint" type="fixed">
+      <child>lidar::link</child>
+      <parent>base_link</parent>
+    </joint>
     <link name='rotor_puller'>
       <pose>0.3 0 0.0 0 1.57 0</pose>
       <inertial>
