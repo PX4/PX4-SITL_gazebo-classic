@@ -1212,6 +1212,10 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
   // set joint positions
+  
+  // DEFAULT:
+  // static PID actuator_cont[2] = {PID(100, 25, 400, _dt, 0.05,100000,-100000), PID(100, 25, 400,_dt, 0.05 ,100000,-100000)};
+  
   static PID actuator_cont[2] = {PID(100, 25, 400, _dt, 0.05,100000,-100000), PID(100, 25, 400,_dt, 0.05 ,100000,-100000)};
 
   for (int i = 0; i < input_reference_.size(); i++) {
