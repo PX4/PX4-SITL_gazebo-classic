@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="ground">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://ground_my/meshes/ground.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual">
+              
+              <pose>0 0 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://ground_my/meshes/ground.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://ground_my/materials/scripts</uri>
+                      <uri>model://ground_my/materials/textures</uri>
+                      <name>groundMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+        </link>        
+    </model>
+</sdf>
+

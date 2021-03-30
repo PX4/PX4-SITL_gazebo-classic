@@ -1,0 +1,16 @@
+material platformMat/Diffuse
+{
+ receive_sfadows off
+ technique
+ {
+  pass
+   {
+    texture_unit
+    {
+     texture texture_plarform.png
+    }
+   }
+ 
+ }
+}
+

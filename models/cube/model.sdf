@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="cube">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision1">
+                <pose>0 12.5 0.1 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cube/meshes/cube.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual1">
+              
+              <pose>0 12.5 0.1 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cube/meshes/cube.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cube/materials/scripts</uri>
+                      <uri>model://cube/materials/textures</uri>
+                      <name>cubeMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision2">
+                <pose>3 10.5 0.1 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cube/meshes/cube.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+              
+              <pose>3 10.5 0.1 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cube/meshes/cube.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cube/materials/scripts</uri>
+                      <uri>model://cube/materials/textures</uri>
+                      <name>cubeMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision3">
+                <pose>-3 9 0.1 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cube/meshes/cube.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual3">
+              
+              <pose>-3 9 0.1 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cube/meshes/cube.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cube/materials/scripts</uri>
+                      <uri>model://cube/materials/textures</uri>
+                      <name>cubeMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision4">
+                <pose>6 8 0.1 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cube/meshes/cube.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual4">
+              
+              <pose>6 8 0.1 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cube/meshes/cube.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cube/materials/scripts</uri>
+                      <uri>model://cube/materials/textures</uri>
+                      <name>cubeMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision5">
+                <pose>-3 18.3 0.1 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cube/meshes/cube.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual5">
+              
+              <pose>-3 18.3 0.1 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cube/meshes/cube.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cube/materials/scripts</uri>
+                      <uri>model://cube/materials/textures</uri>
+                      <name>cubeMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+        </link>        
+    </model>
+</sdf>
+

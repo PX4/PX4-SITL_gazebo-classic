@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.83.6 commit date:2020-03-05, commit time:21:23, hash:eed1beff88af</authoring_tool>
+    </contributor>
+    <created>2020-07-13T16:08:04</created>
+    <modified>2020-07-13T16:08:04</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects/>
+  <library_images/>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene"/>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

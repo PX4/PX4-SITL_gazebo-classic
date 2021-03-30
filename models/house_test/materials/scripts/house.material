@@ -1,0 +1,16 @@
+material houseMat/Diffuse
+{
+ receive_sfadows off
+ technique
+ {
+  pass
+   {
+    texture_unit
+    {
+     texture house_with_wallpaper_texture.png
+    }
+   }
+ 
+ }
+}
+

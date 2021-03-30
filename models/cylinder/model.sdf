@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="cylinder">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision1">
+                <pose>20 -8.4 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cylinder/meshes/cylinder_1.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual1">
+              
+              <pose>20 -8.4 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cylinder/meshes/cylinder_1.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cylinder/materials/scripts</uri>
+                      <uri>model://cylinder/materials/textures</uri>
+                      <name>cylinderMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision2">
+                <pose>-4 13.7 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cylinder/meshes/cylinder_1.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual2">
+              
+              <pose>-4 13.7 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cylinder/meshes/cylinder_1.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cylinder/materials/scripts</uri>
+                      <uri>model://cylinder/materials/textures</uri>
+                      <name>cylinderMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision3">
+                <pose>-15 -8 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cylinder/meshes/cylinder_0_5.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual3">
+              
+              <pose>-15 -8 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cylinder/meshes/cylinder_0_5.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cylinder/materials/scripts</uri>
+                      <uri>model://cylinder/materials/textures</uri>
+                      <name>cylinderMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision4">
+                <pose>0 -13.6 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cylinder/meshes/cylinder_0_5.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual4">
+              
+              <pose>0 -13.6 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cylinder/meshes/cylinder_0_5.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cylinder/materials/scripts</uri>
+                      <uri>model://cylinder/materials/textures</uri>
+                      <name>cylinderMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision5">
+                <pose>18 6.3 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cylinder/meshes/cylinder_0_75.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual5">
+              
+              <pose>18 6.3 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cylinder/meshes/cylinder_0_75.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cylinder/materials/scripts</uri>
+                      <uri>model://cylinder/materials/textures</uri>
+                      <name>cylinderMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision6">
+                <pose>-15 5.5 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://cylinder/meshes/cylinder_0_75.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual6">
+              
+              <pose>-15 5.5 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://cylinder/meshes/cylinder_0_75.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://cylinder/materials/scripts</uri>
+                      <uri>model://cylinder/materials/textures</uri>
+                      <name>cylinderMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+        </link>        
+    </model>
+</sdf>
+

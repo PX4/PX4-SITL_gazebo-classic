@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="platform">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+                <pose>0 0 0.05 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>1 1 0.1</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="visual">
+              <pose>0 0 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://platform/meshes/platfotm_tr.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://platform/materials/scripts</uri>
+                      <uri>model://platform/materials/textures</uri>
+                      <name>platformMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+        </link>        
+    </model>
+</sdf>
+

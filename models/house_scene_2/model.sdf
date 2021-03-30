@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="house">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision_wall">
+                <pose>0 0 0.05 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://house_scene_2/meshes/scene_two.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual_walls">
+              <pose>0 0 0.05 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://house_scene_2/meshes/scene_two_house_new_doors_FIX.dae</uri>
+              </mesh>
+              </geometry>
+              <material>
+                  <script>
+                      <uri>model://house_scene_2/materials/scripts</uri>
+                      <uri>model://house_scene_2/materials/textures</uri>
+                      <name>houseMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+            
+            
+             <collision name="collision_flor">
+                <pose>0 0 0.05 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://house_scene_2/meshes/scene_two_house_wallpapers_flor.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual_flor">
+              <pose>0 0 0.05 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://house_scene_2/meshes/scene_two_house_wallpapers_flor.dae</uri>
+              </mesh>
+              </geometry>
+              <material>
+                  <script>
+                      <uri>model://house_scene_2/materials/scripts</uri>
+                      <uri>model://house_scene_2/materials/textures</uri>
+                      <name>houseMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+            
+        </link>        
+    </model>
+</sdf>
+

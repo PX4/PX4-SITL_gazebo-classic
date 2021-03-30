@@ -1,0 +1,18 @@
+material cylinderMat/Diffuse
+{
+ receive_sfadows off
+ technique
+ {
+  pass
+   {
+    texture_unit
+    {
+     texture cylinder_texture.png
+    }
+   }
+ 
+ }
+}
+
+
+ 

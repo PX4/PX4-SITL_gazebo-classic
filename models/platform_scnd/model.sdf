@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="platform_scnd">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://platform_scnd/meshes/platfotm_scnd_all.dae</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual">
+              <pose>0 0 0 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://platform_scnd/meshes/platfotm_scnd_all.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://platform_scnd/materials/scripts</uri>
+                      <uri>model://platform_scnd/materials/textures</uri>
+                      <name>platformscndMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+        </link>        
+    </model>
+</sdf>
+

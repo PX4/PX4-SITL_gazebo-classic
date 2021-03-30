@@ -1,0 +1,14 @@
+material cubeMat/Diffuse
+{
+ receive_sfadows off
+ technique
+ {
+  pass
+   {
+    texture_unit
+    {
+     texture cube_texture.png
+    }
+   }
+ }
+}

@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+    <model name="qr">
+        <static>true</static>
+        <link name="link">
+            <collision name="collision1">
+                <pose>-4 5.5 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual1">
+              
+              <pose>-4 5.5 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr2.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision2">
+                <pose>4 5.5 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+             <visual name="visual2">
+              
+              <pose>4 5.5 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr4.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision3">
+                <pose>4 0.6 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual3">
+              
+              <pose>4 0.6 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr5.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             
+             
+             <collision name="collision5">
+                <pose>0 -2 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual5">
+              
+              <pose>0 -2 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr6.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision6">
+                <pose>-5.5 -5.2 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual6">
+              
+              <pose>-5.5 -5.2 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr15.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision7">
+                <pose>-1.5 -5.2 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+             <visual name="visual7">
+              
+              <pose>-1.5 -5.2 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr14.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision8">
+                <pose>2.2 -5.2 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual8">
+              
+              <pose>2.2 -5.2 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr13.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+             
+             <collision name="collision9">
+                <pose>5.6 -5.2 0.27 0 0 0</pose>
+                <geometry>
+                    <mesh>
+                        <uri>model://qr_1/meshes/qr.stl</uri>
+                    </mesh>
+                </geometry>
+            </collision>
+            <visual name="visual9">
+              
+              <pose>5.6 -5.2 0.27 0 0 0</pose>
+              <geometry>
+              <mesh>
+                 <uri>model://qr_1/meshes/qr12.dae</uri>
+              </mesh>
+              </geometry>
+              
+              <material>
+                  <script>
+                      <uri>model://qr_1/materials/scripts</uri>
+                      <uri>model://qr_1/materials/textures</uri>
+                      <name>qrMat/Diffuse</name>
+                  </script>
+              </material>
+             </visual>
+        </link>        
+    </model>
+</sdf>
+
