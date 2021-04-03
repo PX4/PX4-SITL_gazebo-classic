@@ -1,4 +1,4 @@
-<!-- DO NOT EDIT: Generated from iris.sdf.jinja for use with HITL -->
+<!-- Generated from iris.sdf.jinja for use with HITL -->
 <sdf version='1.6'>
   <model name='iris'>
     <link name='base_link'>
