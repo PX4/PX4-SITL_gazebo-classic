@@ -87,7 +87,7 @@
     </joint>
     <include>
       <uri>model://airspeed</uri>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0 0 -1.57 0</pose>
       <name>airspeed</name>
     </include>
     <joint name='airspeed_joint' type='fixed'>
