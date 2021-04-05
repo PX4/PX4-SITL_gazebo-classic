@@ -1,4 +1,4 @@
-<sdf version='1.5'>
+<sdf version='1.6'>
   <model name='tailsitter'>
     <link name='base_link'>
       <pose>0 0 0.2 0 0 0</pose>
