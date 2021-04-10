@@ -381,12 +381,6 @@ void LiftDragPlugin::OnUpdate()
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
 
-#if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d cog = this->link->GetInertial()->CoG();
-#else
-  ignition::math::Vector3d cog = ignitionFromGazeboMath(this->link->GetInertial()->GetCoG());
-#endif
-
   // force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag;
 
