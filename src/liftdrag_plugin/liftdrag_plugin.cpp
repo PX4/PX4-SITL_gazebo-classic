@@ -44,7 +44,7 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.0), rho(1.2041)
   this->velocityStall = 0.0;
 
   // 90 deg stall
-  this->alphaStall = 0.5 * M_PI;
+  this->alphaStall = 0.5*M_PI;
   this->claStall = 0.0;
 
   this->radialSymmetry = false;
@@ -67,7 +67,7 @@ LiftDragPlugin::~LiftDragPlugin()
 
 /////////////////////////////////////////////////
 void LiftDragPlugin::Load(physics::ModelPtr _model,
-                          sdf::ElementPtr _sdf)
+                     sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "LiftDragPlugin _model pointer is NULL");
   GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");
@@ -113,8 +113,8 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("cma_stall"))
     this->cmaStall = _sdf->Get<double>("cma_stall");
 
-  if (_sdf->HasElement("cm_delta"))
-    this->cm_delta = _sdf->Get<double>("cm_delta");
+    if (_sdf->HasElement("cm_delta"))
+        this->cm_delta = _sdf->Get<double>("cm_delta");
 
   if (_sdf->HasElement("cp"))
     this->cp = _sdf->Get<ignition::math::Vector3d>("cp");
@@ -146,28 +146,27 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     if (!this->link)
     {
       gzerr << "Link with name[" << linkName << "] not found. "
-            << "The LiftDragPlugin will not generate forces\n";
+        << "The LiftDragPlugin will not generate forces\n";
     }
     else
     {
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&LiftDragPlugin::OnUpdate, this));
     }
-  }
 
+    
+  }
+  
   if (_sdf->HasElement("robotNamespace"))
   {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
-  }
-  else
-  {
+  } else {
     gzerr << "[gazebo_liftdrag_plugin] Please specify a robotNamespace.\n";
   }
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  if (_sdf->HasElement("windSubTopic"))
-  {
+  if (_sdf->HasElement("windSubTopic")){
     this->wind_sub_topic_ = _sdf->Get<std::string>("windSubTopic");
     wind_sub_ = node_handle_->Subscribe("~/" + wind_sub_topic_, &LiftDragPlugin::WindVelocityCallback, this);
   }
@@ -202,7 +201,7 @@ void LiftDragPlugin::OnUpdate()
   if (vel.Length() <= 0.01)
     return;
 
-    // pose of body
+  // pose of body
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d pose = this->link->WorldPose();
 #else
@@ -212,8 +211,7 @@ void LiftDragPlugin::OnUpdate()
   // rotate forward and upward vectors into inertial frame
   ignition::math::Vector3d forwardI = pose.Rot().RotateVector(this->forward);
 
-  if (forwardI.Dot(vel) <= 0.0)
-  {
+  if (forwardI.Dot(vel) <= 0.0){
     // Only calculate lift or drag if the wind relative velocity is in the same direction
     return;
   }
@@ -258,7 +256,7 @@ void LiftDragPlugin::OnUpdate()
   //
   // so,
   // removing spanwise velocity from vel
-  ignition::math::Vector3d velInLDPlane = vel - vel.Dot(spanwiseI) * spanwiseI;
+  ignition::math::Vector3d velInLDPlane = vel - vel.Dot(spanwiseI)*spanwiseI;
 
   // get direction of drag
   ignition::math::Vector3d dragDirection = -velInLDPlane;
@@ -301,16 +299,16 @@ void LiftDragPlugin::OnUpdate()
   if (this->alpha > this->alphaStall)
   {
     cl = (this->cla * this->alphaStall +
-          this->claStall * (this->alpha - this->alphaStall)) *
-         cosSweepAngle;
+          this->claStall * (this->alpha - this->alphaStall))
+         * cosSweepAngle;
     // make sure cl is still great than 0
     cl = std::max(0.0, cl);
   }
   else if (this->alpha < -this->alphaStall)
   {
     cl = (-this->cla * this->alphaStall +
-          this->claStall * (this->alpha + this->alphaStall)) *
-         cosSweepAngle;
+          this->claStall * (this->alpha + this->alphaStall))
+         * cosSweepAngle;
     // make sure cl is still less than 0
     cl = std::min(0.0, cl);
   }
@@ -338,14 +336,14 @@ void LiftDragPlugin::OnUpdate()
   if (this->alpha > this->alphaStall)
   {
     cd = (this->cda * this->alphaStall +
-          this->cdaStall * (this->alpha - this->alphaStall)) *
-         cosSweepAngle;
+          this->cdaStall * (this->alpha - this->alphaStall))
+         * cosSweepAngle;
   }
   else if (this->alpha < -this->alphaStall)
   {
     cd = (-this->cda * this->alphaStall +
-          this->cdaStall * (this->alpha + this->alphaStall)) *
-         cosSweepAngle;
+          this->cdaStall * (this->alpha + this->alphaStall))
+         * cosSweepAngle;
   }
   else
     cd = (this->cda * this->alpha) * cosSweepAngle;
@@ -361,16 +359,16 @@ void LiftDragPlugin::OnUpdate()
   if (this->alpha > this->alphaStall)
   {
     cm = (this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha - this->alphaStall)) *
-         cosSweepAngle;
+          this->cmaStall * (this->alpha - this->alphaStall))
+         * cosSweepAngle;
     // make sure cm is still great than 0
     cm = std::max(0.0, cm);
   }
   else if (this->alpha < -this->alphaStall)
   {
     cm = (-this->cma * this->alphaStall +
-          this->cmaStall * (this->alpha + this->alphaStall)) *
-         cosSweepAngle;
+          this->cmaStall * (this->alpha + this->alphaStall))
+         * cosSweepAngle;
     // make sure cm is still less than 0
     cm = std::min(0.0, cm);
   }
@@ -382,6 +380,12 @@ void LiftDragPlugin::OnUpdate()
 
   // compute moment (torque) at cp
   ignition::math::Vector3d moment = cm * q * this->area * momentDirection;
+
+#if GAZEBO_MAJOR_VERSION >= 9
+  ignition::math::Vector3d cog = this->link->GetInertial()->CoG();
+#else
+  ignition::math::Vector3d cog = ignitionFromGazeboMath(this->link->GetInertial()->GetCoG());
+#endif
 
   // force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag;
@@ -427,9 +431,8 @@ void LiftDragPlugin::OnUpdate()
   this->link->AddTorque(moment);
 }
 
-void LiftDragPlugin::WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg)
-{
+void LiftDragPlugin::WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg) {
   wind_vel_ = ignition::math::Vector3d(msg->velocity().x(),
-                                       msg->velocity().y(),
-                                       msg->velocity().z());
+            msg->velocity().y(),
+            msg->velocity().z());
 }
