@@ -198,7 +198,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
     gzerr << "Aliasing on motor [" << motor_number_ << "] might occur. Consider making smaller simulation time steps or raising the rotor_velocity_slowdown_sim_ param.\n";
   }
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
-  double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
+  double force = turning_direction_ * real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
   if(!reversible_) {
     // Not allowed to have negative thrust.
     force = std::abs(force);
