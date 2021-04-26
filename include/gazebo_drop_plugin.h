@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2020 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2021 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,26 +31,21 @@
  *
  ****************************************************************************/
 /**
- * @brief Airspeed Plugin
+ * @brief Drop Plugin
  *
- * This plugin publishes Airspeed sensor data
+ * This plugin simulates dropping a payload
  *
- * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ * @author Jaeyoung Lim <jalim@ethz.ch>
  */
 
-#ifndef _GAZEBO_AIRSPEED_PLUGIN_HH_
-#define _GAZEBO_AIRSPEED_PLUGIN_HH_
+#ifndef _GAZEBO_DROP_PLUGIN_HH_
+#define _GAZEBO_DROP_PLUGIN_HH_
 
 #include <math.h>
-#include <cstdio>
-#include <cstdlib>
-#include <queue>
-#include <random>
-
-#include <sdf/sdf.hh>
 #include <common.h>
-#include <random>
+#include <sdf/sdf.hh>
 
+#include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/util/system.hh>
@@ -58,58 +53,53 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
 #include <ignition/math.hh>
+#include "CommandMotorSpeed.pb.h"
 
-#include <gazebo/sensors/SensorTypes.hh>
-#include <gazebo/sensors/Sensor.hh>
 
-#include <Airspeed.pb.h>
-#include <Wind.pb.h>
+#include <Odometry.pb.h>
 
 namespace gazebo
 {
 
-typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
+typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 
-class GAZEBO_VISIBLE AirspeedPlugin : public SensorPlugin
+
+class GAZEBO_VISIBLE DropPlugin : public ModelPlugin
 {
 public:
-  AirspeedPlugin();
-  virtual ~AirspeedPlugin();
+  DropPlugin();
+  virtual ~DropPlugin();
 
-protected:
-  virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
-  virtual void OnUpdate(const common::UpdateInfo&);
-  virtual void OnSensorUpdate();
+  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void OnUpdate(const common::UpdateInfo&);
+  physics::ModelPtr GetModelPtr(std::string model_name);
 
 private:
-  void WindVelocityCallback(WindPtr& msg);
+  /// \brief Loads the package model
+  void LoadPackage();
 
+  /// \brief Callback for subscribing to motor commands
+   /// \param rot_velocities Motor command velocity commanded from firmware
+  void VelocityCallback(CommandMotorSpeedPtr &rot_velocities);
+
+
+  std::string namespace_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
-  physics::LinkPtr link_;
-  sensors::SensorPtr parentSensor_;
+  event::ConnectionPtr update_connection_;
+
+  bool package_spawned = false;  ///< Check if the package has already been spawned in the world
+  double max_rot_velocity_ = 3500;   ///< Clip maximum motor velocity
+  double ref_motor_rot_vel_ = 0;     ///< Reference motor velocity 
+  double release_rot_vel_ = 300; ///< Motor velocity command to release the package
+  int motor_number_;
+
+  std::string trigger_sub_topic_ = "/gazebo/command/motor_speed"; ///< Parachute trigger signal topic
+  std::string model_name_ = "parachute_package";
 
   transport::NodePtr node_handle_;
-  transport::SubscriberPtr wind_sub_;
-  transport::PublisherPtr airspeed_pub_;
-  event::ConnectionPtr updateConnection_;
-  event::ConnectionPtr updateSensorConnection_;
+  transport::SubscriberPtr trigger_sub_;
 
-  common::Time last_time_;
-  std::string namespace_;
-  std::string link_name_;
-  std::string model_name_;
-  std::string airspeed_topic_;
-
-  ignition::math::Vector3d wind_vel_;
-  ignition::math::Vector3d vel_a_;
-
-  std::default_random_engine random_generator_;
-  std::normal_distribution<float> standard_normal_distribution_;
-
-  float diff_pressure_stddev_;
-  float temperature_;
-
-};     // class GAZEBO_VISIBLE AirspeedPlugin
+};     // class GAZEBO_VISIBLE DropPlugin
 }      // namespace gazebo
-#endif // _GAZEBO_AIRSPEED_PLUGIN_HH_
+#endif // _GAZEBO_DROP_PLUGIN_HH_

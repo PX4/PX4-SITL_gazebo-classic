@@ -74,9 +74,10 @@
 #include "msgbuffer.h"
 
 //! Default distance sensor model joint naming
-static const std::regex kDefaultLidarModelJointNaming(".*(lidar|sf10a)(.*_joint)");
-static const std::regex kDefaultSonarModelJointNaming(".*(sonar|mb1240-xl-ez4)(.*_joint)");
-static const std::regex kDefaultGPSModelJointNaming(".*(gps|ublox-neo-7M)(.*_joint)");
+static const std::regex kDefaultLidarModelNaming(".*(lidar|sf10a)(.*)");
+static const std::regex kDefaultSonarModelNaming(".*(sonar|mb1240-xl-ez4)(.*)");
+static const std::regex kDefaultGPSModelNaming(".*(gps|ublox-neo-7M)(.*)");
+static const std::regex kDefaultAirspeedModelJointNaming(".*(airspeed)(.*_joint)");
 
 namespace gazebo {
 
@@ -109,7 +110,6 @@ static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
 static const std::string kDefaultIRLockTopic = "/camera/link/irlock";
 static const std::string kDefaultVisionTopic = "/vision_odom";
 static const std::string kDefaultMagTopic = "/mag";
-static const std::string kDefaultAirspeedTopic = "/airspeed";
 static const std::string kDefaultBarometerTopic = "/baro";
 static const std::string kDefaultWindTopic = "/world_wind";
 static const std::string kDefaultGroundtruthTopic = "/groundtruth";
@@ -176,11 +176,11 @@ private:
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg, const int& id);
   void SonarCallback(SonarPtr& sonar_msg, const int& id);
+  void AirspeedCallback(AirspeedPtr& airspeed_msg, const int& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);
   void MagnetometerCallback(MagnetometerPtr& mag_msg);
-  void AirspeedCallback(AirspeedPtr& airspeed_msg);
   void BarometerCallback(BarometerPtr& baro_msg);
   void WindVelocityCallback(WindPtr& msg);
   void SendSensorMessages();
@@ -210,7 +210,7 @@ private:
   template <typename GazeboMsgT>
   void CreateSensorSubscription(
       void (GazeboMavlinkInterface::*fp)(const boost::shared_ptr<GazeboMsgT const>&, const int&),
-      GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, const std::regex& model);
+      GazeboMavlinkInterface* ptr, const physics::Joint_V& joints, physics::ModelPtr& nested_model, const std::regex& model);
 
   static const unsigned n_out_max = 16;
 
@@ -229,7 +229,6 @@ private:
   transport::SubscriberPtr groundtruth_sub_{nullptr};
   transport::SubscriberPtr vision_sub_{nullptr};
   transport::SubscriberPtr mag_sub_{nullptr};
-  transport::SubscriberPtr airspeed_sub_{nullptr};
   transport::SubscriberPtr baro_sub_{nullptr};
   transport::SubscriberPtr wind_sub_{nullptr};
 
@@ -241,7 +240,6 @@ private:
   std::string groundtruth_sub_topic_{kDefaultGroundtruthTopic};
   std::string vision_sub_topic_{kDefaultVisionTopic};
   std::string mag_sub_topic_{kDefaultMagTopic};
-  std::string airspeed_sub_topic_{kDefaultAirspeedTopic};
   std::string baro_sub_topic_{kDefaultBarometerTopic};
   std::string wind_sub_topic_{kDefaultWindTopic};
 
@@ -252,10 +250,6 @@ private:
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
 
-  bool mag_updated_{false};
-  bool baro_updated_{false};
-  bool diff_press_updated_{false};
-
   double groundtruth_lat_rad_{0.0};
   double groundtruth_lon_rad_{0.0};
   double groundtruth_altitude_{0.0};
@@ -263,17 +257,12 @@ private:
   double imu_update_interval_{0.004}; ///< Used for non-lockstep
 
   ignition::math::Vector3d velocity_prev_W_;
-  ignition::math::Vector3d mag_n_;
   ignition::math::Vector3d wind_vel_;
-
-  double temperature_{25.0};
-  double pressure_alt_{0.0};
-  double abs_pressure_{0.0};
 
   bool close_conn_{false};
 
   double optflow_distance_{0.0};
-  double diff_pressure_{0.0};
+  double sonar_distance;
 
   bool enable_lockstep_{false};
   double speed_factor_{1.0};

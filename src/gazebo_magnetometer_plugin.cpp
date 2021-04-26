@@ -194,17 +194,27 @@ void MagnetometerPlugin::OnUpdate(const common::UpdateInfo&)
     float X = H * cosf(declination_rad);
     float Y = H * sinf(declination_rad);
 
+    ignition::math::Vector3d magnetic_field_I(X, Y, Z);
+
+#if GAZEBO_MAJOR_VERSION >= 9
+    ignition::math::Pose3d T_W_I = model_->WorldPose();
+#else
+    ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(model_->GetWorldPose());
+#endif
+    ignition::math::Quaterniond q_body_to_world = q_ENU_to_NED * T_W_I.Rot() * q_FLU_to_FRD.Inverse();
+
+    ignition::math::Vector3d magnetic_field_B = q_body_to_world.RotateVectorReverse(magnetic_field_I);
     // Magnetometer noise
-    Eigen::Vector3d magnetic_field_I(X, Y, Z);
-    addNoise(&magnetic_field_I, dt);
+    Eigen::Vector3d measured_mag(magnetic_field_B.X(), magnetic_field_B.Y(), magnetic_field_B.Z());
+    addNoise(&measured_mag, dt);
 
     // Fill magnetometer messgae
     mag_message_.set_time_usec(current_time.Double() * 1e6);
 
     gazebo::msgs::Vector3d* magnetic_field = new gazebo::msgs::Vector3d();
-    magnetic_field->set_x(magnetic_field_I[0]);
-    magnetic_field->set_y(magnetic_field_I[1]);
-    magnetic_field->set_z(magnetic_field_I[2]);
+    magnetic_field->set_x(measured_mag[0]);
+    magnetic_field->set_y(measured_mag[1]);
+    magnetic_field->set_z(measured_mag[2]);
     mag_message_.set_allocated_magnetic_field(magnetic_field);
 
     last_pub_time_ = current_time;

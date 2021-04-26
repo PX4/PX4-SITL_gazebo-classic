@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <boost/algorithm/string.hpp>
 #include <common.h>
+#include <ignition/math/Rand.hh>
 
 using namespace gazebo;
 using namespace std;
@@ -68,6 +69,11 @@ void LidarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   else
     gzwarn << "[gazebo_lidar_plugin] Please specify a robotNamespace.\n";
 
+  if (_sdf->HasElement("simulate_fog")) {
+    simulate_fog_ = _sdf->GetElement("simulate_fog")->Get<bool>();
+  } else {
+    simulate_fog_ = false;
+  }
   // get minimum distance
   if (_sdf->HasElement("min_distance")) {
     min_distance_ = _sdf->GetElement("min_distance")->Get<double>();
@@ -152,11 +158,15 @@ void LidarPlugin::OnNewLaserScans()
   double current_distance = parentSensor_->Range(0);
 
   // set distance to min/max if actual value is smaller/bigger
-  if (current_distance < min_distance_ || std::isinf(current_distance)) {
+  if (simulate_fog_ && current_distance > 2.0f) {
+    double whiteNoise = ignition::math::Rand::DblNormal(0.0f, 0.1f);
+    current_distance = 2.0f + whiteNoise;
+  } else if (current_distance < min_distance_ || std::isinf(current_distance)) {
     current_distance = min_distance_;
   } else if (current_distance > max_distance_) {
     current_distance = max_distance_;
   }
+
 
   lidar_message_.set_current_distance(current_distance);
   lidar_message_.set_h_fov(kDefaultFOV);

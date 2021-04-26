@@ -77,13 +77,13 @@ void MavlinkInterface::Load()
 
   if (serial_enabled_) {
     // Set up serial interface
-	  io_service_.post(std::bind(&MavlinkInterface::do_read, this));
+	  io_service_.post(std::bind(&MavlinkInterface::do_serial_read, this));
 
     // run io_service for async io
     io_thread_ = std::thread([this] () {
     	io_service_.run();
     });
-    open();
+    open_serial();
 
   } else {
     memset((char *)&remote_simulator_addr_, 0, sizeof(remote_simulator_addr_));
@@ -189,6 +189,158 @@ void MavlinkInterface::Load()
       fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
     }
   }
+  // hil_data_.resize(1);
+}
+
+void MavlinkInterface::SendSensorMessages(const int &time_usec) {
+  for (auto& data : hil_data_) {
+    if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated) {
+      SendSensorMessages(time_usec, data);
+    }
+  }
+}
+
+void MavlinkInterface::SendSensorMessages(const int &time_usec, HILData &hil_data) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+
+  HILData* data = &hil_data;
+  mavlink_hil_sensor_t sensor_msg;
+  sensor_msg.id = data->id;
+  sensor_msg.time_usec = time_usec;
+  if (data->imu_updated) {
+    sensor_msg.xacc = data->accel_b[0];
+    sensor_msg.yacc = data->accel_b[1];
+    sensor_msg.zacc = data->accel_b[2];
+    sensor_msg.xgyro = data->gyro_b[0];
+    sensor_msg.ygyro = data->gyro_b[1];
+    sensor_msg.zgyro = data->gyro_b[2];
+    // std::cout <<data->gyro_b[2] << std::endl;
+
+    sensor_msg.fields_updated = (uint16_t)SensorSource::ACCEL | (uint16_t)SensorSource::GYRO;
+
+    data->imu_updated = false;
+  }
+
+  // send only mag data
+  if (data->mag_updated) {
+    sensor_msg.xmag = data->mag_b[0];
+    sensor_msg.ymag = data->mag_b[1];
+    sensor_msg.zmag = data->mag_b[2];
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::MAG;
+
+    data->mag_updated = false;
+  }
+
+  // send only baro data
+  if (data->baro_updated) {
+    sensor_msg.temperature = data->temperature;
+    sensor_msg.abs_pressure = data->abs_pressure;
+    sensor_msg.pressure_alt = data->pressure_alt;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::BARO;
+
+    data->baro_updated = false;
+  }
+
+  // send only diff pressure data
+  if (data->diff_press_updated) {
+    sensor_msg.diff_pressure = data->diff_pressure;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::DIFF_PRESS;
+
+    data->diff_press_updated = false;
+  }
+
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+    send_mavlink_message(&msg);
+  }
+}
+
+void MavlinkInterface::SendGpsMessages(const SensorData::Gps &data) {
+  // fill HIL GPS Mavlink msg
+  mavlink_hil_gps_t hil_gps_msg;
+  hil_gps_msg.time_usec = data.time_utc_usec;
+  hil_gps_msg.fix_type = data.fix_type;
+  hil_gps_msg.lat = data.latitude_deg;
+  hil_gps_msg.lon = data.longitude_deg;
+  hil_gps_msg.alt = data.altitude;
+  hil_gps_msg.eph = data.eph;
+  hil_gps_msg.epv = data.epv;
+  hil_gps_msg.vel = data.velocity;
+  hil_gps_msg.vn = data.velocity_north;
+  hil_gps_msg.ve = data.velocity_east;
+  hil_gps_msg.vd = data.velocity_down;
+  hil_gps_msg.cog = data.cog;
+  hil_gps_msg.satellites_visible = data.satellites_visible;
+  hil_gps_msg.id = data.id;
+
+  // send HIL_GPS Mavlink msg
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
+    send_mavlink_message(&msg);
+  }
+}
+
+void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data, int id) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.temperature = data.temperature;
+      instance.abs_pressure = data.abs_pressure;
+      instance.pressure_alt = data.pressure_alt;
+      instance.baro_updated = true;
+      return;
+    }
+  }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
+}
+
+void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.diff_pressure = data.diff_pressure;
+      instance.diff_press_updated = true;
+      return;
+    }
+  }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
+}
+
+void MavlinkInterface::UpdateIMU(const SensorData::Imu &data, int id) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.accel_b = data.accel_b;
+      instance.gyro_b = data.gyro_b;
+      instance.imu_updated = true;
+      return;
+    }
+  }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
+}
+
+void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data, int id) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.mag_b = data.mag_b;
+      instance.mag_updated = true;
+      return;
+    }
+  }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
+}
+
+void MavlinkInterface::RegisterNewHILSensorInstance(int id) {
+  HILData new_instance;
+  new_instance.id = id;
+  hil_data_.push_back(new_instance);
 }
 
 void MavlinkInterface::pollForMAVLinkMessages()
@@ -392,7 +544,7 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
 
   if (serial_enabled_) {
 
-    if (!is_open()) {
+    if (!is_serial_open()) {
       std::cerr << "Serial port closed! \n";
       return;
     }
@@ -405,7 +557,7 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
       }
       tx_q_.emplace_back(message);
     }
-    io_service_.post(std::bind(&MavlinkInterface::do_write, this, true));
+    io_service_.post(std::bind(&MavlinkInterface::do_serial_write, this, true));
 
   } else {
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
@@ -449,7 +601,7 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
   }
 }
 
-void MavlinkInterface::open() {
+void MavlinkInterface::open_serial() {
   try{
     serial_dev_.open(device_);
     serial_dev_.set_option(boost::asio::serial_port_base::baud_rate(baudrate_));
@@ -471,7 +623,7 @@ void MavlinkInterface::close()
     ::close(sdk_socket_fd_);
 
     std::lock_guard<std::recursive_mutex> lock(mutex_);
-    if (!is_open())
+    if (!is_serial_open())
       return;
 
     io_service_.stop();
@@ -491,7 +643,7 @@ void MavlinkInterface::close()
   }
 }
 
-void MavlinkInterface::do_write(bool check_tx_state){
+void MavlinkInterface::do_serial_write(bool check_tx_state){
   if (check_tx_state && tx_in_progress_)
     return;
 
@@ -524,7 +676,7 @@ void MavlinkInterface::do_write(bool check_tx_state){
     }
 
     if (!tx_q_.empty()) {
-      do_write(false);
+      do_serial_write(false);
     }
     else {
       tx_in_progress_ = false;
@@ -532,16 +684,16 @@ void MavlinkInterface::do_write(bool check_tx_state){
   });
 }
 
-void MavlinkInterface::do_read(void)
+void MavlinkInterface::do_serial_read(void)
 {
   serial_dev_.async_read_some(boost::asio::buffer(rx_buf_), boost::bind(
-      &MavlinkInterface::parse_buffer, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred
+      &MavlinkInterface::parse_serial_buffer, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred
       )
   );
 }
 
 // Based on MAVConnInterface::parse_buffer in MAVROS
-void MavlinkInterface::parse_buffer(const boost::system::error_code& err, std::size_t bytes_t){
+void MavlinkInterface::parse_serial_buffer(const boost::system::error_code& err, std::size_t bytes_t){
   mavlink_status_t status;
   mavlink_message_t message;
   uint8_t *buf = this->rx_buf_.data();
@@ -571,7 +723,7 @@ void MavlinkInterface::parse_buffer(const boost::system::error_code& err, std::s
       handle_message(&message);
     }
   }
-  do_read();
+  do_serial_read();
 }
 
 void MavlinkInterface::onSigInt() {

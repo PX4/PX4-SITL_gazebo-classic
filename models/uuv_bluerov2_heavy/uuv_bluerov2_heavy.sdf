@@ -31,6 +31,21 @@
 
         </link>
 
+
+<!-- GPS for getting the local pose -->
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <parent>base_link</parent>
+      <child>gps::link</child>
+    </joint>
+
+
+
+<!-- Start of Thrusters  -->
         <link name="thruster1">
             <pose>0.14 -0.10 0 0 1.570796 0.78539815</pose>
             <inertial>
@@ -202,7 +217,7 @@
             <timeConstantDown>0.025</timeConstantDown>
             <maxRotVelocity>1100</maxRotVelocity>
             <motorConstant>-10</motorConstant>
-            <momentConstant>0.01</momentConstant>
+            <momentConstant>-0.01</momentConstant>
             <rotorDragCoefficient>0</rotorDragCoefficient>
             <rollingMomentCoefficient>0</rollingMomentCoefficient>
             <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -262,7 +277,7 @@
             <timeConstantDown>0.025</timeConstantDown>
             <maxRotVelocity>1100</maxRotVelocity>
             <motorConstant>-10</motorConstant>
-            <momentConstant>0.01</momentConstant>
+            <momentConstant>-0.01</momentConstant>
             <rotorDragCoefficient>0</rotorDragCoefficient>
             <rollingMomentCoefficient>0</rollingMomentCoefficient>
             <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -382,7 +397,7 @@
             <timeConstantDown>0.025</timeConstantDown>
             <maxRotVelocity>1100</maxRotVelocity>
             <motorConstant>-10</motorConstant>
-            <momentConstant>0.01</momentConstant>
+            <momentConstant>-0.01</momentConstant>
             <rotorDragCoefficient>0</rotorDragCoefficient>
             <rollingMomentCoefficient>0</rollingMomentCoefficient>
             <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -443,7 +458,7 @@
             <timeConstantDown>0.025</timeConstantDown>
             <maxRotVelocity>1100</maxRotVelocity>
             <motorConstant>-10</motorConstant>
-            <momentConstant>0.01</momentConstant>
+            <momentConstant>-0.01</momentConstant>
             <rotorDragCoefficient>0</rotorDragCoefficient>
             <rollingMomentCoefficient>0</rollingMomentCoefficient>
             <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
@@ -561,8 +576,8 @@
             <hil_mode>false</hil_mode>
             <hil_state_level>false</hil_state_level>
             <vehicle_is_tailsitter>false</vehicle_is_tailsitter>
-            <send_vision_estimation>true</send_vision_estimation>
-            <send_odometry>false</send_odometry>
+            <send_vision_estimation>0</send_vision_estimation>
+            <send_odometry>0</send_odometry>
             <enable_lockstep>true</enable_lockstep>
             <use_tcp>true</use_tcp>
             <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>

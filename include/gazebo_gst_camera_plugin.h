@@ -65,8 +65,12 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
   float rate;
   protected: std::string format;
 
-  protected: std::string udpHost;
-  protected: int udpPort;
+  protected:
+    std::string udpHost;
+    int udpPort;
+    bool useRtmp;
+    std::string rtmpLocation;
+    bool useCuda;
 
   protected: sensors::CameraSensorPtr parentSensor;
   protected: rendering::CameraPtr camera;

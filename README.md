@@ -1,37 +1,20 @@
-# Gazebo for MAVLink SITL and HITL
+# PX4 Gazebo Plugin Suite for MAVLink SITL and HITL
 
 [![Build Status](https://github.com/PX4/sitl_gazebo/workflows/Build%20Tests/badge.svg)](https://github.com/PX4/sitl_gazebo/actions?query=workflow%3A%22Build+Tests%22) [![MacOS Build Tests](https://github.com/PX4/sitl_gazebo/workflows/MacOS%20Build%20Tests/badge.svg)](https://github.com/PX4/sitl_gazebo/actions?query=workflow%3A%22MacOS+Build+Tests%22) 
 
-This is a flight simulator for multirotors, VTOL and fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. This repository is in the process of being re-integrated into RotorS, which then will support ROS and MAVLink as transport options: https://github.com/ethz-asl/rotors_simulator.
+This is a flight simulator for rovers, boats, multirotors, VTOL, fixed wing. It uses the motor model and other pieces from the RotorS simulator, but in contrast to RotorS has no dependency on ROS. Original project: https://github.com/ethz-asl/rotors_simulator.
 
 **If you use this simulator in academic work, please cite RotorS as per the README in the above link.**
 
 
-## Installation (Gazebo 9)
+# Installation
 
-Follow instructions on the [official site](http://gazebosim.org/tutorials?cat=install) to install Gazebo.
+This simulator is designed to be used with the PX4 Autopilot. Please follow the official developer toolchain installation instructions:
+http://docs.px4.io/master/en/simulation/gazebo.html
 
-### Ubuntu
+# Contributing and Testing
 
-```bash
-sudo apt-get install gazebo9 libgazebo9-dev
-```
-
-### Mac OS
-
-```bash
-brew tap osrf/simulation
-brew install gazebo9
-```
-
-### Arch Linux
-
-```bash
-sudo packer -S gazebo
-# or
-yaourt -S gazebo
-```
-
+Please refer to the installations instructions above for normal usage and to get the development environment installed. This section covers specifics for developers interested to contribute to the simulator.
 
 ## *sitl_gazebo* plugin dependencies
 
@@ -40,45 +23,6 @@ Some plugins on this packages require some specific dependencies:
 * Protobuf is required to generate custom protobuf messages to be published and subscribed between topics of different plugins;
 * Jinja 2 is used to generate some SDF models from templates;
 * Gstreamer is required for a plugin that streams video from a simulated camera.
-
-
-### Ubuntu 
-
-```bash
-sudo apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler libeigen3-dev libxml2-utils python-rospkg python-jinja2
-```
-
-#### Gstreamer:
-```
-sudo apt-get install libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly -y
-```
-
-
-### Mac OS
-
-```bash
-pip install rospkg jinja2
-brew tap homebrew/versions
-brew install eigen graphviz libxml2 sdformat3 opencv glib
-brew install homebrew/versions/protobuf260
-```
-
-#### Gstreamer:
-```
-brew install gstreamer gst-plugins-base gst-plugins-good
-```
-
-### Arch Linux
-
-```bash
-sudo pacman -S --noconfirm --needed eigen3 hdf5 opencv protobuf vtk yay python2-jinja
-```
-
-#### Gstreamer:
-```bash
-sudo pacman -S --needed gstreamer gst-plugins-bad gst-plugins-base gst-plugins-base-libs gst-plugins-good gst-plugins-ugly
-```
-
 
 ## Build *sitl_gazebo*
 
@@ -129,15 +73,6 @@ You also need to add the the root location of this repository, e.g. add the foll
 # Set path to sitl_gazebo repository
 export SITL_GAZEBO_PATH=$HOME/src/sitl_gazebo
 ```
-
-
-### Geotagging Plugin
-If you want to use the geotagging plugin, make sure you have `exiftool` installed on your system. On Ubuntu it can be installed with:
-
-```
-sudo apt-get install libimage-exiftool-perl
-```
-
 
 ## Install
 
@@ -192,6 +127,34 @@ make install
 
 When writing test it’s important to be careful which API functions of Gazebo are called. As no Gazebo server is running during the tests some functions can produce undefined behaviour (e.g. segfaults).
 
+## CUDA Hardware Accelerated H264 encoding (optional)
+
+1. Download CUDA 10.0 from https://developer.nvidia.com/cuda-toolkit-archive.
+2. Download Video Codec SDK 9.0 from https://developer.nvidia.com/video-codec-sdk-archive.
+3. Install both archives:
+
+```bash
+wget https://raw.githubusercontent.com/jackersson/env-setup/master/gst-nvidia-docker/install_video_codec_sdk.sh
+chmod +x install_video_codec_sdk.sh
+sudo ./install_video_codec_sdk.sh
+sudo dpkg -i cuda-repo-ubuntu*.deb
+sudo apt-key add /var/cuda-repo-<version>/7fa2af80.pub
+sudo apt-get update
+sudo apt-get install cuda
+```
+
+4. Reboot your system and run the command `nvidia-smi` to verify the successul installation of CUDA.
+5. Install GStreamer 1.18.3:
+
+```bash
+git clone https://github.com/GStreamer/gst-build -b 1.18.3
+cd gst-build
+meson -Dbuildtype=release -Dstrip=true -Dgst-plugins-bad:introspection=enabled -Dgst-plugins-bad:nvcodec=enabled builddir
+ninja -C builddir
+sudo meson install -C builddir
+```
+
+6. Add `<useCuda>true</useCuda>` to any `gazebo_gst_camera_plugin` in a SDF file. For example `./models/fpv_cam/fpv_cam.sdf`.
 
 #### *catkin tools*
 
@@ -199,7 +162,7 @@ With *catkin*, the unit tests are enabled by default.
 
 ```bash
 # After setting up the catkin workspace
-catkin build -j4 -l4 -DBUILD_ROS_INTERFACE=ON
+catkin build -j4 -l4 -DBUILD_ROS_PLUGINS=ON
 cd build/mavlink_sitl_gazebo/
 catkin run_tests
 ```

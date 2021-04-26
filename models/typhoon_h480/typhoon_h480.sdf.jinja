@@ -244,8 +244,8 @@
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
-          <lower>-1e16</lower>
-          <upper>1e16</upper>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
         </limit>
@@ -404,14 +404,18 @@
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
             <udpHost>127.0.0.1</udpHost>
-            <udpPort>5600</udpPort>
+            <udpPort>{{ gst_udp_port }}</udpPort>
         </plugin>
-        <plugin name="GeotaggedImagesPlugin" filename="libgazebo_geotagged_images_plugin.so">
+        <plugin name="CameraManagerPlugin" filename="libgazebo_camera_manager_plugin.so">
             <robotNamespace>typhoon_h480</robotNamespace>
             <interval>1</interval>
             <width>3840</width>
             <height>2160</height>
             <maximum_zoom>8.0</maximum_zoom>
+            <video_uri>{{ video_uri }}</video_uri>
+            <system_id>{{ mavlink_id }}</system_id>
+            <cam_component_id>{{ cam_component_id }}</cam_component_id>
+            <mavlink_cam_udp_port>{{ mavlink_cam_udp_port }}</mavlink_cam_udp_port>
         </plugin>
       </sensor>
     </link>
@@ -422,8 +426,8 @@
       <axis>
         <xyz>0 -1 0</xyz>
         <limit>
-          <lower>-2.09</lower>
-          <upper>2.09</upper>
+          <lower>-1.5708</lower>
+          <upper>0.7854</upper>
           <effort>100</effort>
           <velocity>-1</velocity>
         </limit>
@@ -1433,8 +1437,8 @@
       <control_gimbal_channels>
         <channel>
           <joint_control_pid>
-            <p>0.6</p>
-            <i>0.1</i>
+            <p>0.4</p>
+            <i>0.05</i>
             <d>0.02</d>
             <iMax>0</iMax>
             <iMin>0</iMin>
@@ -1457,9 +1461,9 @@
         </channel>
         <channel>
           <joint_control_pid>
-            <p>2.068</p>
+            <p>0.3</p>
             <i>0.01245</i>
-            <d>0.01</d>
+            <d>0.015</d>
             <iMax>0</iMax>
             <iMin>0</iMin>
             <cmdMax>0.3</cmdMax>

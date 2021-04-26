@@ -1,3 +1,4 @@
+<!-- DO NOT EDIT: Generated from depth_camera.sdf.jinja -->
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <model name="depth_camera">
@@ -24,6 +25,38 @@
         </geometry>
       </visual>
       <sensor name="depth_camera" type="depth">
+        {% if ros_version == 2 %}
+        <always_on>0</always_on>
+        <update_rate>20</update_rate>
+        <camera name="camera_name">
+          <horizontal_fov>1.02974</horizontal_fov>
+          <image>
+            <format>R8G8B8</format>
+            <width>64</width>
+            <height>48</height>
+          </image>
+          <clip>
+            <near>0.5</near>
+            <far>18</far>
+          </clip>
+          <distortion>
+            <k1>0.0</k1>
+            <k2>0.0</k2>
+            <k3>0.0</k3>
+            <p1>0.0</p1>
+            <p2>0.0</p2>
+            <center>0.5 0.5</center>
+          </distortion>
+        </camera>
+
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <camera_name>camera</camera_name>
+          <frame_name>camera_link</frame_name>
+          <hack_baseline>0.07</hack_baseline>
+          <min_depth>0.1</min_depth>
+          <max_depth>12</max_depth>
+        </plugin>
+        {% else %}
         <update_rate>20</update_rate>
         <camera>
           <horizontal_fov>1.02974</horizontal_fov>
@@ -55,6 +88,7 @@
           <distortion_t1>0.0</distortion_t1>
           <distortion_t2>0.0</distortion_t2>
         </plugin>
+        {% endif %}
       </sensor>
     </link>
   </model>

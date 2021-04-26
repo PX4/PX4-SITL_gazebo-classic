@@ -1,6 +1,7 @@
+<?xml version="1.0"?>
 <!-- DO NOT EDIT: Generated from standard_vtol.sdf.jinja -->
 <sdf version='1.5'>
-  <model name='tiltrotor'>
+  <model name='standard_vtol'>
     <pose>0 0 0.246 0 0 0</pose>
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
@@ -8,16 +9,16 @@
         <pose>0 0 0 0 0 0</pose>
         <mass>5</mass>
         <inertia>
-          <ixx>0.197563</ixx>
+          <ixx>0.477708333333</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.1458929</iyy>
+          <iyy>0.341666666667</iyy>
           <iyz>0</iyz>
-          <izz>0.1477</izz>
+          <izz>0.811041666667</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>-0.01 0 -0.08 0 0 0</pose>
+        <pose>0 0 -0.07 0 0 0</pose>
         <geometry>
           <box>
             <size>0.55 2.144 0.05</size>
@@ -42,7 +43,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://tiltrotor/meshes/x8_wing.dae</uri>
+            <uri>model://standard_vtol/meshes/x8_wing.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -80,85 +81,53 @@
           </script>
         </material>
       </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-    <link name='tiltrotor/imu_link'>
-      <pose>0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
-        <inertia>
-          <ixx>1e-05</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1e-05</iyy>
-          <iyz>0</iyz>
-          <izz>1e-05</izz>
-        </inertia>
-      </inertial>
-    </link>
-    <joint name='tiltrotor/imu_joint' type='revolute'>
-      <child>tiltrotor/imu_link</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>1 0 0</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0</upper>
-          <effort>0</effort>
-          <velocity>0</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-    <include>
-      <uri>model://airspeed</uri>
-      <pose>0 0 0 0 0 0</pose>
-      <name>airspeed</name>
-    </include>
-    <joint name='airspeed_joint' type='fixed'>
-      <child>airspeed::link</child>
-      <parent>base_link</parent>
-    </joint>
-    <link name='motor_0'>
-      <pose>0.35 -0.35 0.02 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>0.0166704</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.0167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='motor_0_collision'>
-        <pose>0 0 0 0 0 0</pose>
+      <visual name='m0'>
+        <pose>-0.35 0.35 0.045 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.035</length>
             <radius>0.02</radius>
           </cylinder>
         </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='motor_0_visual'>
-        <pose>0 0 0 0 0 0</pose>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m1'>
+        <pose>-0.35 -0.35 0.045 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.035</length>
+            <radius>0.02</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m2'>
+        <pose>0.35 -0.35 0.045 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.035</length>
+            <radius>0.02</radius>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='m3'>
+        <pose>0.35 0.35 0.045 0 0 0</pose>
         <geometry>
           <cylinder>
             <length>0.035</length>
@@ -176,26 +145,72 @@
       <velocity_decay/>
       <self_collide>0</self_collide>
     </link>
-
-    <joint name='motor_0_joint' type='revolute'>
-      <child>motor_0</child>
+    <link name='standard_vtol/imu_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='standard_vtol/imu_joint' type='revolute'>
+      <child>standard_vtol/imu_link</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0 1 0</xyz>
+        <xyz>1 0 0</xyz>
         <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
         </limit>
         <dynamics>
-          <friction>1.0</friction>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
-
+    <link name='standard_vtol/airspeed_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='standard_vtol/airspeed_joint' type='revolute'>
+      <child>standard_vtol/airspeed_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
     <link name='rotor_0'>
       <pose>0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
@@ -232,7 +247,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://tiltrotor/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://standard_vtol/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -248,7 +263,7 @@
     </link>
     <joint name='rotor_0_joint' type='revolute'>
       <child>rotor_0</child>
-      <parent>motor_0</parent>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -262,77 +277,6 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
-
-    <link name='motor_1'>
-      <pose>-0.35 0.35 0.02 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>0.0166704</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.0167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='motor_1_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='motor_1_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/DarkGrey</name>
-            <uri>__default__</uri>
-          </script>
-        </material>
-      </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-
-    <joint name='motor_1_joint' type='revolute'>
-      <child>motor_1</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
-        </limit>
-        <dynamics>
-          <friction>1.0</friction>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-
     <link name='rotor_1'>
       <pose>-0.35 0.35 0.07 0 0 0</pose>
       <inertial>
@@ -369,12 +313,12 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://tiltrotor/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://standard_vtol/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
           <script>
-            <name>Gazebo/DarkGrey</name>
+            <name>Gazebo/Blue</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -385,7 +329,7 @@
     </link>
     <joint name='rotor_1_joint' type='revolute'>
       <child>rotor_1</child>
-      <parent>motor_1</parent>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -399,79 +343,6 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
-
-
-    <link name='motor_2'>
-      <pose>0.35 0.35 0.02 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>0.0166704</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.0167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='motor_2_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='motor_2_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/DarkGrey</name>
-            <uri>__default__</uri>
-          </script>
-        </material>
-      </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-
-    <joint name='motor_2_joint' type='revolute'>
-      <child>motor_2</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
-        </limit>
-        <dynamics>
-          <friction>1.0</friction>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-
-
     <link name='rotor_2'>
       <pose>0.35 0.35 0.07 0 0 0</pose>
       <inertial>
@@ -508,12 +379,12 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://tiltrotor/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://standard_vtol/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
           <script>
-            <name>Gazebo/DarkGrey</name>
+            <name>Gazebo/Blue</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -524,7 +395,7 @@
     </link>
     <joint name='rotor_2_joint' type='revolute'>
       <child>rotor_2</child>
-      <parent>motor_2</parent>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -538,77 +409,6 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
-<link name='motor_3'>
-       <pose>-0.35 -0.35 0.02 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>0.0166704</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.0167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='motor_3_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='motor_3_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/DarkGrey</name>
-            <uri>__default__</uri>
-          </script>
-        </material>
-      </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-
-    <joint name='motor_3_joint' type='revolute'>
-      <child>motor_3</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
-        </limit>
-        <dynamics>
-          <friction>1.0</friction>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-
-
     <link name='rotor_3'>
       <pose>-0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
@@ -645,12 +445,12 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://tiltrotor/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://standard_vtol/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
           <script>
-            <name>Gazebo/DarkGrey</name>
+            <name>Gazebo/Blue</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -661,9 +461,76 @@
     </link>
     <joint name='rotor_3_joint' type='revolute'>
       <child>rotor_3</child>
-      <parent>motor_3</parent>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <link name='rotor_puller'>
+      <pose>-0.22 0 0.0 0 1.57 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_puller_collision'>
+        <pose>0.0 0 -0.04 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.005</length>
+            <radius>0.06</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_puller_visual'>
+        <pose>0 0 -0.04 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.8 0.8 0.8</scale>
+            <uri>model://standard_vtol/meshes/iris_prop_ccw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+    <joint name='rotor_puller_joint' type='revolute'>
+      <child>rotor_puller</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
         <limit>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -694,7 +561,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://tiltrotor/meshes/x8_elevon_left.dae</uri>
+            <uri>model://standard_vtol/meshes/x8_elevon_left.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -723,7 +590,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://tiltrotor/meshes/x8_elevon_right.dae</uri>
+            <uri>model://standard_vtol/meshes/x8_elevon_right.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -855,8 +722,8 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name="left_wing" filename="libLiftDragPlugin.so">
-      <a0>0.05984281113</a0>
+    <plugin name="left_wing_lift" filename="libLiftDragPlugin.so">
+      <alpha0>0.05984281113</alpha0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -865,7 +732,7 @@
       <cda_stall>-0.9233984055</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>-0.05 0.3 0.05</cp>
-      <area>0.5</area>
+      <area>0.50</area>
       <air_density>1.2041</air_density>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
@@ -873,12 +740,12 @@
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
+      <cl_delta>-1.0</cl_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="right_wing" filename="libLiftDragPlugin.so">
-      <a0>0.05984281113</a0>
+    <plugin name="right_wing_lift" filename="libLiftDragPlugin.so">
+      <alpha0>0.05984281113</alpha0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -887,7 +754,7 @@
       <cda_stall>-0.9233984055</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>-0.05 -0.3 0.05</cp>
-      <area>0.5</area>
+      <area>0.50</area>
       <air_density>1.2041</air_density>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
@@ -895,12 +762,12 @@
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-1.0</control_joint_rad_to_cl>
+      <cl_delta>-1.0</cl_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="elevator" filename="libLiftDragPlugin.so">
-      <a0>-0.2</a0>
+    <plugin name="elevator_lift" filename="libLiftDragPlugin.so">
+      <alpha0>-0.2</alpha0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -917,15 +784,15 @@
       <control_joint_name>
         elevator_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-12.0</control_joint_rad_to_cl>
+      <cl_delta>-12.0</cl_delta>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="rudder" filename="libLiftDragPlugin.so">
-      <a0>0.0</a0>
+    <plugin name="rudder_lift" filename="libLiftDragPlugin.so">
+      <alpha0>0.0</alpha0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
-      <cma>0.0</cma>
+      <cma>0.0.</cma>
       <alpha_stall>0.3391428111</alpha_stall>
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
@@ -951,7 +818,7 @@
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>0</motorNumber>
-      <rotorDragCoefficient>0.0000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -968,7 +835,7 @@
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>1</motorNumber>
-      <rotorDragCoefficient>0.0000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -985,7 +852,7 @@
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>2</motorNumber>
-      <rotorDragCoefficient>0.0000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
@@ -1002,14 +869,31 @@
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>3</motorNumber>
-      <rotorDragCoefficient>0.0000806428</rotorDragCoefficient>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
     </plugin>
+    <plugin name='puller_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace></robotNamespace>
+      <jointName>rotor_puller_joint</jointName>
+      <linkName>rotor_puller</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>3500</maxRotVelocity>
+      <motorConstant>8.54858e-06</motorConstant>
+      <momentConstant>0.01</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>4</motorNumber>
+      <rotorDragCoefficient>0.000106428</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
+    </plugin>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
-      <linkName>tiltrotor/imu_link</linkName>
+      <linkName>standard_vtol/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
       <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
       <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
@@ -1036,6 +920,15 @@
       <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
+    <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+      <robotNamespace/>
+      <linkName>standard_vtol/airspeed_link</linkName>
+    </plugin>
+    <plugin name='drop_plugin' filename='libgazebo_drop_plugin.so'>
+      <robotNamespace/>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>9</motorNumber>
+    </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
@@ -1044,14 +937,14 @@
       <mavlink_addr>INADDR_ANY</mavlink_addr>
       <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
       <mavlink_udp_port>{{ mavlink_udp_port }}</mavlink_udp_port>
-      <serialEnabled>false</serialEnabled>
-      <serialDevice>/dev/ttyACM0</serialDevice>
-      <baudRate>921600</baudRate>
+      <serialEnabled>{{ serial_enabled }}</serialEnabled>
+      <serialDevice>{{ serial_device }}</serialDevice>
+      <baudRate>{{ serial_baudrate }}</baudRate>
       <qgc_addr>INADDR_ANY</qgc_addr>
       <qgc_udp_port>14550</qgc_udp_port>
       <sdk_addr>INADDR_ANY</sdk_addr>
       <sdk_udp_port>14540</sdk_udp_port>
-      <hil_mode>false</hil_mode>
+      <hil_mode>{{ hil_mode }}</hil_mode>
       <hil_state_level>false</hil_state_level>
       <enable_lockstep>true</enable_lockstep>
       <use_tcp>true</use_tcp>
@@ -1093,84 +986,17 @@
           <joint_control_type>velocity</joint_control_type>
           <joint_name>rotor_3_joint</joint_name>
         </channel>
-        <channel name="motor0_tilt">
+        <channel name="rotor4">
           <input_index>4</input_index>
-          <input_offset>0.785398</input_offset>
-          <input_scaling>0.785398</input_scaling>
+          <input_offset>0</input_offset>
+          <input_scaling>5500</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
-          <joint_name>motor_0_joint</joint_name>
-           <joint_control_pid>
-            <p>10</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0.0</iMax>
-            <iMin>0.0</iMin>
-            <cmdMax>2</cmdMax>
-            <cmdMin>-2</cmdMin>
-            <errMax>0.2</errMax>
-          </joint_control_pid>
-        </channel>
-        <channel name="motor1_tilt">
-          <input_index>5</input_index>
-          <input_offset>0.785398</input_offset>
-          <input_scaling>0.785398</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
-          <joint_name>motor_1_joint</joint_name>
-           <joint_control_pid>
-            <p>10</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0.0</iMax>
-            <iMin>0.0</iMin>
-            <cmdMax>2</cmdMax>
-            <cmdMin>-2</cmdMin>
-            <errMax>0.2</errMax>
-          </joint_control_pid>
-        </channel>
-        <channel name="motor2_tilt">
-          <input_index>6</input_index>
-          <input_offset>0.785398</input_offset>
-          <input_scaling>0.785398</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
-          <joint_name>motor_2_joint</joint_name>
-           <joint_control_pid>
-            <p>10</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0.0</iMax>
-            <iMin>0.0</iMin>
-            <cmdMax>2</cmdMax>
-            <cmdMin>-2</cmdMin>
-            <errMax>0.2</errMax>
-          </joint_control_pid>
-        </channel>
-        <channel name="motor3_tilt">
-          <input_index>7</input_index>
-          <input_offset>0.785398</input_offset>
-          <input_scaling>0.785398</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
-          <joint_name>motor_3_joint</joint_name>
-           <joint_control_pid>
-            <p>10</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0.0</iMax>
-            <iMin>0.0</iMin>
-            <cmdMax>2</cmdMax>
-            <cmdMin>-2</cmdMin>
-            <errMax>0.2</errMax>
-          </joint_control_pid>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rotor_puller_joint</joint_name>
         </channel>
         <channel name="left_elevon">
-          <input_index>8</input_index>
+          <input_index>5</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -1179,7 +1005,7 @@
           <joint_name>left_elevon_joint</joint_name>
         </channel>
         <channel name="right_elevon">
-          <input_index>9</input_index>
+          <input_index>6</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
@@ -1188,13 +1014,29 @@
           <joint_name>right_elevon_joint</joint_name>
         </channel>
         <channel name="elevator">
-          <input_index>10</input_index>
+          <input_index>7</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
           <zero_position_disarmed>0</zero_position_disarmed>
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position_kinematic</joint_control_type>
           <joint_name>elevator_joint</joint_name>
+        </channel>
+        <channel name='aux1'>
+          <input_index>8</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1000</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='aux2'>
+          <input_index>9</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1000</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>100</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
         </channel>
       </control_channels>
     </plugin>

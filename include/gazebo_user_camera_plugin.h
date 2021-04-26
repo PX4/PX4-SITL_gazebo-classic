@@ -31,85 +31,44 @@
  *
  ****************************************************************************/
 /**
- * @brief Airspeed Plugin
+ * @brief User Camera Plugin
  *
- * This plugin publishes Airspeed sensor data
+ * This plugin controls the camera view in gzclient
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
  */
 
-#ifndef _GAZEBO_AIRSPEED_PLUGIN_HH_
-#define _GAZEBO_AIRSPEED_PLUGIN_HH_
+#ifndef _USER_CAMERA_PLUGIN_H_
+#define _USER_CAMERA_PLUGIN_H_
 
-#include <math.h>
-#include <cstdio>
-#include <cstdlib>
-#include <queue>
-#include <random>
-
-#include <sdf/sdf.hh>
-#include <common.h>
-#include <random>
-
+#include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/gazebo.hh>
-#include <gazebo/util/system.hh>
+#include <gazebo/gui/GuiPlugin.hh>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+#   if GAZEBO_MAJOR_VERSION >= 9
 #include <gazebo/transport/transport.hh>
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/physics/physics.hh>
-#include <ignition/math.hh>
-
-#include <gazebo/sensors/SensorTypes.hh>
-#include <gazebo/sensors/Sensor.hh>
-
-#include <Airspeed.pb.h>
-#include <Wind.pb.h>
+#   else
+#include <gazebo/transport/transport.hh>
+#include <gazebo/gui/gui.hh>
+#   endif
+#endif
 
 namespace gazebo
 {
+    class GAZEBO_VISIBLE UserCameraPlugin : public GUIPlugin
+    {
+      Q_OBJECT
 
-typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
+      public: 
+        UserCameraPlugin();
+        virtual ~UserCameraPlugin();
 
-class GAZEBO_VISIBLE AirspeedPlugin : public SensorPlugin
-{
-public:
-  AirspeedPlugin();
-  virtual ~AirspeedPlugin();
+      private:
+        void OnUpdate();
 
-protected:
-  virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
-  virtual void OnUpdate(const common::UpdateInfo&);
-  virtual void OnSensorUpdate();
-
-private:
-  void WindVelocityCallback(WindPtr& msg);
-
-  physics::ModelPtr model_;
-  physics::WorldPtr world_;
-  physics::LinkPtr link_;
-  sensors::SensorPtr parentSensor_;
-
-  transport::NodePtr node_handle_;
-  transport::SubscriberPtr wind_sub_;
-  transport::PublisherPtr airspeed_pub_;
-  event::ConnectionPtr updateConnection_;
-  event::ConnectionPtr updateSensorConnection_;
-
-  common::Time last_time_;
-  std::string namespace_;
-  std::string link_name_;
-  std::string model_name_;
-  std::string airspeed_topic_;
-
-  ignition::math::Vector3d wind_vel_;
-  ignition::math::Vector3d vel_a_;
-
-  std::default_random_engine random_generator_;
-  std::normal_distribution<float> standard_normal_distribution_;
-
-  float diff_pressure_stddev_;
-  float temperature_;
-
-};     // class GAZEBO_VISIBLE AirspeedPlugin
-}      // namespace gazebo
-#endif // _GAZEBO_AIRSPEED_PLUGIN_HH_
+        transport::NodePtr node;
+        event::ConnectionPtr update_connection_;
+        std::string model_name_{""};
+    };
+}
+#endif
