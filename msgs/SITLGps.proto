@@ -3,8 +3,8 @@ package sensor_msgs.msgs;
 
 message SITLGps
 {
-  required int64  time_usec             = 1;
-  optional int64  time_utc_usec         = 2;
+  required uint64  time_usec            = 1;
+  optional uint64  time_utc_usec        = 2;
   required double latitude_deg          = 3;
   required double longitude_deg         = 4;
   required double altitude              = 5;

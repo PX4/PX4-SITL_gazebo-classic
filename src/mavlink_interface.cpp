@@ -192,7 +192,7 @@ void MavlinkInterface::Load()
   // hil_data_.resize(1);
 }
 
-void MavlinkInterface::SendSensorMessages(const int &time_usec) {
+void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
   for (auto& data : hil_data_) {
     if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated) {
       SendSensorMessages(time_usec, data);
@@ -200,7 +200,7 @@ void MavlinkInterface::SendSensorMessages(const int &time_usec) {
   }
 }
 
-void MavlinkInterface::SendSensorMessages(const int &time_usec, HILData &hil_data) {
+void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
 
   HILData* data = &hil_data;

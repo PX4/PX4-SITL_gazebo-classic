@@ -681,9 +681,9 @@ void GazeboMavlinkInterface::SendSensorMessages()
   }
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  int time_usec = std::round(world_->SimTime().Double() * 1e6);
+  uint64_t time_usec = std::llround(world_->SimTime().Double() * 1e6);
 #else
-  int time_usec = std::round(world_->GetSimTime().Double() * 1e6);
+  uint64_t time_usec = std::llround(world_->GetSimTime().Double() * 1e6);
 #endif
 
   // send always accel and gyro data (not dependent of the bitmask)
