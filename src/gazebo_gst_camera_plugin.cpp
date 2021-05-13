@@ -22,6 +22,7 @@
 
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "gazebo_gst_camera_plugin.h"
+#include <gst/app/gstappsrc.h>
 
 #include <math.h>
 #include <string>
@@ -39,38 +40,6 @@ using namespace cv;
 GZ_REGISTER_SENSOR_PLUGIN(GstCameraPlugin)
 
 
-static void cb_need_data(GstElement *appsrc, guint unused_size, gpointer user_data) {
-  GstCameraPlugin *plugin = (GstCameraPlugin*)user_data;
-  plugin->gstCallback(appsrc);
-}
-
-void GstCameraPlugin::gstCallback(GstElement *appsrc) {
-
-  frameBufferMutex.lock();
-
-  while (!frameBuffer) {
-	/* can happen if not initialized yet */
-    frameBufferMutex.unlock();
-    usleep(10000);
-    frameBufferMutex.lock();
-  }
-
-  GST_BUFFER_PTS(frameBuffer) = gstTimestamp;
-  GST_BUFFER_DURATION(frameBuffer) = gst_util_uint64_scale_int (1, GST_SECOND, (int)rate);
-  gstTimestamp += GST_BUFFER_DURATION(frameBuffer);
-
-  GstFlowReturn ret;
-  g_signal_emit_by_name(appsrc, "push-buffer", frameBuffer, &ret);
-
-  frameBufferMutex.unlock();
-
-  if (ret != GST_FLOW_OK) {
-    /* something wrong, stop pushing */
-    gzerr << "g_signal_emit_by_name failed" << endl;
-    g_main_loop_quit(mainLoop);
-  }
-}
-
 static void* start_thread(void* param) {
   GstCameraPlugin* plugin = (GstCameraPlugin*)param;
   plugin->startGstThread();
@@ -79,114 +48,103 @@ static void* start_thread(void* param) {
 
 /////////////////////////////////////////////////
 void GstCameraPlugin::startGstThread() {
+  gst_init(nullptr, nullptr);
 
-  gst_init(0, 0);
-
-  mainLoop = g_main_loop_new(NULL, FALSE);
-  if (!mainLoop) {
+  this->gst_loop = g_main_loop_new(nullptr, FALSE);
+  if (!this->gst_loop) {
     gzerr << "Create loop failed. \n";
     return;
   }
 
-  GstElement* pipeline = gst_pipeline_new("sender");
+  GstElement* pipeline = gst_pipeline_new(nullptr);
   if (!pipeline) {
     gzerr << "ERR: Create pipeline failed. \n";
     return;
   }
 
-  GstElement* dataSrc = gst_element_factory_make("appsrc", "AppSrc");
-  GstElement* testSrc = gst_element_factory_make("videotestsrc", "FileSrc");
-  GstElement* conv  = gst_element_factory_make("videoconvert", "Convert");
+  GstElement* source = gst_element_factory_make("appsrc", nullptr);
+  GstElement* queue = gst_element_factory_make("queue", nullptr);
+  GstElement* converter  = gst_element_factory_make("videoconvert", nullptr);
 
   GstElement* encoder;
   if (useCuda) {
-    encoder = gst_element_factory_make("nvh264enc", "AvcEncoder");
-    g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
-    g_object_set(G_OBJECT(encoder), "preset", 1, NULL); //lower = faster, 6=medium
+    encoder = gst_element_factory_make("nvh264enc", nullptr);
+    g_object_set(G_OBJECT(encoder), "bitrate", 800, "preset", 1, nullptr);
   } else {
-    encoder = gst_element_factory_make("x264enc", "AvcEncoder");
-    g_object_set(G_OBJECT(encoder), "bitrate", 800, NULL);
-    g_object_set(G_OBJECT(encoder), "speed-preset", 2, NULL); //lower = faster, 6=medium
-    //g_object_set(G_OBJECT(encoder), "tune", "zerolatency", NULL);
-    //g_object_set(G_OBJECT(encoder), "low-latency", 1, NULL);
-    //g_object_set(G_OBJECT(encoder), "control-rate", 2, NULL);
-  }
-  GstElement* parser  = gst_element_factory_make("h264parse", "Parser");
-  GstElement* payload;
-  GstElement* sink;
- 
-  if (useRtmp) {
-    g_object_set(G_OBJECT(parser), "config-interval", 1, NULL);
-    payload = gst_element_factory_make("flvmux", "FLVMux");
-    sink = gst_element_factory_make("rtmpsink", "RtmpSink");
-    g_object_set(G_OBJECT(sink), "location", this->rtmpLocation.c_str(), NULL);
-  } else {
-    payload = gst_element_factory_make("rtph264pay", "PayLoad");
-    g_object_set(G_OBJECT(payload), "config-interval", 1, NULL);
-    sink  = gst_element_factory_make("udpsink", "UdpSink");
-    g_object_set(G_OBJECT(sink), "host", this->udpHost.c_str(), NULL);
-    g_object_set(G_OBJECT(sink), "port", this->udpPort, NULL);
-    //g_object_set(G_OBJECT(sink), "sync", false, NULL);
-    //g_object_set(G_OBJECT(sink), "async", false, NULL);
+    encoder = gst_element_factory_make("x264enc", nullptr);
+    g_object_set(G_OBJECT(encoder), "bitrate", 800, "speed-preset", 6, "tune", 4, "key-int-max", 10, nullptr);
   }
 
-  if (!dataSrc || !testSrc || !conv || !encoder || !parser || !payload || !sink) {
+  GstElement* payloader;
+  GstElement* sink;
+
+  if (useRtmp) {
+    payloader = gst_element_factory_make("flvmux", nullptr);
+    sink = gst_element_factory_make("rtmpsink", nullptr);
+    g_object_set(G_OBJECT(sink), "location", this->rtmpLocation.c_str(), nullptr);
+  } else {
+    payloader = gst_element_factory_make("rtph264pay", nullptr);
+    sink  = gst_element_factory_make("udpsink", nullptr);
+    g_object_set(G_OBJECT(sink), "host", this->udpHost.c_str(), "port", this->udpPort, nullptr);
+  }
+
+  if (!source || !queue || !converter || !encoder || !payloader || !sink) {
     gzerr << "ERR: Create elements failed. \n";
     return;
   }
 
-// gzerr <<"width"<< this->width<<"\n";
-// gzerr <<"height"<< this->height<<"\n";
-// gzerr <<"rate"<< this->rate<<"\n";
+  // gzerr <<"width"<< this->width<<"\n";
+  // gzerr <<"height"<< this->height<<"\n";
+  // gzerr <<"rate"<< this->rate<<"\n";
 
-  // Config src
-  g_object_set(G_OBJECT(dataSrc), "caps",
+  // Configure source element
+  g_object_set(G_OBJECT(source), "caps",
       gst_caps_new_simple ("video/x-raw",
-      "format", G_TYPE_STRING, "I420",
-      "width", G_TYPE_INT, this->width,
-      "height", G_TYPE_INT, this->height,
-      "framerate", GST_TYPE_FRACTION, (unsigned int)this->rate, 1,
-      NULL),
+        "format", G_TYPE_STRING, "I420",
+        "width", G_TYPE_INT, this->width,
+        "height", G_TYPE_INT, this->height,
+        "framerate", GST_TYPE_FRACTION, (unsigned int)this->rate, 1, nullptr),
       "is-live", TRUE,
-      NULL);
+      "do-timestamp", TRUE,
+      "stream-type", GST_APP_STREAM_TYPE_STREAM,
+      "format", GST_FORMAT_TIME, nullptr);
 
   // Connect all elements to pipeline
-  gst_bin_add_many(GST_BIN(pipeline), dataSrc, conv, encoder, parser, payload, sink, NULL);
+  gst_bin_add_many(GST_BIN(pipeline), source, queue, converter, encoder, payloader, sink, nullptr);
 
   // Link all elements
-  if (gst_element_link_many(dataSrc, conv, encoder, parser, payload, sink, NULL) != TRUE) {
+  if (gst_element_link_many(source, queue, converter, encoder, payloader, sink, nullptr) != TRUE) {
     gzerr << "ERR: Link all the elements failed. \n";
     return;
   }
 
-  // Set up appsrc
-  g_object_set(G_OBJECT(dataSrc), "stream-type", 0, "format", GST_FORMAT_TIME, NULL);
-  g_signal_connect(dataSrc, "need-data", G_CALLBACK(cb_need_data), this);
+  this->source = source;
+  gst_object_ref(this->source);
 
   // Start
   gst_element_set_state(pipeline, GST_STATE_PLAYING);
-  g_main_loop_run(mainLoop);
+  g_main_loop_run(this->gst_loop);
 
   // Clean up
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(GST_OBJECT(pipeline));
-  g_main_loop_unref(mainLoop);
-  mainLoop = nullptr;
-
+  gst_object_unref(this->source);
+  g_main_loop_unref(this->gst_loop);
+  this->gst_loop = nullptr;
+  this->source = nullptr;
 }
 
 /////////////////////////////////////////////////
 void GstCameraPlugin::stopGstThread()
 {
-  if(mainLoop)
-    g_main_loop_quit(mainLoop);
-
+  if(this->gst_loop) {
+    g_main_loop_quit(this->gst_loop);
+  }
 }
 
 /////////////////////////////////////////////////
 GstCameraPlugin::GstCameraPlugin()
-: SensorPlugin(), width(0), height(0), depth(0), frameBuffer(nullptr), mainLoop(nullptr),
-  gstTimestamp(0), mIsActive(false)
+: SensorPlugin(), width(0), height(0), depth(0), gst_loop(nullptr), source(nullptr), mIsActive(false)
 {
 }
 
@@ -195,13 +153,8 @@ GstCameraPlugin::~GstCameraPlugin()
 {
   this->parentSensor.reset();
   this->camera.reset();
-  if (mainLoop) {
-    g_main_loop_quit(mainLoop);
-  }
-  std::lock_guard<std::mutex> guard(frameBufferMutex);
-  if (frameBuffer) {
-	  gst_buffer_unref(frameBuffer);
-	  frameBuffer = nullptr;
+  if (this->gst_loop) {
+    g_main_loop_quit(this->gst_loop);
   }
 }
 
@@ -268,7 +221,7 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
   if (sdf->HasElement("udpHost")) {
     this->udpHost = sdf->GetElement("udpHost")->Get<string>();
   }
-	
+
   this->udpPort = 5600;
   if (sdf->HasElement("udpPort")) {
     this->udpPort = sdf->GetElement("udpPort")->Get<int>();
@@ -356,28 +309,36 @@ void GstCameraPlugin::OnNewFrame(const unsigned char * image,
   image = this->camera->GetImageData(0);
 #endif
 
-  std::lock_guard<std::mutex> guard(frameBufferMutex);
+  // Alloc buffer
+  const guint size = width * height * 1.5;
+  GstBuffer* buffer = gst_buffer_new_allocate(NULL, size, NULL);
 
-  if (frameBuffer) {
-    gst_buffer_unref(frameBuffer);
+  if (!buffer) {
+    gzerr << "gst_buffer_new_allocate failed" << endl;
+    return;
   }
 
-  // Alloc buffer
-  guint size = width * height * 1.5;
-  frameBuffer = gst_buffer_new_allocate(NULL, size, NULL);
+  GstMapInfo map;
 
-  GstMapInfo mapInfo;
-  if (gst_buffer_map(frameBuffer, &mapInfo, GST_MAP_WRITE)) {
+  if (!gst_buffer_map(buffer, &map, GST_MAP_WRITE)) {
+    gzerr << "gst_buffer_map failed" << endl;
+    return;
+  }
 
-    // Color Conversion from RGB to YUV
-    Mat frame = Mat(height, width, CV_8UC3);
-    Mat frameYUV = Mat(height, width, CV_8UC3);
-    frame.data = (uchar*)image;
-    cvtColor(frame, frameYUV, COLOR_RGB2YUV_I420);
+  // Color Conversion from RGB to YUV
+  Mat frame = Mat(height, width, CV_8UC3);
+  Mat frameYUV = Mat(height, width, CV_8UC3);
+  frame.data = (uchar*)image;
 
-    memcpy(mapInfo.data, frameYUV.data, size);
-    gst_buffer_unmap(frameBuffer, &mapInfo);
-  } else {
-	  gzerr << "gst_buffer_map failed"<<endl;
+  cvtColor(frame, frameYUV, COLOR_RGB2YUV_I420);
+  memcpy(map.data, frameYUV.data, size);
+  gst_buffer_unmap(buffer, &map);
+
+  GstFlowReturn ret = gst_app_src_push_buffer(GST_APP_SRC(this->source), buffer);
+
+  if (ret != GST_FLOW_OK) {
+    /* something wrong, stop pushing */
+    gzerr << "gst_app_src_push_buffer failed" << endl;
+    g_main_loop_quit(this->gst_loop);
   }
 }
