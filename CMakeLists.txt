@@ -213,6 +213,7 @@ link_libraries(
 if (GSTREAMER_FOUND)
   link_libraries(
     ${GSTREAMER_LIBRARIES}
+    gstapp-1.0
     ${GLIB_LDFLAGS}
     gobject-2.0
   )
