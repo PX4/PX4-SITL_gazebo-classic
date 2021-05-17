@@ -360,7 +360,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <link name="left_elevon">
+    <link name="left_elevon_link">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -374,7 +374,7 @@
         <pose>0 0.3 -0.3 0.00 0 0.0</pose>
       </inertial>
     </link>
-    <link name="right_elevon">
+    <link name="right_elevon_link">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -404,7 +404,7 @@
     </link>
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
-      <child>left_elevon</child>
+      <child>left_elevon_link</child>
       <pose>0 0.3 -0.25 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
@@ -425,7 +425,7 @@
     </joint>
     <joint name='right_elevon_joint' type='revolute'>
       <parent>base_link</parent>
-      <child>right_elevon</child>
+      <child>right_elevon_link</child>
       <pose>0 -0.3 -0.25 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
