@@ -388,7 +388,7 @@
         <pose>0 -0.3 -0.3 0.00 0 0.0</pose>
       </inertial>
     </link>
-    <link name="rudder">
+    <link name="rudder_link">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -446,7 +446,7 @@
     </joint>
     <joint name='rudder_joint' type='revolute'>
       <parent>base_link</parent>
-      <child>rudder</child>
+      <child>rudder_link</child>
       <pose>0 0 -0.5 0.00 0 0.0</pose>
       <axis>
         <xyz>1 0 0</xyz>
@@ -697,7 +697,7 @@
           <joint_control_type>velocity</joint_control_type>
           <joint_name>rotor_3_joint</joint_name>
         </channel>
-        <channel name="left_elevon">
+        <channel name="left_elevon_channel">
           <input_index>5</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
@@ -706,7 +706,7 @@
           <joint_control_type>position_kinematic</joint_control_type>
           <joint_name>left_elevon_joint</joint_name>
         </channel>
-        <channel name="right_elevon">
+        <channel name="right_elevon_channel">
           <input_index>6</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
