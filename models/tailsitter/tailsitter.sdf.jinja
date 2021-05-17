@@ -360,7 +360,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <link name="left_elevon">
+    <link name="left_elevon_link">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -374,7 +374,7 @@
         <pose>0 0.3 -0.3 0.00 0 0.0</pose>
       </inertial>
     </link>
-    <link name="right_elevon">
+    <link name="right_elevon_link">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -388,7 +388,7 @@
         <pose>0 -0.3 -0.3 0.00 0 0.0</pose>
       </inertial>
     </link>
-    <link name="rudder">
+    <link name="rudder_link">
       <inertial>
         <mass>0.00000001</mass>
         <inertia>
@@ -404,7 +404,7 @@
     </link>
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
-      <child>left_elevon</child>
+      <child>left_elevon_link</child>
       <pose>0 0.3 -0.25 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
@@ -425,7 +425,7 @@
     </joint>
     <joint name='right_elevon_joint' type='revolute'>
       <parent>base_link</parent>
-      <child>right_elevon</child>
+      <child>right_elevon_link</child>
       <pose>0 -0.3 -0.25 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
@@ -446,7 +446,7 @@
     </joint>
     <joint name='rudder_joint' type='revolute'>
       <parent>base_link</parent>
-      <child>rudder</child>
+      <child>rudder_link</child>
       <pose>0 0 -0.5 0.00 0 0.0</pose>
       <axis>
         <xyz>1 0 0</xyz>
@@ -520,7 +520,7 @@
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-    <plugin name="rudder" filename="libLiftDragPlugin.so">
+    <plugin name="rudder_plugin" filename="libLiftDragPlugin.so">
       <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -661,7 +661,7 @@
       <use_tcp>true</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
-        <channel name="rotor0">
+        <channel name="rotor_0_channel">
           <input_index>0</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1200</input_scaling>
@@ -670,7 +670,7 @@
           <joint_control_type>velocity</joint_control_type>
           <joint_name>rotor_0_joint</joint_name>
         </channel>
-        <channel name="rotor1">
+        <channel name="rotor_1_channel">
           <input_index>1</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1200</input_scaling>
@@ -679,7 +679,7 @@
           <joint_control_type>velocity</joint_control_type>
           <joint_name>rotor_1_joint</joint_name>
         </channel>
-        <channel name="rotor2">
+        <channel name="rotor_2_channel">
           <input_index>2</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1200</input_scaling>
@@ -688,7 +688,7 @@
           <joint_control_type>velocity</joint_control_type>
           <joint_name>rotor_2_joint</joint_name>
         </channel>
-        <channel name="rotor3">
+        <channel name="rotor_3_channel">
           <input_index>3</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1200</input_scaling>
@@ -697,7 +697,7 @@
           <joint_control_type>velocity</joint_control_type>
           <joint_name>rotor_3_joint</joint_name>
         </channel>
-        <channel name="left_elevon">
+        <channel name="left_elevon_channel">
           <input_index>5</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
@@ -706,7 +706,7 @@
           <joint_control_type>position_kinematic</joint_control_type>
           <joint_name>left_elevon_joint</joint_name>
         </channel>
-        <channel name="right_elevon">
+        <channel name="right_elevon_channel">
           <input_index>6</input_index>
           <input_offset>0</input_offset>
           <input_scaling>1</input_scaling>
