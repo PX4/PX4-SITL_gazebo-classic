@@ -23,24 +23,19 @@ jobs:
         brew update;
         git clone -b release-1.10.0 https://github.com/google/googletest
         git clone https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0
+    - name: Checkout Firmware master
+      uses: actions/checkout@v2.3.1
+      with:
+        repository: PX4/Firmware
+        ref: master
+        path: Firmware
+        fetch-depth: 0
+        submodules: recurvise
     - name: Install
-      run: |
-        pushd googletest
-        mkdir build
-        pushd build
-        cmake ..
-        make
-        make install
-        popd
-        popd
-        brew install gstreamer gst-plugins-base gst-plugins-good glib python
-        brew install --cask xquartz
-        brew tap PX4/px4
-        brew install px4-dev
-        brew install px4-sim
-        pip3 install --user --upgrade setuptools
-        pip3 install --user --upgrade rospkg pyserial empy toml numpy pandas jinja2
+      working-directory: Firmware
+      run: ./Tools/setup/macos.sh; ./Tools/setup/macos.sh
     - name: Cmake Build
+      working-directory:
       run: |
         mkdir build
         cd build
