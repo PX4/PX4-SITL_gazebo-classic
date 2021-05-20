@@ -199,6 +199,7 @@ include_directories(
 if (GSTREAMER_FOUND)
   include_directories(
     ${GSTREAMER_INCLUDE_DIRS}
+    ${GSTREAMER_APP_INCLUDE_DIRS}
   )
 endif()
 
@@ -213,7 +214,7 @@ link_libraries(
 if (GSTREAMER_FOUND)
   link_libraries(
     ${GSTREAMER_LIBRARIES}
-    gstapp-1.0
+    ${GSTREAMER_APP_LIBRARIES}
     ${GLIB_LDFLAGS}
     gobject-2.0
   )
