@@ -83,7 +83,7 @@ FIND_GSTREAMER_COMPONENT(GSTREAMER_BASE gstreamer-base-1.0 gstbase-1.0)
 # 2. Find GStreamer plugins
 # -------------------------
 
-#FIND_GSTREAMER_COMPONENT(GSTREAMER_APP gstreamer-app-1.0 gstapp-1.0)
+FIND_GSTREAMER_COMPONENT(GSTREAMER_APP gstreamer-app-1.0 gstapp-1.0)
 #FIND_GSTREAMER_COMPONENT(GSTREAMER_AUDIO gstreamer-audio-1.0 gstaudio-1.0)
 #FIND_GSTREAMER_COMPONENT(GSTREAMER_FFT gstreamer-fft-1.0 gstfft-1.0)
 #FIND_GSTREAMER_COMPONENT(GSTREAMER_GL gstreamer-gl-1.0>=1.8.0 gstgl-1.0)
