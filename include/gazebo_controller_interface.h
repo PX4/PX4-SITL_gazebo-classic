@@ -19,7 +19,7 @@
  */
 
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <Eigen/Eigen>
 #include <gazebo/common/common.hh>
 #include <gazebo/common/Plugin.hh>

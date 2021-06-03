@@ -19,7 +19,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"

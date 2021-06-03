@@ -25,7 +25,7 @@
 #include <iostream>
 #include <stdio.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace gazebo {
 

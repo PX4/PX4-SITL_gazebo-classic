@@ -42,7 +42,7 @@
  */
 
 #include <stdio.h>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>

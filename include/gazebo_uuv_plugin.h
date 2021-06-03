@@ -19,7 +19,7 @@
 
 
 #include <stdio.h>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <Eigen/Eigen>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
