@@ -38,7 +38,7 @@
           <robotNamespace></robotNamespace>
         </plugin>
         <always_on>1</always_on>
-        <update_rate>20</update_rate>
+        <update_rate>10</update_rate>
         <visualize>true</visualize>
       </sensor>
     </link>
