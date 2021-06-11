@@ -59,13 +59,15 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
                             [](const string& name)
                             { return name.size() == 0; }), end(names_splitted));
-  const string rootModelName = names_splitted.front(); // The first element is the name of the root model
+
+  // get the root model name
+  const string rootModelName = names_splitted.front();
+
+  // store the model name
+  model_name_ = names_splitted.at(0);
 
   // the second to the last name is the model name
   const string parentSensorModelName = names_splitted.rbegin()[1];
-
-  // store the model name
-  model_name_ = names_splitted[0];
 
   // get gps topic name
   if(_sdf->HasElement("topic")) {
@@ -73,7 +75,7 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   } else {
     // if not set by parameter, get the topic name from the model name
     gps_topic_ = parentSensorModelName;
-    gzwarn << "[gazebo_gps_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
+    gzwarn << "[gazebo_gps_plugin]: " + rootModelName + "::" + parentSensorModelName +
       " using gps topic \"" << parentSensorModelName << "\"\n";
   }
 
@@ -216,7 +218,7 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   gravity_W_ = world_->Gravity();
 
-  gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + model_name_ + "/link/" + gps_topic_, 10);
+  gps_pub_ = node_handle_->Advertise<sensor_msgs::msgs::SITLGps>("~/" + rootModelName + "/link/" + gps_topic_, 10);
 }
 
 void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
