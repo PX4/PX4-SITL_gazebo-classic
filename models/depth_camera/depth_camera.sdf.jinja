@@ -25,7 +25,7 @@
         </geometry>
       </visual>
       <sensor name="depth_camera" type="depth">
-        {% if ros_version == 2 %}
+        {%- if ros_version == '2' -%}
         <always_on>0</always_on>
         <update_rate>20</update_rate>
         <camera name="camera_name">
@@ -56,7 +56,7 @@
           <min_depth>0.1</min_depth>
           <max_depth>12</max_depth>
         </plugin>
-        {% else %}
+        {%- else -%}
         <update_rate>20</update_rate>
         <camera>
           <horizontal_fov>1.02974</horizontal_fov>
@@ -88,7 +88,7 @@
           <distortion_t1>0.0</distortion_t1>
           <distortion_t2>0.0</distortion_t2>
         </plugin>
-        {% endif %}
+        {%- endif -%}
       </sensor>
     </link>
   </model>
