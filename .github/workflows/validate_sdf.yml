@@ -11,7 +11,7 @@ on:
 jobs:
   validate-sdf:
     runs-on: ubuntu-latest
-    container: px4io/px4-dev-simulation-bionic:2020-08-14
+    container: px4io/px4-dev-simulation-bionic:2021-05-31
     steps:
     - uses: actions/checkout@v1
     - name: submodule update
