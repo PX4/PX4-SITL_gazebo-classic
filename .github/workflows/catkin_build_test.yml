@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {rosdistro: 'melodic', container: 'px4io/px4-dev-ros-melodic:2020-11-18'}
-          - {rosdistro: 'noetic', container: 'px4io/px4-dev-ros-noetic:2020-11-18'}
+          - {rosdistro: 'melodic', container: 'px4io/px4-dev-ros-melodic:2021-05-31'}
+          - {rosdistro: 'noetic', container: 'px4io/px4-dev-ros-noetic:2021-05-31'}
     container: ${{ matrix.config.container }}
     steps:
     - uses: actions/checkout@v1
@@ -25,7 +25,7 @@ jobs:
     - name: submodule update
       run: git submodule update --init --recursive
     - name: release_build_test
-      working-directory: 
+      working-directory:
       run: |
         mkdir -p $HOME/catkin_ws/src;
         cd $HOME/catkin_ws
