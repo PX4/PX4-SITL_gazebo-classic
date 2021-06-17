@@ -190,6 +190,10 @@
             <uri>__default__</uri>
           </script>
         </material>
+        <plugin name="left_elevon_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/left_elevon</topic_name>
+          <color>Gazebo/Red</color>
+        </plugin>
       </visual>
     </link>
     <link name="right_elevon">
@@ -219,6 +223,10 @@
             <uri>__default__</uri>
           </script>
         </material>
+        <plugin name="right_elevon_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/right_elevon</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
       </visual>
     </link>
     <link name="left_flap">
@@ -487,6 +495,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
+      <!--<topic_name>lift_force/left_elevon</topic_name> Uncomment to draw the force -->
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
@@ -509,6 +518,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
+      <!--<topic_name>lift_force/right_elevon</topic_name> Uncomment to draw the force -->
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>

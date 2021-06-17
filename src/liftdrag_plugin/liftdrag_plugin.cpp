@@ -26,6 +26,8 @@
 #include "gazebo/msgs/msgs.hh"
 #include "liftdrag_plugin/liftdrag_plugin.h"
 
+#include "Force.pb.h"
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(LiftDragPlugin)
@@ -79,8 +81,10 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
 
 #if GAZEBO_MAJOR_VERSION >= 9
   this->physics = this->world->Physics();
+  this->last_pub_time = this->world->SimTime();
 #else
   this->physics = this->world->GetPhysicsEngine();
+  this->last_pub_time = this->world->GetSimTime();
 #endif
   GZ_ASSERT(this->physics, "LiftDragPlugin physics pointer is NULL");
 
@@ -153,10 +157,8 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&LiftDragPlugin::OnUpdate, this));
     }
-
-    
   }
-  
+
   if (_sdf->HasElement("robotNamespace"))
   {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
@@ -165,6 +167,12 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   }
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
+
+  if (_sdf->HasElement("topic_name")) {
+      const auto lift_force_topic = this->sdf->Get<std::string>("topic_name");
+      lift_force_pub_ = node_handle_->Advertise<physics_msgs::msgs::Force>("~/" + lift_force_topic);
+      gzdbg << "Publishing to ~/" << lift_force_topic << std::endl;
+  }
 
   if (_sdf->HasElement("windSubTopic")){
     this->wind_sub_topic_ = _sdf->Get<std::string>("windSubTopic");
@@ -192,11 +200,14 @@ void LiftDragPlugin::OnUpdate()
   // get linear velocity at cp in inertial frame
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp) - wind_vel_;
+  const common::Time current_time = this->world->SimTime();
 #else
   ignition::math::Vector3d vel = ignitionFromGazeboMath(this->link->GetWorldLinearVel(this->cp)) - wind_vel_;
+  const common::Time current_time = this->world->GetSimTime();
 #endif
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
+  const double dt = (current_time - this->last_pub_time).Double();
 
   if (vel.Length() <= 0.01)
     return;
@@ -423,6 +434,30 @@ void LiftDragPlugin::OnUpdate()
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
   this->link->AddTorque(moment);
+
+  auto relative_center = this->link->RelativePose().Pos() + this->cp;
+
+  // Publish force and center of pressure for potential visual plugin.
+  // - dt is used to control the rate at which the force is published
+  // - it only gets published if 'topic_name' is defined in the sdf
+  if (dt > 1.0 / 10 && this->sdf->HasElement("topic_name")) {
+      msgs::Vector3d* force_center_msg = new msgs::Vector3d;
+      force_center_msg->set_x(relative_center.X());
+      force_center_msg->set_y(relative_center.Y());
+      force_center_msg->set_z(relative_center.Z());
+
+      msgs::Vector3d* force_vector_msg = new msgs::Vector3d;
+      force_vector_msg->set_x(force.X());
+      force_vector_msg->set_y(force.Y());
+      force_vector_msg->set_z(force.Z());
+
+      physics_msgs::msgs::Force force_msg;
+      force_msg.set_allocated_center(force_center_msg);
+      force_msg.set_allocated_force(force_vector_msg);
+
+      lift_force_pub_->Publish(force_msg);
+      this->last_pub_time = current_time;
+  }
 }
 
 void LiftDragPlugin::WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg) {

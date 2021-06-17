@@ -143,6 +143,9 @@ namespace gazebo
 
     private: transport::NodePtr node_handle_;
     private: transport::SubscriberPtr wind_sub_;
+    private: transport::PublisherPtr lift_force_pub_;
+    private: common::Time last_pub_time;
+    private: msgs::Factory msg_factory_;
     private: std::string namespace_;
     private: std::string wind_sub_topic_ = "world_wind";
     private: ignition::math::Vector3d wind_vel_;
