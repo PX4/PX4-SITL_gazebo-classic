@@ -1,6 +1,5 @@
-<!-- Generated from iris.sdf.jinja for use with HITL -->
-<sdf version='1.6'>
-  <model name='iris'>
+<sdf version='1.5'>
+  <model name='iris_hitl'>
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
@@ -68,6 +67,7 @@
       </inertial>
     </link>
     <joint name='/imu_joint' type='revolute'>
+      <pose relative_to='base_link'>0 0 0 0 -0 0</pose>
       <child>/imu_link</child>
       <parent>base_link</parent>
       <axis>
@@ -82,7 +82,6 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
     <link name='rotor_0'>
@@ -418,53 +417,14 @@
       <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <model name='gps0'>
-      <link name='link'>
-        <pose>0 0 0 0 0 0</pose>
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>0.01</mass>
-          <inertia>
-            <ixx>2.1733e-06</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>2.1733e-06</iyy>
-            <iyz>0</iyz>
-            <izz>1.8e-07</izz>
-          </inertia>
-        </inertial>
-        <visual name='visual'>
-          <geometry>
-            <cylinder>
-              <radius>0.01</radius>
-              <length>0.002</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/Black</name>
-              <uri>__default__</uri>
-            </script>
-          </material>
-        </visual>
-        <sensor name='gps' type='gps'>
-          <pose>0 0 0 0 0 0</pose>
-          <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
-            <robotNamespace/>
-            <gpsNoise>1</gpsNoise>
-            <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
-            <gpsZRandomWalk>4.0</gpsZRandomWalk>
-            <gpsXYNoiseDensity>0.0002</gpsXYNoiseDensity>
-            <gpsZNoiseDensity>0.0004</gpsZNoiseDensity>
-            <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
-            <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
-          </plugin>
-        </sensor>
-      </link>
-    </model>
+    <include>
+      <uri>model://gps</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>gps0</name>
+    </include>
     <joint name='gps0_joint' type='fixed'>
-      <parent>base_link</parent>
       <child>gps0::link</child>
+      <parent>base_link</parent>
     </joint>
     <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
@@ -487,10 +447,11 @@
       <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
       <magSubTopic>/mag</magSubTopic>
+      <gpsSubTopic>/gps0</gpsSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
-      <mavlink_tcp_port>4560</mavlink_tcp_port>
       <mavlink_udp_port>14560</mavlink_udp_port>
+      <mavlink_tcp_port>4560</mavlink_tcp_port>
       <serialEnabled>1</serialEnabled>
       <serialDevice>/dev/ttyACM0</serialDevice>
       <baudRate>921600</baudRate>
@@ -503,7 +464,7 @@
       <send_vision_estimation>0</send_vision_estimation>
       <send_odometry>1</send_odometry>
       <enable_lockstep>0</enable_lockstep>
-      <use_tcp>0</use_tcp>
+      <use_tcp>1</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
         <channel name='rotor1'>
