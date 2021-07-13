@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name='iris_ctrlalloc'>
+    <include>
+      <uri>model://iris</uri>
+    </include>
+  </model>
+</sdf>
