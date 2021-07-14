@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name='typhoon_h480'>
+    <include>
+      <uri>model://typhoon_h480</uri>
+    </include>
+  </model>
+</sdf>
