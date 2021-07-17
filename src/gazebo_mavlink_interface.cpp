@@ -75,13 +75,14 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
   if (nested_model != nullptr && std::regex_match(nested_model->GetName(), model)) {
     const std::string model_name = model_->GetName();
 
-    if (nested_model->GetName().find("::") != std::string::npos) {
-      nested_sensor_name = nested_model->GetName().substr(nested_model->GetName().find("::") + 2);
-    } else {
-      nested_sensor_name = nested_model->GetName();
+    // Get the nested model sensor name
+    std::string nested_sensor_name = nested_model->GetName();
+    std::size_t found = nested_sensor_name.find_last_of("::");
+    if (found) {
+      nested_sensor_name = nested_sensor_name.substr(found + 1);
     }
 
-    // Get sensor ID sensor name
+    // Get sensor ID from sensor name
     int sensor_id = 0;
     try {
       // get the sensor id by getting the (last) numbers on the sensor name (ex. lidar10, gets id 10)
@@ -127,14 +128,13 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
     if (std::regex_match((*it)->GetName(), model)) {
       // Get sensor joint name (without the ''::joint' suffix)
       const std::string joint_name = (*it)->GetName().substr(0, (*it)->GetName().size() - 6);
-
-      // If the model is nested, use the sensor name (child model) as the sensor topic
       const std::string model_name = model_->GetName();
-      const std::string::size_type pos = joint_name.find("::");
 
+      // Get the sensor name from the joint name
       std::string sensor_name = joint_name;
-      if (pos != std::string::npos) {
-        sensor_name = joint_name.substr(pos + 2);
+      std::size_t found = joint_name.find_last_of("::");
+      if (found) {
+        sensor_name = joint_name.substr(found + 1);
       }
 
       // If a nested sensor was already registered with this name
