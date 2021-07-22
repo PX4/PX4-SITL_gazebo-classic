@@ -2,13 +2,15 @@
 <sdf version='1.5'>
   <model name='iris_rplidar'>
 
+      
     <include>
       <uri>model://iris</uri>
     </include> 
 
+    
     <include>
       <uri>model://lidar</uri>
-      <pose>-0.12 0 0 0 3.1415 0</pose>
+      <pose>0.09 0 0 0 3.1415 0</pose>
     </include>
     <joint name="lidar_joint" type="fixed">
       <child>lidar::link</child>
@@ -21,13 +23,14 @@
         </limit>
       </axis>
     </joint>
-
+    
+    
     <include>
-      <uri>model://flow_cam</uri>
-      <pose>-0.12 0.05 0 0 1.5708 1.5708</pose>
+      <uri>model://r200</uri>
+      <pose>0.102 0 0.01 0 0 0</pose>
     </include>
-    <joint name="flow_joint" type="revolute">
-      <child>camera::link</child>
+    <joint name="r200_joint" type="fixed">
+      <child>r200::link</child>
       <parent>iris::base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
@@ -37,6 +40,8 @@
         </limit>
       </axis>
     </joint>
+    
+    
 
     <include>
       <uri>model://rplidar</uri>
@@ -53,8 +58,24 @@
         </limit>
       </axis>
     </joint>
+    
+    
+    <include>
+      <uri>model://fpv_cam</uri>
+      <pose>0 0 0 0 1.5708 1.5708</pose>
+    </include>
+    <joint name="fpv_cam_joint" type="fixed">
+      <child>fpv_cam::link</child>
+      <parent>iris::base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+    
 
   </model>
 </sdf>
-<!-- vim: set noet fenc=utf-8 ff=unix sts=0 sw=4 ts=4 : -->
-
