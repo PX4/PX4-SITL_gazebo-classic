@@ -601,7 +601,7 @@
       <control_joint_name>
          rudder_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>0.8</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
