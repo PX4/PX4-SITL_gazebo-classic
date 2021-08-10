@@ -8,7 +8,7 @@
 name: Merge Upstream Changes
 on:
  schedule:
-    - cron: '*/30 * * * *' # every 30 minutes
+    - cron: '0 1 */1 * *' # every day at 00:00
  workflow_dispatch: # on button click
 
 jobs:
