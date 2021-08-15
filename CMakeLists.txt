@@ -22,6 +22,8 @@ project(mavlink_sitl_gazebo VERSION 1.0.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+set(AIRSIM_ROOT "/home/jaeyoung/dev/AirSim")
+
 # Set c++11 or higher
 include(EnableC++XX)
 # Set c11
@@ -98,7 +100,7 @@ else()
   include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${Qt5Core_INCLUDE_DIRS})
 endif()
 
-link_directories(${GAZEBO_LIBRARY_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS} ${AIRSIM_ROOT}/AirLib/lib/x64/Release)
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
@@ -194,6 +196,10 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${OpticalFlow_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
+  ${AIRSIM_ROOT}/AirLib/deps/eigen3
+  ${AIRSIM_ROOT}/AirLib/deps/rpclib/include
+  ${AIRSIM_ROOT}/AirLib/include
+  ${AIRSIM_ROOT}/AirLib/deps/MavLinkCom/include
   )
 
 if (GSTREAMER_FOUND)
@@ -373,8 +379,10 @@ add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
+add_library(gazebo_airsim_plugin SHARED src/gazebo_airsim_plugin.cpp)
 
 set(plugins
+  gazebo_airsim_plugin
   gazebo_airspeed_plugin
   gazebo_camera_manager_plugin
   gazebo_gps_plugin
@@ -406,6 +414,8 @@ foreach(plugin ${plugins})
   target_link_libraries(${plugin} ${Boost_LIBRARIES} ${GAZEBO_LIBRARIES} ${TinyXML_LIBRARIES})
 endforeach()
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
+
+target_link_libraries(gazebo_airsim_plugin AirLib rpc MavLinkCom)
 
 # If BUILD_ROS_PLUGINS set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
