@@ -1,0 +1,11 @@
+<sdf version='1.6'>
+  <model name='typhoon_h480_airsim'>
+    <include>
+      <uri>model://typhoon_h480</uri>
+    </include>
+    <plugin name='airsim_plugin' filename='libgazebo_airsim_plugin.so'>
+      <robotNamespace/>
+      <link_name>typhoon_h480::cgo3_camera_link</link_name>
+    </plugin>
+  </model>
+</sdf>
