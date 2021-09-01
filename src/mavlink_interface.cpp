@@ -186,7 +186,7 @@ void MavlinkInterface::Load()
 
       memset(fds_, 0, sizeof(fds_));
       fds_[CONNECTION_FD].fd = simulator_socket_fd_;
-      fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
+      fds_[CONNECTION_FD].events = POLLIN;
     }
   }
   // hil_data_.resize(1);
@@ -477,7 +477,7 @@ void MavlinkInterface::acceptConnections()
 
   // assign socket to connection descriptor on success
   fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-  fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
+  fds_[CONNECTION_FD].events = POLLIN;
 }
 
 void MavlinkInterface::handle_message(mavlink_message_t *msg)
@@ -569,24 +569,6 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
     if (fds_[CONNECTION_FD].fd > 0) {
-      int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
-      int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
-
-      if (ret < 0) {
-        std::cerr << "poll error: " << strerror(errno) << "\n";
-        return;
-      }
-
-      if (ret == 0 && timeout_ms > 0) {
-        std::cerr << "poll timeout\n";
-        return;
-      }
-
-      if (!(fds_[CONNECTION_FD].revents & POLLOUT)) {
-        std::cerr << "invalid events at fd:" << fds_[CONNECTION_FD].revents << "\n";
-        return;
-      }
-
       ssize_t len;
       if (use_tcp_) {
         len = send(fds_[CONNECTION_FD].fd, buffer, packetlen, 0);
