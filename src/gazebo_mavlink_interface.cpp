@@ -580,6 +580,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   if (hil_mode_) {
     mavlink_interface_->pollFromQgcAndSdk();
+    if (!mavlink_interface_->SerialEnabled()) {
+      mavlink_interface_->pollForMAVLinkMessages();
+    }
   } else {
     mavlink_interface_->pollForMAVLinkMessages();
   }
