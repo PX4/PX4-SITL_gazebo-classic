@@ -178,6 +178,8 @@ public:
     void SetHILMode(bool hil_mode) {hil_mode_ = hil_mode;}
     void SetHILStateLevel(bool hil_state_level) {hil_state_level_ = hil_state_level;}
 
+    bool SerialEnabled() const { return serial_enabled_; }
+
 private:
     bool received_actuator_{false};
     bool received_first_actuator_{false};
