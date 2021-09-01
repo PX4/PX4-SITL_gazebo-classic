@@ -484,27 +484,32 @@ void MavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch (msg->msgid) {
   case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
-    const std::lock_guard<std::mutex> lock(actuator_mutex_);
-
-    mavlink_hil_actuator_controls_t controls;
-    mavlink_msg_hil_actuator_controls_decode(msg, &controls);
-
-    armed_ = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
-
-    for (unsigned i = 0; i < n_out_max; i++) {
-      input_index_[i] = i;
-    }
-
-    // set rotor speeds, controller targets
-    input_reference_.resize(n_out_max);
-    for (int i = 0; i < input_reference_.size(); i++) {
-      input_reference_[i] = controls.controls[i];
-    }
-
-    received_actuator_ = true;
-    received_first_actuator_ = true;
+    handle_actuator_controls(msg);
     break;
   }
+}
+
+void MavlinkInterface::handle_actuator_controls(mavlink_message_t *msg)
+{
+  const std::lock_guard<std::mutex> lock(actuator_mutex_);
+
+  mavlink_hil_actuator_controls_t controls;
+  mavlink_msg_hil_actuator_controls_decode(msg, &controls);
+
+  armed_ = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
+
+  for (unsigned i = 0; i < n_out_max; i++) {
+    input_index_[i] = i;
+  }
+
+  // set rotor speeds, controller targets
+  input_reference_.resize(n_out_max);
+  for (int i = 0; i < input_reference_.size(); i++) {
+    input_reference_[i] = controls.controls[i];
+  }
+
+  received_actuator_ = true;
+  received_first_actuator_ = true;
 }
 
 void MavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)

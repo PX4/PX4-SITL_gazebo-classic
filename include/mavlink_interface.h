@@ -187,6 +187,7 @@ private:
     Eigen::VectorXd input_reference_;
 
     void handle_message(mavlink_message_t *msg);
+    void handle_actuator_controls(mavlink_message_t *msg);
     void acceptConnections();
     void RegisterNewHILSensorInstance(int id);
 
