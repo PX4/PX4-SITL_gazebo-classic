@@ -330,20 +330,19 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     mavlink_interface_->SetHILStateLevel(hil_state_level_);
   }
 
-  bool serial_enabled=false;
   if(_sdf->HasElement("serialEnabled"))
   {
-    serial_enabled = _sdf->GetElement("serialEnabled")->Get<bool>();
+    const bool serial_enabled = _sdf->GetElement("serialEnabled")->Get<bool>();
     mavlink_interface_->SetSerialEnabled(serial_enabled);
   }
 
   bool use_tcp = false;
-  if (!serial_enabled && _sdf->HasElement("use_tcp"))
+  if (!mavlink_interface_->SerialEnabled() && _sdf->HasElement("use_tcp"))
   {
     use_tcp = _sdf->GetElement("use_tcp")->Get<bool>();
     mavlink_interface_->SetUseTcp(use_tcp);
   }
-  gzmsg << "Connecting to PX4 SITL using " << (serial_enabled ? "serial" : (use_tcp ? "TCP" : "UDP")) << "\n";
+  gzmsg << "Connecting to PX4 SITL using " << (mavlink_interface_->SerialEnabled() ? "serial" : (use_tcp ? "TCP" : "UDP")) << "\n";
 
   if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
@@ -510,7 +509,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     mavlink_interface_->SetSdkUdpPort(sdk_udp_port);
   }
 
-  if (serial_enabled) {
+  if (mavlink_interface_->SerialEnabled()) {
     // Set up serial interface
     if(_sdf->HasElement("serialDevice"))
     {
@@ -581,6 +580,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   if (hil_mode_) {
     mavlink_interface_->pollFromQgcAndSdk();
+    if (!mavlink_interface_->SerialEnabled()) {
+      mavlink_interface_->pollForMAVLinkMessages();
+    }
   } else {
     mavlink_interface_->pollForMAVLinkMessages();
   }

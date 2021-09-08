@@ -161,11 +161,20 @@ void MavlinkInterface::Load()
       fds_[LISTEN_FD].events = POLLIN; // only listens for new connections on tcp
 
     } else {
-      remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
-      remote_simulator_addr_.sin_port = htons(mavlink_udp_port_);
-
-      local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-      local_simulator_addr_.sin_port = htons(0);
+      if (!hil_mode_) {
+        // When connecting to SITL, we specify the port where the mavlink traffic originates from.
+        remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
+        remote_simulator_addr_.sin_port = htons(mavlink_udp_port_);
+        local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
+        local_simulator_addr_.sin_port = htons(0);
+      } else {
+        // When connecting to HITL via UDP, the vehicle talks to a specific port that we need to
+        // listen to.
+        remote_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
+        remote_simulator_addr_.sin_port = htons(0);
+        local_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
+        local_simulator_addr_.sin_port = htons(mavlink_udp_port_);
+      }
 
       if ((simulator_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         std::cerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";
@@ -186,7 +195,7 @@ void MavlinkInterface::Load()
 
       memset(fds_, 0, sizeof(fds_));
       fds_[CONNECTION_FD].fd = simulator_socket_fd_;
-      fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
+      fds_[CONNECTION_FD].events = POLLIN;
     }
   }
   // hil_data_.resize(1);
@@ -352,7 +361,8 @@ void MavlinkInterface::pollForMAVLinkMessages()
   received_actuator_ = false;
 
   do {
-    int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
+    const bool needs_to_wait_for_actuator = received_first_actuator_ && enable_lockstep_;
+    int timeout_ms = needs_to_wait_for_actuator ? 1000 : 0;
     int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
 
     if (ret < 0) {
@@ -360,8 +370,10 @@ void MavlinkInterface::pollForMAVLinkMessages()
       return;
     }
 
-    if (ret == 0 && timeout_ms > 0) {
-      std::cerr << "poll timeout\n";
+    if (ret == 0) {
+      if (needs_to_wait_for_actuator) {
+        std::cerr << "poll timeout\n";
+      }
       return;
     }
 
@@ -399,7 +411,7 @@ void MavlinkInterface::pollForMAVLinkMessages()
         mavlink_status_t status;
         for (unsigned i = 0; i < len; ++i) {
           if (mavlink_parse_char(MAVLINK_COMM_0, buf_[i], &msg, &status)) {
-            if (hil_mode_) {
+            if (hil_mode_ && serial_enabled_) {
               send_mavlink_message(&msg);
             }
             handle_message(&msg);
@@ -407,7 +419,7 @@ void MavlinkInterface::pollForMAVLinkMessages()
         }
       }
     }
-  } while (!close_conn_ && received_first_actuator_ && !received_actuator_ && enable_lockstep_ && !gotSigInt_);
+  } while (!close_conn_ && !gotSigInt_ && !received_actuator_);
 }
 
 void MavlinkInterface::pollFromQgcAndSdk()
@@ -477,34 +489,39 @@ void MavlinkInterface::acceptConnections()
 
   // assign socket to connection descriptor on success
   fds_[CONNECTION_FD].fd = ret; // socket is replaced with latest connection
-  fds_[CONNECTION_FD].events = POLLIN | POLLOUT; // read/write
+  fds_[CONNECTION_FD].events = POLLIN;
 }
 
 void MavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch (msg->msgid) {
   case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
-    const std::lock_guard<std::mutex> lock(actuator_mutex_);
-
-    mavlink_hil_actuator_controls_t controls;
-    mavlink_msg_hil_actuator_controls_decode(msg, &controls);
-
-    armed_ = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
-
-    for (unsigned i = 0; i < n_out_max; i++) {
-      input_index_[i] = i;
-    }
-
-    // set rotor speeds, controller targets
-    input_reference_.resize(n_out_max);
-    for (int i = 0; i < input_reference_.size(); i++) {
-      input_reference_[i] = controls.controls[i];
-    }
-
-    received_actuator_ = true;
-    received_first_actuator_ = true;
+    handle_actuator_controls(msg);
     break;
   }
+}
+
+void MavlinkInterface::handle_actuator_controls(mavlink_message_t *msg)
+{
+  const std::lock_guard<std::mutex> lock(actuator_mutex_);
+
+  mavlink_hil_actuator_controls_t controls;
+  mavlink_msg_hil_actuator_controls_decode(msg, &controls);
+
+  armed_ = (controls.mode & MAV_MODE_FLAG_SAFETY_ARMED);
+
+  for (unsigned i = 0; i < n_out_max; i++) {
+    input_index_[i] = i;
+  }
+
+  // set rotor speeds, controller targets
+  input_reference_.resize(n_out_max);
+  for (int i = 0; i < input_reference_.size(); i++) {
+    input_reference_[i] = controls.controls[i];
+  }
+
+  received_actuator_ = true;
+  received_first_actuator_ = true;
 }
 
 void MavlinkInterface::forward_mavlink_message(const mavlink_message_t *message)
@@ -564,24 +581,6 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
     int packetlen = mavlink_msg_to_send_buffer(buffer, message);
 
     if (fds_[CONNECTION_FD].fd > 0) {
-      int timeout_ms = (received_first_actuator_ && enable_lockstep_) ? 1000 : 0;
-      int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
-
-      if (ret < 0) {
-        std::cerr << "poll error: " << strerror(errno) << "\n";
-        return;
-      }
-
-      if (ret == 0 && timeout_ms > 0) {
-        std::cerr << "poll timeout\n";
-        return;
-      }
-
-      if (!(fds_[CONNECTION_FD].revents & POLLOUT)) {
-        std::cerr << "invalid events at fd:" << fds_[CONNECTION_FD].revents << "\n";
-        return;
-      }
-
       ssize_t len;
       if (use_tcp_) {
         len = send(fds_[CONNECTION_FD].fd, buffer, packetlen, 0);
@@ -589,11 +588,13 @@ void MavlinkInterface::send_mavlink_message(const mavlink_message_t *message)
         len = sendto(fds_[CONNECTION_FD].fd, buffer, packetlen, 0, (struct sockaddr *)&remote_simulator_addr_, remote_simulator_addr_len_);
       }
       if (len < 0) {
-        std::cerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
-        if (errno == ECONNRESET || errno == EPIPE) {
-          if (use_tcp_) { // udp socket remains alive
-            std::cerr << "Closing connection." << "\n";
-            close_conn_ = true;
+        if (received_first_actuator_) {
+          std::cerr << "Failed sending mavlink message: " << strerror(errno) << "\n";
+          if (errno == ECONNRESET || errno == EPIPE) {
+            if (use_tcp_) { // udp socket remains alive
+              std::cerr << "Closing connection." << "\n";
+              close_conn_ = true;
+            }
           }
         }
       }
