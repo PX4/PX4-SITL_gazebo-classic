@@ -113,7 +113,7 @@ private:
     struct sockaddr_in          _gcsaddr;   ///< GCS target
     struct pollfd               _fds[1];
     std::mutex                  _captureMutex;
-    int                         _videoURI{5600};
+    std::string                 _videoURI{"udp://127.0.0.1:5600"};
     int                         _systemID{1};
     int                         _componentID{MAV_COMP_ID_CAMERA};
     int                         _mavlinkCamPort{14530};
