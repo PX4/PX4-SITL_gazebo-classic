@@ -115,7 +115,7 @@ void CameraManagerPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     }
 
     if (sdf->HasElement("video_uri")) {
-        _videoURI = sdf->GetElement("video_uri")->Get<int>();
+        _videoURI = sdf->GetElement("video_uri")->Get<std::string>();
     }
     if (sdf->HasElement("system_id")) {
         _systemID = sdf->GetElement("system_id")->Get<int>();
@@ -662,7 +662,6 @@ void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink
 
     // ACK command received and accepted
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-    std::string uri = std::to_string(_videoURI);
 
     mavlink_message_t msg;
     mavlink_msg_video_stream_information_pack_chan(
@@ -681,7 +680,7 @@ void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink
         0,                                          // Rotation (none)
         90,                                         // FOV (made up)
         name,
-        uri.c_str()
+        _videoURI.c_str()
     );
     _send_mavlink_message(&msg, srcaddr);
 }
