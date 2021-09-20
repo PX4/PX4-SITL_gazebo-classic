@@ -68,7 +68,8 @@ if [ -d ${WORLDS_DIR} ]; then
 		if [[ $ret -ge 1 ]]; then
 			RET="$ret"
 		fi
-	done <<<"$(find ${WORLDS_DIR} -type f -name '*.world')"
+	done <<<"$(find ${WORLDS_DIR} -type f -name '*.world' \
+		! -name 'safe_landing.world')"
 else
 	echo "${WORLDS_DIR} doesn't exist!"
 	delete_schema
