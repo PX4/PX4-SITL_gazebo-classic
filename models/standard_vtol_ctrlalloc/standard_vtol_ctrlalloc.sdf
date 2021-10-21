@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name='standard_vtol_ctrlalloc'>
+    <include>
+      <uri>model://standard_vtol</uri>
+    </include>
+  </model>
+</sdf>
