@@ -774,7 +774,8 @@ void CameraManagerPlugin::_handle_storage_info(const mavlink_message_t *pMsg, st
         NAN,                                // read_speed,
         NAN,                                // write_speed
         STORAGE_TYPE_OTHER,                 // storage type
-        storage_name.c_str()                // storage name
+        storage_name.c_str(),               // storage name
+        STORAGE_USAGE_FLAG_SET              // storage usage
     );
     _send_mavlink_message(&msg, srcaddr);
 }
