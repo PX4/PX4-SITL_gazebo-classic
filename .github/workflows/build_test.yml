@@ -23,7 +23,7 @@ jobs:
     - name: submodule update
       run: git submodule update --init --recursive
     - name: Install latest mavlink
-      run: git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0 && rm -rf /usr/local/include/mavlink/v2.0/.git
+      run: git clone --depth 1 https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink && rm -rf /usr/local/include/mavlink/.git
     - name: Cmake Build
       run: |
         mkdir build
