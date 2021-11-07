@@ -22,7 +22,7 @@ jobs:
       run: |
         brew update;
         git clone -b release-1.10.0 https://github.com/google/googletest
-        git clone https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink/v2.0
+        git clone https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink
     - name: Install
       run: |
         pushd googletest
