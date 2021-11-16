@@ -769,9 +769,10 @@ void GazeboMavlinkInterface::SendGroundTruth()
   hil_state_quat.true_airspeed = (model_->GetWorldLinearVel() -  wind_vel_).GetLength() * 100;
 #endif
 
-  hil_state_quat.xacc = accel_true_b.X() * 1000;
-  hil_state_quat.yacc = accel_true_b.Y() * 1000;
-  hil_state_quat.zacc = accel_true_b.Z() * 1000;
+  ignition::math::Vector3d accel_true_b_in_ned = q_nb.RotateVector(accel_true_b);
+  hil_state_quat.xacc = accel_true_b_in_ned.X() * 1000;
+  hil_state_quat.yacc = accel_true_b_in_ned.Y() * 1000;
+  hil_state_quat.zacc = accel_true_b_in_ned.Z() * 1000;
 
   if (!hil_mode_ || (hil_mode_ && hil_state_level_)) {
     mavlink_message_t msg;
