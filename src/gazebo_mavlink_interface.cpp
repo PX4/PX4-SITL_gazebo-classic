@@ -769,7 +769,7 @@ void GazeboMavlinkInterface::SendGroundTruth()
 #else
   hil_state_quat.true_airspeed = (model_->GetWorldLinearVel() -  wind_vel_).GetLength() * 100;
 #endif
-  
+
   hil_state_quat.xacc = accel_true_ned.X() * 1000;
   hil_state_quat.yacc = accel_true_ned.Y() * 1000;
   hil_state_quat.zacc = accel_true_ned.Z() * 1000;
