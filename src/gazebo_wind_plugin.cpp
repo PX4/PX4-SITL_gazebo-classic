@@ -62,7 +62,7 @@ void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
   // Get the wind gust params from SDF.
   getSdfParam<double>(sdf, "windGustStart", wind_gust_start, wind_gust_start);
   getSdfParam<double>(sdf, "windGustDuration", wind_gust_duration, wind_gust_duration);
-  getSdfParam<double>(sdf, "windGustVeloctiyMean", wind_gust_velocity_mean_, wind_gust_velocity_mean_);
+  getSdfParam<double>(sdf, "windGustVelocityMean", wind_gust_velocity_mean_, wind_gust_velocity_mean_);
   getSdfParam<double>(sdf, "windGustVelocityMax", wind_gust_velocity_max_, wind_gust_velocity_max_);
   getSdfParam<double>(sdf, "windGustVelocityVariance", wind_gust_velocity_variance_, wind_gust_velocity_variance_);
   getSdfParam<ignition::math::Vector3d>(sdf, "windGustDirectionMean", wind_gust_direction_mean_, wind_gust_direction_mean_);
