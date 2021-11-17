@@ -108,7 +108,6 @@ class GazeboWindPlugin : public WorldPlugin {
   std::default_random_engine wind_gust_velocity_generator_;
   std::normal_distribution<double> wind_gust_velocity_distribution_;
 
-  ignition::math::Vector3d xyz_offset_;
   ignition::math::Vector3d wind_direction_mean_;
   ignition::math::Vector3d wind_gust_direction_mean_;
   double wind_direction_variance_;
