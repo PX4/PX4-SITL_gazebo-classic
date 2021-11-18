@@ -718,7 +718,8 @@ void GazeboMavlinkInterface::SendGroundTruth()
     last_imu_message_.orientation().y(),
     last_imu_message_.orientation().z());
 
-  ignition::math::Quaterniond q_nb = q_ENU_to_NED * q_gr * q_FLU_to_FRD.Inverse();
+  ignition::math::Quaterniond q_FLU_to_NED = q_ENU_to_NED * q_gr;
+  ignition::math::Quaterniond q_nb = q_FLU_to_NED * q_FLU_to_FRD.Inverse();
 
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Vector3d vel_b = q_FLU_to_FRD.RotateVector(model_->RelativeLinearVel());
@@ -731,9 +732,9 @@ void GazeboMavlinkInterface::SendGroundTruth()
 #endif
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d accel_true_b = q_FLU_to_FRD.RotateVector(model_->RelativeLinearAccel());
+  ignition::math::Vector3d accel_true_ned = q_FLU_to_NED.RotateVector(model_->RelativeLinearAccel());
 #else
-  ignition::math::Vector3d accel_true_b = q_FLU_to_FRD.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
+  ignition::math::Vector3d accel_true_ned = q_FLU_to_NED.RotateVector(ignitionFromGazeboMath(model_->GetRelativeLinearAccel()));
 #endif
 
   // send ground truth
@@ -769,9 +770,9 @@ void GazeboMavlinkInterface::SendGroundTruth()
   hil_state_quat.true_airspeed = (model_->GetWorldLinearVel() -  wind_vel_).GetLength() * 100;
 #endif
 
-  hil_state_quat.xacc = accel_true_b.X() * 1000;
-  hil_state_quat.yacc = accel_true_b.Y() * 1000;
-  hil_state_quat.zacc = accel_true_b.Z() * 1000;
+  hil_state_quat.xacc = accel_true_ned.X() * 1000;
+  hil_state_quat.yacc = accel_true_ned.Y() * 1000;
+  hil_state_quat.zacc = accel_true_ned.Z() * 1000;
 
   if (!hil_mode_ || (hil_mode_ && hil_state_level_)) {
     mavlink_message_t msg;
