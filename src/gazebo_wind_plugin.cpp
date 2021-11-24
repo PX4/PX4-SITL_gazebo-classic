@@ -43,10 +43,6 @@ void GazeboWindPlugin::Load(physics::WorldPtr world, sdf::ElementPtr sdf) {
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  if (sdf->HasElement("xyzOffset"))
-    xyz_offset_ = sdf->GetElement("xyzOffset")->Get<ignition::math::Vector3d>();
-  else
-    gzerr << "[gazebo_wind_plugin] Please specify a xyzOffset.\n";
 
   getSdfParam<std::string>(sdf, "windPubTopic", wind_pub_topic_, wind_pub_topic_);
   double pub_rate = 2.0;
