@@ -36,6 +36,10 @@
  * This plugin publishes Airspeed sensor data
  *
  * @author Jaeyoung Lim <jaeyoung@auterion.com>
+ *
+ * References:
+ * [1] A brief summary of atmospheric modeling with citations:
+ *     Cavcar, M., http://fisicaatmo.at.fcen.uba.ar/practicas/ISAweb.pdf
  */
 
 #ifndef _GAZEBO_AIRSPEED_PLUGIN_HH_
@@ -70,6 +74,14 @@ namespace gazebo
 
 typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
+static constexpr auto DEFAULT_HOME_ALT_AMSL = 488.0; // altitude AMSL at Irchel Park, Zurich, Switzerland [m]
+
+// international standard atmosphere (troposphere model - valid up to 11km) see [1]
+static constexpr auto TEMPERATURE_MSL = 288.15; // temperature at MSL [K] (15 [C])
+static constexpr auto PRESSURE_MSL = 101325.0; // pressure at MSL [Pa]
+static constexpr auto LAPSE_RATE = 0.0065; // reduction in temperature with altitude for troposphere [K/m]
+static constexpr auto AIR_DENSITY_MSL = 1.225; // air density at MSL [kg/m^3]
+
 class GAZEBO_VISIBLE AirspeedPlugin : public SensorPlugin
 {
 public:
@@ -101,14 +113,15 @@ private:
   std::string model_name_;
   std::string airspeed_topic_;
 
-  ignition::math::Vector3d wind_vel_;
-  ignition::math::Vector3d vel_a_;
+  ignition::math::Vector3d wind_vel_; // wind velocity in world frame [m/s]
+  ignition::math::Vector3d air_vel_in_body_; // air velocity in body frame [m/s]
+  ignition::math::Pose3d veh_pose_in_world_; // vehicle pose in world frame
 
   std::default_random_engine random_generator_;
   std::normal_distribution<float> standard_normal_distribution_;
 
-  float diff_pressure_stddev_;
-  float temperature_;
+  float diff_pressure_stddev_; // [hPa]
+  float alt_home_; // home altitude AMSL [m]
 
 };     // class GAZEBO_VISIBLE AirspeedPlugin
 }      // namespace gazebo

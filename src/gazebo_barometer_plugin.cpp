@@ -36,6 +36,8 @@
  * This plugin simulates barometer data
  *
  * @author Elia Tarasov <elias.tarasov@gmail.com>
+ *
+ * References in header.
  */
 
 #include <gazebo_barometer_plugin.h>
@@ -45,8 +47,10 @@ namespace gazebo
 GZ_REGISTER_MODEL_PLUGIN(BarometerPlugin)
 
 BarometerPlugin::BarometerPlugin() : ModelPlugin(),
+    alt_home_(DEFAULT_HOME_ALT_AMSL),
     baro_rnd_y2_(0.0),
     baro_rnd_use_last_(false),
+    baro_drift_pa_per_sec_(0.0),
     baro_drift_pa_(0.0)
 {
 }
@@ -61,9 +65,9 @@ void BarometerPlugin::getSdfParams(sdf::ElementPtr sdf)
   const char *env_alt = std::getenv("PX4_HOME_ALT");
   if (env_alt) {
     alt_home_ = std::stod(env_alt);
-    gzmsg << "[gazebo_barometer_plugin] Home altitude is set to " << alt_home_ << ".\n";
+    gzmsg << "[gazebo_barometer_plugin] Home altitude is set to " << alt_home_ << " m AMSL.\n";
   } else {
-    alt_home_ = kDefaultAltHome;
+    alt_home_ = DEFAULT_HOME_ALT_AMSL;
   }
 
   namespace_.clear();
@@ -76,14 +80,14 @@ void BarometerPlugin::getSdfParams(sdf::ElementPtr sdf)
   if (sdf->HasElement("pubRate")) {
     pub_rate_ = sdf->GetElement("pubRate")->Get<unsigned int>();
   } else {
-    pub_rate_ = kDefaultPubRate;
+    pub_rate_ = DEFAULT_PUB_RATE;
     gzwarn << "[gazebo_barometer_plugin] Using default publication rate of " << pub_rate_ << " Hz\n";
   }
 
   if (sdf->HasElement("baroTopic")) {
     baro_topic_ = sdf->GetElement("baroTopic")->Get<std::string>();
   } else {
-    baro_topic_ = kDefaultBarometerTopic;
+    baro_topic_ = DEFAULT_BAROMETER_TOPIC;
     gzwarn << "[gazebo_barometer_plugin] Using default barometer topic " << baro_topic_ << "\n";
   }
 
@@ -120,7 +124,7 @@ void BarometerPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
   pub_baro_ = node_handle_->Advertise<sensor_msgs::msgs::Pressure>("~/" + model_->GetName() + baro_topic_, 10);
 
   standard_normal_distribution_ = std::normal_distribution<double>(0.0, 1.0);
-  gravity_W_ = world_->Gravity();
+  gravity_in_world_ = world_->Gravity();
 }
 
 void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
@@ -140,19 +144,17 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
 #else
     const ignition::math::Pose3d pose_model_world = ignitionFromGazeboMath(model_->GetWorldPose());
 #endif
+
+    // calculate temperature at current altitude
     ignition::math::Pose3d pose_model; // Z-component pose in local frame (relative to where it started)
     pose_model.Pos().Z() = pose_model_world.Pos().Z() - pose_model_start_.Pos().Z();
+    const float alt_rel = pose_model.Pos().Z(); // Z-component from ENU
+    const float alt_amsl = (float)alt_home_ + alt_rel;
+    const float temperature_local = TEMPERATURE_MSL - LAPSE_RATE * alt_amsl;
 
-    const float pose_n_z = -pose_model.Pos().Z(); // convert Z-component from ENU to NED
-
-    // calculate abs_pressure using an ISA model for the tropsphere (valid up to 11km above MSL)
-    const float lapse_rate = 0.0065f; // reduction in temperature with altitude (Kelvin/m)
-    const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
-    const float alt_msl = (float)alt_home_ - pose_n_z;
-    const float temperature_local = temperature_msl - lapse_rate * alt_msl;
-    const float pressure_ratio = powf(temperature_msl / temperature_local, 5.256f);
-    const float pressure_msl = 101325.0f; // pressure at MSL
-    const float absolute_pressure = pressure_msl / pressure_ratio;
+    // calculate absolute pressure at local temperature
+    const float pressure_ratio = powf(TEMPERATURE_MSL / temperature_local, 5.256f);
+    const float absolute_pressure = PRESSURE_MSL / pressure_ratio;
 
     // generate Gaussian noise sequence using polar form of Box-Muller transformation
     double y1;
@@ -185,17 +187,17 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
     const float absolute_pressure_noisy_hpa = absolute_pressure_noisy * 0.01f;
     baro_msg_.set_absolute_pressure(absolute_pressure_noisy_hpa);
 
-    // calculate density using an ISA model for the tropsphere (valid up to 11km above MSL)
-    const float density_ratio = powf(temperature_msl / temperature_local, 4.256f);
-    const float rho = 1.225f / density_ratio;
+    // calculate air density at local temperature
+    const float density_ratio = powf(TEMPERATURE_MSL / temperature_local , 4.256f);
+    const float air_density = AIR_DENSITY_MSL / density_ratio;
 
     // calculate pressure altitude including effect of pressure noise
-    baro_msg_.set_pressure_altitude(alt_msl -
+    baro_msg_.set_pressure_altitude(alt_amsl -
                                     (abs_pressure_noise + baro_drift_pa_) /
-                                        (gravity_W_.Length() * rho));
+                                        (gravity_in_world_.Length() * air_density));
 
     // calculate temperature in Celsius
-    baro_msg_.set_temperature(temperature_local - 273.0f);
+    baro_msg_.set_temperature(temperature_local + ABSOLUTE_ZERO_C);
 
     // Fill baro msg
     baro_msg_.set_time_usec(current_time.Double() * 1e6);
