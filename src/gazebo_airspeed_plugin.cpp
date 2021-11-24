@@ -46,7 +46,7 @@ GZ_REGISTER_SENSOR_PLUGIN(AirspeedPlugin)
 
 AirspeedPlugin::AirspeedPlugin() : SensorPlugin(),
   diff_pressure_stddev_(0.01f),
-  temperature_(20.0f)
+  alt_home_(DEFAULT_HOME_ALT_AMSL)
 { }
 
 AirspeedPlugin::~AirspeedPlugin()
@@ -111,7 +111,15 @@ void AirspeedPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   airspeed_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Airspeed>("~/" + model_name_ + "/link/" + airspeed_topic_, 10);
   wind_sub_ = node_handle_->Subscribe("~/world_wind", &AirspeedPlugin::WindVelocityCallback, this);
   getSdfParam<float>(_sdf, "DiffPressureStdev", diff_pressure_stddev_, diff_pressure_stddev_);
-  getSdfParam<float>(_sdf, "Temperature", temperature_, temperature_);
+
+  // get the home altitude
+  const char *env_alt = std::getenv("PX4_HOME_ALT");
+  if (env_alt) {
+    alt_home_ = std::stod(env_alt);
+    gzmsg << "[gazebo_airspeed_plugin] Home altitude is set to " << alt_home_ << " m AMSL.\n";
+  } else {
+    alt_home_ = DEFAULT_HOME_ALT_AMSL;
+  }
 
 }
 
@@ -134,29 +142,34 @@ void AirspeedPlugin::OnUpdate(const common::UpdateInfo&){
 #endif
 
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Pose3d T_W_I = link_->WorldPose();
+  veh_pose_in_world_ = link_->WorldPose();
 #else
-  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(link_->GetWorldPose());
+  veh_pose_in_world_ = ignitionFromGazeboMath(link_->GetWorldPose());
 #endif
-  ignition::math::Quaterniond C_W_I = T_W_I.Rot();
+  ignition::math::Quaterniond veh_q_world_to_body = veh_pose_in_world_.Rot();
 
+// air vel. in body frame = inertial vel. in body frame - wind vel. in body frame
 #if GAZEBO_MAJOR_VERSION >= 9
-  vel_a_ = link_->RelativeLinearVel() - C_W_I.RotateVectorReverse(wind_vel_);
+  air_vel_in_body_ = link_->RelativeLinearVel() - veh_q_world_to_body.RotateVectorReverse(wind_vel_);
 #else
-  vel_a_ = ignitionFromGazeboMath(link_->GetRelativeLinearVel()) - C_W_I.RotateVectorReverse(wind_vel_);
+  air_vel_in_body_ = ignitionFromGazeboMath(link_->GetRelativeLinearVel()) - veh_q_world_to_body.RotateVectorReverse(wind_vel_);
 #endif
 
   last_time_ = current_time;
 }
 
 void AirspeedPlugin::OnSensorUpdate() {
-  const float temperature_msl = 288.0f; // temperature at MSL (Kelvin)
-  float temperature_local = temperature_ + 273.0f;
-  const float density_ratio = powf((temperature_msl/temperature_local) , 4.256f);
-  float rho = 1.225f / density_ratio;
 
+  // compute the air density at the local altitude / temperature
+  const float alt_rel = veh_pose_in_world_.Pos().Z(); // Z-component from ENU
+  const float alt_amsl = (float)alt_home_ + alt_rel;
+  const float temperature_local = TEMPERATURE_MSL - LAPSE_RATE * alt_amsl;
+  const float density_ratio = powf(TEMPERATURE_MSL / temperature_local , 4.256f);
+  const float air_density = AIR_DENSITY_MSL / density_ratio;
+
+  // calculate differential pressure + noise in hPa
   const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev_;
-  double diff_pressure = 0.005f * rho * vel_a_.X() * vel_a_.X() + diff_pressure_noise;
+  double diff_pressure = 0.005f * air_density  * air_vel_in_body_.X() * air_vel_in_body_.X() + diff_pressure_noise;
 
   // calculate differential pressure in hPa
   sensor_msgs::msgs::Airspeed airspeed_msg;
