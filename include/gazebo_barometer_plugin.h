@@ -36,6 +36,10 @@
  * This plugin simulates barometer data
  *
  * @author Elia Tarasov <elias.tarasov@gmail.com>
+ *
+ * References:
+ * [1] A brief summary of atmospheric modeling with citations:
+ *     Cavcar, M., http://fisicaatmo.at.fcen.uba.ar/practicas/ISAweb.pdf
  */
 
 #ifndef _GAZEBO_BAROMETER_PLUGIN_HH_
@@ -59,9 +63,17 @@
 
 namespace gazebo {
 
-  static constexpr auto kDefaultBarometerTopic = "/baro";
-  static constexpr auto kDefaultPubRate = 50.0;  // [Hz]. Note: averages the supported Baro device ODR in PX4
-  static constexpr auto kDefaultAltHome = 488.0; // meters
+  static constexpr auto DEFAULT_BAROMETER_TOPIC = "/baro";
+  static constexpr auto DEFAULT_PUB_RATE = 50.0;  // [Hz]. Note: averages the supported Baro device ODR in PX4
+
+  static constexpr auto DEFAULT_HOME_ALT_AMSL = 488.0; // altitude AMSL at Irchel Park, Zurich, Switzerland [m]
+
+  // international standard atmosphere (troposphere model - valid up to 11km) see [1]
+  static constexpr auto TEMPERATURE_MSL = 288.15; // temperature at MSL [K] (15 [C])
+  static constexpr auto PRESSURE_MSL = 101325.0; // pressure at MSL [Pa]
+  static constexpr auto LAPSE_RATE = 0.0065; // reduction in temperature with altitude for troposphere [K/m]
+  static constexpr auto AIR_DENSITY_MSL = 1.225; // air density at MSL [kg/m^3]
+  static constexpr auto ABSOLUTE_ZERO_C = -273.15; // [C]
 
   class BarometerPlugin : public ModelPlugin {
   public:
@@ -93,8 +105,8 @@ namespace gazebo {
     common::Time last_time_;
 
     ignition::math::Pose3d pose_model_start_;
-    ignition::math::Vector3d gravity_W_;
-    double alt_home_;
+    ignition::math::Vector3d gravity_in_world_; // [m/s^2]
+    double alt_home_; // home altitude AMSL [m]
 
     // state variables for baro pressure sensor random noise generator
     double baro_rnd_y2_;
