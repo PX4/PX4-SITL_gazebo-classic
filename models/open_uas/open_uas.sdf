@@ -154,10 +154,10 @@
       <child>airspeed::link</child>
       <parent>base_link</parent>
     </joint>
-    <!--lidar-->
+    <!--lidar / distance sensor-->
     <include>
       <uri>model://lidar</uri>
-      <pose>0 0 -0.07 0 0 0</pose>
+      <pose>0 0 -0.08 0 0 0</pose>
     </include>
 
     <joint name="lidar_joint" type="fixed">
