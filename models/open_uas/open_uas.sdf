@@ -558,7 +558,7 @@
       <control_joint_name>
         left_aileron_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -580,7 +580,7 @@
       <control_joint_name>
         right_aileron_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -602,7 +602,7 @@
       <control_joint_name>
         left_flap_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.1</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -624,7 +624,7 @@
       <control_joint_name>
         right_flap_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.1</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
