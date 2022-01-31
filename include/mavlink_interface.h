@@ -82,6 +82,7 @@ enum class SensorSource {
   MAG		= 0b111000000,
   BARO		= 0b1101000000000,
   DIFF_PRESS	= 0b10000000000,
+  WIND_SENSOR	= 0b10000000011
 };
 
 namespace SensorData {
@@ -104,6 +105,11 @@ namespace SensorData {
 
     struct Airspeed {
         double diff_pressure;
+    };
+
+    struct WindSensor {
+        double wind_speed;
+        double wind_direction;
     };
 
     struct Gps {
@@ -129,12 +135,15 @@ struct HILData {
     int id=-1;
     bool baro_updated{false};
     bool diff_press_updated{false};
+    bool windsensor_updated{false};
     bool mag_updated{false};
     bool imu_updated{false};
     double temperature;
     double pressure_alt;
     double abs_pressure;
     double diff_pressure;
+    double wind_direction;
+    double wind_speed;
     Eigen::Vector3d mag_b;
     Eigen::Vector3d accel_b;
     Eigen::Vector3d gyro_b;
@@ -158,6 +167,7 @@ public:
     void SendGpsMessages(const SensorData::Gps &data);
     void UpdateBarometer(const SensorData::Barometer &data, const int id = 0);
     void UpdateAirspeed(const SensorData::Airspeed &data, const int id = 0);
+    void UpdateWindSensor(const SensorData::WindSensor &data, const int id = 0);
     void UpdateIMU(const SensorData::Imu &data, const int id = 0);
     void UpdateMag(const SensorData::Magnetometer &data, const int id = 0);
     Eigen::VectorXd GetActuatorControls();

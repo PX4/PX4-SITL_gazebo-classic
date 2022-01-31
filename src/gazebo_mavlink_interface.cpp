@@ -443,6 +443,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   CreateSensorSubscription(&GazeboMavlinkInterface::SonarCallback, this, joints, nested_model, kDefaultSonarModelNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, joints, nested_model, kDefaultGPSModelNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::AirspeedCallback, this, joints, nested_model, kDefaultAirspeedModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::WindSensorCallback, this, joints, nested_model, kDefaultWindSensorModelJointNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::ImuCallback, this, joints, nested_model, kDefaultImuModelJointNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::MagnetometerCallback, this, joints, nested_model, kDefaultMagModelJointNaming);
 
@@ -1090,6 +1091,13 @@ void GazeboMavlinkInterface::AirspeedCallback(AirspeedPtr& airspeed_msg, const i
   SensorData::Airspeed airspeed_data;
   airspeed_data.diff_pressure = airspeed_msg->diff_pressure();
   mavlink_interface_->UpdateAirspeed(airspeed_data, id);
+}
+
+void GazeboMavlinkInterface::WindSensorCallback(WindSensorPtr& windsensor_msg, const int& id) {
+  SensorData::WindSensor windsensor_data;
+  windsensor_data.wind_speed = windsensor_msg->wind_speed();
+  windsensor_data.wind_direction = windsensor_msg->wind_direction();
+  mavlink_interface_->UpdateWindSensor(windsensor_data, id);
 }
 
 void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {

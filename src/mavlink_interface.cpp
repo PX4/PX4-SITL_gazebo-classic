@@ -274,6 +274,15 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
     data->diff_press_updated = false;
   }
 
+  // send only windsensor data
+  if (data->windsensor_updated) {
+    sensor_msg.wind_direction = data->wind_direction;
+    sensor_msg.wind_speed = data->wind_speed;
+    sensor_msg.fields_updated = sensor_msg.fields_updated | (uint16_t)SensorSource::WIND_SENSOR;
+
+    data->windsensor_updated = false;
+  }
+
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
@@ -328,6 +337,20 @@ void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) 
     if (instance.id == id) {
       instance.diff_pressure = data.diff_pressure;
       instance.diff_press_updated = true;
+      return;
+    }
+  }
+  //Register new HIL instance if we have never seen the id
+  RegisterNewHILSensorInstance(id);
+}
+
+void MavlinkInterface::UpdateWindSensor(const SensorData::WindSensor &data, int id) {
+  const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
+  for (auto& instance : hil_data_) {
+    if (instance.id == id) {
+      instance.wind_direction = data.wind_direction;
+      instance.wind_speed = data.wind_speed;
+      instance.windsensor_updated = true;
       return;
     }
   }
