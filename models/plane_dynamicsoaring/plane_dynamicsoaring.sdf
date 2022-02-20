@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='plane_dynamicsoaring'>
+    <include>
+      <uri>model://plane</uri>
+    </include>
+    <plugin name='wind_shear_plugin' filename='libgazebo_wind_shear_plugin.so'>
+      <frameId>base_link</frameId>
+      <robotNamespace/>
+      <xyzOffset>1 0 0</xyzOffset>
+      <windDirectionMean>0 1 0</windDirectionMean>
+      <windVelocityMax>15.0</windVelocityMax>
+      <windGustDirection>0 0 0</windGustDirection>
+      <windGustDuration>0</windGustDuration>
+      <windGustStart>0</windGustStart>
+      <windGustVelocityMean>0</windGustVelocityMean>
+      <windShearGradient>0.2</windShearGradient>
+      <windShearOffset>0.0</windShearOffset>
+      <windPubTopic>world_wind</windPubTopic>
+    </plugin>
+  </model>
+</sdf>

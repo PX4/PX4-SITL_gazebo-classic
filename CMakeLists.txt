@@ -366,6 +366,7 @@ add_library(gazebo_mavlink_interface SHARED src/gazebo_mavlink_interface.cpp src
 add_library(gazebo_motor_model SHARED src/gazebo_motor_model.cpp)
 add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plugin.cpp)
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
+add_library(gazebo_wind_shear_plugin SHARED src/gazebo_wind_shear_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
 add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
