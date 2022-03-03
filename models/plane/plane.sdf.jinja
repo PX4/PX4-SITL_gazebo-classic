@@ -97,7 +97,7 @@
       <parent>base_link</parent>
     </joint>
     <link name='rotor_puller'>
-      <pose>0.3 0 0.0 0 1.57 0</pose>
+      <pose>0.22 0 0.0 0 1.57 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -128,10 +128,10 @@
         </surface>
       </collision>
       <visual name='rotor_puller_visual'>
-        <pose>0 0 -0.09 0 0 0</pose>
+        <pose>0.0 0 0.0 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>1 1 1</scale>
+            <scale>0.8 0.8 0.8</scale>
             <uri>model://plane/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
@@ -369,8 +369,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.3</mu>
-              <mu2>0.3</mu2>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+              <fdir1>0 0 1</fdir1>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
             </ode>
           </friction>
           <contact>
@@ -393,7 +396,7 @@
     </link>
     <link name="rear_left_wheel">
       <inertial>
-        <mass>2</mass>
+        <mass>0.05</mass>
         <inertia>
           <ixx>0.035516</ixx>
           <ixy>0</ixy>
@@ -415,8 +418,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.3</mu>
-              <mu2>0.3</mu2>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+              <fdir1>0 0 1</fdir1>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
             </ode>
           </friction>
           <contact>
@@ -463,8 +469,11 @@
         <surface>
           <friction>
             <ode>
-              <mu>0.3</mu>
-              <mu2>0.3</mu2>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+              <fdir1>0 0 1</fdir1>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
             </ode>
           </friction>
           <contact>
