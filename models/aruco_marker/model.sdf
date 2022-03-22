@@ -1,0 +1,36 @@
+<?xml version="1.0"?> <sdf version="1.4"> <model name="aruco_marker">   <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>0.1 0.1</size>
+          </plane>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100</mu>
+              <mu2>50</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>0.1 0.1</size>    </plane>    <mesh>
+        <uri>model://aruco_marker/materials/textures/aruco_marker.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_marker/materials/scripts/</uri>
+            <uri>model://aruco_marker/materials/textures/</uri>
+            <name>ArucoMarker/Image</name>
+          </script>
+        </material>
+      </visual>
+    </link>   </model> </sdf>

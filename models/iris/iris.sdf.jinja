@@ -419,6 +419,15 @@
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
     <include>
+      <uri>model://d435</uri>
+      <pose>0 0 0 0 1.57 0</pose>
+      <name>d435</name>
+    </include>
+    <joint name="d435_joint" type="fixed">
+      <child>d435::link</child>
+      <parent>base_link</parent>
+    </joint>
+    <include>
       <uri>model://gps</uri>
       <pose>0.1 0 0 0 0 0</pose>
       <name>gps0</name>

@@ -516,6 +516,15 @@
       </axis>
     </joint>
     <include>
+      <uri>model://aruco_marker</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>aruco</name>
+    </include>
+    <joint name='aruco_joint' type='fixed'>
+      <child>aruco_marker::link</child>
+      <parent>base_link</parent>
+    </joint>
+    <include>
       <uri>model://gps</uri>
       <pose>0 0 0.12 0 0 0</pose>
       <name>gps</name>

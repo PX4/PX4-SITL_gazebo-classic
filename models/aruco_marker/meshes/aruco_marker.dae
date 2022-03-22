@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<COLLADA version="1.5.0" xmlns="http://www.collada.org/2008/03/COLLADASchema">
+  <asset>
+    <contributor />
+    <unit meter="1" />
+  </asset>
+  <library_lights />
+  <library_materials>
+    <material id="material_1">
+      <instance_effect url="#effect-material_1" />
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="effect-material_1">
+      <profile_COMMON>
+        <newparam sid="DiffuseColor-surface">
+          <surface type="2D">
+            <init_from>object_1</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="DiffuseColor-sampler">
+          <sampler2D>
+            <source>DiffuseColor-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <wrap_p>WRAP</wrap_p>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="COMMON">
+          <lambert>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.2 0.2 0.2 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="DiffuseColor-sampler" texcoord="uv0" />
+            </diffuse>
+            <transparent>
+              <color>0 0 0 1</color>
+            </transparent>
+            <transparency>
+              <float>0</float>
+            </transparency>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_cameras />
+  <library_geometries>
+    <geometry id="mesh_1">
+      <mesh>
+        <source id="mesh_1-position" name="position">
+          <float_array id="mesh_1-position-array" count="12">-10 0 -11.041131019592285 10 0 -11.041131019592285 -10 0 11.041131019592285 10 0 11.041131019592285 </float_array>
+          <technique_common>
+            <accessor source="#mesh_1-position-array" count="4" stride="3">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="mesh_1-texcoord" name="texcoord">
+          <float_array id="mesh_1-texcoord-array" count="8">0 0 0 1 1 0 1 1 </float_array>
+          <technique_common>
+            <accessor source="#mesh_1-texcoord-array" count="4" stride="2">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="mesh_1-normal" name="normal">
+          <float_array id="mesh_1-normal-array" count="3">0 1 0 </float_array>
+          <technique_common>
+            <accessor source="#mesh_1-normal-array" count="1" stride="3">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="mesh_1-vertices">
+          <input semantic="POSITION" source="#mesh_1-position" />
+        </vertices>
+        <polylist material="default" count="1">
+          <input semantic="VERTEX" source="#mesh_1-vertices" offset="0" />
+          <input semantic="TEXCOORD" source="#mesh_1-texcoord" offset="1" />
+          <input semantic="NORMAL" source="#mesh_1-normal" offset="2" />
+          <p>2 2 0 3 3 0 1 1 0 0 0 0</p>
+          <vcount>4</vcount>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_images>
+    <image id="object_1">
+      <init_from>aruco_marker.jpg</init_from>
+    </image>
+  </library_images>
+  <library_visual_scenes>
+    <visual_scene id="Scene">
+      <node id="node_1" sid="node_1" type="NODE">
+        <matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#mesh_1">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="mat0" target="#material_1" />
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <library_animations />
+  <scene>
+    <instance_visual_scene url="#Scene" />
+  </scene>
+</COLLADA>
