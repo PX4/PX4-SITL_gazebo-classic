@@ -1,6 +1,7 @@
 /*
  * Copyright 2017 Nuno Marques, PX4 Pro Dev Team, Lisbon
  * Copyright 2017 Siddharth Patel, NTU Singapore
+ * Copyright 2022 SungTae Moon, KOREATECH Korea
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +29,8 @@
 
 // ROS Topic subscriber
 #include <thread>
-#include "ros/ros.h"
-#include "ros/callback_queue.h"
-#include "ros/subscribe_options.h"
-#include <std_msgs/Int32.h>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/int32.hpp>
 
 namespace gazebo {
 
@@ -43,7 +42,7 @@ class GazeboMotorFailure : public ModelPlugin {
  public:
   GazeboMotorFailure();
 
-  void motorFailNumCallBack(const std_msgs::Int32ConstPtr &_msg);
+  void motorFailNumCallBack(const std_msgs::msg::Int32::SharedPtr msg);
 
   virtual ~GazeboMotorFailure();
 
@@ -57,8 +56,6 @@ class GazeboMotorFailure : public ModelPlugin {
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 
  private:
-
-  void QueueThread();
 
   event::ConnectionPtr updateConnection_;
 
@@ -74,10 +71,9 @@ class GazeboMotorFailure : public ModelPlugin {
   msgs::Int motor_failure_msg_;
   int32_t motor_Failure_Number_;
 
-  // ROS communication
-  ros::NodeHandle* rosNode;
-  ros::Subscriber rosSub;
-  ros::CallbackQueue rosQueue;
-  std::thread rosQueueThread;
+  // ROS2 communication
+  rclcpp::Node::SharedPtr ros_node_;
+  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr subscription;
+
 };
 }
