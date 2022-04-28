@@ -37,7 +37,7 @@ include(GNUInstallDirs)
 #######################
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
-option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" ON)
+option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" OFF)
 option(GENERATE_ROS_MODELS "Generate model sdf for ROS environment" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
