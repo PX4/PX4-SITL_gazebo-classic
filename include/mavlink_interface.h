@@ -152,6 +152,7 @@ public:
     void open();
     void close();
     void Load();
+    void SendHeartbeat();
     void SendSensorMessages(const uint64_t time_usec);
     void SendSensorMessages(const uint64_t time_usec, HILData &hil_data);
     void SendGpsMessages(const SensorData::Gps &data);
@@ -179,6 +180,7 @@ public:
     void SetHILStateLevel(bool hil_state_level) {hil_state_level_ = hil_state_level;}
 
     bool SerialEnabled() const { return serial_enabled_; }
+    bool ReceivedHeartbeats() const { return received_heartbeats_; }
 
 private:
     bool received_actuator_{false};
@@ -187,6 +189,7 @@ private:
     Eigen::VectorXd input_reference_;
 
     void handle_message(mavlink_message_t *msg);
+    void handle_heartbeat(mavlink_message_t *msg);
     void handle_actuator_controls(mavlink_message_t *msg);
     void acceptConnections();
     void RegisterNewHILSensorInstance(int id);
@@ -271,4 +274,6 @@ private:
 
     std::vector<HILData, Eigen::aligned_allocator<HILData>> hil_data_;
     std::atomic<bool> gotSigInt_ {false};
+
+    bool received_heartbeats_ {false};
 };
