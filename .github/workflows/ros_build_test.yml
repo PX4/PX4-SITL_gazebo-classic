@@ -1,11 +1,8 @@
-name: Catkin Build Test
+name: ROS Build Test
 on:
   push:
     branches:
-    - 'master'
-  pull_request:
-    branches:
-    - '*'
+    - 'test/fix-ros-build-CI'
 
 jobs:
   build:
@@ -19,8 +16,8 @@ jobs:
           - {rosdistro: 'galactic'}
     steps:
     - uses: actions/checkout@v3
-      with:
-        submodules: true
+    - name: submodule update
+      run: git submodule update --init --recursive
     -
       name: Build and push
       uses: docker/build-push-action@v3
