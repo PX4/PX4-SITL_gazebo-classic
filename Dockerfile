@@ -9,6 +9,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && apt-get install -y \
     python3-colcon-common-extensions \
     python3-pip \
+    git \
  && rm -rf /var/lib/apt/lists/*
 
 COPY package.xml /ros_ws/src/mavlink_sitl_gazebo/package.xml
@@ -25,7 +26,7 @@ WORKDIR /
 # Install mavlink
 RUN git clone --recursive --depth=1 https://github.com/mavlink/mavlink.git && \
     cd mavlink && \
-    pip3 install future && \
+    pip3 install future jinja2 && \
     python3 -m pymavlink.tools.mavgen --lang=C++11 --wire-protocol=2.0 \
         --output=/mavlink/include/mavlink/v2.0 message_definitions/v1.0/all.xml
 
