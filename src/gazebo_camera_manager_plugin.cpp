@@ -24,6 +24,8 @@
 #include <boost/algorithm/string.hpp>
 #include <opencv2/opencv.hpp>
 
+// Mavlink includes
+#include <ardupilotmega/ardupilotmega.h>
 #include <development/mavlink.h>
 
 using namespace std;

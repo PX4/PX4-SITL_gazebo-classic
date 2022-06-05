@@ -21,6 +21,9 @@
 #include <gazebo_gimbal_controller_plugin.hh>
 #include <errno.h>
 
+// Mavlink includes
+#include <ardupilotmega/ardupilotmega.h>
+
 using namespace gazebo;
 using namespace std;
 
