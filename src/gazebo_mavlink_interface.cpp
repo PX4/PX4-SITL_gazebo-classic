@@ -785,9 +785,12 @@ void GazeboMavlinkInterface::SendGroundTruth()
   hil_state_quat.pitchspeed = omega_nb_b.Y();
   hil_state_quat.yawspeed = omega_nb_b.Z();
 
-  hil_state_quat.lat = groundtruth_lat_rad_ * 180 / M_PI * 1e7;
-  hil_state_quat.lon = groundtruth_lon_rad_ * 180 / M_PI * 1e7;
-  hil_state_quat.alt = groundtruth_altitude_ * 1000;
+  {
+    const std::lock_guard<std::mutex> lock(groundtruth_mutex_);
+    hil_state_quat.lat = groundtruth_lat_rad_ * 180 / M_PI * 1e7;
+    hil_state_quat.lon = groundtruth_lon_rad_ * 180 / M_PI * 1e7;
+    hil_state_quat.alt = groundtruth_altitude_ * 1000;
+  }
 
   hil_state_quat.vx = vel_n.X() * 100;
   hil_state_quat.vy = vel_n.Y() * 100;
@@ -842,6 +845,7 @@ void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg, const int& id) {
 }
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
+  const std::lock_guard<std::mutex> lock(groundtruth_mutex_);
   // update groundtruth lat_rad, lon_rad and altitude
   groundtruth_lat_rad_ = groundtruth_msg->latitude_rad();
   groundtruth_lon_rad_ = groundtruth_msg->longitude_rad();
