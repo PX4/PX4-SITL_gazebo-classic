@@ -217,10 +217,13 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // set input_reference_ from inputs.control
   input_reference_.resize(n_out_max);
   joints_.resize(n_out_max);
+  joint_uses_pid_.resize(n_out_max);
   pids_.resize(n_out_max);
   joint_max_errors_.resize(n_out_max);
+
   for (int i = 0; i < n_out_max; ++i)
   {
+    joint_uses_pid_[i] = false; // By default joints don't use PID control
     pids_[i].Init(0, 0, 0, 0, 0, 0, 0);
     input_reference_[i] = 0;
   }
@@ -302,6 +305,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
               joint_max_errors_[index] = pid->Get<double>("errMax");
             }
             pids_[index].Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
+
+            joint_uses_pid_[index] = true;
           }
         }
         else
@@ -1133,22 +1138,21 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
   received_first_actuator_ = mavlink_interface_->GetReceivedFirstActuator();
 }
 
+// set joint positions
 void GazeboMavlinkInterface::handle_control(double _dt)
 {
-  // set joint positions
   for (int i = 0; i < input_reference_.size(); i++) {
     if (joints_[i] || joint_control_type_[i] == "position_gztopic") {
       double target = input_reference_[i];
-      if (joint_control_type_[i] == "velocity")
-      {
+
+      // Apply PID based force for velocity & PID controlled joint
+      if (joint_control_type_[i] == "velocity" && joint_uses_pid_[i]) {
         double current = joints_[i]->GetVelocity(0);
         double err = current - target;
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
-      }
-      else if (joint_control_type_[i] == "position")
-      {
 
+      } else if (joint_control_type_[i] == "position") {
 #if GAZEBO_MAJOR_VERSION >= 9
         double current = joints_[i]->Position(0);
 #else
@@ -1161,9 +1165,8 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         }
         double force = pids_[i].Update(err, _dt);
         joints_[i]->SetForce(0, force);
-      }
-      else if (joint_control_type_[i] == "position_gztopic")
-      {
+
+      } else if (joint_control_type_[i] == "position_gztopic") {
      #if GAZEBO_MAJOR_VERSION > 7 || (GAZEBO_MAJOR_VERSION == 7 && GAZEBO_MINOR_VERSION >= 4)
         /// only gazebo 7.4 and above support Any
         gazebo::msgs::Any m;
@@ -1176,9 +1179,8 @@ void GazeboMavlinkInterface::handle_control(double _dt)
         m.set_data(ss.str());
      #endif
         joint_control_pub_[i]->Publish(m);
-      }
-      else if (joint_control_type_[i] == "position_kinematic")
-      {
+
+      } else if (joint_control_type_[i] == "position_kinematic") {
         /// really not ideal if your drone is moving at all,
         /// mixing kinematic updates with dynamics calculation is
         /// non-physical.
@@ -1187,9 +1189,8 @@ void GazeboMavlinkInterface::handle_control(double _dt)
      #else
         joints_[i]->SetAngle(0, input_reference_[i]);
      #endif
-      }
-      else
-      {
+
+      } else {
         gzerr << "joint_control_type[" << joint_control_type_[i] << "] undefined.\n";
       }
     }
