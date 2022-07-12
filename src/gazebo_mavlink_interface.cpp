@@ -619,8 +619,10 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
     for (int i = 0; i < input_reference_.size(); i++) {
       if (last_actuator_time_ == 0 || (current_time - last_actuator_time_).Double() > 0.2) {
         turning_velocities_msg.add_motor_speed(0);
+
       } else {
         turning_velocities_msg.add_motor_speed(input_reference_[i]);
+
       }
     }
     // TODO Add timestamp and Header
@@ -1122,16 +1124,20 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
   // Read Input References
   input_reference_.resize(n_out_max);
 
+  // Get the normalized (-1 ... +1) actuator controls input from PX4 instance
   Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
+
   if (actuator_controls.size() < n_out_max) return; //TODO: Handle this properly
+
+  // Translate actuator control input into motor input reference [rad/s]
   for (int i = 0; i < input_reference_.size(); i++) {
     if (armed) {
       input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
           * input_scaling_[i] + zero_position_armed_[i];
-      // std::cout << input_reference_ << ", ";
+
     } else {
       input_reference_[i] = zero_position_disarmed_[i];
-      // std::cout << input_reference_ << ", ";
+
     }
   }
   // std::cout << "Input Reference: " << input_reference_.transpose() << std::endl;

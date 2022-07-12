@@ -185,7 +185,11 @@ void GazeboMotorModel::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
   if(rot_velocities->motor_speed_size() < motor_number_) {
     std::cout  << "You tried to access index " << motor_number_
       << " of the MotorSpeed message array which is of size " << rot_velocities->motor_speed_size() << "." << std::endl;
-  } else ref_motor_rot_vel_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), static_cast<double>(max_rot_velocity_));
+
+  } else {
+    ref_motor_rot_vel_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), static_cast<double>(max_rot_velocity_));
+
+  }
 }
 
 void GazeboMotorModel::MotorFailureCallback(const boost::shared_ptr<const msgs::Int> &fail_msg) {
@@ -194,11 +198,14 @@ void GazeboMotorModel::MotorFailureCallback(const boost::shared_ptr<const msgs::
 
 void GazeboMotorModel::UpdateForcesAndMoments() {
   motor_rot_vel_ = joint_->GetVelocity(0);
+
   if (motor_rot_vel_ / (2 * M_PI) > 1 / (2 * sampling_time_)) {
     gzerr << "Aliasing on motor [" << motor_number_ << "] might occur. Consider making smaller simulation time steps or raising the rotor_velocity_slowdown_sim_ param.\n";
   }
+
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
   double force = real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
+
   if(!reversible_) {
     // Not allowed to have negative thrust.
     force = std::abs(force);
@@ -231,6 +238,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   ignition::math::Vector3d air_drag = -std::abs(real_motor_velocity) * rotor_drag_coefficient_ * velocity_perpendicular_to_rotor_axis;
   // Apply air_drag to link.
   link_->AddForce(air_drag);
+
   // Moments
   // Getting the parent link, such that the resulting torques can be applied to it.
   physics::Link_V parent_links = link_->GetParentJointsLinks();
@@ -249,14 +257,14 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   // - \omega * \mu_1 * V_A^{\perp}
   rolling_moment = -std::abs(real_motor_velocity) * turning_direction_ * rolling_moment_coefficient_ * velocity_perpendicular_to_rotor_axis;
   parent_links.at(0)->AddTorque(rolling_moment);
-  // Apply the filter on the motor's velocity.
-  double ref_motor_rot_vel;
-  ref_motor_rot_vel = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
+
+  // Apply the filter and update new rotor velocity
+  const double new_ref_motor_rot_vel = rotor_velocity_filter_->updateFilter(ref_motor_rot_vel_, sampling_time_);
 
 #if 0 //FIXME: disable PID for now, it does not play nice with the PX4 CI system.
   if (use_pid_)
   {
-    double err = joint_->GetVelocity(0) - turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
+    double err = joint_->GetVelocity(0) - turning_direction_ * new_ref_motor_rot_vel / rotor_velocity_slowdown_sim_;
     double rotorForce = pid_.Update(err, sampling_time_);
     joint_->SetForce(0, rotorForce);
     // gzerr << "rotor " << joint_->GetName() << " : " << rotorForce << "\n";
@@ -266,16 +274,16 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 #if GAZEBO_MAJOR_VERSION >= 7
     // Not desirable to use SetVelocity for parts of a moving model
     // impact on rest of the dynamic system is non-physical.
-    joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+    joint_->SetVelocity(0, turning_direction_ * new_ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #elif GAZEBO_MAJOR_VERSION >= 6
     // Not ideal as the approach could result in unrealistic impulses, and
     // is only available in ODE
     joint_->SetParam("fmax", 0, 2.0);
-    joint_->SetParam("vel", 0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+    joint_->SetParam("vel", 0, turning_direction_ * new_ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif
   }
 #else
-  joint_->SetVelocity(0, turning_direction_ * ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
+  joint_->SetVelocity(0, turning_direction_ * new_ref_motor_rot_vel / rotor_velocity_slowdown_sim_);
 #endif /* if 0 */
 }
 
