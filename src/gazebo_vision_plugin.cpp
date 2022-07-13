@@ -186,6 +186,11 @@ void VisionPlugin::OnUpdate(const common::UpdateInfo&)
     _bias.Y() += random_walk.Y() * dt - _bias.Y() / _corellation_time;
     _bias.Z() += random_walk.Z() * dt - _bias.Z() / _corellation_time;
 
+    // clear odom msg repeatin fields to reset size
+    odom_msg.clear_velocity_covariance();
+    odom_msg.clear_pose_covariance();
+
+
     // Fill odom msg
     odom_msg.set_time_usec(current_time.Double() * 1e6);
 
