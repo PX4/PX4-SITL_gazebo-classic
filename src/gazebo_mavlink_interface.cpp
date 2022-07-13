@@ -392,7 +392,17 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
     presetManager->GetCurrentProfileParam("max_step_size", param);
     const double max_step_size = our_any_cast<double>(param);
-    if (1.0 / real_time_update_rate != max_step_size)
+
+    // Adapt the real_time_update_rate according to the speed
+    // that we ask for in the env variable.
+    // Makes sure we don't do this multiple times.
+    if (1.0 / (real_time_update_rate / speed_factor_) != max_step_size) {
+      real_time_update_rate *= speed_factor_;
+      presetManager->SetCurrentProfileParam("real_time_update_rate", real_time_update_rate);
+    }
+
+    // Do this check twice in case the real_time_update_rate has updated.
+    if (1.0 / (real_time_update_rate / speed_factor_) != max_step_size)
     {
       gzerr << "max_step_size of " << max_step_size
             << " s does not match real_time_update_rate of "
@@ -401,11 +411,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     }
 
     update_skip_factor_ = real_time_update_rate_int / 250;
-
-    // Adapt the real_time_update_rate according to the speed
-    // that we ask for in the env variable.
-    real_time_update_rate *= speed_factor_;
-    presetManager->SetCurrentProfileParam("real_time_update_rate", real_time_update_rate);
   }
 
   // Listen to the update event. This event is broadcast every
