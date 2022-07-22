@@ -1,0 +1,87 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='iris_pendulum'>
+  <static>false</static>
+  <include>
+    <uri>model://iris</uri>
+  </include>
+
+  <link name='pendulum'>
+    <pose>0 0 0.5 0 0 0</pose>
+    <inertial>
+      <mass>0.01</mass>
+      <inertia>
+        <ixx>0.00005</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.008333</iyy>
+        <iyz>0</iyz>
+        <izz>0.008333</izz>
+      </inertia>
+    </inertial>
+    <collision name='pendulun_collision'>
+      <geometry>
+        <cylinder>
+          <radius>0.01</radius>
+          <length>1</length>
+        </cylinder>
+      </geometry>
+    </collision>
+    <visual name='pendulum_visual'>
+      <geometry>
+        <cylinder>
+          <radius>0.01</radius>
+          <length>1</length>
+        </cylinder>
+      </geometry>
+    </visual>
+    <gravity>1</gravity>
+  </link>
+
+  <link name='load'>
+    <pose>0 0 1 0 0 0</pose>
+    <inertial>
+      <mass>0.1</mass>
+      <inertia>
+        <ixx>0.004</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.004</iyy>
+        <iyz>0</iyz>
+        <izz>0.004</izz>
+      </inertia>
+    </inertial>
+
+    <collision name='load_collision'>
+      <geometry>
+        <sphere>
+          <radius>0.1 0.1 0.1</radius>
+        </sphere>
+      </geometry>
+    </collision>
+
+    <visual name='load_visual'>
+      <geometry>
+        <sphere>
+          <radius>0.1 0.1 0.1</radius>
+        </sphere>
+      </geometry>
+    </visual>
+    <gravity>1</gravity>
+  </link>
+
+  <joint name='load_joint' type='universal'>
+    <pose>0 0 0 0 0 0</pose>
+    <child>load</child>
+    <parent>pendulum</parent>
+  </joint>
+
+  <joint name='pendulum_joint' type='universal'>
+    <pose>0 0 -0.5 0 0 0</pose>
+    <child>pendulum</child>
+    <parent>iris::base_link</parent>
+  </joint>
+
+
+  </model>
+</sdf>
