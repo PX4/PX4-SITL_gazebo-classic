@@ -832,8 +832,11 @@ void GimbalControllerPlugin::HandleGimbalDeviceSetAttitude(const mavlink_message
     this->yawRateSetpoint = NAN;
 
   } else {
-    float rollRad, pitchRad, yawRad;
-    mavlink_quaternion_to_euler(&set_attitude.q[0], &rollRad, &pitchRad, &yawRad);
+    const auto euler = detail::QtoZXY(ignition::math::Quaterniond(
+			    set_attitude.q[0], set_attitude.q[1], set_attitude.q[2], set_attitude.q[3]));
+    const float pitchRad = euler[0];
+    const float rollRad = euler[1];
+    const float yawRad = euler[2];
 
     const std::lock_guard<std::mutex> lock(setpointMutex);
     this->rollSetpoint = rollRad;
