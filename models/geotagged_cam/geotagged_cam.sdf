@@ -24,8 +24,8 @@
           <horizontal_fov>1.0</horizontal_fov>
           <image>
             <format>R8G8B8</format>
-            <width>640</width>
-            <height>360</height>
+            <width>1080</width>
+            <height>720</height>
           </image>
           <clip>
             <near>0.05</near>
@@ -35,9 +35,34 @@
         <always_on>1</always_on>
         <update_rate>5</update_rate>
         <visualize>true</visualize>
+         <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
+              <robotNamespace></robotNamespace>
+            <alwaysOn>true</alwaysOn>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <updateRate>30.0</updateRate>
+            <cameraName>usb_cam/camera</cameraName>
+            <frameName>/robot_camera_link</frameName>
+            <CxPrime>320.5</CxPrime>
+            <Cx>320.5</Cx>
+            <Cy>240.5</Cy>
+            <hackBaseline>0</hackBaseline>
+            <focalLength>277.191356</focalLength>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
+          </plugin>
         <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
             <robotNamespace></robotNamespace>
             <udpPort>5600</udpPort>
+            <alwaysOn>true</alwaysOn>
+            <updateRate>0.0</updateRate>
+            <cameraName>multisense_sl/camera</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>camera_frame</frameName>
         </plugin>
         <plugin name="CameraManagerPlugin" filename="libgazebo_camera_manager_plugin.so">
           <robotNamespace></robotNamespace>
