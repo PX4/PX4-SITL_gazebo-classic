@@ -76,25 +76,7 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
  public:
   GazeboMotorModel()
       : ModelPlugin(),
-        MotorModel(),
-        command_sub_topic_(kDefaultCommandSubTopic),
-        motor_failure_sub_topic_(kDefaultMotorFailureNumSubTopic),
-        motor_speed_pub_topic_(kDefaultMotorVelocityPubTopic),
-        motor_number_(0),
-        motor_Failure_Number_(0),
-        turning_direction_(turning_direction::CW),
-        max_force_(kDefaultMaxForce),
-        max_rot_velocity_(kDefaulMaxRotVelocity),
-        moment_constant_(kDefaultMomentConstant),
-        motor_constant_(kDefaultMotorConstant),
-        //motor_test_sub_topic_(kDefaultMotorTestSubTopic),
-        ref_motor_rot_vel_(0.0),
-        rolling_moment_coefficient_(kDefaultRollingMomentCoefficient),
-        rotor_drag_coefficient_(kDefaultRotorDragCoefficient),
-        rotor_velocity_slowdown_sim_(kDefaultRotorVelocitySlowdownSim),
-        time_constant_down_(kDefaultTimeConstantDown),
-        time_constant_up_(kDefaultTimeConstantUp),
-        reversible_(false) {
+        MotorModel() {
   }
 
   virtual ~GazeboMotorModel();
@@ -111,33 +93,33 @@ class GazeboMotorModel : public MotorModel, public ModelPlugin {
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 
  private:
-  std::string command_sub_topic_;
-  std::string motor_failure_sub_topic_;
+  std::string command_sub_topic_{kDefaultCommandSubTopic};
+  std::string motor_failure_sub_topic_{kDefaultMotorFailureNumSubTopic};
   std::string joint_name_;
   std::string link_name_;
-  std::string motor_speed_pub_topic_;
+  std::string motor_speed_pub_topic_{kDefaultMotorVelocityPubTopic};
   std::string namespace_;
 
-  int motor_number_;
-  int turning_direction_;
+  int motor_number_{0};
+  int turning_direction_{turning_direction::CW};
 
-  int motor_Failure_Number_; /*!< motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly */
+  int motor_Failure_Number_{0}; /*!< motor_Failure_Number is (motor_number_ + 1) as (0) is considered no_fail. Publish accordingly */
   int tmp_motor_num; // A temporary variable used to print msg
 
   int screen_msg_flag = 1;
 
-  double max_force_;
-  double max_rot_velocity_;
-  double moment_constant_;
-  double motor_constant_;
-  double ref_motor_rot_vel_;
-  double rolling_moment_coefficient_;
-  double rotor_drag_coefficient_;
-  double rotor_velocity_slowdown_sim_;
-  double time_constant_down_;
-  double time_constant_up_;
+  double max_force_{kDefaultMaxForce};
+  double max_rot_velocity_{kDefaulMaxRotVelocity};
+  double moment_constant_{kDefaultMomentConstant};
+  double motor_constant_{kDefaultMotorConstant};
+  double ref_motor_rot_vel_{0.0};
+  double rolling_moment_coefficient_{kDefaultRollingMomentCoefficient};
+  double rotor_drag_coefficient_{kDefaultRotorDragCoefficient};
+  double rotor_velocity_slowdown_sim_{kDefaultRotorVelocitySlowdownSim};
+  double time_constant_down_{kDefaultTimeConstantDown};
+  double time_constant_up_{kDefaultTimeConstantUp};
 
-  bool reversible_;
+  bool reversible_{false};
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_pub_;
