@@ -3,7 +3,7 @@ name: Firmware Build and SITL Tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
       - '*'
@@ -21,17 +21,17 @@ jobs:
       image: px4io/px4-dev-simulation-focal:2021-05-31
       options: --privileged --ulimit core=-1 --security-opt seccomp=unconfined
     steps:
-    - name: Checkout Firmware master
+    - name: Checkout Firmware main
       uses: actions/checkout@v2.3.1
       with:
         repository: PX4/Firmware
-        ref: master
+        ref: main
         path: Firmware
         fetch-depth: 0
         submodules: recurvise
     - name: Checkout matching branch on PX4/Firmware if possible
       run: |
-        git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using master instead"
+        git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using main instead"
         git submodule update --init --recursive
       working-directory: Firmware
     - name: Configure Firmware to include current sitl_gazebo version
@@ -41,10 +41,10 @@ jobs:
         git checkout ${{github.head_ref}}
     - name: Download MAVSDK
       working-directory: Firmware
-      run: wget "https://github.com/mavlink/MAVSDK/releases/download/v$(cat test/mavsdk_tests/MAVSDK_VERSION)/mavsdk_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
+      run: wget "https://github.com/mavlink/MAVSDK/releases/download/v$(cat test/mavsdk_tests/MAVSDK_VERSION)/libmavsdk-dev_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
     - name: Install MAVSDK
       working-directory: Firmware
-      run: dpkg -i "mavsdk_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
+      run: dpkg -i "libmavsdk-dev_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
       shell: cmake -P {0}
