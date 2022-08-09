@@ -263,76 +263,6 @@
       </axis>
     </joint>
 
-
-    <link name='motor_1'>
-      <pose>-0.35 0.35 0.02 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>0.0166704</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.0167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='motor_1_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='motor_1_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/DarkGrey</name>
-            <uri>__default__</uri>
-          </script>
-        </material>
-      </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-
-    <joint name='motor_1_joint' type='revolute'>
-      <child>motor_1</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
-        </limit>
-        <dynamics>
-          <friction>1.0</friction>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-
     <link name='rotor_1'>
       <pose>-0.35 0.35 0.07 0 0 0</pose>
       <inertial>
@@ -385,7 +315,7 @@
     </link>
     <joint name='rotor_1_joint' type='revolute'>
       <child>rotor_1</child>
-      <parent>motor_1</parent>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -539,76 +469,6 @@
       </axis>
     </joint>
 
-<link name='motor_3'>
-       <pose>-0.35 -0.35 0.02 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
-        <inertia>
-          <ixx>0.0166704</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.0166704</iyy>
-          <iyz>0</iyz>
-          <izz>0.0167604</izz>
-        </inertia>
-      </inertial>
-      <collision name='motor_3_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='motor_3_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.035</length>
-            <radius>0.02</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/DarkGrey</name>
-            <uri>__default__</uri>
-          </script>
-        </material>
-      </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
-      <self_collide>0</self_collide>
-    </link>
-
-    <joint name='motor_3_joint' type='revolute'>
-      <child>motor_3</child>
-      <parent>base_link</parent>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1.5</lower>
-          <upper>1.5</upper>
-        </limit>
-        <dynamics>
-          <friction>1.0</friction>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
-
-
     <link name='rotor_3'>
       <pose>-0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
@@ -661,7 +521,7 @@
     </link>
     <joint name='rotor_3_joint' type='revolute'>
       <child>rotor_3</child>
-      <parent>motor_3</parent>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -1112,25 +972,6 @@
             <errMax>0.2</errMax>
           </joint_control_pid>
         </channel>
-        <channel name="motor1_tilt">
-          <input_index>5</input_index>
-          <input_offset>0.785398</input_offset>
-          <input_scaling>0.785398</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
-          <joint_name>motor_1_joint</joint_name>
-           <joint_control_pid>
-            <p>10</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0.0</iMax>
-            <iMin>0.0</iMin>
-            <cmdMax>2</cmdMax>
-            <cmdMin>-2</cmdMin>
-            <errMax>0.2</errMax>
-          </joint_control_pid>
-        </channel>
         <channel name="motor2_tilt">
           <input_index>6</input_index>
           <input_offset>0.785398</input_offset>
@@ -1139,25 +980,6 @@
           <zero_position_armed>0</zero_position_armed>
           <joint_control_type>position</joint_control_type>
           <joint_name>motor_2_joint</joint_name>
-           <joint_control_pid>
-            <p>10</p>
-            <i>0</i>
-            <d>0</d>
-            <iMax>0.0</iMax>
-            <iMin>0.0</iMin>
-            <cmdMax>2</cmdMax>
-            <cmdMin>-2</cmdMin>
-            <errMax>0.2</errMax>
-          </joint_control_pid>
-        </channel>
-        <channel name="motor3_tilt">
-          <input_index>7</input_index>
-          <input_offset>0.785398</input_offset>
-          <input_scaling>0.785398</input_scaling>
-          <zero_position_disarmed>0</zero_position_disarmed>
-          <zero_position_armed>0</zero_position_armed>
-          <joint_control_type>position</joint_control_type>
-          <joint_name>motor_3_joint</joint_name>
            <joint_control_pid>
             <p>10</p>
             <i>0</i>
