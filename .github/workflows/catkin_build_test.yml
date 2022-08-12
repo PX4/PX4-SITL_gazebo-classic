@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {rosdistro: 'melodic', container: 'px4io/px4-dev-ros-melodic:2021-05-31'}
-          - {rosdistro: 'noetic', container: 'px4io/px4-dev-ros-noetic:2021-05-31'}
+          # - {rosdistro: 'melodic', container: 'px4io/px4-dev-ros-melodic:2021-12-11'}
+          - {rosdistro: 'noetic', container: 'px4io/px4-dev-ros-noetic:2022-08-12'}
     container: ${{ matrix.config.container }}
     steps:
     - uses: actions/checkout@v1
