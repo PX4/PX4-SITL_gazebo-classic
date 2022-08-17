@@ -44,6 +44,11 @@
 namespace gazebo {
 GZ_REGISTER_SENSOR_PLUGIN(AirspeedPlugin)
 
+// Sign function taken from https://stackoverflow.com/a/4609795/8548472
+template <typename T> int sign(T val) {
+  return (T(0) < val) - (val < T(0));
+}
+
 AirspeedPlugin::AirspeedPlugin() : SensorPlugin(),
   diff_pressure_stddev_(0.01f),
   alt_home_(DEFAULT_HOME_ALT_AMSL)
@@ -169,7 +174,7 @@ void AirspeedPlugin::OnSensorUpdate() {
 
   // calculate differential pressure + noise in hPa
   const float diff_pressure_noise = standard_normal_distribution_(random_generator_) * diff_pressure_stddev_;
-  double diff_pressure = 0.005f * air_density  * air_vel_in_body_.X() * air_vel_in_body_.X() + diff_pressure_noise;
+  double diff_pressure = sign(air_vel_in_body_.X()) * 0.005f * air_density  * air_vel_in_body_.X() * air_vel_in_body_.X() + diff_pressure_noise;
 
   // calculate differential pressure in hPa
   sensor_msgs::msgs::Airspeed airspeed_msg;
