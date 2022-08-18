@@ -204,7 +204,7 @@ void MavlinkInterface::Load()
 
 void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
   for (auto& data : hil_data_) {
-    if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated) {
+    if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated | data.windsensor_updated) {
       SendSensorMessages(time_usec, data);
     }
   }

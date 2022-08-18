@@ -82,7 +82,7 @@ enum class SensorSource {
   MAG		= 0b111000000,
   BARO		= 0b1101000000000,
   DIFF_PRESS	= 0b10000000000,
-  WIND_SENSOR	= 0b10000000011
+  WIND_SENSOR	= 0b10000000000000
 };
 
 namespace SensorData {

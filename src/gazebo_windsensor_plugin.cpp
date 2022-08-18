@@ -113,6 +113,11 @@ void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   wind_sub_ = node_handle_->Subscribe("~/world_wind", &WindSensorPlugin::WindVelocityCallback, this);
 
 
+  // Set initial wind as zero
+  wind_.X() = 0;
+  wind_.Y() = 0;
+  wind_.Z() = 0;
+
 }
 
 void WindSensorPlugin::OnUpdate(const common::UpdateInfo&){
