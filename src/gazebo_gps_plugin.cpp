@@ -41,7 +41,6 @@ GpsPlugin::~GpsPlugin()
   if (updateSensorConnection_)
     updateSensorConnection_->~Connection();
   parentSensor_.reset();
-  world_->Reset();
 }
 
 void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
