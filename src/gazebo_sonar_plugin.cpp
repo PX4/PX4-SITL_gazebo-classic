@@ -45,7 +45,6 @@ SonarPlugin::~SonarPlugin()
   newScansConnection_->~Connection();
   newScansConnection_.reset();
   parentSensor_.reset();
-  world_.reset();
 }
 
 /////////////////////////////////////////////////
