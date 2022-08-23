@@ -243,9 +243,11 @@ private:
   std::string baro_sub_topic_{kDefaultBarometerTopic};
   std::string wind_sub_topic_{kDefaultWindTopic};
 
-  std::mutex last_imu_message_mutex_ {};
-  std::condition_variable last_imu_message_cond_ {};
-  sensor_msgs::msgs::Imu last_imu_message_;
+  std::mutex imu_received_mutex_ {};
+  std::condition_variable imu_received_cond_ {};
+  bool imu_received_ {false};
+  bool imu_received_once_ {false};
+  int64_t last_imu_message_seq_{0};
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
@@ -267,8 +269,8 @@ private:
 
   bool enable_lockstep_{false};
   double speed_factor_{1.0};
-  int64_t previous_imu_seq_{0};
   unsigned update_skip_factor_{1};
+  uint64_t update_counter_{0u};
 
   bool hil_mode_{false};
   bool hil_state_level_{false};
