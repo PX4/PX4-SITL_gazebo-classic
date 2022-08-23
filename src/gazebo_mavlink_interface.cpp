@@ -554,18 +554,16 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 // This gets called by the world update start event.
 void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
-  std::unique_lock<std::mutex> lock(last_imu_message_mutex_);
+  std::unique_lock<std::mutex> lock(imu_received_mutex_);
 
-  if (previous_imu_seq_ > 0) {
-    while (previous_imu_seq_ == last_imu_message_.seq() && IsRunning()) {
-      last_imu_message_cond_.wait_for(lock, std::chrono::milliseconds(10));
+  if (imu_received_once_) {
+    while (!imu_received_ && IsRunning()) {
+      imu_received_cond_.wait_for(lock, std::chrono::milliseconds(10));
     }
   }
-
-  previous_imu_seq_ = last_imu_message_.seq();
-
+  imu_received_ = false;
   // Always run at 250 Hz. At 500 Hz, the skip factor should be 2, at 1000 Hz 4.
-  if (!(previous_imu_seq_ % update_skip_factor_ == 0)) {
+  if (!(update_counter_++ % update_skip_factor_ == 0)) {
     return;
   }
 
@@ -597,7 +595,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   // Always send Gyro and Accel data at full rate (= sim update rate)
   SendSensorMessages();
 
-  // Send groudntruth at full rate
+  // Send groundtruth at full rate
   SendGroundTruth();
 
   if (close_conn_) { // close connection if required
@@ -653,27 +651,45 @@ void GazeboMavlinkInterface::setMavlinkSensorOrientation(const ignition::math::V
 
 void GazeboMavlinkInterface::ImuCallback(ImuPtr& imu_message)
 {
-  std::unique_lock<std::mutex> lock(last_imu_message_mutex_);
+  std::unique_lock<std::mutex> lock(imu_received_mutex_);
 
-  const int64_t diff = imu_message->seq() - last_imu_message_.seq();
+  const int64_t diff = imu_message->seq() - last_imu_message_seq_;
   if (diff != 1 && imu_message->seq() != 0)
   {
     gzerr << "Skipped " << (diff - 1) << " IMU samples (presumably CPU usage is too high)\n";
   }
 
-  last_imu_message_ = *imu_message;
+  last_imu_message_seq_ = imu_message->seq();
+
+  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
+    imu_message->orientation().w(),
+    imu_message->orientation().x(),
+    imu_message->orientation().y(),
+    imu_message->orientation().z());
+
+  ignition::math::Vector3d accel_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
+    imu_message->linear_acceleration().x(),
+    imu_message->linear_acceleration().y(),
+    imu_message->linear_acceleration().z()));
+
+  ignition::math::Vector3d gyro_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
+    imu_message->angular_velocity().x(),
+    imu_message->angular_velocity().y(),
+    imu_message->angular_velocity().z()));
+
+  SensorData::Imu imu_data;
+  imu_data.accel_b = Eigen::Vector3d(accel_b.X(), accel_b.Y(), accel_b.Z());
+  imu_data.gyro_b = Eigen::Vector3d(gyro_b.X(), gyro_b.Y(), gyro_b.Z());
+  mavlink_interface_->UpdateIMU(imu_data);
+
+  imu_received_ = true;
+  imu_received_once_ = true;
   lock.unlock();
-  last_imu_message_cond_.notify_one();
+  imu_received_cond_.notify_one();
 }
 
 void GazeboMavlinkInterface::SendSensorMessages()
 {
-  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
-    last_imu_message_.orientation().w(),
-    last_imu_message_.orientation().x(),
-    last_imu_message_.orientation().y(),
-    last_imu_message_.orientation().z());
-
   bool should_send_imu = false;
   if (!enable_lockstep_) {
 #if GAZEBO_MAJOR_VERSION >= 9
@@ -695,35 +711,18 @@ void GazeboMavlinkInterface::SendSensorMessages()
   uint64_t time_usec = std::llround(world_->GetSimTime().Double() * 1e6);
 #endif
 
-  // send always accel and gyro data (not dependent of the bitmask)
-  // required so to keep the timestamps on sync and the lockstep can
-  // work properly
-  ignition::math::Vector3d accel_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
-    last_imu_message_.linear_acceleration().x(),
-    last_imu_message_.linear_acceleration().y(),
-    last_imu_message_.linear_acceleration().z()));
-
-  ignition::math::Vector3d gyro_b = q_FLU_to_FRD.RotateVector(ignition::math::Vector3d(
-    last_imu_message_.angular_velocity().x(),
-    last_imu_message_.angular_velocity().y(),
-    last_imu_message_.angular_velocity().z()));
-
-  SensorData::Imu imu_data;
-  imu_data.accel_b = Eigen::Vector3d(accel_b.X(), accel_b.Y(), accel_b.Z());
-  imu_data.gyro_b = Eigen::Vector3d(gyro_b.X(), gyro_b.Y(), gyro_b.Z());
-  mavlink_interface_->UpdateIMU(imu_data);
-
   mavlink_interface_->SendSensorMessages(time_usec);
 }
 
 void GazeboMavlinkInterface::SendGroundTruth()
 {
   // ground truth
-  ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
-    last_imu_message_.orientation().w(),
-    last_imu_message_.orientation().x(),
-    last_imu_message_.orientation().y(),
-    last_imu_message_.orientation().z());
+  #if GAZEBO_MAJOR_VERSION >= 9
+    ignition::math::Pose3d pose_gr = model_->WorldPose();
+  #else
+    ignition::math::Pose3d pose_gr = ignitionFromGazeboMath(model_->GetWorldPose());
+  #endif
+  ignition::math::Quaterniond q_gr = pose_gr.Rot();
 
   ignition::math::Quaterniond q_FLU_to_NED = q_ENU_to_NED * q_gr;
   ignition::math::Quaterniond q_nb = q_FLU_to_NED * q_FLU_to_FRD.Inverse();
