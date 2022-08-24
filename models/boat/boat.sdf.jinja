@@ -394,21 +394,11 @@
         </geometry>
       </visual>
     </link>
-    <link name='boat/imu_link'>
+    <include>
+      <uri>model://imu</uri>
       <pose>0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
-        <inertia>
-          <ixx>1e-05</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>1e-05</iyy>
-          <iyz>0</iyz>
-          <izz>1e-05</izz>
-        </inertia>
-      </inertial>
-    </link>
+      <name>imu</name>
+    </include>
     <joint name='right_engine_propeller_joint' type='revolute'>
       <child>right_propeller_link</child>
       <parent>base_link</parent>
@@ -427,8 +417,8 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <joint name='boat/imu_joint' type='revolute'>
-      <child>boat/imu_link</child>
+    <joint name='imu_joint' type='revolute'>
+      <child>imu::link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -454,19 +444,6 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
-      <robotNamespace></robotNamespace>
-      <linkName>boat/imu_link</linkName>
-      <imuTopic>/imu</imuTopic>
-      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
-      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
-      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
-      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
-      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
-      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
-      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
-      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
-    </plugin>
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
       <pubRate>100</pubRate>
