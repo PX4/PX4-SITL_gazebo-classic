@@ -55,8 +55,6 @@ static constexpr double kDefaultAdisAccelerometerTurnOnBiasSigma =
 // Earth's gravity in Zurich (lat=+47.3667degN, lon=+8.5500degE, h=+500m, WGS84)
 static constexpr double kDefaultGravityMagnitude = 9.8068;
 
-static const std::string kDefaultImuTopic = "imu";
-
 // A description of the parameters:
 // https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics
 // TODO(burrimi): Should I have a minimalistic description of the params here?
@@ -95,7 +93,7 @@ struct ImuParameters {
         gravity_magnitude(kDefaultGravityMagnitude) {}
 };
 
-class GazeboImuPlugin : public ModelPlugin {
+class GazeboImuPlugin : public SensorPlugin {
  public:
 
   GazeboImuPlugin();
@@ -105,7 +103,7 @@ class GazeboImuPlugin : public ModelPlugin {
   void Publish();
 
  protected:
-  void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
 
   void addNoise(
       Eigen::Vector3d* linear_acceleration,

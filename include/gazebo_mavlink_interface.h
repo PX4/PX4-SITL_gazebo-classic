@@ -78,6 +78,7 @@ static const std::regex kDefaultLidarModelNaming(".*(lidar|sf10a)(.*)");
 static const std::regex kDefaultSonarModelNaming(".*(sonar|mb1240-xl-ez4)(.*)");
 static const std::regex kDefaultGPSModelNaming(".*(gps|ublox-neo-7M)(.*)");
 static const std::regex kDefaultAirspeedModelJointNaming(".*(airspeed)(.*_joint)");
+static const std::regex kDefaultImuModelJointNaming(".*(imu)(\\d*_joint)");
 
 namespace gazebo {
 
@@ -171,7 +172,7 @@ private:
   event::ConnectionPtr updateConnection_;
   event::ConnectionPtr sigIntConnection_;
 
-  void ImuCallback(ImuPtr& imu_msg);
+  void ImuCallback(ImuPtr& imu_msg, const int& id);
   void GpsCallback(GpsPtr& gps_msg, const int& id);
   void GroundtruthCallback(GtPtr& groundtruth_msg);
   void LidarCallback(LidarPtr& lidar_msg, const int& id);

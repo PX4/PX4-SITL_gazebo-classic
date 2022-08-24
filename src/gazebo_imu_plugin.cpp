@@ -25,12 +25,17 @@
 #include <iostream>
 #include <stdio.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
+
+#include <gazebo/sensors/Sensor.hh>
 
 namespace gazebo {
 
+GZ_REGISTER_SENSOR_PLUGIN(GazeboImuPlugin)
+
 GazeboImuPlugin::GazeboImuPlugin()
-    : ModelPlugin(),
+    : SensorPlugin(),
       velocity_prev_W_(0,0,0)
 {
 }
@@ -40,10 +45,31 @@ GazeboImuPlugin::~GazeboImuPlugin() {
 }
 
 
-void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+void GazeboImuPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf) {
   // Store the pointer to the model
-  model_ = _model;
-  world_ = model_->GetWorld();
+  world_ = physics::get_world(_parent->WorldName());
+
+  link_ = boost::dynamic_pointer_cast<physics::Link>(
+      world_->EntityByName(_parent->ParentName()));
+  if (link_ == NULL) {
+    gzthrow("ImuPlugin: could not find the link associated to the sensor");
+  }
+
+  model_ = link_->GetParentModel();
+  if (model_ == NULL) {
+    gzthrow("ImuPlugin: could not find the model associated to the sensor");
+  }
+
+  // Get the root model name
+  const std::string scopedName = _parent->ParentName();
+  std::vector<std::string> names_splitted;
+  boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+  names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                            [](const std::string& name)
+                            { return name.size() == 0; }), end(names_splitted));
+
+  // the second to the last name is the model name
+  const std::string parentSensorModelName = names_splitted.rbegin()[1];
 
   // default params
   namespace_.clear();
@@ -55,18 +81,12 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  if (_sdf->HasElement("linkName"))
-    link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
-  else
-    gzerr << "[gazebo_imu_plugin] Please specify a linkName.\n";
-  // Get the pointer to the link
-  link_ = model_->GetLink(link_name_);
-  if (link_ == NULL)
-    gzthrow("[gazebo_imu_plugin] Couldn't find specified link \"" << link_name_ << "\".");
+  if (_sdf->HasElement("imuTopic"))
+    imu_topic_ = _sdf->GetElement("imuTopic")->Get<std::string>();
+  else {
+    imu_topic_ = parentSensorModelName;
+  }
 
-  frame_id_ = link_name_;
-
-  getSdfParam<std::string>(_sdf, "imuTopic", imu_topic_, kDefaultImuTopic);
   getSdfParam<double>(_sdf, "gyroscopeNoiseDensity",
                       imu_parameters_.gyroscope_noise_density,
                       imu_parameters_.gyroscope_noise_density);
@@ -106,7 +126,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
       event::Events::ConnectWorldUpdateBegin(
           boost::bind(&GazeboImuPlugin::OnUpdate, this, _1));
 
-  imu_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Imu>("~/" + model_->GetName() + imu_topic_, 10);
+  imu_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Imu>("~/" + model_->GetName()+ "/link/" + imu_topic_, 10);
 
   // Fill imu message.
   // imu_message_.header.frame_id = frame_id_; TODO Add header
@@ -324,7 +344,4 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
   imu_pub_->Publish(imu_message_);
 }
-
-
-GZ_REGISTER_MODEL_PLUGIN(GazeboImuPlugin);
 }
