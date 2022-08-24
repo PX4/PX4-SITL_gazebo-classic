@@ -654,9 +654,9 @@ void GimbalControllerPlugin::SendGimbalDeviceInformation()
     mavlinkChannel,
     &msg,
     timeMs,
-    "PX4",
-    "Gazebo SITL",
-    "", // custom_name
+    std::string("PX4").c_str(),
+    std::string("Gazebo SITL").c_str(),
+    std::string("").c_str(), // custom_name
     firmwareVersion,
     hardwareVersion,
     uid,
