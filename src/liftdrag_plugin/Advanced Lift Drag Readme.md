@@ -1,7 +1,5 @@
-# Introduction
-This document describes the new Gazebo plugin for aerodynamic modeling, updates to the physics formulation (quadratic drag, sideforce, moments about all three axes, body rate derivatives), and also figure out a workflow to get from AVL derivatives to Gazebo parameters, while maintaining accurate physics representation/effects. <br>
-
-# Notation
+<h1>Introduction</h1><br>This document describes the new Gazebo plugin for aerodynamic modeling, updates to the physics formulation (quadratic drag, sideforce, moments about all three axes, body rate derivatives), and also figure out a workflow to get from AVL derivatives to Gazebo parameters, while maintaining accurate physics representation/effects. <br> 
+<h1>Notation</h1>
 All the variables representing aerodynamic coefficients and derivatives are named according to the following convention: <br>
 <ul>
     <li>The first letter of these variable names is a capital C.</li>
@@ -22,14 +20,13 @@ All the variables representing aerodynamic coefficients and derivatives are name
     </ul>
  </ul>
 One potentially confusing item in the code is the abbreviation “CDp”. CDp could be used to refer to a body rate derivative (the change in coefficient of drag with respect to the non-dimensionalized roll rate) or parasitic drag. This code uses it to refer to the body rate derivative: the parasitic drag (also known as “zero-lift drag”) is referred to as CD0 in the code. <br>
-
-# Coordinate Frames
+<h1>Coordinate Frames</h1>
 Gazebo uses an ENU (east-north-up) reference frame, while the AVL equations of motion assume an NED (north-east-down) frame. Both of these frames are mapped onto the aircraft assuming that it is traveling along the X-axis of the frame (east in ENU, north in NED). What this means in practice is that the ENU frame has a Y axis out the left wing and a Z axis pointing upward, while the NED frame has a Y axis pointing out the right wing and a Z axis pointing downward. As such, the angles, forces, and moments need to be translated between the frames.
 As of August 2022, the advanced lift-drag plugin computes all forces in the stability frame, and all moments in the body frame. The stability frame is a reference frame oriented such that the X-axis is pointed opposite to the projection of the relative wind vector onto the plane of symmetry of the aircraft. In other words, compared to the body frame, the stability frame has been rotated about the Y-axis by an angle ⍺, the angle of attack. This is important, since the lift and drag are computed in this frame. The following Stack Overflow post (https://aviation.stackexchange.com/questions/70577/under-what-circumstances-is-the-aircraft-stability-axis-system-used-in-either) contains a diagram showing the stability, body, and wind axes. <br>
-
-# Getting the Aerodynamic Parameters
+<h1>Getting the Aerodynamic Parameters</h1>
+<h2>AVL</h2>
 AVL, also known as Athena Vortex Lattice, was used to obtain the aerodynamic parameters and derivatives needed for the advanced lift-drag plugin. AVL uses a vortex-lattice method to compute the forces and moments acting on an aircraft at any arbitrary flight condition, and can also compute the stability and control derivatives needed to create a linearized simulation of an aircraft about a trim condition. <br> To use AVL, you first need to create a file containing your aircraft configuration. The AVL User Primer (https://web.mit.edu/drela/Public/web/avl/AVL_User_Primer.pdf) explains how to do this. Another useful resource is the variety of example files that comes with AVL: modifying one of those to suit your needs is typically much easier than writing an AVL file from scratch. <br> Once you have created your aircraft input file, open up AVL, and load your aircraft using the LOAD command. Go to the operations menu with the OPER command; from here, typing in X and hitting the Enter/Return key should execute a flow computation. Once you are satisfied with the computation, use the ST command to get derivatives in the stability axes and the SB commands to get derivatives in the body axes. Note that you will need derivatives from both of these commands to fill out the advanced lift-drag plugin. <br> One important fact to note. This plugin treats each individual control surface as its own surface; it cannot combine them the way AVL can. As such, if you are trying to determine the control derivatives for your aircraft’s ailerons, you need to determine the control derivatives for the left and the right ailerons individually- doing them both at once may not work. <br> <br>Make sure to sanity-check your results! While AVL is generally reliable, there are some cases where it has produced erroneous results. For example, when I ran an R/C aircraft after something large (e.g. the Boeing 737 example model), AVL used the wrong reference point; as a result, several derivatives came out enormously larger than they should have.
-
+<h2>Necessary Parameters</h2>
 From user measurements or calculations:
 <ol>
    <li>Reference area, span, chord, aspect ratio</li>
@@ -47,7 +44,7 @@ From AVL files:
 </ol>
 When using AVL to calculate the wing efficiency, remember that AVL’s efficiency is span efficiency, which would be the same as Oswald efficiency, if profile drag does not depend on the square of CL. This is not true in general: as such, the span efficiency is an upper bound on Oswald efficiency. <br> AVL sometimes computes an incorrect number for span efficiency, and you may need to calculate it by hand. AVL’s drag and lift numbers are correct, however, so plugging those into the formula $e = \frac{C_L^2}{\pi C_{Di} AR}$ should yield the span efficiency. The coefficient of induced drag, $C_{Di}$, is calculated by subtracting the zero lift drag from the total drag: $C_{Di} = C_D-C_{D0}$. AVL is an inviscid solver, which means it doesn’t have a CD0 added in by default. As such, its CD equals CDi, unless you manually add in a CD0. Note that span efficiencies greater than 1 can exist; non-planar wings can have span efficiencies greater than 1. However, if AVL comes up with a span efficiency greater than 1 for a planar wing, it is most likely wrong.<br>
 For AVL derivatives, the current plan is to use the control derivatives at a single operating point - currently the trim condition (i.e. the angle of attack it would fly at when traveling at a certain “cruise airspeed”). <br> Something to note about the AVL derivatives: every one of the angular derivatives is how much the value of some coefficient changes per radian of angle of attack or sideslip angle. The control derivatives, however, are how much that coefficient changes per degree of control surface deflection. You can put the numbers from AVL directly in the code, since the code converts the control surface deflections from radians to degrees. <br> 
-# Forces and Moments
+<h1>Forces and Moments</h1><br>
 Using the reference area of the aircraft, the derivatives from AVL, the control surface deflections, the angle of attack and sideslip angle, and the non-dimensionalized body rates, this simulator models the main forces of lift and drag on the vehicle. 
 Most of the above parameters are used to calculate the current coefficients of lift, drag, sideforce, and moment about all three axes. 
 To compute the aerodynamic coefficients, the code sums up the contributions from several different effects. The following equations hold in the linear, pre-stall flight regime:
@@ -75,7 +72,7 @@ The moments, however, need an additional term: either the span (b) or the mean a
 $$ℓ =  C_ℓ S_{ref} qb$$
 $$m=  C_m S_{ref} qc$$
 $$n =  C_n S_{ref} qb$$
-# Post-Stall Models
+<h1>Post-Stall Models</h1>
 As of August 2022, the plugin uses two post-stall models to compute the coefficient of lift and drag on the aircraft. The model for lift coefficient is a Newtonian model, based on the Third Law of Motion. 
 The post-stall drag model was constructed using two papers: one from Stringer et al which provides drag coefficients at angles of attack from zero to 360 degrees and the other from Ostowari and Naik which provides flat plate coefficients of drag at a variety of aspect ratios. The Stringer paper was used to relate drag to angle of attack, while Ostowari’s report was used to create a model of flat plate drag at a variety of aspect ratios. To create the latter model, I fit a sigmoid function to some of the numbers in the second paper, with the form below.
 $$C_{D,fp} = \frac{2}{1+ e ^ {K1+K2 AR}}$$
