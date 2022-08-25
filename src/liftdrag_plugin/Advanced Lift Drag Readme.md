@@ -5,7 +5,7 @@ All the variables representing aerodynamic coefficients and derivatives are name
     <li>The first letter of these variable names is a capital C.</li>
     <li>The next letter(s) represent the force or moment that this variable relates to.</li>
     <ul>
-        <li>If this variable pertains to a force, the next letter is a capital L, D, or Y, representing Lift, Drag, or sideforce (force in the Y- direction) respectively.</li>
+        <li>If this variable pertains to a force, the next letter is a capital L, D, or Y, representing **L**ift, **D**rag, or sideforce (force in the **Y**- direction) respectively.</li>
         <li>If this variable pertains to a moment, the next letters are “ell”, “em”, or “en”, all lowercase, representing roll moment, pitch moment, and yaw moment respectively. This was chosen to avoid confusion between CL, the coefficient of lift, and Cell, the coefficient of roll moment.</li>
     </ul>
     <li>The next letter(s) represent what the coefficient is being differentiated with respect to.</li>
@@ -78,5 +78,5 @@ The post-stall drag model was constructed using two papers: one from Stringer et
 $$C_{D,fp} = \frac{2}{1+ e ^ {K1+K2 AR}}$$
 The coefficients K1 and K2 are in the code, but might need some tuning.
 A sigmoid function was used because CD initially increases quickly as aspect ratio rises, but that increase would slow down as AR goes to infinity. Intuitively, it seemed like a good model for the drag vs. aspect ratio relation, and the fit seemed pretty good as well.
-Looking at the data from Stringer, I could see that the CD was approximately equal to 1-cos(2AoA). This has a maximum value of 2, so I divided this expression by 2 to make sure multiplying it by flat-plate drag would not produce unreasonable results. 
-The resulting drag model uses the flat plate model to determine an upper bound on coefficient of drag, then multiplies that upper bound by 0.5-0.5cos(2AoA) to determine the actual coefficient of drag. This should provide at least a usable estimate of post stall drag.
+Looking at the data from Stringer, I could see that the CD was approximately equal to 1-cos(2α). This has a maximum value of 2, so I divided this expression by 2 to make sure multiplying it by flat-plate drag would not produce unreasonable results. 
+The resulting drag model uses the flat plate model to determine an upper bound on coefficient of drag, then multiplies that upper bound by 0.5-0.5cos(2α) to determine the actual coefficient of drag. This should provide at least a usable estimate of post stall drag.
