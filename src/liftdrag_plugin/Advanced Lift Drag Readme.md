@@ -1,4 +1,4 @@
-<h1>Introduction</h1><br>This document describes the new Gazebo plugin for aerodynamic modeling, updates to the physics formulation (quadratic drag, sideforce, moments about all three axes, body rate derivatives), and also figure out a workflow to get from AVL derivatives to Gazebo parameters, while maintaining accurate physics representation/effects. <br> 
+<h1>Introduction</h1><br>This document describes the new Gazebo plugin for aerodynamic modeling, which updates the physics formulation, adding in quadratic drag, sideforce, moments about all three axes, and body rate derivatives.
 <h1>Notation</h1>
 All the variables representing aerodynamic coefficients and derivatives are named according to the following convention: <br>
 <ul>
