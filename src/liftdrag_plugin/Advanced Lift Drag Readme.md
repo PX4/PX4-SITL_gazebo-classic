@@ -5,7 +5,7 @@ All the variables representing aerodynamic coefficients and derivatives are name
     <li>The first letter of these variable names is a capital C.</li>
     <li>The next letter(s) represent the force or moment that this variable relates to.</li>
     <ul>
-        <li>If this variable pertains to a force, the next letter is a capital L, D, or Y, representing **L**ift, **D**rag, or sideforce (force in the **Y**- direction) respectively.</li>
+        <li>If this variable pertains to a force, the next letter is a capital L, D, or Y, representing <b>L</b>ift, <b>D</b>rag, or sideforce (force in the <b>Y</b>- direction) respectively.</li>
         <li>If this variable pertains to a moment, the next letters are “ell”, “em”, or “en”, all lowercase, representing roll moment, pitch moment, and yaw moment respectively. This was chosen to avoid confusion between CL, the coefficient of lift, and Cell, the coefficient of roll moment.</li>
     </ul>
     <li>The next letter(s) represent what the coefficient is being differentiated with respect to.</li>
