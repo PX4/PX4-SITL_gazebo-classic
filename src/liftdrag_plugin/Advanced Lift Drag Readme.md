@@ -48,26 +48,26 @@ For AVL derivatives, the current plan is to use the control derivatives at a sin
 Using the reference area of the aircraft, the derivatives from AVL, the control surface deflections, the angle of attack and sideslip angle, and the non-dimensionalized body rates, this simulator models the main forces of lift and drag on the vehicle. 
 Most of the above parameters are used to calculate the current coefficients of lift, drag, sideforce, and moment about all three axes. 
 To compute the aerodynamic coefficients, the code sums up the contributions from several different effects. The following equations hold in the linear, pre-stall flight regime:
-$$C_L  =  C_{L0} + C_{Lα} α + C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \Sigma_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
-$$C_D  =  C_{D0} + \frac{{{C_L}} ^ {2}}{π ARe} + C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \Sigma_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
-$$C_Y  =  C_{Y β} β + C_{Yp} p+ C_{Yq} q+ C_{Yr} r+ \Sigma_{x=1}^{CS} C_{Y,ctrl,x} \delta_{ctrl,x}$$
-$$C_ℓ  =  C_{ℓ β} β + C_{ℓp} p+ C_{ℓq} q+ C_{ℓr} r+ \Sigma_{x=1}^{CS} C_{ℓ,ctrl,x} \delta_{ctrl,x}$$
-$$C_m  =  C_{m α} α + C_{mp} p+ C_{mq} q+ C_{mr} r+ \Sigma_{x=1}^{CS} C_{m,ctrl,x} \delta_{ctrl,x}$$
-$$C_n  =  C_{n β} β + C_{np} p+ C_{nq} q+ C_{nr} r+ \Sigma_{x=1}^{CS} C_{n,ctrl,x} \delta_{ctrl,x}$$
+$$C_L  =  C_{L0} + C_{Lα} α + C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
+$$C_D  =  C_{D0} + \frac{{{C_L}} ^ {2}}{π ARe} + C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
+$$C_Y  =  C_{Y β} β + C_{Yp} p+ C_{Yq} q+ C_{Yr} r+ \sum_{x=1}^{CS} C_{Y,ctrl,x} \delta_{ctrl,x}$$
+$$C_ℓ  =  C_{ℓ β} β + C_{ℓp} p+ C_{ℓq} q+ C_{ℓr} r+ \sum_{x=1}^{CS} C_{ℓ,ctrl,x} \delta_{ctrl,x}$$
+$$C_m  =  C_{m α} α + C_{mp} p+ C_{mq} q+ C_{mr} r+ \sum_{x=1}^{CS} C_{m,ctrl,x} \delta_{ctrl,x}$$
+$$C_n  =  C_{n β} β + C_{np} p+ C_{nq} q+ C_{nr} r+ \sum_{x=1}^{CS} C_{n,ctrl,x} \delta_{ctrl,x}$$
 Here, the expression “CS” refers to the number of control surfaces on the aircraft. The summation adds up the effect of all the control surfaces.
 Post stall, most of these equations have been left unchanged. The ones that do change compute the coefficients of lift and drag, which change to the following:
-$$C_L = 2{sin} ^ {2} ( α )cos( α )+ C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \Sigma_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
-$$C_D = C_{D,FP} (0.5-0.5cos(2 α ))+ C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \Sigma_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
+$$C_L = 2{sin} ^ {2} ( α )cos( α )+ C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
+$$C_D = C_{D,FP} (0.5-0.5cos(2 α ))+ C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
 $C_{D,FP}$ is the flat-plate coefficient of drag. Currently, this is computed as follows:
   $C_{D,FP} = \frac{2}{1+ e ^ {K1+K2 AR}}$
 K1 and K2 are empirical coefficients. Currently, K1 is equal to -0.224, and K2 is equal to -0.115. <br> A sigmoid function is used to blend the pre-stall and post-stall models together, with a blending parameter M used to determine how sharply the plane stalls. Currently, the default value of M is 15, which switches from pre-stall to post-stall over the course of about 1.8 degrees of angle of attack.
 $$\sigma = \frac{1+ e ^ {-M*( \alpha - \alpha_{stall} )} +e ^ {M*( \alpha - \alpha_{stall} )}}{(1+ e ^ {-M*( \alpha - \alpha_{stall} )} ) ( {1+e} ^ {M( α - α_{stall} )} )}$$
 As such, the actual equations for the coefficient of lift and drag are:
 $$C_L  =(1- \sigma )( C_{L0} + C_{L \alpha} \alpha )+ 2 \sigma {sin} ^ 2 ( α )cos( α )+ C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
-$$C_D = (1-\sigma)\frac{{{C_L}} ^ {2}}{π ARe}+ \sigma C_{D,FP}(0.5-0.5cos(2 α )) C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
+$$C_D = (1-\sigma)(C_{D0}+\frac{{{C_L}} ^ {2}}{π ARe})+ \sigma C_{D,FP}(0.5-0.5cos(2 α ))+ C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
 Given these coefficients, multiplying by the reference area of the aircraft (Sref) and the current dynamic pressure (q) produces the forces.
 $$F =  C_F S_{ref} q$$
-$$q=0.5 \rho v ^ {2}$$
+$$q=\frac{1}{2} \rho v ^ {2}$$
 The moments, however, need an additional term: either the span (b) or the mean aerodynamic chord (c) of the aircraft.
 $$ℓ =  C_ℓ S_{ref} qb$$
 $$m=  C_m S_{ref} qc$$
