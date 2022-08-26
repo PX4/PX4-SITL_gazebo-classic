@@ -82,6 +82,15 @@
       <child>airspeed::link</child>
       <parent>base_link</parent>
     </joint>
+    <include>
+      <uri>model://magnetometer</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>mag</name>
+    </include>
+    <joint name='mag_joint' type='fixed'>
+      <child>mag::link</child>
+      <parent>base_link</parent>
+    </joint>
     <link name='rotor_right'>
       <pose>0.05 -0.25 0.05 0 1.57 0</pose>
       <inertial>
@@ -555,14 +564,6 @@
     </plugin>
     <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
-    </plugin>
-    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
-      <robotNamespace/>
-      <pubRate>100</pubRate>
-      <noiseDensity>0.0004</noiseDensity>
-      <randomWalk>6.4e-06</randomWalk>
-      <biasCorrelationTime>600</biasCorrelationTime>
-      <magTopic>/mag</magTopic>
     </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>

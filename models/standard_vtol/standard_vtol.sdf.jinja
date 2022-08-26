@@ -177,6 +177,15 @@
       <child>airspeed::link</child>
       <parent>base_link</parent>
     </joint>
+    <include>
+      <uri>model://magnetometer</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>mag</name>
+    </include>
+    <joint name='mag_joint' type='fixed'>
+      <child>mag::link</child>
+      <parent>base_link</parent>
+    </joint>
     <link name='rotor_0'>
       <pose>0.35 -0.35 0.07 0 0 0</pose>
       <inertial>
@@ -860,14 +869,6 @@
     <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
     </plugin>
-    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
-      <robotNamespace/>
-      <pubRate>100</pubRate>
-      <noiseDensity>0.0004</noiseDensity>
-      <randomWalk>6.4e-06</randomWalk>
-      <biasCorrelationTime>600</biasCorrelationTime>
-      <magTopic>/mag</magTopic>
-    </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
       <pubRate>50</pubRate>
@@ -876,7 +877,6 @@
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
-      <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
       <mavlink_addr>INADDR_ANY</mavlink_addr>
       <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
