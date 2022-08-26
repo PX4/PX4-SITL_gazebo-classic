@@ -43,7 +43,6 @@
       <child>gps::link</child>
     </joint>
     
-    
     <include>
       <uri>model://imu</uri>
       <pose>0 0 0 0 0 0</pose>
@@ -51,6 +50,16 @@
     </include>
     <joint name='imu_joint' type='fixed'>
       <child>imu::link</child>
+      <parent>base_link</parent>
+    </joint>
+
+    <include>
+      <uri>model://magnetometer</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>mag</name>
+    </include>
+    <joint name='mag_joint' type='fixed'>
+      <child>mag::link</child>
       <parent>base_link</parent>
     </joint>
 
@@ -534,15 +543,6 @@
             <motorNumber>7</motorNumber>
             <motorSpeedPubTopic>/motor_speed/7</motorSpeedPubTopic>
             <rotorVelocitySlowdownSim>0.025</rotorVelocitySlowdownSim>
-        </plugin>
-
-        <plugin name="magnetometer_plugin" filename="libgazebo_magnetometer_plugin.so">
-            <robotNamespace />
-            <pubRate>100</pubRate>
-            <noiseDensity>0.0004</noiseDensity>
-            <randomWalk>6.4e-06</randomWalk>
-            <biasCorrelationTime>600</biasCorrelationTime>
-            <magTopic>/mag</magTopic>
         </plugin>
 
         <plugin name="barometer_plugin" filename="libgazebo_barometer_plugin.so">

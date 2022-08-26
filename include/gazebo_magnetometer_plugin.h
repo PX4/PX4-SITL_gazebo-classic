@@ -58,13 +58,15 @@
 
 #include <ignition/math.hh>
 
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/sensors/MagnetometerSensor.hh>
+
 #include <common.h>
 
 #include <geo_mag_declination.h>
 
 namespace gazebo {
 
-static constexpr auto kDefaultMagnetometerTopic = "mag";
 static constexpr auto kDefaultPubRate = 100.0; // [Hz]. Note: corresponds to most of the mag devices supported in PX4
 
 // Default values for use with ADIS16448 IMU
@@ -74,13 +76,13 @@ static constexpr auto kDefaultBiasCorrelationTime = 6.0e+2; // [s]
 
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 
-class MagnetometerPlugin : public ModelPlugin {
+class MagnetometerPlugin : public SensorPlugin {
 public:
   MagnetometerPlugin();
   virtual ~MagnetometerPlugin();
 
 protected:
-  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo&);
   void addNoise(Eigen::Vector3d* magnetic_field, const double dt);
   void GroundtruthCallback(GtPtr&);
@@ -88,8 +90,12 @@ protected:
 
 private:
   std::string namespace_;
+  sensors::MagnetometerSensorPtr parentSensor_;
+  std::string model_name_;
   physics::ModelPtr model_;
   physics::WorldPtr world_;
+  physics::LinkPtr link_;
+
   std::string mag_topic_;
   transport::NodePtr node_handle_;
   transport::PublisherPtr pub_mag_;

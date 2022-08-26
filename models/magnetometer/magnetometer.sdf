@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="magnetometer">
+    <pose>0 0 0 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>1e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-07</iyy>
+          <iyz>0</iyz>
+          <izz>1e-07</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor name="magnetometer" type="magnetometer">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+          <robotNamespace/>
+          <pubRate>100</pubRate>
+          <noiseDensity>0.0004</noiseDensity>
+          <randomWalk>6.4e-06</randomWalk>
+          <biasCorrelationTime>600</biasCorrelationTime>
+        </plugin>
+      </sensor>
+    </link>
+  </model>
+</sdf>
