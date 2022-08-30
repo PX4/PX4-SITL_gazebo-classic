@@ -35,7 +35,7 @@ jobs:
         git submodule update --init --recursive
       working-directory: Firmware
     - name: Configure Firmware to include current sitl_gazebo version
-      working-directory: Firmware/Tools/sitl_gazebo
+      working-directory: Firmware/Tools/simulation/gazebo/sitl_gazebo
       run: |
         git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} || echo "Couldn't find the feature branch of the pull request, using default branch"
         git checkout ${{github.head_ref}}
