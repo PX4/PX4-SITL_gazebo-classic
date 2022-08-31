@@ -159,11 +159,12 @@ void GazeboSwashplatePlugin::VelocityCallback(CommandMotorSpeedPtr &rot_velociti
     double swashplate_1 = static_cast<double>(rot_velocities->motor_speed(3));
     double swashplate_2 = static_cast<double>(rot_velocities->motor_speed(4));
 
-    ///Computing swashplate geometries
+    ///Computing swashplate geometries. Assumes S0 angle = 0, S1 angle = 140, S2 angle = 220
     ///TODO: Define geometries more generally
-    ref_cyclic_command_ = (swashplate_0 + swashplate_1 + swashplate_2)/3;
-    ref_pitch_command_ = swashplate_0 - (std::cos(M_PI/3) * swashplate_1 + std::cos(M_PI/3) * swashplate_2)/2;
-    ref_roll_command_ = std::sin(M_PI/3) * swashplate_1 - std::sin(M_PI/3) * swashplate_2;
+    double constant = std::cos(220. * M_PI / 180.) + std::cos(140. * M_PI / 180.);
+    ref_cyclic_command_ = (swashplate_1 + swashplate_2 - swashplate_0 * constant) / (2. - constant);
+    ref_roll_command_ = (-swashplate_1 + ref_cyclic_command_ + (swashplate_0 - ref_cyclic_command_) * std::cos(140. * M_PI / 180.)) / std::sin(140. * M_PI / 180.);
+    ref_pitch_command_ = swashplate_0 - ref_cyclic_command_;
 
   }
 }
