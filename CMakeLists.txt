@@ -376,6 +376,7 @@ add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
+add_library(gazebo_swashplate_plugin SHARED src/gazebo_swashplate_plugin.cpp)
 
 set(plugins
   gazebo_airspeed_plugin
@@ -403,6 +404,7 @@ set(plugins
   gazebo_parachute_plugin
   gazebo_airship_dynamics_plugin
   gazebo_drop_plugin
+  gazebo_swashplate_plugin
   )
 
 foreach(plugin ${plugins})

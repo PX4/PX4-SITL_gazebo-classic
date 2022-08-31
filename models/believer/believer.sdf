@@ -35,8 +35,8 @@
         <pose>0 0 0 0 0 3.141</pose>
         <geometry>
           <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://believer/meshes/believer_body.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://believer/meshes/body.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -126,8 +126,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>1.0 1.0 1.0</scale>
-            <uri>model://believer/meshes/propeller_cw.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://believer/meshes/main_rotor.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -176,8 +176,8 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <scale>1.0 1.0 1.0</scale>
-            <uri>model://believer/meshes/propeller_cw.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://believer/meshes/tail_rotor.stl</uri>
           </mesh>
         </geometry>
         <material>
