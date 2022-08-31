@@ -4,7 +4,7 @@
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0.02 0 0.07 0 0 0</pose>
         <mass>1.5</mass>
         <inertia>
           <ixx>0.029125</ixx>
@@ -94,9 +94,9 @@
           <ixx>9.75e-07</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000273104</iyy>
+          <iyy>0.0000273104</iyy>
           <iyz>0</iyz>
-          <izz>0.000274004</izz>
+          <izz>0.0000274004</izz>
         </inertia>
       </inertial>
       <collision name='rotor_0_collision'>
@@ -235,7 +235,7 @@
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
-    <plugin name='back_left_motor_model' filename='libgazebo_motor_model.so'>
+    <!-- <plugin name='back_left_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace/>
       <jointName>rotor_1_joint</jointName>
       <linkName>rotor_1</linkName>
@@ -250,7 +250,7 @@
       <rotorDragCoefficient>0.000175</rotorDragCoefficient>
       <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
-    </plugin>
+    </plugin> -->
     <include>
       <uri>model://gps</uri>
       <pose>0.1 0 0 0 0 0</pose>

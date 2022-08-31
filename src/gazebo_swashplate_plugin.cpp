@@ -185,8 +185,8 @@ void GazeboSwashplatePlugin::UpdateForcesAndMoments() {
   link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force));
 
   ignition::math::Vector3d control_moment;
-  control_moment.X() = -ref_roll_command_ * 1.0;
-  control_moment.Y() = -ref_pitch_command_ * 1.0;
+  control_moment.X() = ref_roll_command_ * 3.0;
+  control_moment.Y() = -ref_pitch_command_ * 3.0;
   physics::Link_V parent_links = link_->GetParentJointsLinks();
 
   ignition::math::Vector3d rolling_moment;
