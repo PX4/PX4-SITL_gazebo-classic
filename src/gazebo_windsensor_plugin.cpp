@@ -46,7 +46,9 @@ GZ_REGISTER_SENSOR_PLUGIN(WindSensorPlugin)
 
 WindSensorPlugin::WindSensorPlugin() : SensorPlugin(),
   wind_direction_(0.0),
-  wind_speed_(0.0f)
+  wind_speed_(0.0f),
+  gauss_dir_(0.0, 4*(M_PI/180.0)),
+  gauss_speed_(0.0, 0.3)
 { }
 
 WindSensorPlugin::~WindSensorPlugin()
@@ -112,7 +114,6 @@ void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   windsensor_pub_ = node_handle_->Advertise<sensor_msgs::msgs::WindSensor>("~/" + model_name_ + "/link/" + windsensor_topic_, 10);
   wind_sub_ = node_handle_->Subscribe("~/world_wind", &WindSensorPlugin::WindVelocityCallback, this);
 
-
   // Set initial wind as zero
   wind_.X() = 0;
   wind_.Y() = 0;
@@ -155,9 +156,14 @@ void WindSensorPlugin::OnUpdate(const common::UpdateInfo&){
 #endif
 
   last_time_ = current_time;
-
-  wind_direction_ = atan2(vel_a_.X(), vel_a_.Y());
-  wind_speed_ =  vel_a_.Length();
+  wind_direction_ = atan2f(vel_a_.Y(),vel_a_.X()) * (180.0/M_PI);
+  // resolution of 1 degree
+  wind_direction_ = round(wind_direction_) * (M_PI/180.0) + gauss_dir_(generator_);
+  // wind sensor cannot measure wind in the z-direction
+  vel_a_.Z() = 0;
+  wind_speed_ =  vel_a_.Length()*10.0;
+  // resolution of 0.1m/s
+  wind_speed_ = round(wind_speed_)/10.0 + gauss_speed_(generator_);
 }
 
 void WindSensorPlugin::OnSensorUpdate() {

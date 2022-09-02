@@ -330,7 +330,6 @@ set(sensor_msgs
   msgs/OpticalFlow.proto
   msgs/MagneticField.proto
   msgs/Pressure.proto
-  # Cloudline Additions
   msgs/WindSensor.proto
   )
 
@@ -377,7 +376,6 @@ add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
 add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
-# Cloudline Additions
 add_library(gazebo_windsensor_plugin SHARED src/gazebo_windsensor_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 
@@ -406,7 +404,6 @@ set(plugins
   gazebo_usv_dynamics_plugin
   gazebo_parachute_plugin
   gazebo_drop_plugin
-  # Cloudline Additions
   gazebo_windsensor_plugin
   gazebo_airship_dynamics_plugin
   )

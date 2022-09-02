@@ -106,6 +106,10 @@ private:
   std::string model_name_;
   std::string windsensor_topic_;
 
+  std::normal_distribution<float> gauss_dir_;
+  std::normal_distribution<float> gauss_speed_;
+  std::default_random_engine generator_;
+  
   ignition::math::Vector3d wind_;
   float wind_direction_;
   float wind_speed_;
