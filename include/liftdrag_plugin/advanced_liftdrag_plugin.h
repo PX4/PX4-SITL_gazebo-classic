@@ -166,8 +166,11 @@ namespace gazebo
     /// angle of attack.
     protected: bool radialSymmetry;
 
-    /// \brief effective planeform surface area
+    /// \brief effective planform surface area
     protected: double area;
+
+    /// \brief wing mean aerodynamic chord
+    protected: double mac;
 
     /// \brief aspect ratio
     protected: double AR;

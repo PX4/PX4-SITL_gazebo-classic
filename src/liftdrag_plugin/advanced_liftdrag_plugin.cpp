@@ -27,6 +27,8 @@
  * in a way to be compatible with AVL.
  * Force equations are computed in the body, while
  * moment equations are computed in the stability frame.
+ * 
+ * For more information, read the Readme file provided in the same folder.
  *
  *
 */
@@ -66,7 +68,7 @@ before being multiplied by these numbers.
 */
 /////////////////////////////////////////////////
 AdvancedLiftDragPlugin::AdvancedLiftDragPlugin() : CL0(0.0), CD0(0.02), Cem0(0.0),
-rho(1.2041), M(15),
+rho(1.2041), M(15), mac(0),
 CLa(6.283), CYa(0.0), Cella(0.0), Cema(0.0), Cena(0.0),
 CLb(0.0), CYb(0.0), Cellb(0.0), Cemb(0.0), Cenb(0.0),
 num_ctrl_surfaces(0), ctrl_surface_direction(0),
@@ -293,6 +295,10 @@ void AdvancedLiftDragPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("AR"))
     this->AR = _sdf->Get<double>("AR");
 
+  //Add mean aerodynamic chord
+  if (_sdf->HasElement("mac"))
+    this->mac = _sdf->Get<double>("mac");
+
   //Add wing efficiency (Oswald efficiency factor for a 3D wing)
   if (_sdf->HasElement("eff"))
     this->eff = _sdf->Get<double>("eff");
@@ -364,17 +370,13 @@ void AdvancedLiftDragPlugin::OnUpdate()
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at ref_pt in inertial frame
 #if GAZEBO_MAJOR_VERSION >= 9
-  ignition::math::Vector3d vel = this->link->WorldLinearVel(this->ref_pt) - wind_vel_;
+  ignition::math::Vector3d air_velocity = this->link->WorldLinearVel(this->ref_pt) - wind_vel_;
   const common::Time current_time = this->world->SimTime();
 #else
-  ignition::math::Vector3d vel = ignitionFromGazeboMath(this->link->GetWorldLinearVel(this->ref_pt)) - wind_vel_;
+  ignition::math::Vector3d air_velocity = ignitionFromGazeboMath(this->link->GetWorldLinearVel(this->ref_pt)) - wind_vel_;
   const common::Time current_time = this->world->GetSimTime();
 #endif
   const double dt = (current_time - this->last_pub_time).Double();
-
-  if (vel.Length() <= 0.01)
-    return;
-
   // pose of body
 #if GAZEBO_MAJOR_VERSION >= 9
   ignition::math::Pose3d pose = this->link->WorldPose();
@@ -383,46 +385,48 @@ void AdvancedLiftDragPlugin::OnUpdate()
 #endif
 
   //Define body frame: X forward, Z downward, Y out the right wing
-  ignition::math::Vector3d bodyX = pose.Rot().RotateVector(this->forward);
-  ignition::math::Vector3d bodyZ = -1*(pose.Rot().RotateVector(this->upward));
-  ignition::math::Vector3d bodyY =  bodyZ.Cross(bodyX);
+  ignition::math::Vector3d body_x_axis = pose.Rot().RotateVector(this->forward);
+  ignition::math::Vector3d body_z_axis = -1*(pose.Rot().RotateVector(this->upward));
+  ignition::math::Vector3d body_y_axis =  body_z_axis.Cross(body_x_axis);
 
-  // Get the in-plane velocity (remove spanwise velocity from the velocity vector vel)
-  ignition::math::Vector3d velInLDPlane = vel - vel.Dot(bodyY)*bodyY;
+  // Get the in-plane velocity (remove spanwise velocity from the velocity vector air_velocity)
+  ignition::math::Vector3d velInLDPlane = air_velocity - air_velocity.Dot(body_y_axis)*body_y_axis;
 
   // Define stability frame: X is in-plane velocity, Y is the same as body Y,
   // and Z perpendicular to both
-  ignition::math::Vector3d stabilityX = velInLDPlane;
-  stabilityX.Normalize();
-  ignition::math::Vector3d stabilityY = bodyY;
-  ignition::math::Vector3d stabilityZ = stabilityX.Cross(stabilityY);
+  ignition::math::Vector3d stability_x_axis = velInLDPlane;
+  stability_x_axis.Normalize();
+  ignition::math::Vector3d stability_y_axis = body_y_axis;
+  ignition::math::Vector3d stability_z_axis = stability_x_axis.Cross(stability_y_axis);
 
   double span = std::sqrt(this->area*this->AR); // Wing span
-  double mac = this->area/span; //Mean aerodynamic chord
+  if (this->mac == 0){
+    //Computing the mean aerodynamic chord involves integrating the square of
+    //the chord along the span. If this parameter has not been input, this plugin
+    //will approximate MAC as mean chord. This works for rectangular and trapezoidal
+    //wings, but for more complex wing shapes, doing the integral is preferred.
+    this->mac = this->area/span;
+  }
 
   //Get non-dimensional body rates. Gazebo uses ENU, so some have to be flipped
   ignition::math::Vector3d body_rates = this->link->RelativeAngularVel();
-  double speed = vel.Length();
+  double speed = air_velocity.Length();
   double p = body_rates.X()*span/(2*speed); //Non-dimensionalized roll rate
-  double q = -1*body_rates.Y()*mac/(2*speed); //Non-dimensionalized pitch rate
+  double q = -1*body_rates.Y()*this->mac/(2*speed); //Non-dimensionalized pitch rate
   double r = -1*body_rates.Z()*span/(2*speed); //Non-dimensionalized yaw rate
 
-  if (bodyX.Dot(vel) <= 0.0){
-    // Only calculate lift or drag if the wind relative velocity is in the same direction
-    return;
-  }
-
   //Compute angle of attack, alpha, using the stability and body axes
-  double stabXHoriz = stabilityX.Dot(bodyX);
-  double stabXVert = stabilityX.Dot(bodyZ);
-  this->alpha = atan2(stabXVert,stabXHoriz);
+  //Project stability x onto body x and z, then take arctan to find alpha
+  double stabx_proj_bodyx = stability_x_axis.Dot(body_x_axis);
+  double stabx_proj_bodyz = stability_x_axis.Dot(body_z_axis);
+  this->alpha = atan2(stabx_proj_bodyz,stabx_proj_bodyx);
 
   double sinAlpha = sin(this->alpha);
   double cosAlpha = cos(this->alpha);
 
   //Compute sideslip angle, beta
-  double velSW = vel.Dot(bodyY);
-  double velFW = vel.Dot(bodyX);
+  double velSW = air_velocity.Dot(body_y_axis);
+  double velFW = air_velocity.Dot(body_x_axis);
   this->beta = (atan2(velSW,velFW));
 
   //Compute dynamic pressure
@@ -450,7 +454,7 @@ CL_prestall = this->CL0 + this->CLa*this->alpha
 CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
 */
 
-  CL = (1-sigma)*(this->CL0 + this->CLa*this->alpha) + sigma*(2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha);
+  CL = (1-sigma)*(this->CL0 + this->CLa*this->alpha) + sigma*(2*(this->alpha/abs(this->alpha))*sinAlpha*sinAlpha*cosAlpha);
   // Add sideslip effect, if any
   CL = CL + this->CLb*this->beta;
   // Add effect of rate terms
@@ -493,7 +497,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   gzdbg << "Current CL:" << CL << "\n";
 
   // Compute lift force at ref_pt
-  ignition::math::Vector3d lift = CL * dyn_pres * this->area * (-1 * stabilityZ);
+  ignition::math::Vector3d lift = CL * dyn_pres * this->area * (-1 * stability_z_axis);
 
   // Compute CD at ref_pt, check for stall
   double CD;
@@ -520,11 +524,11 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   double CD_fp_k1 = -0.224;
   double CD_fp_k2 = -0.115;
   double CD_fp = 2/(1+exp(CD_fp_k1+CD_fp_k2*(std::max(this->AR,1/this->AR))));
-  CD = (1-sigma)*(this->CD0 + (pow(CL,2))/(M_PI*this->AR*this->eff))+sigma*abs(CD_fp*(0.5-0.5*cos(2*this->alpha)));
+  CD = (1-sigma)*(this->CD0 + (CL*CL)/(M_PI*this->AR*this->eff))+sigma*abs(CD_fp*(0.5-0.5*cos(2*this->alpha)));
   // Add rate terms
   CD = CD + this->CDp*p + this->CDq*q + this->CDr * r;
   gzdbg << "Current Efficiency:" << this->eff << "\n";
-  gzdbg << "Current Lift-Induced CD:" << (pow(CL,2))/(M_PI*this->AR*this->eff) << "\n";
+  gzdbg << "Current Lift-Induced CD:" << (CL*CL)/(M_PI*this->AR*this->eff) << "\n";
   gzdbg << "Current CD, no deflection:" << CD << "\n";
 
   // Add in control surface terms
@@ -532,7 +536,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   gzdbg << "Current CD:" << CD << "\n";
 
   // Place drag at ref_pt
-  ignition::math::Vector3d drag = CD * dyn_pres * this->area * (-1*stabilityX);
+  ignition::math::Vector3d drag = CD * dyn_pres * this->area * (-1*stability_x_axis);
 
   // Compute sideforce coefficient, CY
   // Start with angle of attack, sideslip, and control terms
@@ -541,7 +545,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   CY = CY + this->CYp*p + this->CYq*q + this->CYr * r;
   gzdbg << "Current CY:" << CY << "\n";
 
-  ignition::math::Vector3d sideforce = CY * dyn_pres * this->area * stabilityY;
+  ignition::math::Vector3d sideforce = CY * dyn_pres * this->area * stability_y_axis;
 
 
   /*
@@ -591,7 +595,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   gzdbg << "Current Cn:" << Cen << "\n";
 
   // Compute moment (torque)
-  ignition::math::Vector3d moment = (Cem * dyn_pres * this->area * mac * bodyY) + (Cell * dyn_pres * this->area * span * bodyX) + (Cen * dyn_pres * this->area * span * bodyZ);
+  ignition::math::Vector3d moment = (Cem * dyn_pres * this->area * this->mac * body_y_axis) + (Cell * dyn_pres * this->area * span * body_x_axis) + (Cen * dyn_pres * this->area * span * body_z_axis);
 
   // compute force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag + sideforce;
@@ -638,4 +642,3 @@ void AdvancedLiftDragPlugin::WindVelocityCallback(const boost::shared_ptr<const 
             msg->velocity().y(),
             msg->velocity().z());
 }
-
