@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="imu">
+    <pose>0 0 0 0 0 0</pose>
+    <link name="link">
+      <inertial>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor name="imu" type="imu">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+          <robotNamespace></robotNamespace>
+          <linkName>standard_vtol/imu_link</linkName>
+          <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+          <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+          <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+          <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+          <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+          <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+          <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+          <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+        </plugin>
+      </sensor>
+    </link>
+  </model>
+</sdf>

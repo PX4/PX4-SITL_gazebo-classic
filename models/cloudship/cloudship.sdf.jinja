@@ -383,7 +383,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     {# GPS joint which includes GPS plugin #}
     <include>
       <uri>model://gps</uri>
@@ -495,29 +495,26 @@
     </plugin>
 
     {# IMU #}
-    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
-      <robotNamespace/>
-      <linkName>hull</linkName>
-      <imuTopic>/imu</imuTopic>
-      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
-      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
-      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
-      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
-      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
-      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
-      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
-      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
-    </plugin>
+    <include>
+      <uri>model://imu</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>imu</name>
+    </include>
+    <joint name='imu_joint' type='fixed'>
+      <child>imu::link</child>
+      <parent>hull</parent>
+    </joint>
 
     {# Magnetometer #}
-    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
-      <robotNamespace/>
-      <pubRate>20</pubRate>
-      <noiseDensity>0.0004</noiseDensity>
-      <randomWalk>6.4e-06</randomWalk>
-      <biasCorrelationTime>600</biasCorrelationTime>
-      <magTopic>/mag</magTopic>
-    </plugin>
+    <include>
+      <uri>model://magnetometer</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>mag</name>
+    </include>
+    <joint name='mag_joint' type='fixed'>
+      <child>mag::link</child>
+      <parent>hull</parent>
+    </joint>
 
     {# Barometer #}
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
