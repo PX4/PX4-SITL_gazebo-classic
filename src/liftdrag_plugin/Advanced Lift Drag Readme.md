@@ -25,7 +25,7 @@ All the variables representing aerodynamic coefficients and derivatives are name
         <li>$\hat{r}$: non-dimensionalized yaw rate $(\hat{r} = \frac{rB}{2V})$</li>
     </ul>
  </ul>
-In the definitions of the non-dimensionalized rates above, $\hat{p},\hat{q}, and \hat{r}$ refer to the non-dimensional rates, p,q, and r to the dimensional rates, B to the wingspan (capitalized to avoid confusion with the lowercase b used in the naming convention), and $\overline{c}$ to refer to the mean aerodynamic chord.
+In the definitions of the non-dimensionalized rates above, $\hat{p},\hat{q},$ and $\hat{r}$ refer to the non-dimensional rates, p,q, and r to the dimensional rates, B to the wingspan (capitalized to avoid confusion with the lowercase b used in the naming convention), and $\overline{c}$ to refer to the mean aerodynamic chord.
 One potentially confusing item in the code is the abbreviation “CDp”. CDp could be used to refer to a body rate derivative (the change in coefficient of drag with respect to the non-dimensionalized roll rate) or parasitic drag. This code uses it to refer to the body rate derivative: the parasitic drag (also known as “zero-lift drag”) is referred to as CD0 in the code. <br>
 <h1>Coordinate Frames</h1>
 Gazebo uses an ENU (east-north-up) reference frame, while the AVL equations of motion assume an NED (north-east-down) frame. Both of these frames are mapped onto the aircraft assuming that it is traveling along the X-axis of the frame (east in ENU, north in NED). What this means in practice is that the ENU frame has a Y axis out the left wing and a Z axis pointing upward, while the NED frame has a Y axis pointing out the right wing and a Z axis pointing downward. As such, the angles, forces, and moments need to be translated between the frames.
@@ -72,13 +72,13 @@ $$\sigma = \frac{1+ e ^ {-M*( \alpha - \alpha_{stall} )} +e ^ {M*( \alpha - \alp
 As such, the actual equations for the coefficient of lift and drag are:
 $$C_L  =(1- \sigma )( C_{L0} + C_{L \alpha} \alpha )+ 2 \sigma {sin} ^ 2 ( α )cos( α )+ C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
 $$C_D = (1-\sigma)(C_{D0}+\frac{{{C_L}} ^ {2}}{π ARe})+ \sigma C_{D,FP}(0.5-0.5cos(2 α ))+ C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
-Given these coefficients, multiplying by the reference area of the aircraft (Sref) and the current dynamic pressure ($\overline{q}$) produces the forces.
+Given these coefficients, multiplying by the reference area of the aircraft (Sref) and the current dynamic pressure $(\overline{q})$ produces the forces.
 $$F =  C_F S_{ref} \overline{q}$$
 $$\overline{q}=\frac{1}{2} \rho v ^ {2}$$
-Here, $\rho$ refers to air density. The moments, however, need an additional term: either the span (b) or the mean aerodynamic chord ($\overline{c}$) of the aircraft.
-$$ℓ =  C_ℓ S_{ref} qb$$
-$$m=  C_m S_{ref} q\overline{c}$$
-$$n =  C_n S_{ref} qb$$
+Here, $\rho$ refers to air density. The moments, however, need an additional term: either the span (b) or the mean aerodynamic chord $(\overline{c})$ of the aircraft.
+$$ℓ =  C_ℓ S_{ref} \overline{q}B$$
+$$m=  C_m S_{ref} \overline{q}\overline{c}$$
+$$n =  C_n S_{ref} \overline{q}B$$
 <h1>Post-Stall Models</h1>
 The plugin uses two post-stall models to compute the coefficient of lift and drag on the aircraft. The model for lift coefficient is a Newtonian model, based on the Third Law of Motion. 
 The post-stall drag model was constructed using two papers: one from Stringer et al (https://aip.scitation.org/doi/pdf/10.1063/1.5011207) which provides drag coefficients at angles of attack from zero to 360 degrees and the other from Ostowari and Naik (https://www.nrel.gov/docs/legosti/old/2559.pdf) which provides flat plate coefficients of drag at a variety of aspect ratios. The Stringer paper was used to relate drag to angle of attack, while Ostowari’s report was used to create a model of flat plate drag at a variety of aspect ratios. To create the latter model, a sigmoid function is fit to some of the numbers in the second paper, with the form below.
