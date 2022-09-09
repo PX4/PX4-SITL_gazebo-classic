@@ -27,7 +27,7 @@
  * in a way to be compatible with AVL.
  * Force equations are computed in the body, while
  * moment equations are computed in the stability frame.
- * 
+ *
  * For more information, read the Readme file provided in the same folder.
  *
  *
@@ -67,49 +67,8 @@ are all dimensionless, since the body rates (p, q, and r) are all non-dimensiona
 before being multiplied by these numbers.
 */
 /////////////////////////////////////////////////
-AdvancedLiftDragPlugin::AdvancedLiftDragPlugin() : CL0(0.0), CD0(0.02), Cem0(0.0),
-rho(1.2041), M(15), mac(0),
-CLa(6.283), CYa(0.0), Cella(0.0), Cema(0.0), Cena(0.0),
-CLb(0.0), CYb(0.0), Cellb(0.0), Cemb(0.0), Cenb(0.0),
-num_ctrl_surfaces(0), ctrl_surface_direction(0),
-CD_ctrl(0), CY_ctrl(0), CL_ctrl(0), Cell_ctrl(0), Cem_ctrl(0), Cen_ctrl(0),
-CDp(0), CYp(0), CLp(0), Cellp(0), Cemp(0), Cenp(0),
-CDq(0), CYq(0), CLq(0), Cellq(0), Cemq(0), Cenq(0),
-CDr(0), CYr(0), CLr(0), Cellr(0), Cemr(0), Cenr(0)
+AdvancedLiftDragPlugin::AdvancedLiftDragPlugin()
 {
-  // AVL reference point (it replaces the center of pressure in the original LiftDragPlugin)
-  this->ref_pt = ignition::math::Vector3d(0, 0, 0);
-
-  //Forward vector
-  this->forward = ignition::math::Vector3d(1, 0, 0);
-
-  //Upward vector
-  this->upward = ignition::math::Vector3d(0, 0, 1);
-
-  //Placeholder for wind vector. This will be updated later in the plugin
-  this->wind_vel_ = ignition::math::Vector3d(0.0, 0.0, 0.0);
-
-  //Aircraft reference area (typically defined as wing area)
-  this->area = 1.0;
-
-  //Placeholder: angle of attack (updated later)
-  this->alpha = 0.0;
-
-  //Placeholder: sideslip angle (updated later)
-  this->beta = 0.0;
-
-  //Stall speed
-  this->velocityStall = 0.0;
-
-  //Set stall angle to 30 degrees
-  double alphaStallDefault = (1.0/6.0)*M_PI; //30 degrees, converted to radians
-  this->alphaStall = alphaStallDefault;
-
-  this->radialSymmetry = false;
-
-  //Initialize moment curve slope after stall
-  this->CemaStall = 0.0;
-
 }
 
 /////////////////////////////////////////////////
@@ -432,6 +391,7 @@ void AdvancedLiftDragPlugin::OnUpdate()
 
   //Compute dynamic pressure
   double dyn_pres = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
+  gzdbg << "LD Plane Vel:" << speedInLDPlane;
 
   // Compute CL at ref_pt, check for stall
   double CL{0.0};

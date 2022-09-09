@@ -64,144 +64,142 @@ namespace gazebo
     protected: physics::ModelPtr model;
 
     /// \brief coefficient of lift at zero angle of attack
-    protected: double CL0;
+    protected: double CL0 {0.0};
 
     /// \brief coefficient of drag at zero lift
-    protected: double CD0;
+    protected: double CD0 {0.02};
 
     /// \brief coefficient of pitching moment at zero angle of attack
-    protected: double Cem0;
+    protected: double Cem0 {0.0};
 
     /// \brief Coefficient of Lift / alpha slope.
     /// Lift = C_L * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
-    protected: double CLa;
+    protected: double CLa {2*M_PI};
 
     /// \brief Coefficient of sideforce with respect to angle of attack alpha
-    protected: double CYa;
+    protected: double CYa {0.0};
 
     /// \brief Coefficient of rolling moment with respect to angle of attack alpha
-    protected: double Cella;
+    protected: double Cella {0.0};
 
     /// \brief Coefficient of Moment / alpha slope.
     /// Moment = C_M * q * S
     /// where q (dynamic pressure) = 0.5 * rho * v^2
-    protected: double Cema;
+    protected: double Cema {0.0};
 
     /// \brief Coefficient of yawing moment with respect to angle of attack alpha
     // No memes, please.
-    protected: double Cena;
+    protected: double Cena {0.0};
 
     /// \brief Coefficient of lift with respect to sideslip angle beta.
-    protected: double CLb;
+    protected: double CLb {0.0};
 
     /// \brief Coefficient of sideforce with respect to sideslip angle beta
-    protected: double CYb;
+    protected: double CYb {0.0};
 
     /// \brief Coefficient of roll moment with respect to sideslip angle beta
-    protected: double Cellb;
+    protected: double Cellb {0.0};
 
     /// \brief Coefficient of pitching moment with respect to sideslip angle beta.
-    protected: double Cemb;
+    protected: double Cemb {0.0};
 
     /// \brief Coefficient of yaw moment with respect to sideslip angle beta
-    protected: double Cenb;
+    protected: double Cenb {0.0};
 
     /// \brief Number of control surfaces.
-    protected: int num_ctrl_surfaces;
+    protected: int num_ctrl_surfaces {0};
 
     /// \brief Vectors of control surface deflections.
-    protected: std::vector<double> ctrl_surface_direction;
+    protected: std::vector<double> ctrl_surface_direction {};
 
     /// \brief Vectors of control derivatives.
-    protected: std::vector<double> CD_ctrl;
-    protected: std::vector<double> CY_ctrl;
-    protected: std::vector<double> CL_ctrl;
-    protected: std::vector<double> Cell_ctrl;
-    protected: std::vector<double> Cem_ctrl;
-    protected: std::vector<double> Cen_ctrl;
+    protected: std::vector<double> CD_ctrl {};
+    protected: std::vector<double> CY_ctrl {};
+    protected: std::vector<double> CL_ctrl {};
+    protected: std::vector<double> Cell_ctrl {};
+    protected: std::vector<double> Cem_ctrl {};
+    protected: std::vector<double> Cen_ctrl {};
 
     /// \brief Body rate derivatives
-    protected: double CDp;
-    protected: double CYp;
-    protected: double CLp;
-    protected: double Cellp;
-    protected: double Cemp;
-    protected: double Cenp;
+    protected: double CDp {0.0};
+    protected: double CYp {0.0};
+    protected: double CLp {0.0};
+    protected: double Cellp {0.0};
+    protected: double Cemp {0.0};
+    protected: double Cenp {0.0};
 
-    protected: double CDq;
-    protected: double CYq;
-    protected: double CLq;
-    protected: double Cellq;
-    protected: double Cemq;
-    protected: double Cenq;
+    protected: double CDq {0.0};
+    protected: double CYq {0.0};
+    protected: double CLq {0.0};
+    protected: double Cellq {0.0};
+    protected: double Cemq {0.0};
+    protected: double Cenq {0.0};
 
-    protected: double CDr;
-    protected: double CYr;
-    protected: double CLr;
-    protected: double Cellr;
-    protected: double Cemr;
-    protected: double Cenr;
+    protected: double CDr {0.0};
+    protected: double CYr {0.0};
+    protected: double CLr {0.0};
+    protected: double Cellr {0.0};
+    protected: double Cemr {0.0};
+    protected: double Cenr {0.0};
 
-    /// \brief angle of attack when airfoil stalls
-    protected: double alphaStall;
+    /// \brief angle of attack when airfoil stalls (default: pi/6 radians = 30 degrees)
+    protected: double alphaStallDefault {M_PI/6.0};
+    protected: double alphaStall {alphaStallDefault};
 
     /// \brief Cm-alpha rate after stall
-    protected: double CemaStall;
+    protected: double CemaStall {0.0};
 
-    /// \breif Coefficient of Moment / control surface deflection angle slope
-    protected: double Cem_delta;
-
-    /// \brief: \TODO: make a stall velocity curve
-    protected: double velocityStall;
+    /// \brief: //Stall speed
+    protected: double velocityStall {0.0};
 
     /// \brief air density
     /// at 25 deg C it's about 1.1839 kg/m^3
     /// At 20 °C and 101.325 kPa, dry air has a density of 1.2041 kg/m3.
-    protected: double rho;
+    protected: double rho {1.2041};
 
     /// \brief if the shape is aerodynamically radially symmetric about
     /// the forward direction. Defaults to false for wing shapes.
     /// If set to true, the upward direction is determined by the
     /// angle of attack.
-    protected: bool radialSymmetry;
+    protected: bool radialSymmetry {false};
 
-    /// \brief effective planform surface area
-    protected: double area;
+    //Aircraft reference area (typically defined as wing area)
+    protected: double area {1.0};
 
     /// \brief wing mean aerodynamic chord
-    protected: double mac;
+    protected: double mac {0.0};
 
     /// \brief aspect ratio
-    protected: double AR;
+    protected: double AR {0.0};
 
     /// \brief wing efficiency
-    protected: double eff;
+    protected: double eff {0.0};
 
     /// \brief angle of attack
-    protected: double alpha;
+    protected: double alpha {0.0};
 
     /// \brief sideslip angle
-    protected: double beta;
+    protected: double beta {0.0};
 
     /// \brief sigmoid blending parameter
-    protected: double M;
+    protected: double M {15.0};
 
     /// @brief coefficients for flat plate drag model
-    protected: double CD_fp_k1 = -0.224;
-    protected: double CD_fp_k2 = -0.115;
+    protected: double CD_fp_k1 {-0.224};
+    protected: double CD_fp_k2 {-0.115};
 
     /// \brief aerodynamic reference point in link local coordinates
     // This is the point about which AVL calculates its forces and moments
-    protected: ignition::math::Vector3d ref_pt;
+    protected: ignition::math::Vector3d ref_pt {0.0,0.0,0.0};
 
     /// \brief Normally, this is taken as a direction parallel to the chord
     /// of the airfoil in zero angle of attack forward flight.
-    protected: ignition::math::Vector3d forward;
+    protected: ignition::math::Vector3d forward {1.0,0.0,0.0};
 
     /// \brief A vector in the lift/drag plane, perpendicular to the forward
     /// vector.
-    protected: ignition::math::Vector3d upward;
+    protected: ignition::math::Vector3d upward {0.0,0.0,0.0};
 
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
@@ -214,7 +212,7 @@ namespace gazebo
     protected: sdf::ElementPtr sdf;
 
     /// @brief controls the rate at which the force is published
-    static const expr kForceVisualizationPublishingInterval = 0.1; // [sec]
+    static constexpr double kForceVisualizationPublishingInterval = 0.1; // [sec]
 
     private: void WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg);
 
