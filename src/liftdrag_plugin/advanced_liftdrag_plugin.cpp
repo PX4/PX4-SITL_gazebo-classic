@@ -102,7 +102,8 @@ CDr(0), CYr(0), CLr(0), Cellr(0), Cemr(0), Cenr(0)
   this->velocityStall = 0.0;
 
   //Set stall angle to 30 degrees
-  this->alphaStall = (1.0/6.0)*M_PI;
+  double alphaStallDefault = (1.0/6.0)*M_PI; //30 degrees, converted to radians
+  this->alphaStall = alphaStallDefault;
 
   this->radialSymmetry = false;
 
@@ -391,11 +392,11 @@ void AdvancedLiftDragPlugin::OnUpdate()
 
   // Get the in-plane velocity (remove spanwise velocity from the velocity vector air_velocity)
   ignition::math::Vector3d velInLDPlane = air_velocity - air_velocity.Dot(body_y_axis)*body_y_axis;
+  double speedInLDPlane = velInLDPlane.Length();
 
   // Define stability frame: X is in-plane velocity, Y is the same as body Y,
   // and Z perpendicular to both
-  ignition::math::Vector3d stability_x_axis = velInLDPlane;
-  stability_x_axis.Normalize();
+  ignition::math::Vector3d stability_x_axis = velInLDPlane/speedInLDPlane;
   ignition::math::Vector3d stability_y_axis = body_y_axis;
   ignition::math::Vector3d stability_z_axis = stability_x_axis.Cross(stability_y_axis);
 
@@ -410,10 +411,10 @@ void AdvancedLiftDragPlugin::OnUpdate()
 
   //Get non-dimensional body rates. Gazebo uses ENU, so some have to be flipped
   ignition::math::Vector3d body_rates = this->link->RelativeAngularVel();
-  double speed = air_velocity.Length();
-  double p = body_rates.X()*span/(2*speed); //Non-dimensionalized roll rate
-  double q = -1*body_rates.Y()*this->mac/(2*speed); //Non-dimensionalized pitch rate
-  double r = -1*body_rates.Z()*span/(2*speed); //Non-dimensionalized yaw rate
+  double airspeed = air_velocity.Length();
+  double p = body_rates.X()*span/(2*airspeed); //Non-dimensionalized roll rate
+  double q = -1*body_rates.Y()*this->mac/(2*airspeed); //Non-dimensionalized pitch rate
+  double r = -1*body_rates.Z()*span/(2*airspeed); //Non-dimensionalized yaw rate
 
   //Compute angle of attack, alpha, using the stability and body axes
   //Project stability x onto body x and z, then take arctan to find alpha
@@ -430,11 +431,10 @@ void AdvancedLiftDragPlugin::OnUpdate()
   this->beta = (atan2(velSW,velFW));
 
   //Compute dynamic pressure
-  double speedInLDPlane = velInLDPlane.Length();
   double dyn_pres = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
 
   // Compute CL at ref_pt, check for stall
-  double CL;
+  double CL{0.0};
 
    // Use a sigmoid function to blend pre- and post-stall models
   double sigma = (1+exp(-1*this->M*(this->alpha-this->alphaStall))+exp(this->M*(this->alpha+this->alphaStall)))/((1+exp(-1*this->M*(this->alpha-this->alphaStall)))*(1+exp(this->M*(this->alpha+this->alphaStall)))); //blending function
@@ -500,7 +500,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   ignition::math::Vector3d lift = CL * dyn_pres * this->area * (-1 * stability_z_axis);
 
   // Compute CD at ref_pt, check for stall
-  double CD;
+  double CD{0.0};
 
     //Add in quadratic model and a high-angle-of-attack (Newtonian) model
 
@@ -521,9 +521,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
     The coefficients k1 and k2 might need some tuning.
     I chose a sigmoid because the CD would initially increase quickly with aspect
     ratio, but that rate of increase would slow down as AR goes to infinity.*/
-  double CD_fp_k1 = -0.224;
-  double CD_fp_k2 = -0.115;
-  double CD_fp = 2/(1+exp(CD_fp_k1+CD_fp_k2*(std::max(this->AR,1/this->AR))));
+  double CD_fp = 2/(1+exp(this->CD_fp_k1+this->CD_fp_k2*(std::max(this->AR,1/this->AR))));
   CD = (1-sigma)*(this->CD0 + (CL*CL)/(M_PI*this->AR*this->eff))+sigma*abs(CD_fp*(0.5-0.5*cos(2*this->alpha)));
   // Add rate terms
   CD = CD + this->CDp*p + this->CDq*q + this->CDr * r;
@@ -557,7 +555,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   always be positive or zero, in the alpha<-stall angle the Cm is assumed to always be
   negative or zero.
   */
-  double Cem;
+  double Cem{0.0};
   if (this->alpha > this->alphaStall)
   {
     Cem = this->Cem0 + (this->Cema * this->alphaStall +
@@ -617,7 +615,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   // Publish force and center of pressure for potential visual plugin.
   // - dt is used to control the rate at which the force is published
   // - it only gets published if 'topic_name' is defined in the sdf
-  if (dt > 1.0 / 10 && this->sdf->HasElement("topic_name")) {
+  if (dt > kForceVisualizationPublishingInterval && this->sdf->HasElement("topic_name")) {
       msgs::Vector3d* force_center_msg = new msgs::Vector3d;
       force_center_msg->set_x(relative_center.X());
       force_center_msg->set_y(relative_center.Y());

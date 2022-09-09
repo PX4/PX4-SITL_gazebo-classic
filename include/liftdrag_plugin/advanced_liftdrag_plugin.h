@@ -187,6 +187,10 @@ namespace gazebo
     /// \brief sigmoid blending parameter
     protected: double M;
 
+    /// @brief coefficients for flat plate drag model
+    protected: double CD_fp_k1 = -0.224;
+    protected: double CD_fp_k2 = -0.115;
+
     /// \brief aerodynamic reference point in link local coordinates
     // This is the point about which AVL calculates its forces and moments
     protected: ignition::math::Vector3d ref_pt;
@@ -208,6 +212,9 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
+
+    /// @brief controls the rate at which the force is published
+    static const expr kForceVisualizationPublishingInterval = 0.1; // [sec]
 
     private: void WindVelocityCallback(const boost::shared_ptr<const physics_msgs::msgs::Wind> &msg);
 
