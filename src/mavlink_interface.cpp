@@ -275,6 +275,9 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
   }
 
   // send only windsensor data
+
+  /* Commented to ensure succesfull building until mavlink message definitions are 
+    updated
   if (data->windsensor_updated) {
     sensor_msg.wind_direction = data->wind_direction;
     sensor_msg.wind_speed = data->wind_speed;
@@ -282,6 +285,7 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
 
     data->windsensor_updated = false;
   }
+  */
 
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
