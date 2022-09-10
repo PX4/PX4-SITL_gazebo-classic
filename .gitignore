@@ -1,5 +1,6 @@
 Build/
 build/
+.vscode/
 scripts/schemas
 .DS_Store
 *~
