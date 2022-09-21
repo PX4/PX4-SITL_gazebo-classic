@@ -371,9 +371,14 @@ void AdvancedLiftDragPlugin::OnUpdate()
   //Get non-dimensional body rates. Gazebo uses ENU, so some have to be flipped
   ignition::math::Vector3d body_rates = this->link->RelativeAngularVel();
   double airspeed = air_velocity.Length();
-  double p = body_rates.X()*span/(2*airspeed); //Non-dimensionalized roll rate
-  double q = -1*body_rates.Y()*this->mac/(2*airspeed); //Non-dimensionalized pitch rate
-  double r = -1*body_rates.Z()*span/(2*airspeed); //Non-dimensionalized yaw rate
+  double p = 0; //Non-dimensionalized roll rate
+  double q = 0; //Non-dimensionalized pitch rate
+  double r = 0; //Non-dimensionalized yaw rate
+  if(airspeed < 0.01){
+    p = body_rates.X()*span/(2*airspeed); //Non-dimensionalized roll rate
+    q = -1*body_rates.Y()*this->mac/(2*airspeed); //Non-dimensionalized pitch rate
+    r = -1*body_rates.Z()*span/(2*airspeed); //Non-dimensionalized yaw rate
+  }
 
   //Compute angle of attack, alpha, using the stability and body axes
   //Project stability x onto body x and z, then take arctan to find alpha
