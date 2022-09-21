@@ -57,7 +57,6 @@
 #include <sdf/sdf.hh>
 #include <common.h>
 #include <Airspeed.pb.h>
-#include <WindSensor.pb.h>
 #include <CommandMotorSpeed.pb.h>
 #include <MotorSpeed.pb.h>
 #include <Imu.pb.h>
@@ -79,16 +78,15 @@ static const std::regex kDefaultLidarModelNaming(".*(lidar|sf10a)(.*)");
 static const std::regex kDefaultSonarModelNaming(".*(sonar|mb1240-xl-ez4)(.*)");
 static const std::regex kDefaultGPSModelNaming(".*(gps|ublox-neo-7M)(.*)");
 static const std::regex kDefaultAirspeedModelJointNaming(".*(airspeed)(.*_joint)");
-static const std::regex kDefaultWindSensorModelJointNaming(".*(windsensor)(.*_joint)");
 static const std::regex kDefaultImuModelJointNaming(".*(imu)(\\d*_joint)");
 static const std::regex kDefaultMagModelJointNaming(".*(mag)(\\d*_joint)");
+static const std::regex kDefaultAirflowSensorModelJointNaming(".*(airflowsensor)(.*_joint)");
 
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 typedef const boost::shared_ptr<const nav_msgs::msgs::Odometry> OdomPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Airspeed> AirspeedPtr;
-typedef const boost::shared_ptr<const sensor_msgs::msgs::WindSensor> WindSensorPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::IRLock> IRLockPtr;
@@ -182,7 +180,6 @@ private:
   void LidarCallback(LidarPtr& lidar_msg, const int& id);
   void SonarCallback(SonarPtr& sonar_msg, const int& id);
   void AirspeedCallback(AirspeedPtr& airspeed_msg, const int& id);
-  void WindSensorCallback(WindSensorPtr& windsensor_msg, const int& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
   void VisionCallback(OdomPtr& odom_msg);

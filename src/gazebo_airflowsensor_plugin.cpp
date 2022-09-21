@@ -33,36 +33,36 @@
 /**
  * @brief WindSensor Plugin
  *
- * This plugin publishes Windsensor
+ * This plugin publishes airflow sensor measurements
  *
  * @author Henry Kotze <henry@flycloudline.com>
  */
 
-#include <gazebo_windsensor_plugin.h>
+#include <gazebo_airflowsensor_plugin.h>
 #include <boost/algorithm/string.hpp>
 
 namespace gazebo {
-GZ_REGISTER_SENSOR_PLUGIN(WindSensorPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(AirflowSensorPlugin)
 
-WindSensorPlugin::WindSensorPlugin() : SensorPlugin(),
-  wind_direction_(0.0),
-  wind_speed_(0.0f),
+AirflowSensorPlugin::AirflowSensorPlugin() : SensorPlugin(),
+  airflow_direction_(0.0),
+  airflow_speed_(0.0f),
   gauss_dir_(0.0, 4*(M_PI/180.0)),
   gauss_speed_(0.0, 0.3)
 { }
 
-WindSensorPlugin::~WindSensorPlugin()
+AirflowSensorPlugin::~AirflowSensorPlugin()
 {
     if (updateConnection_)
       updateConnection_->~Connection();
 }
 
-void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
+void AirflowSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   this->parentSensor_ = std::dynamic_pointer_cast<sensors::Sensor>(_parent);
   if (!parentSensor_)
-    gzthrow("WindSensorPlugin requires a Wind Sensor as its parent");
+    gzthrow("AirflowSensorPlugin requires a airflow Sensor as its parent");
 
   // Get the root model name
   const std::string scopedName = _parent->ParentName();
@@ -79,14 +79,14 @@ void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   // store the model name
   model_name_ = names_splitted[0];
 
-  // get windsensor topic name
+  // get airflow sensor topic name
   if(_sdf->HasElement("topic")) {
-    windsensor_topic_ = _sdf->GetElement("topic")->Get<std::string>();
+    airflowsensor_topic_ = _sdf->GetElement("topic")->Get<std::string>();
   } else {
     // if not set by parameter, get the topic name from the model name
-    windsensor_topic_ = parentSensorModelName;
-    gzwarn << "[gazebo_windsensor_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
-      " using windsensor topic \"" << parentSensorModelName << "\"\n";
+    airflowsensor_topic_ = parentSensorModelName;
+    gzwarn << "[gazebo_airflowsensor_plugin]: " + names_splitted.front() + "::" + names_splitted.rbegin()[1] +
+      " using airflowsensor topic \"" << parentSensorModelName << "\"\n";
   }
 
 
@@ -96,7 +96,7 @@ void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_windsensor_plugin] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_airflowsensor_plugin] Please specify a robotNamespace.\n";
   }
 
   this->node_handle_ = transport::NodePtr(new transport::Node());
@@ -104,15 +104,15 @@ void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   this->parentSensor_->SetUpdateRate(10.0);
   this->parentSensor_->SetActive(false);
-  updateSensorConnection_ = parentSensor_->ConnectUpdated(boost::bind(&WindSensorPlugin::OnSensorUpdate, this));
+  updateSensorConnection_ = parentSensor_->ConnectUpdated(boost::bind(&AirflowSensorPlugin::OnSensorUpdate, this));
   this->parentSensor_->SetActive(true);
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&WindSensorPlugin::OnUpdate, this, _1));
+  updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&AirflowSensorPlugin::OnUpdate, this, _1));
 
-  windsensor_pub_ = node_handle_->Advertise<sensor_msgs::msgs::WindSensor>("~/" + model_name_ + "/link/" + windsensor_topic_, 10);
-  wind_sub_ = node_handle_->Subscribe("~/world_wind", &WindSensorPlugin::WindVelocityCallback, this);
+  airflow_sensor_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Airspeed>("~/" + model_name_ + "/link/" + airflowsensor_topic_, 10);
+  wind_sub_ = node_handle_->Subscribe("~/world_wind", &AirflowSensorPlugin::WindVelocityCallback, this);
 
   // Set initial wind as zero
   wind_.X() = 0;
@@ -121,7 +121,7 @@ void WindSensorPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
 }
 
-void WindSensorPlugin::OnUpdate(const common::UpdateInfo&){
+void AirflowSensorPlugin::OnUpdate(const common::UpdateInfo&){
 
   #if GAZEBO_MAJOR_VERSION >= 9
   model_ = world_->ModelByName(model_name_);
@@ -132,7 +132,7 @@ void WindSensorPlugin::OnUpdate(const common::UpdateInfo&){
 #endif
   link_ = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
   if (link_ == NULL)
-    gzthrow("[gazebo_airspeed_plugin] Couldn't find specified link \"" << link_name_ << "\".");
+    gzthrow("[gazebo_airflowsensor_plugin] Couldn't find specified link \"" << link_name_ << "\".");
 
 #if GAZEBO_MAJOR_VERSION >= 9
   common::Time current_time = world_->SimTime();
@@ -148,46 +148,41 @@ void WindSensorPlugin::OnUpdate(const common::UpdateInfo&){
   ignition::math::Quaterniond C_W_I = T_W_I.Rot();
 
 #if GAZEBO_MAJOR_VERSION >= 9
+  body_wind_ = C_W_I.RotateVectorReverse(wind_);
   vel_a_ = link_->RelativeLinearVel() - C_W_I.RotateVectorReverse(wind_);
-  ang_a_ = link_->RelativeLinearVel() - C_W_I.RotateVectorReverse(wind_);
+  body_vel_ = link_->RelativeLinearVel();
 #else
+  body_wind_ = C_W_I.RotateVectorReverse(wind_);
   vel_a_ = ignitionFromGazeboMath(link_->GetRelativeLinearVel()) - C_W_I.RotateVectorReverse(wind_);
-  ang_a_ = ignitionFromGazeboMath(link_->GetRelativeAngularVel());
+  body_vel_ = ignitionFromGazeboMath(link_->GetRelativeLinearVel());
 #endif
 
   last_time_ = current_time;
-  wind_direction_ = atan2f(vel_a_.Y(),vel_a_.X()) * (180.0/M_PI);
+  airflow_direction_ = atan2f(vel_a_.Y(),vel_a_.X()) * (180.0/M_PI);
   // resolution of 1 degree
-  wind_direction_ = round(wind_direction_) * (M_PI/180.0) + gauss_dir_(generator_);
-  // wind sensor cannot measure wind in the z-direction
+  airflow_direction_ = round(airflow_direction_) * (M_PI/180.0) + gauss_dir_(generator_);
+  // airflow sensor cannot measure wind in the z-direction
   vel_a_.Z() = 0;
-  wind_speed_ =  vel_a_.Length()*10.0;
+  airflow_speed_ =  vel_a_.Length()*10.0;
   // resolution of 0.1m/s
-  wind_speed_ = round(wind_speed_)/10.0 + gauss_speed_(generator_);
+  airflow_speed_ = round(airflow_speed_)/10.0 + gauss_speed_(generator_);
 }
 
-void WindSensorPlugin::OnSensorUpdate() {
+void AirflowSensorPlugin::OnSensorUpdate() {
 
-
-  sensor_msgs::msgs::WindSensor windsensor_msg;
-  windsensor_msg.set_time_usec(last_time_.Double() * 1e6);
-  windsensor_msg.set_wind_speed(wind_speed_);
-  windsensor_msg.set_wind_direction(wind_direction_);
-  windsensor_pub_->Publish(windsensor_msg);
+    sensor_msgs::msgs::Airspeed airflow_sensor_msg;
+    airflow_sensor_msg.set_time_usec(last_time_.Double() * 1e6);
+    airflow_sensor_msg.set_diff_pressure(ignition::math::NAN_D);
+    airflow_sensor_msg.set_direction(airflow_direction_);
+    airflow_sensor_msg.set_speed(airflow_speed_);
+    airflow_sensor_pub_->Publish(airflow_sensor_msg);
 
 }
 
-void WindSensorPlugin::WindVelocityCallback(WindPtr& wind) {
+void AirflowSensorPlugin::WindVelocityCallback(WindPtr& wind) {
 
   // Get world wind velocity.
   ignition::math::Vector3d wind_world = ignition::math::Vector3d(wind->velocity().x(), wind->velocity().y(), wind->velocity().z());
-
-  // Rotate to body frame
-  #if GAZEBO_MAJOR_VERSION >= 9
-    wind_ = link_->WorldPose().Rot().Inverse().RotateVector(wind_world);
-  #else
-    wind_ = ignitionFromGazeboMath(link_->GetWorldPose()).Rot().Inverse().RotateVector(wind_world);
-  #endif
 
 }
 } // namespace gazebo

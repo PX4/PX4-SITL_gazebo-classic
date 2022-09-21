@@ -330,7 +330,15 @@ set(sensor_msgs
   msgs/OpticalFlow.proto
   msgs/MagneticField.proto
   msgs/Pressure.proto
+<<<<<<< HEAD
   msgs/WindSensor.proto
+=======
+  # Cloudline Additions
+  msgs/AirshipDynamicForces.proto
+  )
+set(PX4_msgs
+  msgs/HrtAbsolute.proto
+>>>>>>> 3d7464a... Windsensor naming changed to airflow sensor
   )
 
 PROTOBUF_GENERATE_CPP(MAV_PROTO_SRCS MAV_PROTO_HDRS ${mav_msgs})
@@ -376,7 +384,7 @@ add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
 add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
-add_library(gazebo_windsensor_plugin SHARED src/gazebo_windsensor_plugin.cpp)
+add_library(gazebo_airflowsensor_plugin SHARED src/gazebo_airflowsensor_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 
 set(plugins
@@ -404,7 +412,12 @@ set(plugins
   gazebo_usv_dynamics_plugin
   gazebo_parachute_plugin
   gazebo_drop_plugin
+<<<<<<< HEAD
   gazebo_windsensor_plugin
+=======
+  # Cloudline Additions
+  gazebo_airflowsensor_plugin
+>>>>>>> 3d7464a... Windsensor naming changed to airflow sensor
   gazebo_airship_dynamics_plugin
   )
 

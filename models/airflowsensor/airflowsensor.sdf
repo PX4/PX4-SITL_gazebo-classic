@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-  <model name="windsensor">
+  <model name="airflowsensor">
     <link name="link">
       <pose>0 0 0 0 0 0</pose>
       <visual name="visual">
@@ -16,12 +16,12 @@
           </script>
         </material>
       </visual>
-      <sensor name='windsensor' type='gps'>
+      <sensor name='airflowsensor' type='gps'>
         <pose>0 0 0 0 0 0</pose>
         <update_rate>5.0</update_rate>
         <always_on>true</always_on>
         <visualize>false</visualize>
-        <plugin name='gazebo_windsensor_plugin' filename='libgazebo_windsensor_plugin.so'>
+        <plugin name='gazebo_airflowsensor_plugin' filename='libgazebo_airflowsensor_plugin.so'>
           <robotNamespace/>
         </plugin>
       </sensor>

@@ -31,15 +31,15 @@
  *
  ****************************************************************************/
 /**
- * @brief WindSensor Plugin
+ * @brief AirflowSensor Plugin
  *
- * This plugin publishes WindSensor sensor data
+ * This plugin publishes Airflow sensor data
  *
  * @author Henry Kotze <henry@flycloudline.com>
  */
 
-#ifndef _GAZEBO_WINDSENSOR_PLUGIN_HH_
-#define _GAZEBO_WINDSENSOR_PLUGIN_HH_
+#ifndef _GAZEBO_AIRFLOWSENSOR_PLUGIN_HH_
+#define _GAZEBO_AIRFLOWSENSOR_PLUGIN_HH_
 
 #include <math.h>
 #include <cstdio>
@@ -62,7 +62,7 @@
 #include <gazebo/sensors/SensorTypes.hh>
 #include <gazebo/sensors/Sensor.hh>
 
-#include <WindSensor.pb.h>
+#include <Airspeed.pb.h>
 #include <Wind.pb.h>
 
 namespace gazebo
@@ -70,11 +70,11 @@ namespace gazebo
 
 typedef const boost::shared_ptr<const physics_msgs::msgs::Wind> WindPtr;
 
-class GAZEBO_VISIBLE WindSensorPlugin : public SensorPlugin
+class GAZEBO_VISIBLE AirflowSensorPlugin : public SensorPlugin
 {
 public:
-  WindSensorPlugin();
-  virtual ~WindSensorPlugin();
+  AirflowSensorPlugin();
+  virtual ~AirflowSensorPlugin();
 
 protected:
   virtual void Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf);
@@ -91,7 +91,7 @@ private:
 
   transport::NodePtr node_handle_;
   transport::SubscriberPtr wind_sub_;
-  transport::PublisherPtr windsensor_pub_;
+  transport::PublisherPtr airflow_sensor_pub_;
   event::ConnectionPtr updateSensorConnection_;
   event::ConnectionPtr updateConnection_;
 
@@ -104,16 +104,18 @@ private:
   std::string namespace_;
   std::string link_name_;
   std::string model_name_;
-  std::string windsensor_topic_;
+  std::string airflowsensor_topic_;
 
   std::normal_distribution<float> gauss_dir_;
   std::normal_distribution<float> gauss_speed_;
   std::default_random_engine generator_;
   
   ignition::math::Vector3d wind_;
-  float wind_direction_;
-  float wind_speed_;
+  ignition::math::Vector3d body_wind_;
+  ignition::math::Vector3d body_vel_;
+  float airflow_direction_;
+  float airflow_speed_;
 
-};     // class GAZEBO_VISIBLE WindSensorPlugin
+};     // class GAZEBO_VISIBLE AirflowSensorPlugin
 }      // namespace gazebo
-#endif // _GAZEBO_WINDSENSOR_PLUGIN_HH_
+#endif // _GAZEBO_AIRFLOWSENSOR_PLUGIN_HH_

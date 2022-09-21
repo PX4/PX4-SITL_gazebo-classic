@@ -1,9 +1,0 @@
-syntax = "proto2";
-package sensor_msgs.msgs;
-
-message WindSensor
-{
-  required int64  time_usec             = 1;
-  required double wind_speed            = 2;
-  required double wind_direction        = 3;
-}
