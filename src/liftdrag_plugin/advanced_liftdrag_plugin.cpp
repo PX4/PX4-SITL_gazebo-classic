@@ -371,14 +371,9 @@ void AdvancedLiftDragPlugin::OnUpdate()
   //Get non-dimensional body rates. Gazebo uses ENU, so some have to be flipped
   ignition::math::Vector3d body_rates = this->link->RelativeAngularVel();
   double airspeed = air_velocity.Length();
-  double p = 0; //Non-dimensionalized roll rate
-  double q = 0; //Non-dimensionalized pitch rate
-  double r = 0; //Non-dimensionalized yaw rate
-  if(airspeed < 0.01){
-    p = body_rates.X()*span/(2*airspeed); //Non-dimensionalized roll rate
-    q = -1*body_rates.Y()*this->mac/(2*airspeed); //Non-dimensionalized pitch rate
-    r = -1*body_rates.Z()*span/(2*airspeed); //Non-dimensionalized yaw rate
-  }
+  double rr = body_rates.X(); //Roll rate
+  double pr = -1*body_rates.Y(); //Pitch rate
+  double yr = -1*body_rates.Z(); //Yaw rate
 
   //Compute angle of attack, alpha, using the stability and body axes
   //Project stability x onto body x and z, then take arctan to find alpha
@@ -396,6 +391,7 @@ void AdvancedLiftDragPlugin::OnUpdate()
 
   //Compute dynamic pressure
   double dyn_pres = 0.5 * this->rho * speedInLDPlane * speedInLDPlane;
+  double half_rho_vel = 0.5 * this->rho * speedInLDPlane;
   gzdbg << "LD Plane Vel:" << speedInLDPlane;
 
   // Compute CL at ref_pt, check for stall
@@ -422,8 +418,6 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   CL = (1-sigma)*(this->CL0 + this->CLa*this->alpha) + sigma*(2*(this->alpha/abs(this->alpha))*sinAlpha*sinAlpha*cosAlpha);
   // Add sideslip effect, if any
   CL = CL + this->CLb*this->beta;
-  // Add effect of rate terms
-  CL = CL + this->CLp*p + this->CLq*q + this->CLr*r;
   gzdbg << "Current Zero Deflection CL:" << CL << "\n";
   gzdbg << "control surface: " << this->sdf->Get<std::string>("control_joint_name") << "\n";
   gzdbg << "alpha: " << this->alpha << "\n";
@@ -462,7 +456,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   gzdbg << "Current CL:" << CL << "\n";
 
   // Compute lift force at ref_pt
-  ignition::math::Vector3d lift = CL * dyn_pres * this->area * (-1 * stability_z_axis);
+  ignition::math::Vector3d lift = (CL * dyn_pres + (this->CLp * (rr*span/2) * half_rho_vel) + (this->CLq * (pr*this->mac/2) * half_rho_vel) + (this->CLr * (yr*span/2) * half_rho_vel)) * (this->area * (-1 * stability_z_axis));
 
   // Compute CD at ref_pt, check for stall
   double CD{0.0};
@@ -488,8 +482,6 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
     ratio, but that rate of increase would slow down as AR goes to infinity.*/
   double CD_fp = 2/(1+exp(this->CD_fp_k1+this->CD_fp_k2*(std::max(this->AR,1/this->AR))));
   CD = (1-sigma)*(this->CD0 + (CL*CL)/(M_PI*this->AR*this->eff))+sigma*abs(CD_fp*(0.5-0.5*cos(2*this->alpha)));
-  // Add rate terms
-  CD = CD + this->CDp*p + this->CDq*q + this->CDr * r;
   gzdbg << "Current Efficiency:" << this->eff << "\n";
   gzdbg << "Current Lift-Induced CD:" << (CL*CL)/(M_PI*this->AR*this->eff) << "\n";
   gzdbg << "Current CD, no deflection:" << CD << "\n";
@@ -499,16 +491,14 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   gzdbg << "Current CD:" << CD << "\n";
 
   // Place drag at ref_pt
-  ignition::math::Vector3d drag = CD * dyn_pres * this->area * (-1*stability_x_axis);
+  ignition::math::Vector3d drag = (CD * dyn_pres + (this->CDp * (rr*span/2) * half_rho_vel) + (this->CDq * (pr*this->mac/2) * half_rho_vel) + (this->CDr * (yr*span/2) * half_rho_vel)) * (this->area * (-1*stability_x_axis));
 
   // Compute sideforce coefficient, CY
   // Start with angle of attack, sideslip, and control terms
   double CY = this->CYa * this->alpha + this->CYb * this->beta + CY_ctrl_tot;
-  // Add rate terms
-  CY = CY + this->CYp*p + this->CYq*q + this->CYr * r;
   gzdbg << "Current CY:" << CY << "\n";
 
-  ignition::math::Vector3d sideforce = CY * dyn_pres * this->area * stability_y_axis;
+  ignition::math::Vector3d sideforce = (CY * dyn_pres + (this->CYp * (rr*span/2) * half_rho_vel) + (this->CYq * (pr*this->mac/2) * half_rho_vel) + (this->CYr * (yr*span/2) * half_rho_vel)) * (this->area * stability_y_axis);
 
 
   /*
@@ -536,29 +526,26 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   }
   // Add sideslip effect, if any
   Cem = this->Cemb * this->beta;
-  // Add rate terms
-  Cem = Cem + this->Cemp*p + this->Cemq*q + this->Cemr * r;
 
   // Take into account the effect of control surface deflection angle to Cm
   Cem += Cem_ctrl_tot;
   gzdbg << "Current Cm:" << Cem << "\n";
+  ignition::math::Vector3d pm = ((Cem * dyn_pres) + (this->Cemp * (rr*span/2) * half_rho_vel) + (this->Cemq * (pr*this->mac/2) * half_rho_vel) + (this->Cemr * (yr*span/2) * half_rho_vel)) * (this->area * this->mac * body_y_axis);
 
   // Compute roll moment coefficient, Cell
   // Start with angle of attack, sideslip, and control terms
   double Cell = this-> Cella * this->alpha + this->Cellb * this-> beta + Cell_ctrl_tot;
-  // Add rate terms
-  Cell = Cell + this->Cellp*p + this->Cellq*q + this->Cellr * r;
+  ignition::math::Vector3d rm = ((Cell * dyn_pres) + (this->Cellp * (rr*span/2) * half_rho_vel) + (this->Cellq * (pr*this->mac/2) * half_rho_vel) + (this->Cellr * (yr*span/2) * half_rho_vel)) * (this->area * span * body_x_axis);
 
   // Compute yaw moment coefficient, Cen
   // Start with angle of attack, sideslip, and control terms
   double Cen = this->Cena * this->alpha + this->Cenb * this->beta + Cen_ctrl_tot;
-  // Add rate terms
-  Cen = Cen + this->Cenp*p + this->Cenq*q + this->Cenr * r;
+  ignition::math::Vector3d ym = ((Cen * dyn_pres) + (this->Cenp * (rr*span/2) * half_rho_vel) + (this->Cenq * (pr*this->mac/2) * half_rho_vel) + (this->Cenr * (yr*span/2) * half_rho_vel)) * (this->area * span * body_z_axis);
   gzdbg << "Current Cl:" << Cell << "\n";
   gzdbg << "Current Cn:" << Cen << "\n";
 
   // Compute moment (torque)
-  ignition::math::Vector3d moment = (Cem * dyn_pres * this->area * this->mac * body_y_axis) + (Cell * dyn_pres * this->area * span * body_x_axis) + (Cen * dyn_pres * this->area * span * body_z_axis);
+  ignition::math::Vector3d moment = pm+rm+ym;
 
   // compute force about cg in inertial frame
   ignition::math::Vector3d force = lift + drag + sideforce;
