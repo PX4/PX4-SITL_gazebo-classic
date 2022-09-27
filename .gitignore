@@ -29,3 +29,4 @@ models/typhoon_h480/typhoon_h480.sdf
 models/depth_camera/depth_camera.sdf
 models/standard_vtol_drop/standard_vtol_drop.sdf
 models/tailsitter/tailsitter.sdf
+models/advanced_plane/advanced_plane.sdf
