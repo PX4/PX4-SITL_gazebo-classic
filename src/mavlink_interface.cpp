@@ -209,6 +209,21 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
   }
 }
 
+void MavlinkInterface::SendHeartbeat() {
+  // In order to start the mavlink instance on Pixhawk over USB, we need to send heartbeats.
+  if (hil_mode_) {
+    mavlink_message_t msg;
+    mavlink_msg_heartbeat_pack_chan(
+      1, 200,
+      MAVLINK_COMM_0,
+      &msg,
+      MAV_TYPE_GENERIC,
+      MAV_AUTOPILOT_INVALID,
+      0, 0, 0);
+    send_mavlink_message(&msg);
+  }
+}
+
 void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data) {
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
 
@@ -495,10 +510,18 @@ void MavlinkInterface::acceptConnections()
 void MavlinkInterface::handle_message(mavlink_message_t *msg)
 {
   switch (msg->msgid) {
+  case MAVLINK_MSG_ID_HEARTBEAT:
+    handle_heartbeat(msg);
+    break;
   case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
     handle_actuator_controls(msg);
     break;
   }
+}
+
+void MavlinkInterface::handle_heartbeat(mavlink_message_t *)
+{
+  received_heartbeats_ = true;
 }
 
 void MavlinkInterface::handle_actuator_controls(mavlink_message_t *msg)

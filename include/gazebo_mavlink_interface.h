@@ -249,6 +249,7 @@ private:
   common::Time last_time_;
   common::Time last_imu_time_;
   common::Time last_actuator_time_;
+  common::Time last_heartbeat_sent_time_{};
 
   double groundtruth_lat_rad_{0.0};
   double groundtruth_lon_rad_{0.0};
