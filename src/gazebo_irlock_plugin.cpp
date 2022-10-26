@@ -119,6 +119,16 @@ void IRLockPlugin::OnUpdated()
         irlock_message.set_size_x(0); // unused by beacon estimator
         irlock_message.set_size_y(0); // unused by beacon estimator
 
+        // Use ignition to send orientation quaternion
+        ignition::math::Pose3d modelRelativePose = gazebo::msgs::ConvertIgn(model.pose());
+        ignition::math::Quaterniond q_enu_to_ned(3.141f, 0.0f, 0.0f);
+        ignition::math::Quaterniond modelRelativeRotNed = q_enu_to_ned * modelRelativePose.Rot();
+
+        irlock_message.set_q_w(modelRelativeRotNed.W());
+        irlock_message.set_q_x(modelRelativeRotNed.X());
+        irlock_message.set_q_y(modelRelativeRotNed.Y());
+        irlock_message.set_q_z(modelRelativeRotNed.Z());
+
         // send message
         irlock_pub_->Publish(irlock_message);
 
