@@ -174,20 +174,11 @@ void MavlinkInterface::Load()
         fds_[LISTEN_FD].events = POLLIN; // only listens for new connections on tcp
       }
     } else {
-      if (!hil_mode_) {
-        // When connecting to SITL, we specify the port where the mavlink traffic originates from.
-        remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
-        remote_simulator_addr_.sin_port = htons(mavlink_udp_port_);
-        local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-        local_simulator_addr_.sin_port = htons(0);
-      } else {
-        // When connecting to HITL via UDP, the vehicle talks to a specific port that we need to
-        // listen to.
-        remote_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-        remote_simulator_addr_.sin_port = htons(0);
-        local_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
-        local_simulator_addr_.sin_port = htons(mavlink_udp_port_);
-      }
+      // When connecting to SITL, we specify the port where the mavlink traffic originates from.
+      remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
+      remote_simulator_addr_.sin_port = htons(mavlink_udp_remote_port_);
+      local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
+      local_simulator_addr_.sin_port = htons(mavlink_udp_local_port_);
 
       if ((simulator_socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         std::cerr << "Creating UDP socket failed: " << strerror(errno) << ", aborting\n";

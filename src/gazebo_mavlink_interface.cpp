@@ -497,9 +497,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   auto worldName = world_->GetName();
 #endif
 
-  if (_sdf->HasElement("mavlink_udp_port")) {
-    int mavlink_udp_port = _sdf->GetElement("mavlink_udp_port")->Get<int>();
-    mavlink_interface_->SetMavlinkUdpPort(mavlink_udp_port);
+  if (_sdf->HasElement("mavlink_udp_remote_port")) {
+    int mavlink_udp_remote_port = _sdf->GetElement("mavlink_udp_remote_port")->Get<int>();
+    mavlink_interface_->SetMavlinkUdpRemotePort(mavlink_udp_remote_port);
+  }
+
+  if (_sdf->HasElement("mavlink_udp_local_port")) {
+    int mavlink_udp_local_port = _sdf->GetElement("mavlink_udp_local_port")->Get<int>();
+    mavlink_interface_->SetMavlinkUdpLocalPort(mavlink_udp_local_port);
   }
 
   if (_sdf->HasElement("mavlink_tcp_port")) {
