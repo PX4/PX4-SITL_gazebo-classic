@@ -218,14 +218,18 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     gzwarn << "[gazebo_gst_camera_plugin] Please specify a robotNamespace.\n";
 
   this->udpHost = "127.0.0.1";
-  if (sdf->HasElement("udpHost")) {
-    this->udpHost = sdf->GetElement("udpHost")->Get<string>();
+  const char *host_ip = std::getenv("PX4_VIDEO_HOST_IP");
+  if (host_ip) {
+  	this->udpHost = std::string(host_ip);
+  } else if (sdf->HasElement("udpHost")) {
+  	this->udpHost = sdf->GetElement("udpHost")->Get<string>();
   }
 
   this->udpPort = 5600;
   if (sdf->HasElement("udpPort")) {
     this->udpPort = sdf->GetElement("udpPort")->Get<int>();
   }
+  gzwarn << "[gazebo_gst_camera_plugin] Streaming video to ip: " << this->udpHost << " port: "  << this->udpPort << std::endl;
 
   if (sdf->HasElement("rtmpLocation")) {
     this->rtmpLocation = sdf->GetElement("rtmpLocation")->Get<string>();
