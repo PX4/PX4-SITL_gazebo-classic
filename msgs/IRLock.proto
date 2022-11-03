@@ -9,4 +9,8 @@ message IRLock
   required float pos_y		= 4;
   required float size_x		= 5;
   required float size_y		= 6;
+  optional double q_w = 7;
+  optional double q_x = 8;
+  optional double q_y = 9;
+  optional double q_z = 10;
 }
