@@ -348,7 +348,22 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     gzerr << "GimbalControllerPlugin::Load ERROR! Can't get imu sensor '"
           << cameraImuSensorName << "' " << endl;
   }
+  
+  const char *host_ip = std::getenv("PX4_VIDEO_HOST_IP");
+  if (host_ip) {
+    this->udp_gimbal_host_ip = std::string(host_ip);
+  } else if (this->sdf->HasElement("udp_gimbal_host_ip")) {
+    this->udp_gimbal_host_ip =  _sdf->Get<std::string>("udp_gimbal_host_ip");
+  } else {
+    this->udp_gimbal_host_ip = "127.0.0.1";
+  }
 
+  if (this->sdf->HasElement("udp_gimbal_port_remote")) {
+    this->udp_gimbal_port_remote = _sdf->Get<int>("udp_gimbal_port_remote");
+  } else {
+    this->udp_gimbal_port_remote = 13030;
+  }
+  gzwarn << "[gazebo_gimbal_controller_plugin] Streaming gimbal mavlink stream to ip: " << this->udp_gimbal_host_ip  << " port: " << this->udp_gimbal_port_remote << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -747,8 +762,8 @@ void GimbalControllerPlugin::SendMavlinkMessage(const mavlink_message_t &msg)
 
   sockaddr_in dest_addr {};
   dest_addr.sin_family = AF_INET;
-  inet_pton(AF_INET, "127.0.0.1", &dest_addr.sin_addr.s_addr);
-  dest_addr.sin_port = htons(13030);
+  inet_pton(AF_INET, this->udp_gimbal_host_ip.c_str(), &dest_addr.sin_addr.s_addr);
+  dest_addr.sin_port = htons(this->udp_gimbal_port_remote);
 
   const ssize_t len = sendto(this->sock, buffer, packetlen, 0, reinterpret_cast<sockaddr *>(&dest_addr), sizeof(dest_addr));
   if (len <= 0) {
