@@ -35,9 +35,12 @@ if __name__ == "__main__":
     parser.add_argument('--stdout', action='store_true', default=False, help="dump to stdout instead of file")
     parser.add_argument('--mavlink_id', default=1, help="Mavlink system ID")
     parser.add_argument('--cam_component_id', default=100, help="Mavlink camera component ID")
+    parser.add_argument('--gst_udp_host', default="127.0.0.1", help="Gstreamer UDP host for SITL")
     parser.add_argument('--gst_udp_port', default=5600, help="Gstreamer UDP port for SITL")
     parser.add_argument('--video_uri', default="udp://127.0.0.1:5600", help="Mavlink camera URI for SITL")
     parser.add_argument('--mavlink_cam_udp_port', default=14530, help="Mavlink camera UDP port for SITL")
+    parser.add_argument('--udp_onboard_gimbal_host_ip', default=13030, help="Mavlink Gimbal UDP for SITL")
+    parser.add_argument('--udp_onboard_gimbal_port_remote', default=13030, help="Mavlink Gimbal UDP for SITL")
     parser.add_argument('--generate_ros_models', default=False, dest='generate_ros_models', type=str2bool,
                     help="required if generating the agent for usage with ROS nodes, by default false")
     args = parser.parse_args()
@@ -65,9 +68,12 @@ if __name__ == "__main__":
          'serial_baudrate': args.serial_baudrate, \
          'mavlink_id': args.mavlink_id, \
          'cam_component_id': args.cam_component_id, \
+         'gst_udp_host': args.gst_udp_host, \
          'gst_udp_port': args.gst_udp_port, \
          'video_uri': args.video_uri, \
          'mavlink_cam_udp_port': args.mavlink_cam_udp_port, \
+         'udp_onboard_gimbal_host_ip': args.udp_onboard_gimbal_host_ip, \
+         'udp_onboard_gimbal_port_remote': args.udp_onboard_gimbal_port_remote, \
          'hil_mode': args.hil_mode, \
          'ros_version': ros_version}
 
