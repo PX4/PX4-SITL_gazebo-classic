@@ -156,6 +156,9 @@ namespace gazebo
     private: static constexpr uint8_t ourSysid {1};
     private: static constexpr uint8_t ourCompid {MAV_COMP_ID_GIMBAL};
     private: static constexpr uint8_t mavlinkChannel {MAVLINK_COMM_3};
+
+    private: std::string udp_gimbal_host_ip;
+    private: int udp_gimbal_port_remote;
   };
 }
 #endif
