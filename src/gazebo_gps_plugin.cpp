@@ -139,6 +139,8 @@ void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     getSdfParam<double>(_sdf, "homeAltitude", alt_home_, alt_home_);
   }
 
+  enu_.emplace(lat_home_ * 180.0 / M_PI, lon_home_ * 180.0 / M_PI, alt_home_, GeographicLib::Geocentric::WGS84());
+
   // get random walk in XY plane
   if (_sdf->HasElement("gpsXYRandomWalk")) {
     getSdfParam<double>(_sdf, "gpsXYRandomWalk", gps_xy_random_walk_, kDefaultGpsXYRandomWalk);
@@ -289,7 +291,14 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
 
   // reproject position with noise into geographic coordinates
   auto pos_with_noise = pos_W_I + noise_gps_pos_ + gps_bias_;
-  auto latlon = reproject(pos_with_noise, lat_home_, lon_home_, alt_home_);
+  double current_latitude;
+  double current_longitude;
+  double current_altitude;
+  if (enu_.has_value()) {
+    enu_.value().Reverse(pos_with_noise.X(), pos_with_noise.Y(), pos_with_noise.Z(), current_latitude, current_longitude, current_altitude);
+  } else {
+    auto latlon = reproject(pos_with_noise, lat_home_, lon_home_, alt_home_);
+  }
 
   // fill SITLGps msg
   sensor_msgs::msgs::SITLGps gps_msg;
@@ -302,9 +311,9 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
   // gps_msg.set_latitude_deg(parentSensor_->Latitude().Degree());
   // gps_msg.set_longitude_deg(parentSensor_->Longitude().Degree());
   // gps_msg.set_altitude(parentSensor_->Altitude());
-  gps_msg.set_latitude_deg(latlon.first * 180.0 / M_PI);
-  gps_msg.set_longitude_deg(latlon.second * 180.0 / M_PI);
-  gps_msg.set_altitude(pos_W_I.Z() + alt_home_ - noise_gps_pos_.Z() + gps_bias_.Z());
+  gps_msg.set_latitude_deg(current_latitude);
+  gps_msg.set_longitude_deg(current_longitude);
+  gps_msg.set_altitude(current_altitude);
 
   std_xy_ = 1.0;
   std_z_ = 1.0;

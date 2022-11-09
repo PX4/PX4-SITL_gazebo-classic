@@ -36,6 +36,9 @@
 #include <sdf/sdf.hh>
 #include <common.h>
 
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/util/system.hh>
@@ -108,6 +111,8 @@ private:
   double world_latitude_ = 0.0;
   double world_longitude_ = 0.0;
   double world_altitude_ = 0.0;
+
+  std::optional<GeographicLib::LocalCartesian> enu_;
 
   // gps delay related
   static constexpr double gps_delay_ = 0.12;           // 120 ms
