@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="airflowsensor">
+    <link name="link">
+      <pose>0 0 0 0 0 0</pose>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor name='airflowsensor' type='gps'>
+        <pose>0 0 0 0 0 0</pose>
+        <update_rate>5.0</update_rate>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <plugin name='gazebo_airflowsensor_plugin' filename='libgazebo_airflowsensor_plugin.so'>
+          <robotNamespace/>
+        </plugin>
+      </sensor>
+    </link>
+  </model>
+</sdf>

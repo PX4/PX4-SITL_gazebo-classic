@@ -445,6 +445,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   CreateSensorSubscription(&GazeboMavlinkInterface::AirspeedCallback, this, joints, nested_model, kDefaultAirspeedModelJointNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::ImuCallback, this, joints, nested_model, kDefaultImuModelJointNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::MagnetometerCallback, this, joints, nested_model, kDefaultMagModelJointNaming);
+  CreateSensorSubscription(&GazeboMavlinkInterface::AirspeedCallback, this, joints, nested_model, kDefaultAirflowSensorModelJointNaming);
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
@@ -1093,6 +1094,8 @@ void GazeboMavlinkInterface::MagnetometerCallback(MagnetometerPtr& mag_msg, cons
 void GazeboMavlinkInterface::AirspeedCallback(AirspeedPtr& airspeed_msg, const int& id) {
   SensorData::Airspeed airspeed_data;
   airspeed_data.diff_pressure = airspeed_msg->diff_pressure();
+  airspeed_data.speed = airspeed_msg->speed();
+  airspeed_data.direction = airspeed_msg->direction();
   mavlink_interface_->UpdateAirspeed(airspeed_data, id);
 }
 

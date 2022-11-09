@@ -5,4 +5,6 @@ message Airspeed
 {
   required int64  time_usec             = 1;
   required double diff_pressure         = 2;
+  optional double speed                 = 3;
+  optional double direction             = 4;
 }

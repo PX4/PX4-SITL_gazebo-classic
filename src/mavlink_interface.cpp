@@ -207,6 +207,9 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
     if (data.baro_updated | data.diff_press_updated | data.mag_updated | data.imu_updated) {
       SendSensorMessages(time_usec, data);
     }
+    if(data.airflow_updated){
+      SendAirflowSensorMessages(time_usec, data);
+    }
   }
 }
 
@@ -221,6 +224,24 @@ void MavlinkInterface::SendHeartbeat() {
       MAV_TYPE_GENERIC,
       MAV_AUTOPILOT_INVALID,
       0, 0, 0);
+    send_mavlink_message(&msg);
+  }
+}
+
+void MavlinkInterface::SendAirflowSensorMessages(uint64_t time_usec, HILData &hil_data) {
+
+
+  mavlink_hil_airflow_sensor_t airflow_sensor_msg;
+  // airflow_sensor_msg.id = data.id;
+  airflow_sensor_msg.time_usec = time_usec;
+  airflow_sensor_msg.speed = hil_data.airflow_speed;
+  airflow_sensor_msg.direction = hil_data.airflow_direction;
+
+  hil_data.airflow_updated = false;
+
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_airflow_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &airflow_sensor_msg);
     send_mavlink_message(&msg);
   }
 }
@@ -274,6 +295,7 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
     data->diff_press_updated = false;
   }
 
+
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
@@ -326,9 +348,17 @@ void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) 
   const std::lock_guard<std::mutex> lock(sensor_msg_mutex_);
   for (auto& instance : hil_data_) {
     if (instance.id == id) {
-      instance.diff_pressure = data.diff_pressure;
-      instance.diff_press_updated = true;
-      return;
+
+      if(!isnan(data.diff_pressure)){
+        instance.diff_pressure = data.diff_pressure;
+        instance.diff_press_updated = true;
+        return;
+      } else {
+        instance.airflow_speed = data.speed;
+        instance.airflow_direction = data.direction;
+        instance.airflow_updated = true;
+        return;
+      }
     }
   }
   //Register new HIL instance if we have never seen the id

@@ -80,6 +80,7 @@ static const std::regex kDefaultGPSModelNaming(".*(gps|ublox-neo-7M)(.*)");
 static const std::regex kDefaultAirspeedModelJointNaming(".*(airspeed)(.*_joint)");
 static const std::regex kDefaultImuModelJointNaming(".*(imu)(\\d*_joint)");
 static const std::regex kDefaultMagModelJointNaming(".*(mag)(\\d*_joint)");
+static const std::regex kDefaultAirflowSensorModelJointNaming(".*(airflowsensor)(.*_joint)");
 
 namespace gazebo {
 

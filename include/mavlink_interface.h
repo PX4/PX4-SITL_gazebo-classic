@@ -81,7 +81,7 @@ enum class SensorSource {
   GYRO		= 0b111000,
   MAG		= 0b111000000,
   BARO		= 0b1101000000000,
-  DIFF_PRESS	= 0b10000000000,
+  DIFF_PRESS	= 0b10000000000
 };
 
 namespace SensorData {
@@ -104,6 +104,13 @@ namespace SensorData {
 
     struct Airspeed {
         double diff_pressure;
+        double speed;
+        double direction;
+    };
+
+    struct WindSensor {
+        double wind_speed;
+        double wind_direction;
     };
 
     struct Gps {
@@ -129,12 +136,15 @@ struct HILData {
     int id=-1;
     bool baro_updated{false};
     bool diff_press_updated{false};
+    bool airflow_updated{false};
     bool mag_updated{false};
     bool imu_updated{false};
     double temperature;
     double pressure_alt;
     double abs_pressure;
     double diff_pressure;
+    double airflow_speed;
+    double airflow_direction;
     Eigen::Vector3d mag_b;
     Eigen::Vector3d accel_b;
     Eigen::Vector3d gyro_b;
@@ -155,6 +165,8 @@ public:
     void SendHeartbeat();
     void SendSensorMessages(const uint64_t time_usec);
     void SendSensorMessages(const uint64_t time_usec, HILData &hil_data);
+    void SendAirflowSensorMessages(uint64_t time_usec, HILData &hil_data);
+
     void SendGpsMessages(const SensorData::Gps &data);
     void UpdateBarometer(const SensorData::Barometer &data, const int id = 0);
     void UpdateAirspeed(const SensorData::Airspeed &data, const int id = 0);
