@@ -1,0 +1,1151 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Motor constants {-->
+{%- set rotor_velocity_slowdown_sim = 0.0159236 -%}
+{%- set motor_constant = 12.68433 -%} {# [kg.m/s^2] #}
+{%- set moment_constant = 0.016 -%} {# [m] #}
+{%- set time_constant_up = 1.0 / 80.0 -%} {# [s] #}
+{%- set time_constant_down = 1.0 / 40.0 -%} {# [s] #}
+{%- set max_rot_velocity = 1 -%} {# [rad/s] #}
+{%- set rotor_drag_coefficient = 0.1 -%} {# orig 8.06428e-04 #}
+{%- set rolling_moment_coefficient = "1e-6" -%}
+<!--}-->
+
+<!-- Robot parameters and arguments {-->
+{%- set mass_body = 2.3 -%} {# [kg] #}
+{%- set mass_arm = 0.02 -%} {# [kg] #}
+{%- set mass_rotor = 0.005 -%} {# [kg] #}
+<!--}-->
+
+<!-- Inertias {-->
+{%- set inertia_body_radius = 0.3 -%} {# [m] #}
+{%- set inertia_body_height = 0.07 -%} {# [m] #}
+
+{%- set body_ixx = mass_body * (3 * inertia_body_radius * inertia_body_radius + inertia_body_height * inertia_body_height) / 12 -%}
+{%- set body_ixy = 0 -%}
+{%- set body_ixz = 0 -%}
+{%- set body_iyy = mass_body * (3 * inertia_body_radius * inertia_body_radius + inertia_body_height * inertia_body_height) / 12 -%}
+{%- set body_iyz = 0 -%}
+{%- set body_izz = (mass_body * inertia_body_radius * inertia_body_radius) / 2 -%}
+
+{%- set arm_ixx = 0.000166667 -%}
+{%- set arm_ixy = 0 -%}
+{%- set arm_ixz = 0 -%}
+{%- set arm_iyy = 0.000166667 -%}
+{%- set arm_iyz = 0 -%}
+{%- set arm_izz = 0.000166667 -%}
+
+{%- set rotor_ixx = 0.0001 -%}
+{%- set rotor_ixy = 0 -%}
+{%- set rotor_ixz = 0 -%}
+{%- set rotor_iyy = 0.0001 -%}
+{%- set rotor_iyz = 0 -%}
+{%- set rotor_izz = 0.0001 -%}
+<!--}-->
+
+<sdf version='1.6'>
+  <model name='{{ vehicle_name }}'>
+
+    <static>0</static>
+
+    <!-- BODY {-->
+    <link name='base_link'>
+      <pose>0 0 0 0 0 1.5708</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>{{ mass_body }}</mass>
+        <inertia>
+          <ixx>{{ body_ixx }}</ixx>
+          <ixy>{{ body_ixy }}</ixy>
+          <ixz>{{ body_ixz }}</ixz>
+          <iyy>{{ body_iyy }}</iyy>
+          <iyz>{{ body_iyz }}</iyz>
+          <izz>{{ body_izz }}</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_inertia_collision'>
+        <pose>0 0 0.05 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.259</length>
+            <radius>0.094</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='base_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_central_body.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <!--} END BODY -->
+
+    <!-- ARMS {-->
+
+    <!-- ARM 0 {-->
+    <link name="arm_0_link">
+      <pose>0 0 0 0 0 1.5708</pose>
+      <inertial>
+        <mass>{{ mass_arm }}</mass>
+        <inertia>
+          <ixx>{{ arm_ixx }}</ixx>
+          <ixy>{{ arm_ixy }}</ixy>
+          <ixz>{{ arm_ixz }}</ixz>
+          <iyy>{{ arm_iyy }}</iyy>
+          <iyz>{{ arm_iyz }}</iyz>
+          <izz>{{ arm_izz }}</izz>
+        </inertia>
+      </inertial>
+      <visual name='arm_0_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_arm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_0_motor'>
+        <pose>-0.175 -0.175 0.02 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_motor.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='arm_0_collision'>
+        <pose>-0.155 -0.155 -0.104 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.16</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <joint name='arm_0_joint' type='fixed'>
+      <child>arm_0_link</child>
+      <parent>base_link</parent>
+    </joint>
+    <!--} END ARM 0 -->
+
+    <!-- ARM 1 {-->
+    <link name="arm_1_link">
+      <pose>0 0 0 0 0 -1.5708</pose>
+      <inertial>
+        <mass>{{ mass_arm }}</mass>
+        <inertia>
+          <ixx>{{ arm_ixx }}</ixx>
+          <ixy>{{ arm_ixy }}</ixy>
+          <ixz>{{ arm_ixz }}</ixz>
+          <iyy>{{ arm_iyy }}</iyy>
+          <iyz>{{ arm_iyz }}</iyz>
+          <izz>{{ arm_izz }}</izz>
+        </inertia>
+      </inertial>
+      <visual name='arm_1_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_arm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_1_motor'>
+        <pose>-0.175 -0.175 0.02 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_motor.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='arm_1_collision'>
+        <pose>-0.155 -0.155 -0.104 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.16</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <joint name='arm_1_joint' type='fixed'>
+      <child>arm_1_link</child>
+      <parent>base_link</parent>
+    </joint>
+    <!--} END ARM 1 -->
+
+    <!-- ARM 2 {-->
+    <link name="arm_2_link">
+      <pose>0 0 0 0 0 3.14159</pose>
+      <inertial>
+        <mass>{{ mass_arm }}</mass>
+        <inertia>
+          <ixx>{{ arm_ixx }}</ixx>
+          <ixy>{{ arm_ixy }}</ixy>
+          <ixz>{{ arm_ixz }}</ixz>
+          <iyy>{{ arm_iyy }}</iyy>
+          <iyz>{{ arm_iyz }}</iyz>
+          <izz>{{ arm_izz }}</izz>
+        </inertia>
+      </inertial>
+      <visual name='arm_2_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_arm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_2_motor'>
+        <pose>-0.175 -0.175 0.02 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_motor.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='arm_2_collision'>
+        <pose>-0.155 -0.155 -0.104 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.16</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <joint name='arm_2_joint' type='fixed'>
+      <child>arm_2_link</child>
+      <parent>base_link</parent>
+    </joint>
+    <!--} END ARM 2 -->
+
+    <!-- ARM 3 {-->
+    <link name="arm_3_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>{{ mass_arm }}</mass>
+        <inertia>
+          <ixx>{{ arm_ixx }}</ixx>
+          <ixy>{{ arm_ixy }}</ixy>
+          <ixz>{{ arm_ixz }}</ixz>
+          <iyy>{{ arm_iyy }}</iyy>
+          <iyz>{{ arm_iyz }}</iyz>
+          <izz>{{ arm_izz }}</izz>
+        </inertia>
+      </inertial>
+      <visual name='arm_3_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_arm.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='arm_3_motor'>
+        <pose>-0.175 -0.175 0.02 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_motor.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name='arm_3_collision'>
+        <pose>-0.155 -0.155 -0.104 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.16</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+    </link>
+    <joint name='arm_3_joint' type='fixed'>
+      <child>arm_3_link</child>
+      <parent>base_link</parent>
+    </joint>
+    <!--} END ARM 3 -->
+
+  <!--} END ARMS -->
+
+    <!-- MAGNETOMETER {-->
+    <link name="mag1::link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>1e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-07</iyy>
+          <iyz>0</iyz>
+          <izz>1e-07</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor name="magnetometer" type="magnetometer">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+          <robotNamespace/>
+          <magTopic>mag</magTopic>
+          <pubRate>100</pubRate>
+          <noiseDensity>0.0004</noiseDensity>
+          <randomWalk>6.4e-06</randomWalk>
+          <biasCorrelationTime>600</biasCorrelationTime>
+        </plugin>
+      </sensor>
+    </link>
+
+    <joint name='mag1_joint' type='fixed'>
+      <child>mag1::link</child>
+      <parent>base_link</parent>
+    </joint>
+    <!--} MAGNETOMETER -->
+
+    <!-- IMU {-->
+    <link name='imu1::link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.1</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <sensor name="imu" type="imu">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <visualize>false</visualize>
+        <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+          <robotNamespace></robotNamespace>
+          <imuTopic>imu</imuTopic>
+          <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+          <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+          <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+          <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+          <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+          <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+          <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+          <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+        </plugin>
+      </sensor>
+    </link>
+
+    <joint name='imu1_joint' type='revolute'>
+      <child>imu1::link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <!--} END IMU -->
+
+    <!-- ROTORS {-->
+    <link name='rotor_0'>
+      <pose>0.175 -0.175 0.041 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>{{ mass_rotor }}</mass>
+        <inertia>
+          <ixx>{{ rotor_ixx }}</ixx>
+          <ixy>{{ rotor_ixy }}</ixy>
+          <ixz>{{ rotor_ixz }}</ixz>
+          <iyy>{{ rotor_iyy }}</iyy>
+          <iyz>{{ rotor_iyz }}</iyz>
+          <izz>{{ rotor_izz }}</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_0_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.009</length>
+            <radius>0.128</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_0_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_propeller.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='rotor_0_joint' type='revolute'>
+      <child>rotor_0</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='rotor_1'>
+      <pose>-0.175 0.175 0.041 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>{{ mass_rotor }}</mass>
+        <inertia>
+          <ixx>{{ rotor_ixx }}</ixx>
+          <ixy>{{ rotor_ixy }}</ixy>
+          <ixz>{{ rotor_ixz }}</ixz>
+          <iyy>{{ rotor_iyy }}</iyy>
+          <iyz>{{ rotor_iyz }}</iyz>
+          <izz>{{ rotor_izz }}</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_1_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.009</length>
+            <radius>0.128</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_1_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_propeller.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='rotor_1_joint' type='revolute'>
+      <child>rotor_1</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='rotor_2'>
+      <pose>0.175 0.175 0.041 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>{{ mass_rotor }}</mass>
+        <inertia>
+          <ixx>{{ rotor_ixx }}</ixx>
+          <ixy>{{ rotor_ixy }}</ixy>
+          <ixz>{{ rotor_ixz }}</ixz>
+          <iyy>{{ rotor_iyy }}</iyy>
+          <iyz>{{ rotor_iyz }}</iyz>
+          <izz>{{ rotor_izz }}</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_2_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.009</length>
+            <radius>0.128</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_2_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>-1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_propeller.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='rotor_2_joint' type='revolute'>
+      <child>rotor_2</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <link name='rotor_3'>
+      <pose>-0.175 -0.175 0.041 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>{{ mass_rotor }}</mass>
+        <inertia>
+          <ixx>{{ rotor_ixx }}</ixx>
+          <ixy>{{ rotor_ixy }}</ixy>
+          <ixz>{{ rotor_ixz }}</ixz>
+          <iyy>{{ rotor_iyy }}</iyy>
+          <iyz>{{ rotor_iyz }}</iyz>
+          <izz>{{ rotor_izz }}</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_3_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.009</length>
+            <radius>0.128</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_3_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>-1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_propeller.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='rotor_3_joint' type='revolute'>
+      <child>rotor_3</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+    <!--} END ROTORS -->
+
+    <!-- PLUGINS {-->
+
+    <!-- ROSBAG PLUGIN {-->
+    <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
+      <robotNamespace/>
+      <linkName>base_link</linkName>
+      <rotorVelocitySlowdownSim>{{ rotor_velocity_slowdown_sim }}</rotorVelocitySlowdownSim>
+    </plugin>
+    <!--} END ROSBAG PLUGIN -->
+
+    <!-- MOTOR PLUGINS {-->
+    <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace/>
+      <jointName>rotor_0_joint</jointName>
+      <linkName>rotor_0</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>{{ time_constant_up }}</timeConstantUp>
+      <timeConstantDown>{{ time_constant_down }}</timeConstantDown>
+      <maxRotVelocity>{{ max_rot_velocity }}</maxRotVelocity>
+      <motorConstant>{{ motor_constant }}</motorConstant>
+      <momentConstant>{{ moment_constant }}</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <rotorDragCoefficient>{{ rotor_drag_coefficient }}</rotorDragCoefficient>
+      <rollingMomentCoefficient>{{ rolling_moment_coefficient }}</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>{{ rotor_velocity_slowdown_sim }}</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin name='back_left_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace/>
+      <jointName>rotor_1_joint</jointName>
+      <linkName>rotor_1</linkName>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>{{ time_constant_up }}</timeConstantUp>
+      <timeConstantDown>{{ time_constant_down }}</timeConstantDown>
+      <maxRotVelocity>{{ max_rot_velocity }}</maxRotVelocity>
+      <motorConstant>{{ motor_constant }}</motorConstant>
+      <momentConstant>{{ moment_constant }}</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <rotorDragCoefficient>{{ rotor_drag_coefficient }}</rotorDragCoefficient>
+      <rollingMomentCoefficient>{{ rolling_moment_coefficient }}</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>{{ rotor_velocity_slowdown_sim }}</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin name='front_left_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace/>
+      <jointName>rotor_2_joint</jointName>
+      <linkName>rotor_2</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>{{ time_constant_up }}</timeConstantUp>
+      <timeConstantDown>{{ time_constant_down }}</timeConstantDown>
+      <maxRotVelocity>{{ max_rot_velocity }}</maxRotVelocity>
+      <motorConstant>{{ motor_constant }}</motorConstant>
+      <momentConstant>{{ moment_constant }}</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <rotorDragCoefficient>{{ rotor_drag_coefficient }}</rotorDragCoefficient>
+      <rollingMomentCoefficient>{{ rolling_moment_coefficient }}</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>{{ rotor_velocity_slowdown_sim }}</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin name='back_right_motor_model' filename='libgazebo_motor_model.so'>
+      <robotNamespace/>
+      <jointName>rotor_3_joint</jointName>
+      <linkName>rotor_3</linkName>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>{{ time_constant_up }}</timeConstantUp>
+      <timeConstantDown>{{ time_constant_down }}</timeConstantDown>
+      <maxRotVelocity>{{ max_rot_velocity }}</maxRotVelocity>
+      <motorConstant>{{ motor_constant }}</motorConstant>
+      <momentConstant>{{ moment_constant }}</momentConstant>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <rotorDragCoefficient>{{ rotor_drag_coefficient }}</rotorDragCoefficient>
+      <rollingMomentCoefficient>{{ rolling_moment_coefficient }}</rollingMomentCoefficient>
+      <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
+      <rotorVelocitySlowdownSim>{{ rotor_velocity_slowdown_sim }}</rotorVelocitySlowdownSim>
+    </plugin>
+    <!--} END MOTOR PLUGINS -->
+
+    <!-- GPS PLUGIN {-->
+    <link name='gps1::link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>2.1733e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.1733e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.8e-07</izz>
+        </inertia>
+      </inertial>
+      <visual name='visual'>
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.002</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <sensor name='gps' type='gps'>
+        <pose>0 0 0 0 0 0</pose>
+        <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
+          <robotNamespace/>
+          <gpsNoise>1</gpsNoise>
+          <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
+          <gpsZRandomWalk>4.0</gpsZRandomWalk>
+          <gpsXYNoiseDensity>0.0002</gpsXYNoiseDensity>
+          <gpsZNoiseDensity>0.0004</gpsZNoiseDensity>
+          <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
+          <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+        </plugin>
+      </sensor>
+    </link>
+    <joint name='gps1_joint' type='fixed'>
+      <parent>base_link</parent>
+      <child>gps1::link</child>
+    </joint>
+    <!--} END GPS PLUGIN -->
+
+    <!-- GROUND TRUTH PLUGIN {-->
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
+    </plugin>
+    <!--} END GROUND TRUTH PLUGIN-->
+
+    <!-- BAROMETER PLUGIN {-->
+    <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>50</pubRate>
+      <baroTopic>/baro</baroTopic>
+      <baroDriftPaPerSec>0</baroDriftPaPerSec>
+    </plugin>
+    <!--} END BAROMETER PLUGIN -->
+
+    <!-- MAVLINK PLUGIN {-->
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace/>
+      <imuSubTopic>/imu</imuSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+      <mavlink_hostname>{{ mavlink_hostname }}</mavlink_hostname>
+      <mavlink_addr>{{ mavlink_addr }}</mavlink_addr>
+      <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
+      <mavlink_udp_remote_port>{{ mavlink_udp_remote_port }}</mavlink_udp_remote_port>
+      <mavlink_udp_local_port>{{ mavlink_udp_local_port }}</mavlink_udp_local_port>
+      <serialEnabled>{{ serial_enabled }}</serialEnabled>
+      <serialDevice>{{ serial_device }}</serialDevice>
+      <baudRate>{{ serial_baudrate }}</baudRate>
+      <qgc_addr>{{ qgc_addr }}</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <sdk_addr>INADDR_ANY</sdk_addr>
+      <sdk_udp_port>14540</sdk_udp_port>
+      <hil_mode>{{ hil_mode }}</hil_mode>
+      <hil_state_level>0</hil_state_level>
+      <send_vision_estimation>0</send_vision_estimation>
+      <send_odometry>0</send_odometry>
+      <enable_lockstep>{{ lockstep }}</enable_lockstep>
+      <use_tcp>{{ use_tcp }}</use_tcp>
+      <tcp_client_mode>{{ tcp_client_mode }}</tcp_client_mode>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <control_channels>
+        <channel name='rotor1'>
+          <input_index>0</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0.15</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor2'>
+          <input_index>1</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0.15</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor3'>
+          <input_index>2</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0.15</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor4'>
+          <input_index>3</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0.15</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+        </channel>
+        <channel name='rotor5'>
+          <input_index>4</input_index>
+          <input_offset>1</input_offset>
+          <input_scaling>324.6</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_control_pid>
+            <p>0.1</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0.0</iMax>
+            <iMin>0.0</iMin>
+            <cmdMax>2</cmdMax>
+            <cmdMin>-2</cmdMin>
+          </joint_control_pid>
+          <joint_name>zephyr_delta_wing::propeller_joint</joint_name>
+        </channel>
+        <channel name='rotor6'>
+          <input_index>5</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>0.524</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position</joint_control_type>
+          <joint_name>zephyr_delta_wing::flap_left_joint</joint_name>
+          <joint_control_pid>
+            <p>10.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>20</cmdMax>
+            <cmdMin>-20</cmdMin>
+          </joint_control_pid>
+        </channel>
+        <channel name='rotor7'>
+          <input_index>6</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>0.524</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position</joint_control_type>
+          <joint_name>zephyr_delta_wing::flap_right_joint</joint_name>
+          <joint_control_pid>
+            <p>10.0</p>
+            <i>0</i>
+            <d>0</d>
+            <iMax>0</iMax>
+            <iMin>0</iMin>
+            <cmdMax>20</cmdMax>
+            <cmdMin>-20</cmdMin>
+          </joint_control_pid>
+        </channel>
+        <channel name='rotor8'>
+          <input_index>7</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>0.524</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position</joint_control_type>
+        </channel>
+      </control_channels>
+    </plugin>
+    <!--} END MAVLINK PLUGIN -->
+    <!--} END PLUGINS-->
+
+    <!-- CAMERA {-->
+    <link name="camera_link">
+         <inertial>
+           <mass>0.01</mass>
+           <inertia>
+             <ixx>0.000166667</ixx>
+             <iyy>0.000166667</iyy>
+             <izz>0.000166667</izz>
+           </inertia>
+         </inertial>
+         <collision name="collision">
+           <geometry>
+             <box>
+               <size>0.01 0.01 0.01</size>
+             </box>
+           </geometry>
+         </collision>
+         <visual name="visual">
+           <geometry>
+             <box>
+               <size>0.01 0.01 0.01</size>
+             </box>
+           </geometry>
+         </visual>
+         <sensor type="camera" name="camera">
+            <always_on>0</always_on>
+            <update_rate>30</update_rate>
+
+            <visualize>true</visualize>
+
+            <camera name="main">
+                <horizontal_fov>1.047</horizontal_fov>
+                <image>
+                    <width>1280</width>
+                    <height>720</height>
+                </image>
+            </camera>
+            <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
+                <robotNamespace></robotNamespace>
+                <udpHost>{{ gstudphost }}</udpHost>
+                <udpPort>{{ gstudpport }}</udpPort>
+                <useCuda>{{ gst_use_cuda }}</useCuda>
+                <useCudaCustomParams>{{ gst_use_cuda }}</useCudaCustomParams>
+                <useVaapi>false</useVaapi>
+                <convFbImgToI420>true</convFbImgToI420>
+            </plugin>
+         </sensor>
+
+    </link>
+    <joint name='camera_joint' type='fixed'>
+          <child>camera_link</child>
+          <parent>base_link</parent>
+          <axis>
+            <xyz>1 0 0</xyz>
+            <limit>
+              <lower>0</lower>
+              <upper>0</upper>
+              <effort>0</effort>
+              <velocity>0</velocity>
+            </limit>
+            <dynamics>
+              <spring_reference>0</spring_reference>
+              <spring_stiffness>0</spring_stiffness>
+            </dynamics>
+            <use_parent_model_frame>1</use_parent_model_frame>
+          </axis>
+    </joint>
+
+    <!--} END CAMERA -->
+
+    <!-- RP LIDAR {-->
+    <link name="2d_scanner_link">
+      <pose>0 0 0.089 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.000166667</ixx>
+          <iyy>0.000166667</iyy>
+          <izz>0.000166667</izz>
+        </inertia>
+      </inertial>
+      <sensor name="rplidar" type="ray">
+        <always_on>true</always_on>
+        <update_rate>20</update_rate>
+        <visualize>false</visualize>
+        <topic>scan</topic>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.1241390751</min_angle>
+              <max_angle>3.1241390751</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.15</min>
+            <max>14</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="{{ vehicle_name }}_rplidar" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:={{ vehicle_name }}/rplidar/scan</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>{{ vehicle_name }}/rplidar</frame_name>
+        </plugin>
+      </sensor>
+      <visual name='rplidar_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://ssrc_fog_x/meshes/x500_rplidar.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+  </link>
+
+  <joint name='2d_scanner_joint' type='fixed'>
+    <child>2d_scanner_link</child>
+    <parent>base_link</parent>
+  </joint>
+  <!--} END RP LIDAR -->
+
+  <!-- GARMIN RANGEFINDER {-->
+  <link name="lidar1::link">
+    <pose>-0.007 -0.04 -0.039 0 1.5708 1.5708</pose>
+    <inertial>
+      <mass>0.01</mass>
+      <inertia>
+        <ixx>0.000166667</ixx>
+        <iyy>0.000166667</iyy>
+        <izz>0.000166667</izz>
+      </inertia>
+    </inertial>
+    <visual name='garmin_visual'>
+      <pose>0 0 0 0 0 0</pose>
+      <geometry>
+        <mesh>
+          <scale>0.001 0.001 0.001</scale>
+          <uri>model://ssrc_fog_x/meshes/garmin_lidar_v3.stl</uri>
+        </mesh>
+      </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Black</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      <material>
+        <script>
+          <name>Gazebo/DarkGrey</name>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+        </script>
+      </material>
+    </visual>
+    <sensor name="garmin" type="ray">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>false</visualize>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>1</samples>
+            <resolution>1</resolution>
+            <min_angle>-0</min_angle>
+            <max_angle>0</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.06</min> <!-- do not change: use min_distance (below) for realistic behavior (smaller values cause issues) -->
+          <max>35</max>   <!-- do not change: use min_distance (below) for realistic behavior (bigger values cause issues) -->
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="{{ vehicle_name }}_garmin" filename="libgazebo_lidar_plugin.so">
+        <robotNamespace></robotNamespace>
+        <min_distance>0.1</min_distance>
+        <max_distance>30.0</max_distance>
+      </plugin>
+    </sensor>
+  </link>
+  <!-- name of the link for garmin has to contain lidar word to be detected by mavlink gazebo plugin -->
+  <joint name='lidar1_joint' type='fixed'>
+    <child>lidar1::link</child>
+    <parent>base_link</parent>
+  </joint>
+  <!--} END GARMIN RANGEFINDER -->
+
+  </model>
+</sdf>
