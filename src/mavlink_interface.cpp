@@ -97,7 +97,7 @@ void MavlinkInterface::Load()
 
     if (use_tcp_) {
 
-      local_simulator_addr_.sin_addr.s_addr = htonl(mavlink_addr_);
+      local_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
       local_simulator_addr_.sin_port = htons(mavlink_tcp_port_);
 
       if ((simulator_socket_fd_ = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
