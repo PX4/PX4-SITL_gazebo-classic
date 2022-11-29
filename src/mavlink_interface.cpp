@@ -36,6 +36,9 @@ void MavlinkInterface::Load()
     }
   }
 
+  // initialize sender status to zero
+  memset((char *)&sender_m_status_, 0, sizeof(sender_m_status_));
+
   if (hil_mode_) {
 
     local_qgc_addr_.sin_family = AF_INET;
@@ -277,6 +280,11 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_sensor_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+    // Override default global mavlink channel status with instance specific status
+    FinalizeOutgoingMessage(&msg, 1, 200,
+      MAVLINK_MSG_ID_HIL_SENSOR_MIN_LEN,
+      MAVLINK_MSG_ID_HIL_SENSOR_LEN,
+      MAVLINK_MSG_ID_HIL_SENSOR_CRC);
     send_mavlink_message(&msg);
   }
 }
@@ -303,6 +311,11 @@ void MavlinkInterface::SendGpsMessages(const SensorData::Gps &data) {
   if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
     mavlink_message_t msg;
     mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
+    // Override default global mavlink channel status with instance specific status
+    FinalizeOutgoingMessage(&msg, 1, 200,
+      MAVLINK_MSG_ID_HIL_GPS_MIN_LEN,
+      MAVLINK_MSG_ID_HIL_GPS_LEN,
+      MAVLINK_MSG_ID_HIL_GPS_CRC);
     send_mavlink_message(&msg);
   }
 }
@@ -426,12 +439,25 @@ void MavlinkInterface::pollForMAVLinkMessages()
         mavlink_message_t msg;
         mavlink_status_t status;
         for (unsigned i = 0; i < len; ++i) {
-          if (mavlink_parse_char(MAVLINK_COMM_0, buf_[i], &msg, &status)) {
+          auto msg_received = static_cast<Framing>(
+            mavlink_frame_char_buffer(&m_buffer_, &m_status_, buf_[i], &msg, &status));
+          if (msg_received == Framing::bad_crc || msg_received == Framing::bad_signature) {
+            _mav_parse_error(&m_status_);
+            m_status_.msg_received = MAVLINK_FRAMING_INCOMPLETE;
+            m_status_.parse_state = MAVLINK_PARSE_STATE_IDLE;
+            if (buf_[i] == MAVLINK_STX) {
+              m_status_.parse_state = MAVLINK_PARSE_STATE_GOT_STX;
+              m_buffer_.len = 0;
+              mavlink_start_checksum(&m_buffer_);
+            }
+          }
+
+          if (msg_received != Framing::incomplete) {
             if (hil_mode_ && serial_enabled_) {
               send_mavlink_message(&msg);
             }
             handle_message(&msg);
-          }
+          }    
         }
       }
     }
@@ -764,4 +790,12 @@ Eigen::VectorXd MavlinkInterface::GetActuatorControls() {
 bool MavlinkInterface::GetArmedState() {
   const std::lock_guard<std::mutex> lock(actuator_mutex_);
   return armed_;
+}
+
+// Mavlink helper function to finalize message without global channel status
+uint16_t MavlinkInterface::FinalizeOutgoingMessage(mavlink_message_t* msg, uint8_t system_id, uint8_t component_id, uint8_t min_length, uint8_t length, uint8_t crc_extra)
+{
+    const std::lock_guard<std::mutex> guard(mav_status_mutex_);
+    return mavlink_finalize_message_buffer(msg, system_id, component_id, &sender_m_status_,
+        min_length, length, crc_extra);
 }

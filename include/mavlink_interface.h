@@ -163,6 +163,8 @@ public:
     Eigen::VectorXd GetActuatorControls();
     bool GetArmedState();
     void onSigInt();
+    uint16_t FinalizeOutgoingMessage(mavlink_message_t* msg, uint8_t system_id, uint8_t component_id,
+        uint8_t min_length, uint8_t length, uint8_t crc_extra);
     bool GetReceivedFirstActuator() {return received_first_actuator_;}
     void SetBaudrate(int baudrate) {baudrate_ = baudrate;}
     void SetSerialEnabled(bool serial_enabled) {serial_enabled_ = serial_enabled;}
@@ -276,4 +278,8 @@ private:
     std::atomic<bool> gotSigInt_ {false};
 
     bool received_heartbeats_ {false};
+
+    std::mutex mav_status_mutex_;
+    mavlink_status_t sender_m_status_{};
+
 };
