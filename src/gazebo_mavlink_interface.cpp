@@ -20,6 +20,9 @@
  */
 
 #include <gazebo_mavlink_interface.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+
 namespace gazebo {
 GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
@@ -463,6 +466,16 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     imu_update_interval_ = 1 / _sdf->GetElement("imu_rate")->Get<int>();
   }
 
+  if (_sdf->HasElement("mavlink_hostname")) {
+    mavlink_hostname_str_ = _sdf->GetElement("mavlink_hostname")->Get<std::string>();
+    if (! mavlink_interface_->SerialEnabled() && ! mavlink_hostname_str_.empty()) {
+      // Start hostname resolver thread
+      hostname_resolver_thread_ = std::thread([this] () {
+        ResolveWorker();
+      });
+    }
+  }
+
   if (_sdf->HasElement("mavlink_addr")) {
     std::string mavlink_addr_str = _sdf->GetElement("mavlink_addr")->Get<std::string>();
     if (mavlink_addr_str != "INADDR_ANY") {
@@ -547,7 +560,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default \n";
   }
 
-  mavlink_interface_->Load();
+  if (hostptr_ || mavlink_hostname_str_.empty() || mavlink_interface_->SerialEnabled()) {
+    gzmsg << "--> load mavlink_interface_\n";
+    mavlink_interface_->Load();
+    mavlink_loaded_ = true;
+  }
 }
 
 // This gets called by the world update start event.
@@ -563,6 +580,11 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   imu_received_ = false;
   // Always run at 250 Hz. At 500 Hz, the skip factor should be 2, at 1000 Hz 4.
   if (!(update_counter_++ % update_skip_factor_ == 0)) {
+    return;
+  }
+
+  if (!mavlink_loaded_) {
+    // mavlink not loaded, exit
     return;
   }
 
@@ -1215,5 +1237,38 @@ bool GazeboMavlinkInterface::IsRunning()
 void GazeboMavlinkInterface::onSigInt() {
   mavlink_interface_->onSigInt();
 }
+
+bool GazeboMavlinkInterface::resolveHostName()
+{
+  if (!mavlink_hostname_str_.empty()) {
+    gzmsg << "Try to resolve hostname: '"  << mavlink_hostname_str_ << "'" << std::endl;
+    hostptr_ = gethostbyname(mavlink_hostname_str_.c_str());
+    if (hostptr_ && hostptr_->h_length && hostptr_->h_addrtype == AF_INET) {
+      struct in_addr **addr_l = (struct in_addr **)hostptr_->h_addr_list;
+      char *addr_str = inet_ntoa(*addr_l[0]);
+      std::string ip_addr = std::string(addr_str);
+      mavlink_interface_->SetMavlinkAddr(ip_addr);
+      gzmsg << "Host name '" << mavlink_hostname_str_ << "' resolved to IP: " << ip_addr << std::endl;
+      return true;
+    }
+    return false;
+  } else {
+    // Assume resolved in case hostname is not given at all
+    return true;
+  }
+
+}
+
+void GazeboMavlinkInterface::ResolveWorker()
+{
+  gzmsg << "[ResolveWorker] Start Resolving hostname" << std::endl;
+  while (!resolveHostName()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  }
+  gzmsg << "[ResolveWorker] --> load mavlink_interface_" << std::endl;
+  mavlink_interface_->Load();
+  mavlink_loaded_ = true;
+}
+
 
 }
