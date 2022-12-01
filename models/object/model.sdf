@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="object">
+  <pose>0 0 0 0 0 0</pose>
+    <static>true</static>
+    <link name="link">
+    <!--NO collision for the moment-->
+      <!--<collision name="collision">
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>100 100</size>
+          </plane>
+        </geometry>
+        <surface>
+          <contact>
+             <collide_bitmask>65535</collide_bitmask>
+          </contact>
+          <friction>
+            <ode>
+              <mu>100</mu>
+              <mu2>50</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>-->
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <pose>0 0 1 1.5707 0 1.5707</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.07</radius>
+            <length>0.4</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>__default__</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
