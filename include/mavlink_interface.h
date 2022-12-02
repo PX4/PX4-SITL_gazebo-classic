@@ -169,6 +169,7 @@ public:
     void SetBaudrate(int baudrate) {baudrate_ = baudrate;}
     void SetSerialEnabled(bool serial_enabled) {serial_enabled_ = serial_enabled;}
     void SetUseTcp(bool use_tcp) {use_tcp_ = use_tcp;}
+    void SetUseTcpClientMode(bool tcp_client_mode) {tcp_client_mode_ = tcp_client_mode;}
     void SetDevice(std::string device) {device_ = device;}
     void SetEnableLockstep(bool enable_lockstep) {enable_lockstep_ = enable_lockstep;}
     void SetMavlinkAddr(std::string mavlink_addr) {mavlink_addr_str_ = mavlink_addr;}
@@ -195,6 +196,7 @@ private:
     void handle_actuator_controls(mavlink_message_t *msg);
     void acceptConnections();
     void RegisterNewHILSensorInstance(int id);
+    bool tryConnect();
 
     // Serial interface
     void open_serial();
@@ -236,6 +238,7 @@ private:
     };
     struct pollfd fds_[N_FDS];
     bool use_tcp_{false};
+    bool tcp_client_mode_{false};
     bool close_conn_{false};
 
     in_addr_t mavlink_addr_;
