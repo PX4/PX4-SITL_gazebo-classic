@@ -226,7 +226,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
   double real_motor_velocity = motor_rot_vel_ * rotor_velocity_slowdown_sim_;
   double force =
       real_motor_velocity * std::abs(real_motor_velocity) * motor_constant_;
-
+  // std::cout << "FORCE:" << force << std::endl;
   if (!reversible_) {
     // Not allowed to have negative thrust.
     force = std::abs(force);

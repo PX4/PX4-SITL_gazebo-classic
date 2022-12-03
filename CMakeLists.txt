@@ -37,7 +37,8 @@ include(GNUInstallDirs)
 #######################
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
-option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" OFF)
+option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" ON)
+set(BUILD_ROS2_PLUGINS ON) #Enable ROS2
 option(GENERATE_ROS_MODELS "Generate model sdf for ROS environment" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
@@ -102,6 +103,8 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
+
+#add_subdirectory( external/CommunicationLib)
 
 # for ROS2 subscribers and publishers
 if (BUILD_ROS2_PLUGINS)
@@ -378,7 +381,7 @@ add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
 
-add_library(RealSensePlugin SHARED src/RealSensePlugin.cc)
+#add_library(RealSensePlugin SHARED src/RealSensePlugin.cc)
 
 set(plugins
   gazebo_airspeed_plugin
@@ -414,16 +417,20 @@ foreach(plugin ${plugins})
 endforeach()
 target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
-target_link_libraries(RealSensePlugin ${GAZEBO_libraries})
-
-
 # If BUILD_ROS2_PLUGINS set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
 if (BUILD_ROS2_PLUGINS)
-  add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
-  target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
-  list(APPEND plugins gazebo_motor_failure_plugin)
-  message(STATUS "adding gazebo_motor_failure_plugin to build")
+  # add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
+  # target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  # list(APPEND plugins gazebo_motor_failure_plugin)
+  # message(STATUS "adding gazebo_motor_failure_plugin to build")
+
+
+  add_library(RealSensePlugin SHARED src/RealSensePlugin.cc)
+  ament_target_dependencies(RealSensePlugin rclcpp std_msgs sensor_msgs)
+  target_link_libraries(RealSensePlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  list(APPEND plugins RealSensePlugin)
+  message(STATUS "adding RealSensePlugin to build")
 
   include_directories(
     include
@@ -432,7 +439,13 @@ if (BUILD_ROS2_PLUGINS)
     ${rclcpp_INCLUDE_DIRS}
   )
 
-  target_link_libraries(gazebo_motor_failure_plugin
+  # target_link_libraries(gazebo_motor_failure_plugin
+  #   ${ament_LIBRARIES}
+  #   ${rclcpp_LIBRARIES}
+  #   ${GAZEBO_libraries}
+  # )
+
+  target_link_libraries(RealSensePlugin
     ${ament_LIBRARIES}
     ${rclcpp_LIBRARIES}
     ${GAZEBO_libraries}

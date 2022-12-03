@@ -26,44 +26,60 @@
 #include <sdf/sdf.hh>
 #include <string>
 
-namespace gazebo
-{
-  // Forward declare private data class
-  struct RealSensePluginPrivate;
+// ROS2
+#include "rclcpp/rclcpp.hpp"
+#include "sensor_msgs/msg/image.hpp"
+#include "std_msgs/msg/string.hpp"
 
-  /// \brief A plugin that simulates Real Sense camera streams.
-  class GAZEBO_VISIBLE RealSensePlugin : public ModelPlugin
-  {
-    /// \brief Constructor.
-    public:
-    RealSensePlugin();
+namespace gazebo {
+// Forward declare private data class
+struct RealSensePluginPrivate;
 
-    /// \brief Destructor.
-    public:
-    ~RealSensePlugin();
+/// \brief A plugin that simulates Real Sense camera streams.
+class GAZEBO_VISIBLE RealSensePlugin : public ModelPlugin {
+  /// \brief Constructor.
+public:
+  RealSensePlugin();
 
-    // Documentation Inherited.
-    public:
-    virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+  /// \brief Destructor.
+public:
+  ~RealSensePlugin();
 
-    /// \brief Callback for the World Update event.
-    public:
-    void OnUpdate();
+  // Documentation Inherited.
+public:
+  virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
-    /// \brief Callback that publishes a received Depth Camera Frame as an
-    /// ImageStamped message.
-    public:
-    virtual void OnNewDepthFrame() const;
+  /// \brief Callback for the World Update event.
+public:
+  void OnUpdate();
 
-    /// \brief Callback that publishes a received Camera Frame as an
-    /// ImageStamped message.
-    public:
-    virtual void OnNewFrame(const rendering::CameraPtr cam,
-                            const transport::PublisherPtr pub) const;
+  /// \brief Callback that publishes a received Depth Camera Frame as an
+  /// ImageStamped message.
+public:
+  virtual void OnNewDepthFrame() const;
 
-    /// \brief Private data pointer.
-    private: std::unique_ptr<RealSensePluginPrivate> dataPtr;
-  };
-}
+  /// \brief Callback that publishes a received Camera Frame as an
+  /// ImageStamped message.
+public:
+  virtual void OnNewFrame(const rendering::CameraPtr cam,
+                          const transport::PublisherPtr pub, int id) const;
+  virtual void OnNewColorFrame(const rendering::CameraPtr cam,
+                               const transport::PublisherPtr pub) const;
+
+  /// \brief Private data pointer.
+private:
+  std::unique_ptr<RealSensePluginPrivate> dataPtr;
+
+  // Sdf parameters
+  std::string pubTopic_;
+
+  // ROS2 communication
+  rclcpp::Node::SharedPtr ros_node_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr publisher_rgb_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr publisher_d_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr publisher_ir1_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr publisher_ir2_;
+  rclcpp::TimerBase::SharedPtr timer_;
+};
+} // namespace gazebo
 #endif
-

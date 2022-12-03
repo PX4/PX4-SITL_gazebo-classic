@@ -24,10 +24,10 @@
 #define IRED1_PUB_FREQ_HZ 60
 #define IRED2_PUB_FREQ_HZ 60
 
-#define DEPTH_CAMERA_NAME "depth"
-#define COLOR_CAMERA_NAME "color"
-#define IRED1_CAMERA_NAME "ired1"
-#define IRED2_CAMERA_NAME "ired2"
+#define DEPTH_CAMERA_NAME "_depth"
+#define COLOR_CAMERA_NAME "_color"
+#define IRED1_CAMERA_NAME "_ired1"
+#define IRED2_CAMERA_NAME "_ired2"
 
 #define DEPTH_CAMERA_TOPIC "depth"
 #define COLOR_CAMERA_TOPIC "color"
@@ -127,10 +127,45 @@ RealSensePlugin::RealSensePlugin() : dataPtr(new RealSensePluginPrivate) {
 RealSensePlugin::~RealSensePlugin() {}
 
 /////////////////////////////////////////////////
-void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/) {
+
+void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+
+  // Read in parameters
+  if (_sdf->HasElement("pubTopic")) {
+    pubTopic_ = _sdf->GetElement("pubTopic")->Get<std::string>();
+  } else {
+    std::cout << "[Gazebo RealSense] Please specify a PubTopic for the camera."
+              << std::endl;
+  }
+
+  // ROS2 Topic subscriber
+  // Initialize ROS2, if it has not already been initialized.
+  if (!rclcpp::ok()) {
+    int argc = 0;
+    char **argv = NULL;
+    rclcpp::init(argc, argv);
+  }
+
+  // create ROS2 publisher node
+  this->ros_node_ = rclcpp::Node::make_shared(
+      pubTopic_ + "_node"); // TODO change string to something esle
+
+  publisher_rgb_ = this->ros_node_->create_publisher<sensor_msgs::msg::Image>(
+      pubTopic_ + "_rgb", 10);
+  publisher_d_ = this->ros_node_->create_publisher<sensor_msgs::msg::Image>(
+      pubTopic_ + "_d", 10);
+  publisher_ir1_ = this->ros_node_->create_publisher<sensor_msgs::msg::Image>(
+      pubTopic_ + "_ir1", 10);
+  publisher_ir2_ = this->ros_node_->create_publisher<sensor_msgs::msg::Image>(
+      pubTopic_ + "_ir2", 10);
+
+  // timer_ = this->ros_node_->create_wall_timer(
+  //     std::chrono::milliseconds(500),
+  //     std::bind(&RealSensePlugin::testPub, this));
+
   // Output the name of the model
   std::cout << std::endl
-            << "RealSensePlugin: The rs_camera plugin is attach to model "
+            << "RealSensePlugin: The rs_camera plugin is attach to model: "
             << _model->GetName() << std::endl;
 
   // Store a pointer to the this model
@@ -145,17 +180,24 @@ void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/) {
   // Get Cameras Renderers
   this->dataPtr->depthCam =
       std::dynamic_pointer_cast<sensors::DepthCameraSensor>(
-          smanager->GetSensor(DEPTH_CAMERA_NAME))
+          smanager->GetSensor(this->dataPtr->rsModel->GetName() +
+                              DEPTH_CAMERA_NAME))
           ->DepthCamera();
-  this->dataPtr->ired1Cam = std::dynamic_pointer_cast<sensors::CameraSensor>(
-                                smanager->GetSensor(IRED1_CAMERA_NAME))
-                                ->Camera();
-  this->dataPtr->ired2Cam = std::dynamic_pointer_cast<sensors::CameraSensor>(
-                                smanager->GetSensor(IRED2_CAMERA_NAME))
-                                ->Camera();
-  this->dataPtr->colorCam = std::dynamic_pointer_cast<sensors::CameraSensor>(
-                                smanager->GetSensor(COLOR_CAMERA_NAME))
-                                ->Camera();
+  this->dataPtr->ired1Cam =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(
+          smanager->GetSensor(this->dataPtr->rsModel->GetName() +
+                              IRED1_CAMERA_NAME))
+          ->Camera();
+  this->dataPtr->ired2Cam =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(
+          smanager->GetSensor(this->dataPtr->rsModel->GetName() +
+                              IRED2_CAMERA_NAME))
+          ->Camera();
+  this->dataPtr->colorCam =
+      std::dynamic_pointer_cast<sensors::CameraSensor>(
+          smanager->GetSensor(this->dataPtr->rsModel->GetName() +
+                              COLOR_CAMERA_NAME))
+          ->Camera();
 
   // Check if camera renderers have been found successfuly
   if (!this->dataPtr->depthCam) {
@@ -181,24 +223,27 @@ void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/) {
 
   // Setup Transport Node
   this->dataPtr->transportNode = transport::NodePtr(new transport::Node());
+
   this->dataPtr->transportNode->Init(this->dataPtr->world->Name());
+  // this->dataPtr->transportNode->Init(this->dataPtr->rsModel->GetName());
 
   // Setup Publishers
-  std::string rsTopicRoot =
-      "~/" + this->dataPtr->rsModel->GetName() + "/rs/stream/";
+  std::string rsTopicRoot = "~/" + this->dataPtr->rsModel->GetName() +
+                            "/rs/stream/"; // here lies the problem...
 
+  std::cout << pubTopic_ << " \t " << rsTopicRoot << std::endl;
   this->dataPtr->depthPub =
       this->dataPtr->transportNode->Advertise<msgs::ImageStamped>(
           rsTopicRoot + DEPTH_CAMERA_TOPIC, 1, DEPTH_PUB_FREQ_HZ);
   this->dataPtr->ired1Pub =
       this->dataPtr->transportNode->Advertise<msgs::ImageStamped>(
-          rsTopicRoot + IRED1_CAMERA_TOPIC, 1, DEPTH_PUB_FREQ_HZ);
+          rsTopicRoot + IRED1_CAMERA_TOPIC, 1, IRED1_PUB_FREQ_HZ);
   this->dataPtr->ired2Pub =
       this->dataPtr->transportNode->Advertise<msgs::ImageStamped>(
-          rsTopicRoot + IRED2_CAMERA_TOPIC, 1, DEPTH_PUB_FREQ_HZ);
+          rsTopicRoot + IRED2_CAMERA_TOPIC, 1, IRED2_PUB_FREQ_HZ);
   this->dataPtr->colorPub =
       this->dataPtr->transportNode->Advertise<msgs::ImageStamped>(
-          rsTopicRoot + COLOR_CAMERA_TOPIC, 1, DEPTH_PUB_FREQ_HZ);
+          rsTopicRoot + COLOR_CAMERA_TOPIC, 1, COLOR_PUB_FREQ_HZ);
 
   // Listen to depth camera new frame event
   this->dataPtr->newDepthFrameConn =
@@ -208,17 +253,17 @@ void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/) {
   this->dataPtr->newIred1FrameConn =
       this->dataPtr->ired1Cam->ConnectNewImageFrame(
           std::bind(&RealSensePlugin::OnNewFrame, this, this->dataPtr->ired1Cam,
-                    this->dataPtr->ired1Pub));
+                    this->dataPtr->ired1Pub, 1));
 
   this->dataPtr->newIred2FrameConn =
       this->dataPtr->ired2Cam->ConnectNewImageFrame(
           std::bind(&RealSensePlugin::OnNewFrame, this, this->dataPtr->ired2Cam,
-                    this->dataPtr->ired2Pub));
+                    this->dataPtr->ired2Pub, 2));
 
   this->dataPtr->newColorFrameConn =
       this->dataPtr->colorCam->ConnectNewImageFrame(
-          std::bind(&RealSensePlugin::OnNewFrame, this, this->dataPtr->colorCam,
-                    this->dataPtr->colorPub));
+          std::bind(&RealSensePlugin::OnNewColorFrame, this,
+                    this->dataPtr->colorCam, this->dataPtr->colorPub));
 
   // Listen to the update event
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -226,8 +271,8 @@ void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/) {
 }
 
 /////////////////////////////////////////////////
-void RealSensePlugin::OnNewFrame(const rendering::CameraPtr cam,
-                                 const transport::PublisherPtr pub) const {
+void RealSensePlugin::OnNewColorFrame(const rendering::CameraPtr cam,
+                                      const transport::PublisherPtr pub) const {
   msgs::ImageStamped msg;
 
   // Set Simulation Time
@@ -249,7 +294,67 @@ void RealSensePlugin::OnNewFrame(const rendering::CameraPtr cam,
 
   // Publish realsense infrared stream
   pub->Publish(msg);
-  std::cout << "New frame" << std::endl;
+
+  // ROS2 publish
+  sensor_msgs::msg::Image img_msg = sensor_msgs::msg::Image();
+  img_msg.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
+  img_msg.header.frame_id = "color_image";
+  img_msg.height = cam->ImageHeight();
+  img_msg.width = cam->ImageWidth();
+  img_msg.encoding = "rgb8";
+  img_msg.is_bigendian = false;
+  img_msg.step = 3 * cam->ImageWidth();
+
+  img_msg.data.insert(
+      img_msg.data.end(), &cam->ImageData(0)[0],
+      &cam->ImageData(0)[3 * cam->ImageWidth() * cam->ImageHeight()]);
+
+  publisher_rgb_->publish(img_msg);
+}
+void RealSensePlugin::OnNewFrame(const rendering::CameraPtr cam,
+                                 const transport::PublisherPtr pub,
+                                 int id) const {
+  msgs::ImageStamped msg;
+
+  // Set Simulation Time
+  msgs::Set(msg.mutable_time(), this->dataPtr->world->SimTime());
+
+  // Set Image Dimensions
+  msg.mutable_image()->set_width(cam->ImageWidth());
+  msg.mutable_image()->set_height(cam->ImageHeight());
+
+  // Set Image Pixel Format
+  msg.mutable_image()->set_pixel_format(
+      common::Image::ConvertPixelFormat(cam->ImageFormat()));
+
+  // Set Image Data
+  msg.mutable_image()->set_step(cam->ImageWidth() * cam->ImageDepth());
+  msg.mutable_image()->set_data(cam->ImageData(), cam->ImageDepth() *
+                                                      cam->ImageWidth() *
+                                                      cam->ImageHeight());
+
+  // Publish realsense infrared stream
+  pub->Publish(msg);
+
+  // ROS2 publish
+  sensor_msgs::msg::Image img_msg = sensor_msgs::msg::Image();
+  img_msg.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
+  img_msg.header.frame_id = "test";
+  img_msg.height = cam->ImageHeight();
+  img_msg.width = cam->ImageWidth();
+  img_msg.encoding = "mono8";
+  img_msg.is_bigendian = false;
+  img_msg.step = cam->ImageWidth();
+
+  img_msg.data.insert(
+      img_msg.data.end(), &cam->ImageData(0)[0],
+      &cam->ImageData(0)[cam->ImageWidth() * cam->ImageHeight()]);
+  if (id == 1) {
+    publisher_ir1_->publish(img_msg);
+  }
+  if (id == 2) {
+    publisher_ir2_->publish(img_msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -300,6 +405,35 @@ void RealSensePlugin::OnNewDepthFrame() const {
 
   // Publish realsense scaled depth map
   this->dataPtr->depthPub->Publish(msg);
+
+  // ROS2 publish
+  sensor_msgs::msg::Image img_msg = sensor_msgs::msg::Image();
+  img_msg.header.stamp =
+      rclcpp::Clock(RCL_ROS_TIME).now(); // maybe change to SIM time??
+  img_msg.header.frame_id = "depth";
+  img_msg.height = this->dataPtr->depthCam->ImageHeight();
+  img_msg.width = this->dataPtr->depthCam->ImageWidth();
+  img_msg.encoding = "mono8";
+  img_msg.is_bigendian = false;
+  img_msg.step = this->dataPtr->depthCam->ImageWidth();
+
+  // std::cout << this->dataPtr->depthCam->ImageHeight() << "\t"
+  //           << this->dataPtr->depthCam->ImageWidth() << "\t"
+  //           << this->dataPtr->depthCam->ImageDepth() << std::endl;
+
+  auto start_ptr = this->dataPtr->depthMap.data();
+  // auto end_ptr =
+  //     this->dataPtr->depthMap.data()[this->dataPtr->depthCam->ImageHeight() *
+  //                                    this->dataPtr->depthCam->ImageWidth()];
+  // auto end_ptr = this->dataPtr->depthMap.data()[1000000];
+
+  // std::vector<u_int16_t> dataVec2(
+  //     *start_ptr, *(start_ptr + 2 * img_msg.height * img_msg.width));
+
+  img_msg.data.insert(img_msg.data.end(), this->dataPtr->depthMap.begin(),
+                      this->dataPtr->depthMap.end());
+
+  publisher_d_->publish(img_msg);
 }
 
 /////////////////////////////////////////////////
