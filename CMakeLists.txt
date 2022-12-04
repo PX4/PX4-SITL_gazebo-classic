@@ -112,6 +112,7 @@ if (BUILD_ROS2_PLUGINS)
   find_package(geometry_msgs REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
+  find_package(std_srvs REQUIRED)
 endif()
 
 
@@ -381,8 +382,6 @@ add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
 
-#add_library(RealSensePlugin SHARED src/RealSensePlugin.cc)
-
 set(plugins
   gazebo_airspeed_plugin
   gazebo_camera_manager_plugin
@@ -432,6 +431,12 @@ if (BUILD_ROS2_PLUGINS)
   list(APPEND plugins RealSensePlugin)
   message(STATUS "adding RealSensePlugin to build")
 
+  add_library(ServoPlugin SHARED src/ServoPlugin.cc)
+  ament_target_dependencies(ServoPlugin rclcpp std_msgs sensor_msgs std_srvs)
+  target_link_libraries(ServoPlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  list(APPEND plugins ServoPlugin)
+  message(STATUS "adding ServoPlugin to build")
+
   include_directories(
     include
     ${geometry_msgs_INCLUDE_DIRS}
@@ -446,6 +451,12 @@ if (BUILD_ROS2_PLUGINS)
   # )
 
   target_link_libraries(RealSensePlugin
+    ${ament_LIBRARIES}
+    ${rclcpp_LIBRARIES}
+    ${GAZEBO_libraries}
+  )
+
+  target_link_libraries(ServoPlugin
     ${ament_LIBRARIES}
     ${rclcpp_LIBRARIES}
     ${GAZEBO_libraries}
@@ -541,6 +552,7 @@ install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
 
 
 install(TARGETS RealSensePlugin DESTINATION ${GZRS_PLUGIN_PATH})
+install(TARGETS ServoPlugin DESTINATION ${GZRS_PLUGIN_PATH})
 
 configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})

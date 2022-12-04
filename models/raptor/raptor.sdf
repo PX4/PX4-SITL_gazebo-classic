@@ -38,8 +38,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://iris/meshes/iris.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://raptor/meshes/raptor_drone.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -335,14 +335,66 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+
+
+    <!-- GRIPPER -->
+    <link name='leftGripperLink'>
+      <pose>0.0 0.0 1.0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000273104</iyy>
+          <iyz>0</iyz>
+          <izz>0.000274004</izz>
+        </inertia>
+      </inertial>
+
+      <visual name='leftGripperLink_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://iris/meshes/iris_prop_ccw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+    <joint name='leftGripperJoint' type='revolute'>
+      <child>leftGripperLink</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace/>
       <linkName>base_link</linkName>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
 
-    <plugin name='hello_world' filename='gazebo_hello_world_plugin.so'>
-      <robotNamespace/>
+    <plugin name='leftGripper_plugin' filename='libServoPlugin.so'>
+      <subTopic>leftGripper_deg</subTopic>
+      <linkName>leftGripperLink</linkName>
+      <jointName>leftGripperJoint</jointName>
     </plugin>
     <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace/>
