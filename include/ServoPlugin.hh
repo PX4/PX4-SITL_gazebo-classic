@@ -61,8 +61,9 @@ private:
   physics::LinkPtr link_;
   physics::JointController *joint_controller_;
 
-  // angle
-  // double angle_;
+  // state variables
+  double angle_;
+  bool td_;
 
   // ROS2 communication
   rclcpp::Node::SharedPtr ros_node_;

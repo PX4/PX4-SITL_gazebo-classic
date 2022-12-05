@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <sdf version="1.6">
-  <model name='iris'>
+  <model name='raptor'>
     <link name='base_link'>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0.5 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>1.5</mass>
@@ -15,12 +15,14 @@
           <izz>0.055225</izz>
         </inertia>
       </inertial>
+      <self_collide>false</self_collide>
       <collision name='base_link_inertia_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <box>
-            <size>0.47 0.47 0.11</size>
-          </box>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://raptor/meshes/drone_hitbox.stl</uri>
+          </mesh>
         </geometry>
         <surface>
           <contact>
@@ -39,7 +41,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://raptor/meshes/raptor_drone.stl</uri>
+            <uri>model://raptor/meshes/drone_w_feets.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -54,7 +56,7 @@
     </link>
     <include>
       <uri>model://imu</uri>
-      <pose>0 0 0 0 0 0</pose>
+      <pose relative_to='base_link'>0 0.03 0 0 0 0</pose>
       <name>imu</name>
     </include>
     <joint name='imu_joint' type='revolute'>
@@ -76,7 +78,7 @@
       </axis>
     </joint>
     <link name='rotor_0'>
-      <pose>0.13 -0.22 0.023 0 0 0</pose>
+      <pose relative_to='base_link'>0.20088 -0.13402 0.030824 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -89,6 +91,7 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
+      <self_collide>false</self_collide>
       <collision name='rotor_0_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -141,7 +144,7 @@
       </axis>
     </joint>
     <link name='rotor_1'>
-      <pose>-0.13 0.2 0.023 0 0 0</pose>
+      <pose relative_to='base_link'>-0.20088 0.13402 0.030824 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -154,6 +157,7 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
+      <self_collide>false</self_collide>
       <collision name='rotor_1_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -206,7 +210,7 @@
       </axis>
     </joint>
     <link name='rotor_2'>
-      <pose>0.13 0.22 0.023 0 0 0</pose>
+      <pose relative_to='base_link'>0.20088 0.13402 0.030824 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -219,6 +223,7 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
+      <self_collide>false</self_collide>
       <collision name='rotor_2_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -271,7 +276,7 @@
       </axis>
     </joint>
     <link name='rotor_3'>
-      <pose>-0.13 -0.2 0.023 0 0 0</pose>
+      <pose relative_to='base_link'>-0.20088 -0.13402 0.030824 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -284,6 +289,7 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
+      <self_collide>false</self_collide>
       <collision name='rotor_3_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -337,8 +343,8 @@
     </joint>
 
 
-    <!-- GRIPPER -->
-    <link name='leftGripperLink'>
+    <!-- TEST GRIPPER -->
+    <!-- <link name='leftGripperLink'>
       <pose>0.0 0.0 1.0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -382,7 +388,7 @@
         </limit>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
-    </joint>
+    </joint> -->
 
 
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
@@ -391,11 +397,11 @@
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
     </plugin>
 
-    <plugin name='leftGripper_plugin' filename='libServoPlugin.so'>
+    <!-- <plugin name='leftGripper_plugin' filename='libServoPlugin.so'>
       <subTopic>leftGripper_deg</subTopic>
       <linkName>leftGripperLink</linkName>
       <jointName>leftGripperJoint</jointName>
-    </plugin>
+    </plugin> -->
     <plugin name='front_right_motor_model' filename='libgazebo_motor_model.so'>
       <robotNamespace/>
       <jointName>rotor_0_joint</jointName>
@@ -466,7 +472,7 @@
     </plugin>
     <include>
       <uri>model://gps</uri>
-      <pose>0.1 0 0 0 0 0</pose>
+      <pose relative_to='base_link'> -0.03 0 0 0 0</pose>
       <name>gps0</name>
     </include>
     <joint name='gps0_joint' type='fixed'>
@@ -475,7 +481,7 @@
     </joint>
     <include>
       <uri>model://magnetometer</uri>
-      <pose>0 0 0 0 0 0</pose>
+      <pose relative_to='base_link'>0 0 0 0 0 0</pose>
       <name>mag</name>
     </include>
     <joint name='mag_joint' type='fixed'>
@@ -573,8 +579,6 @@
           <joint_control_type>position</joint_control_type>
           <joint_name>zephyr_delta_wing::flap_left_joint</joint_name>
           <joint_control_pid>
-            <p>10.0</p>
-            <i>0</i>
             <d>0</d>
             <iMax>0</iMax>
             <iMin>0</iMin>
@@ -612,13 +616,233 @@
     </plugin>
     <static>0</static>
 
+    <!-- GRIPPER -->
+    <link name='gripper_base_link'>
 
-    <!-- REALSENSE Facing downwards -->
+      <pose relative_to='base_link'> 0.0 0.0 -0.05 0.0 1.5707963 0.0</pose><!--1.5707963 1.5707963 -0.02 -->
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.029125</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.029125</iyy>
+          <iyz>0</iyz>
+          <izz>0.055225</izz>
+        </inertia>
+      </inertial>
+      <self_collide> false</self_collide>
+      <collision name='gripper_base_link_inertia_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02617 0.02689 0.04064</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='gripper_base_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://raptor/meshes/gripper_base.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/White</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+
+    <joint name='gripper_base_joint' type='fixed'>
+      <child>gripper_base_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <link name='gripper_left_link'>
+      <pose relative_to='gripper_base_link'> 0.05666 0.0 -0.03465 0.0 0.0 0.0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.029125</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.029125</iyy>
+          <iyz>0</iyz>
+          <izz>0.055225</izz>
+        </inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <collision name='gripper_left_link_inertia_collision'>
+        <pose>0.03417 0 0.02 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 0.08 0.03</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='gripper_left_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://raptor/meshes/gripper_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+
+    <joint name='gripper_left_joint' type='revolute'>
+      <child>gripper_left_link</child>
+      <parent>gripper_base_link</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+      <pose relative_to='gripper_base_link'> 0.01248 0.0 -0.02006 0.0 0.0 0.0</pose>
+    </joint>
+
+    <plugin name='gripper_left_plugin' filename='libServoPlugin.so'>
+      <subTopic>leftGripper_deg</subTopic>
+      <linkName>gripper_left_link</linkName>
+      <jointName>gripper_left_joint</jointName>
+      <initialAngle>90.0</initialAngle>
+      <turningDirection>0</turningDirection> <!-- 0: clockwise, 1: counterclockwise -->
+    </plugin>
+
+    <link name='gripper_right_link'>
+      <!--x: -0.01248 -0.04418 = -0.05666  -->
+      <!--z: 0.02006 + 0.01459 = -0.03465 -->
+      <pose relative_to='gripper_base_link'> 0.05666 0.0 0.03465 0.0 0.0 0.0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.029125</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.029125</iyy>
+          <iyz>0</iyz>
+          <izz>0.055225</izz>
+        </inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <collision name='gripper_right_link_inertia_collision'>
+        <pose>0.03417 0 0.02 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 0.08 0.03</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='gripper_right_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://raptor/meshes/gripper_2.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+
+    <joint name='gripper_right_joint' type='revolute'>
+      <child>gripper_right_link</child>
+      <parent>gripper_base_link</parent>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+      <pose relative_to='gripper_base_link'> 0.01248 0.0 0.02006 0.0 0.0 0.0</pose>
+    </joint>
+
+    <plugin name='gripper_right_plugin' filename='libServoPlugin.so'>
+      <subTopic>rightGripper_deg</subTopic>
+      <linkName>gripper_right_link</linkName>
+      <jointName>gripper_right_joint</jointName>
+      <initialAngle>90.0</initialAngle>
+      <turningDirection>1</turningDirection> <!-- 0: clockwise, 1: counterclockwise -->
+    </plugin>
+
+
+       <!-- REALSENSE Facing downwards -->
  <model name="realsense_camera_down">
      <plugin name="realsense_down_plugin" filename="libRealSensePlugin.so">
       <pubTopic>realsense_down</pubTopic>
     </plugin>
-    <pose>0.0 0.0 -0.05 0.0 1.57079632679 0.0</pose>
+    <pose relative_to='base_link'>0.0 0.0 -0.08 0.0 1.57079632679 0.0</pose> <!---0.1-->
 
     <joint name='realsense_joint' type='fixed'>
       <child>realsense_down_link</child>
@@ -646,7 +870,7 @@
         </inertia>
         <pose>0 0 0 0 -0 0</pose>
       </inertial>
-      <self_collide>0</self_collide>
+      <self_collide>false</self_collide>
       <kinematic>0</kinematic>
       <gravity>1</gravity>
       <visual name="visual">
@@ -797,13 +1021,12 @@
   </model>
 
 
-
   <!-- REALSENSE Facing forwards -->
  <model name="realsense_camera_front">
      <plugin name="realsense_front_plugin" filename="libRealSensePlugin.so">
       <pubTopic>realsense_front</pubTopic>
     </plugin>
-    <pose>0.08 0.0 -0.05 0.0  0.78539816339 0.0</pose> <!-- 0.78539816339-->
+    <pose relative_to='base_link'>0.07 0.0 0 -0.01  0.78539816339 0.0</pose> <!-- .08 0.0 -0.05-->
 
     <joint name='realsense_joint' type='fixed'>
       <child>realsense_front_link</child>
@@ -820,7 +1043,7 @@
 
     <link name="realsense_front_link">
       <inertial>
-        <mass>0.0615752</mass>
+        <mass>0.0001</mass><!--0.0615752-->
         <inertia>
           <ixx>9.108e-05</ixx>
           <ixy>0</ixy>
@@ -831,7 +1054,7 @@
         </inertia>
         <pose>0 0 0 0 -0 0</pose>
       </inertial>
-      <self_collide>0</self_collide>
+      <self_collide>false</self_collide>
       <kinematic>0</kinematic>
       <gravity>1</gravity>
       <visual name="visual">
@@ -980,5 +1203,9 @@
       </sensor>
     </link>
   </model>
+
+
+
+
   </model>
 </sdf>

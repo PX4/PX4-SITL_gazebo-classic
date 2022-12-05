@@ -22,12 +22,16 @@ ServoPlugin::ServoPlugin() : dataPtr(new ServoPluginPrivate) {}
 ServoPlugin::~ServoPlugin() { delete joint_controller_; }
 
 void ServoPlugin::set_angle(const std_msgs::msg::Float64 &msg) {
-  joint_controller_->SetJointPosition(this->joint_, msg.data * M_PI / 180.0);
+  if (td_ == false) {
+    angle_ = msg.data * M_PI / 180.0;
+  } else {
+    angle_ = -msg.data * M_PI / 180.0;
+  }
 }
 
 /////////////////////////////////////////////////
 
-// TODO add parameters: max_force
+// TODO add parameters: initial position
 void ServoPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // Store a pointer to the this model
   model_ = _model;
@@ -43,6 +47,26 @@ void ServoPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     subTopic_ = _sdf->GetElement("subTopic")->Get<std::string>();
   } else {
     std::cout << "[Gazebo Servo] Please specify a SubTopic for the servo."
+              << std::endl;
+  }
+
+  if (_sdf->HasElement("turningDirection")) {
+    td_ = _sdf->GetElement("turningDirection")->Get<bool>();
+  } else {
+    std::cout
+        << "[Gazebo Servo] Please specify a turningDirection for the servo."
+        << std::endl;
+  }
+
+  if (_sdf->HasElement("initialAngle")) {
+    if (td_ == false) {
+      angle_ = _sdf->GetElement("initialAngle")->Get<double>() * M_PI / 180.0;
+    } else {
+      angle_ = -_sdf->GetElement("initialAngle")->Get<double>() * M_PI / 180.0;
+    }
+
+  } else {
+    std::cout << "[Gazebo Servo] Please specify an initialAngle for the servo."
               << std::endl;
   }
 
@@ -130,6 +154,8 @@ void ServoPlugin::OnUpdate() {
 
   // std::cout << "updating" << std::endl;
   rclcpp::spin_some(this->ros_node_);
+
+  joint_controller_->SetJointPosition(this->joint_, angle_);
   joint_controller_->Update();
   // timestep
 
