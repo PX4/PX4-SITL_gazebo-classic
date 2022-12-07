@@ -2,7 +2,7 @@ name: TII Validate SDF files
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, rebase_main ]
   pull_request:
     branches: [ main ]
 
