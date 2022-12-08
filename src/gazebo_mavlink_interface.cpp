@@ -136,8 +136,8 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
 
       // Get the sensor name from the joint name
       std::string sensor_name = joint_name;
-      std::size_t found = joint_name.find_last_of(":/");
-      if (!(found== std::string::npos)) {
+      std::size_t found = joint_name.find_last_of("::");
+      if (found) {
         sensor_name = joint_name.substr(found + 1);
       }
 
@@ -197,7 +197,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
-    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace." << std::endl;
   }
 
   if (_sdf->HasElement("protocol_version")) {
@@ -247,7 +247,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
           }
           else
           {
-            gzwarn << "joint_control_type[" << index << "] not specified, using velocity.\n";
+            gzwarn << "joint_control_type[" << index << "] not specified, using velocity." << std::endl;
             joint_control_type_[index] = "velocity";
           }
 
@@ -308,12 +308,12 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         }
         else
         {
-          gzerr << "input_index[" << index << "] out of range, not parsing.\n";
+          gzerr << "input_index[" << index << "] out of range, not parsing." << std::endl;
         }
       }
       else
       {
-        gzerr << "no input_index, not parsing.\n";
+        gzerr << "no input_index, not parsing." << std::endl;
         break;
       }
       channel = channel->GetNextElement("channel");
@@ -352,14 +352,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     mavlink_interface_->SetUseTcpClientMode(tcp_client_mode);
   }
   gzmsg << "Connecting to PX4 SITL using " << (mavlink_interface_->SerialEnabled() ?
-    "serial" : (use_tcp ? (tcp_client_mode ? "TCP (client mode)" : "TCP (server mode)") : "UDP")) << "\n";
+    "serial" : (use_tcp ? (tcp_client_mode ? "TCP (client mode)" : "TCP (server mode)") : "UDP")) << std::endl;
 
   if (!hil_mode_ && _sdf->HasElement("enable_lockstep"))
   {
     enable_lockstep_ = _sdf->GetElement("enable_lockstep")->Get<bool>();
     mavlink_interface_->SetEnableLockstep(enable_lockstep_);
   }
-  gzmsg << "Lockstep is " << (enable_lockstep_ ? "enabled" : "disabled") << "\n";
+  gzmsg << "Lockstep is " << (enable_lockstep_ ? "enabled" : "disabled") << std::endl;
 
   // When running in lockstep, we can run the simulation slower or faster than
   // realtime. The speed can be set using the env variable PX4_SIM_SPEED_FACTOR.
@@ -371,11 +371,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       speed_factor_ = std::atof(speed_factor_str);
       if (!std::isfinite(speed_factor_) || speed_factor_ <= 0.0)
       {
-        gzerr << "Invalid speed factor '" << speed_factor_str << "', aborting\n";
+        gzerr << "Invalid speed factor '" << speed_factor_str << "', aborting" << std::endl;
         abort();
       }
     }
-    gzmsg << "Speed factor set to: " << speed_factor_ << "\n";
+    gzmsg << "Speed factor set to: " << speed_factor_ << std::endl;
 
     boost::any param;
 #if GAZEBO_MAJOR_VERSION >= 8
@@ -563,18 +563,18 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   // set the Mavlink protocol version to use on the link
   if (protocol_version_ == 2.0) {
     chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
-    gzmsg << "Using MAVLink protocol v2.0\n";
+    gzmsg << "Using MAVLink protocol v2.0" << std::endl;
   }
   else if (protocol_version_ == 1.0) {
     chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
-    gzmsg << "Using MAVLink protocol v1.0\n";
+    gzmsg << "Using MAVLink protocol v1.0" << std::endl;
   }
   else {
-    gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default \n";
+    gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default " << std::endl;
   }
 
   if (hostptr_ || mavlink_hostname_str_.empty() || mavlink_interface_->SerialEnabled()) {
-    gzmsg << "--> load mavlink_interface_\n";
+    gzmsg << "--> load mavlink_interface_" << std::endl;
     mavlink_interface_->Load();
     mavlink_loaded_ = true;
   }
@@ -608,16 +608,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 #endif
   double dt = (current_time - last_time_).Double();
 
-  bool close_conn_ = false;
-
-  if (hil_mode_) {
-    mavlink_interface_->pollFromQgcAndSdk();
-    if (!mavlink_interface_->SerialEnabled()) {
-      mavlink_interface_->pollForMAVLinkMessages();
-    }
-  } else {
-    mavlink_interface_->pollForMAVLinkMessages();
-  }
+  mavlink_interface_->ReadMAVLinkMessages();
 
   // We need to send out heartbeats at a high rate until the connection is established,
   // otherwise PX4 on USB doesn't enable mavlink and the buffer fills up.
@@ -631,10 +622,6 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   // Send groundtruth at full rate
   SendGroundTruth();
-
-  if (close_conn_) { // close connection if required
-    mavlink_interface_->close();
-  }
 
   handle_actuator_controls();
 
@@ -830,31 +817,42 @@ void GazeboMavlinkInterface::SendGroundTruth()
       MAVLINK_MSG_ID_HIL_STATE_QUATERNION_MIN_LEN,
       MAVLINK_MSG_ID_HIL_STATE_QUATERNION_LEN,
       MAVLINK_MSG_ID_HIL_STATE_QUATERNION_CRC);
-    mavlink_interface_->send_mavlink_message(&msg);
+    mavlink_interface_->PushSendMessage(&msg);
   }
 }
 
 void GazeboMavlinkInterface::GpsCallback(GpsPtr& gps_msg, const int& id) {
-  SensorData::Gps gps_data;
-  gps_data.time_utc_usec = gps_msg->time_utc_usec();
-  gps_data.fix_type = 3;
-  gps_data.latitude_deg = gps_msg->latitude_deg() * 1e7;
-  gps_data.longitude_deg = gps_msg->longitude_deg() * 1e7;
-  gps_data.altitude = gps_msg->altitude() * 1000.0;
-  gps_data.eph = gps_msg->eph() * 100.0;
-  gps_data.epv = gps_msg->epv() * 100.0;
-  gps_data.velocity = gps_msg->velocity() * 100.0;
-  gps_data.velocity_north = gps_msg->velocity_north() * 100.0;
-  gps_data.velocity_east = gps_msg->velocity_east() * 100.0;
-  gps_data.velocity_down = -gps_msg->velocity_up() * 100.0;
+    // fill HIL GPS Mavlink msg
+  mavlink_hil_gps_t hil_gps_msg;
+  hil_gps_msg.time_usec = static_cast<uint64_t>(gps_msg->time_utc_usec());
+  hil_gps_msg.fix_type = 3;
+  hil_gps_msg.lat = static_cast<int32_t>(gps_msg->latitude_deg() * 1e7);
+  hil_gps_msg.lon = static_cast<int32_t>(gps_msg->longitude_deg() * 1e7);
+  hil_gps_msg.alt = static_cast<int32_t>(gps_msg->altitude() * 1000.0);
+  hil_gps_msg.eph = static_cast<uint16_t>(gps_msg->eph() * 100.0);
+  hil_gps_msg.epv = static_cast<uint16_t>(gps_msg->epv() * 100.0);
+  hil_gps_msg.vel = static_cast<uint16_t>(gps_msg->velocity() * 100.0);
+  hil_gps_msg.vn = static_cast<int16_t>(gps_msg->velocity_north() * 100.0);
+  hil_gps_msg.ve = static_cast<int16_t>(gps_msg->velocity_east() * 100.0);
+  hil_gps_msg.vd = static_cast<int16_t>(-gps_msg->velocity_up() * 100.0);
   // MAVLINK_HIL_GPS_T CoG is [0, 360]. math::Angle::Normalize() is [-pi, pi].
   ignition::math::Angle cog(atan2(gps_msg->velocity_east(), gps_msg->velocity_north()));
   cog.Normalize();
-  gps_data.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
-  gps_data.satellites_visible = 10;
-  gps_data.id = id;
+  hil_gps_msg.cog = static_cast<uint16_t>(GetDegrees360(cog) * 100.0);
+  hil_gps_msg.satellites_visible = 10;
+  hil_gps_msg.id = id;
 
-  mavlink_interface_->SendGpsMessages(gps_data);
+  // send HIL_GPS Mavlink msg
+  if (!hil_mode_ || (hil_mode_ && !hil_state_level_)) {
+    mavlink_message_t msg;
+    mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
+    // Override default global mavlink channel status with instance specific status
+    mavlink_interface_->FinalizeOutgoingMessage(&msg, 1, 200,
+      MAVLINK_MSG_ID_HIL_GPS_MIN_LEN,
+      MAVLINK_MSG_ID_HIL_GPS_LEN,
+      MAVLINK_MSG_ID_HIL_GPS_CRC);
+    mavlink_interface_->PushSendMessage(&msg);
+  }
 }
 
 void GazeboMavlinkInterface::GroundtruthCallback(GtPtr& groundtruth_msg) {
@@ -916,7 +914,7 @@ void GazeboMavlinkInterface::LidarCallback(LidarPtr& lidar_message, const int& i
     MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN,
     MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN,
     MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC);
-  mavlink_interface_->send_mavlink_message(&msg);
+  mavlink_interface_->PushSendMessage(&msg);
 }
 
 void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_message) {
@@ -951,7 +949,7 @@ void GazeboMavlinkInterface::OpticalFlowCallback(OpticalFlowPtr& opticalFlow_mes
     MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_MIN_LEN,
     MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_LEN,
     MAVLINK_MSG_ID_HIL_OPTICAL_FLOW_CRC);
-  mavlink_interface_->send_mavlink_message(&msg);
+  mavlink_interface_->PushSendMessage(&msg);
 }
 
 void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const int& id) {
@@ -997,7 +995,7 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const int& i
     MAVLINK_MSG_ID_DISTANCE_SENSOR_MIN_LEN,
     MAVLINK_MSG_ID_DISTANCE_SENSOR_LEN,
     MAVLINK_MSG_ID_DISTANCE_SENSOR_CRC);
-  mavlink_interface_->send_mavlink_message(&msg);
+  mavlink_interface_->PushSendMessage(&msg);
 }
 
 void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
@@ -1022,7 +1020,7 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
     MAVLINK_MSG_ID_LANDING_TARGET_MIN_LEN,
     MAVLINK_MSG_ID_LANDING_TARGET_LEN,
     MAVLINK_MSG_ID_LANDING_TARGET_CRC);
-  mavlink_interface_->send_mavlink_message(&msg);
+  mavlink_interface_->PushSendMessage(&msg);
 }
 
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
@@ -1111,7 +1109,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
       MAVLINK_MSG_ID_ODOMETRY_MIN_LEN,
       MAVLINK_MSG_ID_ODOMETRY_LEN,
       MAVLINK_MSG_ID_ODOMETRY_CRC);
-    mavlink_interface_->send_mavlink_message(&msg);
+    mavlink_interface_->PushSendMessage(&msg);
   }
   else if (send_vision_estimation_) {
     // send VISION_POSITION_ESTIMATE Mavlink msg
@@ -1152,7 +1150,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
       MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_MIN_LEN,
       MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_LEN,
       MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE_CRC);
-    mavlink_interface_->send_mavlink_message(&msg);
+    mavlink_interface_->PushSendMessage(&msg);
   }
 }
 
@@ -1175,7 +1173,7 @@ void GazeboMavlinkInterface::BarometerCallback(BarometerPtr& baro_msg) {
   baro_data.temperature = baro_msg->temperature();
   baro_data.abs_pressure = baro_msg->absolute_pressure();
   baro_data.pressure_alt = baro_msg->pressure_altitude();
-  mavlink_interface_->UpdateBarometer(baro_data);
+  mavlink_interface_->UpdateBarometer(baro_data, 0);
 }
 
 void GazeboMavlinkInterface::WindVelocityCallback(WindPtr& msg) {
@@ -1272,7 +1270,7 @@ void GazeboMavlinkInterface::handle_control(double _dt)
       }
       else
       {
-        gzerr << "joint_control_type[" << joint_control_type_[i] << "] undefined.\n";
+        gzerr << "joint_control_type[" << joint_control_type_[i] << "] undefined." << std::endl;
       }
     }
   }

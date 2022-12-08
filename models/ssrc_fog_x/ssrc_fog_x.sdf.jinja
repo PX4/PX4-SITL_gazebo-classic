@@ -323,7 +323,7 @@
   <!--} END ARMS -->
 
     <!-- MAGNETOMETER {-->
-    <link name="mag1::link">
+    <link name="mag0::link">
       <inertial>
         <mass>0.001</mass>
         <inertia>
@@ -354,7 +354,6 @@
         <visualize>false</visualize>
         <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
           <robotNamespace/>
-          <magTopic>mag</magTopic>
           <pubRate>100</pubRate>
           <noiseDensity>0.0004</noiseDensity>
           <randomWalk>6.4e-06</randomWalk>
@@ -363,14 +362,14 @@
       </sensor>
     </link>
 
-    <joint name='mag1_joint' type='fixed'>
-      <child>mag1::link</child>
+    <joint name='mag0_joint' type='fixed'>
+      <child>mag0::link</child>
       <parent>base_link</parent>
     </joint>
     <!--} MAGNETOMETER -->
 
     <!-- IMU {-->
-    <link name='imu1::link'>
+    <link name='imu0::link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -403,7 +402,6 @@
         <visualize>false</visualize>
         <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
           <robotNamespace></robotNamespace>
-          <imuTopic>imu</imuTopic>
           <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
           <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
           <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
@@ -416,8 +414,8 @@
       </sensor>
     </link>
 
-    <joint name='imu1_joint' type='revolute'>
-      <child>imu1::link</child>
+    <joint name='imu0_joint' type='revolute'>
+      <child>imu0::link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -1078,7 +1076,7 @@
   <!--} END RP LIDAR -->
 
   <!-- GARMIN RANGEFINDER {-->
-  <link name="lidar1::link">
+  <link name="lidar0::link">
     <pose>-0.007 -0.04 -0.039 0 1.5708 1.5708</pose>
     <inertial>
       <mass>0.01</mass>
@@ -1141,8 +1139,8 @@
     </sensor>
   </link>
   <!-- name of the link for garmin has to contain lidar word to be detected by mavlink gazebo plugin -->
-  <joint name='lidar1_joint' type='fixed'>
-    <child>lidar1::link</child>
+  <joint name='lidar0_joint' type='fixed'>
+    <child>lidar0::link</child>
     <parent>base_link</parent>
   </joint>
   <!--} END GARMIN RANGEFINDER -->

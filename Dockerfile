@@ -14,9 +14,9 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 
 
 # Clone c_library_v2 commit matching with current px4-firmware mavlink commit
-# => mavlink/c_library_v2:3e428a3 is built from mavlink/mavlink:d012c7a
+# => mavlink/c_library_v2:fbdb7c29 is built from mavlink/mavlink:08112084
 RUN git clone -q https://github.com/mavlink/c_library_v2.git  /usr/local/include/mavlink && \
-    cd /usr/local/include/mavlink && git checkout -q 3e428a3197543890c6b36b273947593917c15b67 && \
+    cd /usr/local/include/mavlink && git checkout -q fbdb7c29e47902d44eeaa58b4395678a9b78f3ae && \
     rm -rf /usr/local/include/mavlink/.git
 
 ENV _MAVLINK_INCLUDE_DIR  /usr/local/include/mavlink

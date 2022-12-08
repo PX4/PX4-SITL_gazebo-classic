@@ -22,6 +22,7 @@
 #pragma once
 
 #include <vector>
+#include <queue>
 #include <regex>
 #include <thread>
 #include <mutex>
@@ -59,6 +60,9 @@ static const uint32_t kDefaultMavlinkUdpLocalPort = 0;
 static const uint32_t kDefaultMavlinkTcpPort = 4560;
 static const uint32_t kDefaultQGCUdpPort = 14550;
 static const uint32_t kDefaultSDKUdpPort = 14540;
+
+static const size_t kMaxRecvBufferSize = 20;
+static const size_t kMaxSendBufferSize = 30;
 
 using lock_guard = std::lock_guard<std::recursive_mutex>;
 static constexpr auto kDefaultDevice = "/dev/ttyACM0";
@@ -106,23 +110,6 @@ namespace SensorData {
     struct Airspeed {
         double diff_pressure;
     };
-
-    struct Gps {
-        uint64_t time_utc_usec;
-        int fix_type;
-        double latitude_deg;
-        double longitude_deg;
-        double altitude;
-        double eph;
-        double epv;
-        double velocity;
-        double velocity_north;
-        double velocity_east;
-        double velocity_down;
-        double cog;
-        double satellites_visible;
-        int id;
-    };
 }
 
 struct HILData {
@@ -146,8 +133,10 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     MavlinkInterface();
     ~MavlinkInterface();
-    void pollForMAVLinkMessages();
-    void pollFromQgcAndSdk();
+    void ReadMAVLinkMessages();
+    std::shared_ptr<mavlink_message_t> PopRecvMessage();
+    void PushSendMessage(std::shared_ptr<mavlink_message_t> msg);
+    void PushSendMessage(mavlink_message_t* msg);
     void send_mavlink_message(const mavlink_message_t *message);
     void forward_mavlink_message(const mavlink_message_t *message);
     void open();
@@ -156,7 +145,6 @@ public:
     void SendHeartbeat();
     void SendSensorMessages(const uint64_t time_usec);
     void SendSensorMessages(const uint64_t time_usec, HILData &hil_data);
-    void SendGpsMessages(const SensorData::Gps &data);
     void UpdateBarometer(const SensorData::Barometer &data, const int id = 0);
     void UpdateAirspeed(const SensorData::Airspeed &data, const int id = 0);
     void UpdateIMU(const SensorData::Imu &data, const int id = 0);
@@ -183,6 +171,7 @@ public:
     void SetSdkUdpPort(int sdk_udp_port) {sdk_udp_port_ = sdk_udp_port;}
     void SetHILMode(bool hil_mode) {hil_mode_ = hil_mode;}
     void SetHILStateLevel(bool hil_state_level) {hil_state_level_ = hil_state_level;}
+    bool IsRecvBuffEmpty() {return receiver_buffer_.empty();}
 
     bool SerialEnabled() const { return serial_enabled_; }
     bool ReceivedHeartbeats() const { return received_heartbeats_; }
@@ -208,6 +197,10 @@ private:
         return serial_dev_.is_open();
     }
     void do_serial_write(bool check_tx_state);
+
+    // UDP/TCP send/receive thread workers
+    void ReceiveWorker();
+    void SendWorker();
 
     static const unsigned n_out_max = 16;
 
@@ -285,6 +278,14 @@ private:
 
     bool received_heartbeats_ {false};
 
+    std::mutex receiver_buff_mtx_;
+    std::queue<std::shared_ptr<mavlink_message_t>> receiver_buffer_;
+    std::thread receiver_thread_;
+
+    std::mutex sender_buff_mtx_;
+    std::queue<std::shared_ptr<mavlink_message_t>> sender_buffer_;
+    std::thread sender_thread_;
+    std::condition_variable sender_cv_;
     std::mutex mav_status_mutex_;
     mavlink_status_t sender_m_status_{};
 
