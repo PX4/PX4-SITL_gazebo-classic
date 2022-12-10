@@ -29,6 +29,16 @@ void ServoPlugin::set_angle(const std_msgs::msg::Float64 &msg) {
   }
 }
 
+void ServoPlugin::set_servo(
+    std::shared_ptr<raptor_interface::srv::SetServo::Request> request,
+    std::shared_ptr<raptor_interface::srv::SetServo::Response> response) {
+  if (td_ == false) {
+    angle_ = request->angle * M_PI / 180.0;
+  } else {
+    angle_ = -request->angle * M_PI / 180.0;
+  }
+  response->success = true;
+}
 /////////////////////////////////////////////////
 
 // TODO add parameters: initial position
@@ -136,6 +146,10 @@ void ServoPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   subscription_ = this->ros_node_->create_subscription<std_msgs::msg::Float64>(
       subTopic_, 10,
       std::bind(&ServoPlugin::set_angle, this, std::placeholders::_1));
+
+  service_ = this->ros_node_->create_service<raptor_interface::srv::SetServo>(
+      subTopic_, std::bind(&ServoPlugin::set_servo, this, std::placeholders::_1,
+                           std::placeholders::_2));
   // Spin ROS2 node
   // rclcpp::spin(this->ros_node_);
 

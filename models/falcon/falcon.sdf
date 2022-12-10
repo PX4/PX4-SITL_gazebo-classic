@@ -2,8 +2,6 @@
 <sdf version='1.5'>
   <model name='plane'>
     <pose>0 0 0.246 0 0 0</pose>
-
-
     <!--LINKS-->
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
@@ -103,6 +101,7 @@
           <izz>0.000167604</izz>
         </inertia>
       </inertial>
+
       <collision name='rotor_puller_collision'>
         <pose>0.0 0 0.0 0 0 0</pose>
         <geometry>
@@ -274,35 +273,6 @@
         <material>
           <script>
             <name>Gazebo/Blue</name>
-            <uri>__default__</uri>
-          </script>
-        </material>
-      </visual>
-    </link>
-    <link name="gripper_arm">
-      <inertial>
-        <mass>0.00000001</mass>
-        <inertia>
-          <ixx>0.000001</ixx>
-          <ixy>0.0</ixy>
-          <iyy>0.000001</iyy>
-          <ixz>0.0</ixz>
-          <iyz>0.0</iyz>
-          <izz>0.000001</izz>
-        </inertia>
-        <pose>0.0 0.0 -0.08 0.0 0 0.0</pose>
-      </inertial>
-      <visual name='gripper_arm_visual'>
-        <pose>0.0 0.0 -0.08 0.0 0.0 0.0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.02 0.02 0.02</scale>
-            <uri>model://falcon/meshes/gripper_dummy.dae</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Red</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -806,5 +776,74 @@
       </control_channels>
     </plugin>
     <static>0</static>
+
+    <!-- GRIPPER ARM -->
+    <link name='gripper_base_link'>
+
+      <pose relative_to='base_link'> 0.0 0.0 1.0 0.0 0.0 1.5707963</pose><!--1.5707963 1.5707963 -0.02 -->
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.029125</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.029125</iyy>
+          <iyz>0</iyz>
+          <izz>0.055225</izz>
+        </inertia>
+      </inertial>
+      <self_collide> false</self_collide>
+      <collision name='gripper_base_link_inertia_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.02617 0.02689 0.04064</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='gripper_base_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://falcon/meshes/base.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/White</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+    </link>
+
+    <joint name='gripper_base_joint' type='fixed'>
+      <child>gripper_base_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
   </model>
 </sdf>

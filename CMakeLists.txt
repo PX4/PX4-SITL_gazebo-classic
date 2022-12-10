@@ -383,6 +383,8 @@ add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
 
+add_library(VideoPlugin SHARED src/VideoPlugin.cc)
+
 set(plugins
   gazebo_airspeed_plugin
   gazebo_camera_manager_plugin
@@ -410,6 +412,7 @@ set(plugins
   gazebo_parachute_plugin
   gazebo_airship_dynamics_plugin
   gazebo_drop_plugin
+  VideoPlugin
   )
 
 foreach(plugin ${plugins})
@@ -433,7 +436,7 @@ if (BUILD_ROS2_PLUGINS)
   message(STATUS "adding RealSensePlugin to build")
 
   add_library(ServoPlugin SHARED src/ServoPlugin.cc)
-  ament_target_dependencies(ServoPlugin rclcpp std_msgs sensor_msgs std_srvs)
+  ament_target_dependencies(ServoPlugin rclcpp std_msgs sensor_msgs std_srvs raptor_interface)
   target_link_libraries(ServoPlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
   list(APPEND plugins ServoPlugin)
   message(STATUS "adding ServoPlugin to build")
@@ -546,6 +549,7 @@ file(GLOB models_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/models/*)
 
 file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/worlds/.DS_Store)
 file(GLOB worlds_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/worlds/*)
+
 
 install(TARGETS ${plugins} mav_msgs nav_msgs std_msgs sensor_msgs DESTINATION ${PLUGIN_PATH})
 install(DIRECTORY ${models_list} DESTINATION ${MODEL_PATH})

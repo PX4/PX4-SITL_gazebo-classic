@@ -26,10 +26,10 @@
 #include <sdf/sdf.hh>
 #include <string>
 // ROS2
+#include "raptor_interface/srv/set_servo.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float64.hpp"
 #include "std_msgs/msg/string.hpp"
-
 namespace gazebo {
 // Forward declare private data class
 struct ServoPluginPrivate;
@@ -46,6 +46,9 @@ public:
 private:
   // callbacks
   void set_angle(const std_msgs::msg::Float64 &msg);
+  void set_servo(
+      std::shared_ptr<raptor_interface::srv::SetServo::Request> request,
+      std::shared_ptr<raptor_interface::srv::SetServo::Response> response);
 
   // data pointer
   std::unique_ptr<ServoPluginPrivate> dataPtr;
@@ -70,6 +73,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   // rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr subscription_;
+  rclcpp::Service<raptor_interface::srv::SetServo>::SharedPtr service_;
 };
 } // namespace gazebo
 #endif

@@ -9,27 +9,13 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    <!-- <include>
+    <include>
       <uri>model://asphalt_plane</uri>
-    </include> -->
+    </include>
     <include>
       <uri>model://object</uri>
-      <pose> 0 0 1 0 0 0</pose>
+      <pose>0 0 1 1.5707 0 1.5707</pose>
     </include>
-
-    <include>
-      <uri>model://video</uri>
-      <pose> 0 -4 1 0 0 1.57079632679</pose>
-    </include>
-
-    <!-- <spherical_coordinates>
-      <surface_model>EARTH_WGS84</surface_model>
-      <latitude_deg>47.424478</latitude_deg>
-      <longitude_deg>8.387005</longitude_deg>
-      <elevation>389.0</elevation>
-      <heading>0</heading>
-      <world_frame_orientation>'NED'</world_frame_orientation>
-    </spherical_coordinates> -->
 
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
@@ -54,4 +40,3 @@
     </physics>
   </world>
 </sdf>
-
