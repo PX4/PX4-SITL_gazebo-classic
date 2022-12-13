@@ -24,6 +24,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include <Sniffer.pb.h>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/physics/physics.hh>
 

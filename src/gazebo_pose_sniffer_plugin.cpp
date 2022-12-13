@@ -72,35 +72,38 @@ void PoseSnifferPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
     _links.push_back(link);
     tracked_link_element = tracked_link_element->GetNextElement("tracked_link");
   }
-  _poses.resize(_links.size());
-  int i = 0;
-  for (auto &pose : _poses) {
-    pose.systemId = 1;
-    pose.elementId = i;
-    ++i;
-  }
 }
 
 void PoseSnifferPlugin::OnUpdate(common::UpdateInfo const &updateInfo) {
+
+  char buffer[256];
+  sniffer_msgs::msgs::Vehicle v;
+    v.set_vehicle_type("vector");
+    v.set_system_id(1);
+
   unsigned int i = 0;
   for (auto link : _links) {
+    sniffer_msgs::msgs::Joint * j = v.add_joint();
+
     auto pose = link->WorldPose();
     auto position = pose.Pos();
     auto rotation = pose.Rot();
 
-    auto &pose_to_update = _poses[i];
-
-    pose_to_update.x = position.X();
-    pose_to_update.y = position.Y();
-    pose_to_update.z = position.Z();
-    pose_to_update.pitch = rotation.Pitch();
-    pose_to_update.yaw = rotation.Yaw();
-    pose_to_update.roll = rotation.Roll();
+    j->set_joint_id(i);
+    j->set_x(position.X());
+    j->set_y(position.Y());
+    j->set_z(position.Z());
+    j->set_pitch(rotation.Pitch());
+    j->set_yaw(rotation.Yaw());
+    j->set_roll(rotation.Roll());
     ++i;
   }
-  if (!_poses.empty()) {
-    sendto(_fd, (const char *)&_poses.front(),
-           sizeof(_poses[0]) * _poses.size(), MSG_CONFIRM,
+
+  if (v.SerializeToArray(buffer, 256)) {
+    sendto(_fd, buffer,
+           256, MSG_CONFIRM,
            (const struct sockaddr *)&_sockaddr, sizeof(_sockaddr));
-  }
+  } else {
+    gzerr << "[gazebo_pose_sniffer_plugin] serialization failed for vehicle id : " << 1 << std::endl;
+  }  
 }
