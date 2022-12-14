@@ -383,8 +383,6 @@ add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
 
-add_library(VideoPlugin SHARED src/VideoPlugin.cc)
-
 set(plugins
   gazebo_airspeed_plugin
   gazebo_camera_manager_plugin
@@ -412,7 +410,6 @@ set(plugins
   gazebo_parachute_plugin
   gazebo_airship_dynamics_plugin
   gazebo_drop_plugin
-  VideoPlugin
   )
 
 foreach(plugin ${plugins})
@@ -434,6 +431,12 @@ if (BUILD_ROS2_PLUGINS)
   target_link_libraries(RealSensePlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
   list(APPEND plugins RealSensePlugin)
   message(STATUS "adding RealSensePlugin to build")
+
+  add_library(VideoPlugin SHARED src/VideoPlugin.cc)
+  ament_target_dependencies(VideoPlugin rclcpp std_msgs std_srvs)
+  target_link_libraries(VideoPlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  list(APPEND plugins VideoPlugin)
+  message(STATUS "adding VideoPlugin to build")
 
   add_library(ServoPlugin SHARED src/ServoPlugin.cc)
   ament_target_dependencies(ServoPlugin rclcpp std_msgs sensor_msgs std_srvs raptor_interface)
@@ -459,6 +462,12 @@ if (BUILD_ROS2_PLUGINS)
     ${rclcpp_LIBRARIES}
     ${GAZEBO_libraries}
   )
+
+  target_link_libraries(VideoPlugin
+  ${ament_LIBRARIES}
+  ${rclcpp_LIBRARIES}
+  ${GAZEBO_libraries}
+)
 
   target_link_libraries(ServoPlugin
     ${ament_LIBRARIES}
@@ -557,6 +566,7 @@ install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
 
 
 install(TARGETS RealSensePlugin DESTINATION ${GZRS_PLUGIN_PATH})
+install(TARGETS VideoPlugin DESTINATION ${GZRS_PLUGIN_PATH})
 install(TARGETS ServoPlugin DESTINATION ${GZRS_PLUGIN_PATH})
 
 configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)

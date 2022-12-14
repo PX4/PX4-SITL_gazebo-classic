@@ -29,6 +29,10 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/core/mat.hpp>
 
+// ROS2
+#include "rclcpp/rclcpp.hpp"
+#include "std_srvs/srv/trigger.hpp"
+
 namespace gazebo {
 // Forward declare private data class
 struct VideoPluginPrivate;
@@ -46,11 +50,19 @@ public:
 
   /// \brief Private data pointer.
 private:
+  void
+  video_trigger(std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+                std::shared_ptr<std_srvs::srv::Trigger::Response> response);
   std::unique_ptr<VideoPluginPrivate> dataPtr;
   std::string file_name_;
   cv::VideoCapture cap_;
   char *data_;
   std::unique_ptr<cv::VideoWriter> videoPtr_;
+  std::atomic<bool> recording_;
+
+  // ROS2 communication
+  rclcpp::Node::SharedPtr ros_node_;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr service_;
 };
 } // namespace gazebo
 #endif

@@ -61,7 +61,22 @@ VideoPlugin::~VideoPlugin() { delete data_; }
 
 /////////////////////////////////////////////////
 
+void VideoPlugin::video_trigger(
+    std::shared_ptr<std_srvs::srv::Trigger::Request> request,
+    std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
+  if (recording_ == false) {
+    std::cout << "start recording" << std::endl;
+    recording_ = true;
+  } else {
+    std::cout << "stop recording" << std::endl;
+    recording_ = false;
+    videoPtr_->release();
+  }
+  response->success = true;
+}
+
 void VideoPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
+  recording_ = false;
   // Output the name of the model
   std::cout << std::endl
             << "VideoPlugin: The rs_camera plugin is attach to model: "
@@ -114,7 +129,7 @@ void VideoPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   std::cout << "Saving video to following file: " << file_name_ << std::endl;
   videoPtr_ = std::make_unique<cv::VideoWriter>(
       "/home/aurel/Videos/test.avi",
-      cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), COLOR_PUB_FREQ_HZ,
+      cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 10,
       cv::Size(frame_width, frame_height));
   // cv::VideoWriter::fourcc('M', 'J', 'P', 'G')
   if (!videoPtr_->isOpened()) {
@@ -152,60 +167,37 @@ void VideoPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // Listen to the update event
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&VideoPlugin::OnUpdate, this));
+
+  // ROS2 stuff
+  // Initialize ROS2, if it has not already been initialized.
+  if (!rclcpp::ok()) {
+    int argc = 0;
+    char **argv = NULL;
+    rclcpp::init(argc, argv);
+  }
+
+  // create ROS2 publisher node
+  this->ros_node_ = rclcpp::Node::make_shared(
+      "video_node"); // TODO change string to something esle
+
+  service_ = this->ros_node_->create_service<std_srvs::srv::Trigger>(
+      "videoTrigger", std::bind(&VideoPlugin::video_trigger, this,
+                                std::placeholders::_1, std::placeholders::_2));
 }
 
 /////////////////////////////////////////////////
 void VideoPlugin::OnNewColorFrame(const rendering::CameraPtr cam,
                                   const transport::PublisherPtr pub) const {
-  msgs::ImageStamped msg;
+  if (recording_ == true) {
+    memcpy(data_, cam->ImageData(),
+           (cam->ImageDepth()) * (cam->ImageHeight()) * (cam->ImageWidth()));
 
-  // Set Simulation Time
-  msgs::Set(msg.mutable_time(), this->dataPtr->world->SimTime());
+    cv::Mat image(int(cam->ImageHeight()), int(cam->ImageWidth()), CV_8UC3,
+                  data_);
 
-  // Set Image Dimensions
-  msg.mutable_image()->set_width(cam->ImageWidth());
-  msg.mutable_image()->set_height(cam->ImageHeight());
-
-  // Set Image Pixel Format
-  msg.mutable_image()->set_pixel_format(
-      common::Image::ConvertPixelFormat(cam->ImageFormat()));
-
-  // Set Image Data
-  msg.mutable_image()->set_step(cam->ImageWidth() * cam->ImageDepth());
-  msg.mutable_image()->set_data(cam->ImageData(), cam->ImageDepth() *
-                                                      cam->ImageWidth() *
-                                                      cam->ImageHeight());
-
-  // Publish Video infrared stream
-  pub->Publish(msg);
-
-  // // TODO: save RGB image to mp4
-  // cv::Mat::size s = cv::Mat::size(cam->ImageWidth(), cam->ImageHeight());
-  // // cv::Mat::type t = cv::Mat::type(CV_8UC3)
-
-  memcpy(data_, cam->ImageData(),
-         (cam->ImageDepth()) * (cam->ImageHeight()) * (cam->ImageWidth()));
-  cv::Mat image(int(cam->ImageHeight()), int(cam->ImageWidth()), CV_8UC3,
-                data_);
-
-  // std::vector<u_int8_t> data;
-
-  // data.insert(data.end(), cam->ImageData()[0],
-  //             cam->ImageData()[(cam->ImageDepth()) * (cam->ImageHeight()) *
-  //                              (cam->ImageWidth())]);
-
-  // const
-  //                               CV_8UC3, dataprt);
-  // memcpy(data, msg.mutable_image()->Image().data().c_str(),
-  //        msg.mutable_image()->Image().data().length());
-  // cv::Mat image(int(cam->ImageWidth()), int(cam->ImageHeight()), CV_8UC3,
-  //               &data);
-
-  // std::cout << "video pub now" << std::endl;
-  //  save frame
-
-  videoPtr_->write(image);
+    videoPtr_->write(image);
+  }
 }
 
 /////////////////////////////////////////////////
-void VideoPlugin::OnUpdate() {}
+void VideoPlugin::OnUpdate() { rclcpp::spin_some(this->ros_node_); }

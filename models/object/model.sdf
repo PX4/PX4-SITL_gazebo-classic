@@ -3,32 +3,37 @@
   <model name="object">
     <link name="link">
       <pose>0 0 0 1.57079632679 0 0</pose>
-      <gravity>false</gravity>
+      <gravity>true</gravity>
       <inertial name="inertial">
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.1</mass>
+        <mass>0.00001</mass>
         <inertia>
-          <ixx>0.02</ixx>
+          <ixx>0.00001</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.02</iyy>
+          <iyy>0.00001</iyy>
           <iyz>0</iyz>
-          <izz>0.02</izz>
+          <izz>0.00001</izz>
         </inertia>
       </inertial>
 
       <collision name="collision">
         <geometry>
-          <cylinder>
-            <radius>0.04</radius>
-            <length>0.2</length>
-          </cylinder>
+        <box>
+          <size>0.02 0.2 0.3</size>
+        </box>
         </geometry>
         <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>1000</max_vel>
+            </ode>
+          </contact>
           <friction>
             <ode>
-              <mu>100</mu>
-              <mu2>50</mu2>
+              <mu>100000</mu>
+              <mu2>100000</mu2>
             </ode>
           </friction>
         </surface>
@@ -38,10 +43,9 @@
         <cast_shadows>false</cast_shadows>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <cylinder>
-            <radius>0.04</radius>
-            <length>0.2</length>
-          </cylinder>
+          <box>
+          <size>0.02 0.2 0.3</size>
+        </box>
         </geometry>
         <material>
           <script>

@@ -53,7 +53,7 @@
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
-      <self_collide>0</self_collide>
+      <self_collide>false</self_collide>
     </link>
     <include>
       <uri>model://imu</uri>
@@ -136,7 +136,7 @@
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
-      <self_collide>0</self_collide>
+      <self_collide>false</self_collide>
     </link>
     <joint name='rotor_puller_joint' type='revolute'>
       <child>rotor_puller</child>
@@ -186,6 +186,7 @@
           <color>Gazebo/Red</color>
         </plugin>
       </visual>
+      <self_collide>false</self_collide>
     </link>
     <link name="right_elevon">
       <inertial>
@@ -219,6 +220,7 @@
           <color>Gazebo/Green</color>
         </plugin>
       </visual>
+      <self_collide>false</self_collide>
     </link>
     <link name="left_flap">
       <inertial>
@@ -248,6 +250,7 @@
           </script>
         </material>
       </visual>
+      <self_collide>false</self_collide>
     </link>
     <link name="right_flap">
       <inertial>
@@ -277,6 +280,7 @@
           </script>
         </material>
       </visual>
+      <self_collide>false</self_collide>
     </link>
     <link name="elevator">
       <inertial>
@@ -306,6 +310,7 @@
           </script>
         </material>
       </visual>
+      <self_collide>false</self_collide>
     </link>
     <link name="rudder">
       <inertial>
@@ -335,6 +340,7 @@
           </script>
         </material>
       </visual>
+      <self_collide>false</self_collide>
     </link>
 
 
@@ -423,26 +429,6 @@
         </ode>
       </physics>
     </joint>
-    <joint name='gripper_arm_joint' type='revolute'>
-      <parent>base_link</parent>
-      <child>gripper_arm</child>
-      <pose>0.0 0.0 -0.08 0.0 0 0.0</pose>
-      <axis>
-        <xyz>0 1 0</xyz>
-       <!-- <limit>
-          <lower>-0.53</lower>
-          <upper>0.53</upper>
-        </limit> -->
-        <dynamics>
-          <damping>1.000</damping>
-        </dynamics>
-      </axis>
-      <physics>
-        <ode>
-          <implicit_spring_damper>1</implicit_spring_damper>
-        </ode>
-      </physics>
-    </joint>
     <joint name='elevator_joint' type='revolute'>
       <parent>base_link</parent>
       <child>elevator</child>
@@ -503,19 +489,6 @@
       <child>mag::link</child>
       <parent>base_link</parent>
     </joint>
-
-
-
-    <!--TRANSMISSIONS-->
-  <!--  <transmission name="gripper_arm_transmission">
-      <type>transmission_interface/SimpleTransmission</type>
-      <actuator name="gripper_servo">
-        <mechanicalReduction>1</mechanicalReduction>
-      </actuator>
-      <joint name="gripper_arm_joint">
-        <hardwareInterface>EffortJointInterface</hardwareInterface>
-      </joint>
-    </transmission>-->
 
 
     <!--PLUGINS-->
@@ -675,6 +648,10 @@
     <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
     </plugin>
+    <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
+      <robotNamespace/>
+      <gpsNoise>false</gpsNoise>
+    </plugin>
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
       <pubRate>50</pubRate>
@@ -780,25 +757,25 @@
     <!-- GRIPPER ARM -->
     <link name='gripper_base_link'>
 
-      <pose relative_to='base_link'> 0.0 0.0 1.0 0.0 0.0 1.5707963</pose><!--1.5707963 1.5707963 -0.02 -->
+      <pose relative_to='base_link'> 0.0 0.0 -0.08 0.0 0.0 1.5707963</pose><!--1.5707963 1.5707963 -0.02 -->
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.05</mass>
+        <mass>0.00000001</mass>
         <inertia>
-          <ixx>0.029125</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.029125</iyy>
-          <iyz>0</iyz>
-          <izz>0.055225</izz>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
         </inertia>
       </inertial>
-      <self_collide> false</self_collide>
       <collision name='gripper_base_link_inertia_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
+          <!-- <empty></empty> -->
           <box>
-            <size>0.02617 0.02689 0.04064</size>
+            <size>0.001 0.001 0.001</size>
           </box>
         </geometry>
         <surface>
@@ -817,7 +794,7 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>0.001 0.001 0.001</scale>
+            <scale>0.0008 0.0008 0.0008</scale>
             <uri>model://falcon/meshes/base.stl</uri>
           </mesh>
         </geometry>
@@ -830,6 +807,7 @@
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
+      <self_collide>false</self_collide>
     </link>
 
     <joint name='gripper_base_joint' type='fixed'>
@@ -844,6 +822,160 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+
+     <link name='gripper_arm_link'>
+      <pose relative_to='gripper_base_link'> 0.0 0.0 0.0 3.1415 3.1415 0.0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='gripper_arm_link_inertia_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.0008 0.0008 0.0008</scale>
+            <uri>model://falcon/meshes/arm_hitbox.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='gripper_arm_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.0008 0.0008 0.0008</scale>
+            <uri>model://falcon/meshes/arm.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>false</self_collide>
+    </link>
+
+    <joint name='gripper_arm_joint' type='revolute'>
+      <child>gripper_arm_link</child>
+      <parent>gripper_base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+      <pose relative_to='gripper_base_link'> 0.0 0.0 0.0 0.0 0.0 0.0</pose>
+    </joint>
+
+    <plugin name='gripper_arm_plugin' filename='libServoPlugin.so'>
+      <subTopic>gripperArm_deg</subTopic>
+      <linkName>gripper_arm_link</linkName>
+      <jointName>gripper_arm_joint</jointName>
+      <initialAngle>180</initialAngle>
+      <turningDirection>0</turningDirection> <!-- 0: clockwise, 1: counterclockwise -->
+    </plugin>
+
+
+    <link name='gripper_finger_link'>
+      <pose relative_to='gripper_arm_link'> 0.0 0.3296 0.0156 1.5707963 4.71238898038 0.0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='gripper_finger_link_inertia_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.0008 0.0008 0.0008</scale>
+            <uri>model://falcon/meshes/finger_hitbox.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='gripper_finger_link_inertia_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.0008 0.0008 0.0008</scale>
+            <uri>model://falcon/meshes/finger.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>false</self_collide>
+    </link>
+
+    <joint name='gripper_finger_joint' type='revolute'>
+      <child>gripper_finger_link</child>
+      <parent>gripper_arm_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <use_parent_model_frame>0</use_parent_model_frame>
+      </axis>
+      <pose relative_to='gripper_arm_link'>  0.0 0.3296 0.0156 0.0 0.0</pose>
+    </joint>
+
+    <plugin name='gripper_finger_plugin' filename='libServoPlugin.so'>
+      <subTopic>gripperFinger_deg</subTopic>
+      <linkName>gripper_finger_link</linkName>
+      <jointName>gripper_finger_joint</jointName>
+      <initialAngle>10</initialAngle>
+      <turningDirection>0</turningDirection> <!-- 0: clockwise, 1: counterclockwise -->
+    </plugin>
+
 
   </model>
 </sdf>

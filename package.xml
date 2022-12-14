@@ -64,6 +64,7 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>std_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
   <depend>rclcpp</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
