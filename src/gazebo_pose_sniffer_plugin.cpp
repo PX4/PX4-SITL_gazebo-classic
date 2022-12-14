@@ -69,7 +69,15 @@ void PoseSnifferPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   while (tracked_link_element) {
     auto link =
         model->GetLink(tracked_link_element->Get<std::string>().c_str());
-    _links.push_back(link);
+    if (link != nullptr) {
+      _links.push_back(link);
+    } else {
+      gzerr << "[gazebo_pose_sniffer_plugin] Link : \""
+            << tracked_link_element->Get<std::string>().c_str()
+            << " \" not found in the sdf file, are you sure of its name or "
+               "that it's not part of an included sdf file ?"
+            << std::endl;
+    }
     tracked_link_element = tracked_link_element->GetNextElement("tracked_link");
   }
   _poses.resize(_links.size());
