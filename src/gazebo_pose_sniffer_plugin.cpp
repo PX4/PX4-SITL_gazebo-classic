@@ -26,9 +26,10 @@ PoseSnifferPlugin::PoseSnifferPlugin() {}
 PoseSnifferPlugin::~PoseSnifferPlugin() {}
 
 void PoseSnifferPlugin::InitializeUdpEndpoint(sdf::ElementPtr const &sdf) {
+    gzerr << "[gazebo_pose_sniffer_plugin] Load: " << sdf->GetName()   << std::endl;
   memset(&_sockaddr, 0, sizeof(_sockaddr));
 
-  _sockaddr.sin_family = AF_INET;  // IPv4
+  _sockaddr.sin_family = AF_INET; // IPv4
 
   if (sdf->HasElement("pose_receiver_ip")) {
     std::string receiver_ip =
@@ -51,6 +52,13 @@ void PoseSnifferPlugin::InitializeUdpEndpoint(sdf::ElementPtr const &sdf) {
     gzmsg << "and port 7000" << std::endl;
   }
 
+  if (sdf->HasElement("vehicle_reference")) {
+    _vehicle_reference = sdf->GetElement("vehicle_reference")->Get<std::string>();
+  } else {
+    _vehicle_reference = "iris";
+  }
+
+
   // Creating socket file descriptor
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     perror("socket creation failed");
@@ -58,11 +66,12 @@ void PoseSnifferPlugin::InitializeUdpEndpoint(sdf::ElementPtr const &sdf) {
   }
 }
 
-
 void PoseSnifferPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
-   InitializeUdpEndpoint(sdf);
+ 
 
-   _update_connection = event::Events::ConnectWorldUpdateBegin(
+  InitializeUdpEndpoint(sdf);
+
+  _update_connection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&PoseSnifferPlugin::OnUpdate, this, _1));
 
   auto tracked_link_element = sdf->GetElement("tracked_link");
@@ -75,7 +84,7 @@ void PoseSnifferPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   _poses.resize(_links.size());
   int i = 0;
   for (auto &pose : _poses) {
-    pose.systemId = 1;
+    // pose.systemId = 1;
     pose.elementId = i;
     ++i;
   }
@@ -98,9 +107,77 @@ void PoseSnifferPlugin::OnUpdate(common::UpdateInfo const &updateInfo) {
     pose_to_update.roll = rotation.Roll();
     ++i;
   }
+
+  uint8_t buffer[256];
+  Vehicle v;
+  v.vehicleId = 1;
+  v.vehicleName = _vehicle_reference;
+  v.poses = _poses;
+
+  Vehicle v2;
+
+  int r = SerializeVehicle(v, buffer);
+  DeserializeVehicle(v2, buffer);
+
   if (!_poses.empty()) {
-    sendto(_fd, (const char *)&_poses.front(),
-           sizeof(_poses[0]) * _poses.size(), MSG_CONFIRM,
+    sendto(_fd, buffer,
+           r, 0,
            (const struct sockaddr *)&_sockaddr, sizeof(_sockaddr));
   }
+}
+
+unsigned int PoseSnifferPlugin::SerializeVehicle(Vehicle const &vehicle,
+                                                 uint8_t (&buffer)[256]) {
+  uint32_t index = 0;
+
+  // 4bytes byte for the vehicleId
+  memcpy(buffer + index, &vehicle.vehicleId, sizeof(vehicle.vehicleId));
+  index += sizeof(vehicle.vehicleId);
+
+  // 4bytes byte for the vehicle name length
+  uint32_t name_size = vehicle.vehicleName.size();
+  memcpy(buffer + index, &name_size, sizeof(name_size));
+  index += sizeof(name_size);
+
+  // vehicle name
+  memcpy(buffer + index, vehicle.vehicleName.c_str(),
+         vehicle.vehicleName.size());
+  index += vehicle.vehicleName.size();
+
+  // 4 bytes for the Node number
+  uint32_t poses_number = vehicle.poses.size();
+  memcpy(buffer + index, &poses_number, sizeof(poses_number));
+  index += sizeof(vehicle.poses.size());
+
+  memcpy(buffer + index, vehicle.poses.data(), vehicle.poses.size() * sizeof(Pose));
+
+  return index;
+}
+
+bool PoseSnifferPlugin::DeserializeVehicle(Vehicle &vehicle,
+                                                 uint8_t const (&buffer)[256]) {
+  uint32_t index = 0;
+
+  // 4bytes byte for the vehicleId
+  memcpy(&vehicle.vehicleId, buffer + index, sizeof(vehicle.vehicleId));
+  index += sizeof(vehicle.vehicleId);
+
+  // 4bytes byte for the vehicle name length
+  uint32_t name_size;
+  memcpy(&name_size, buffer + index, sizeof(name_size));
+  index += sizeof(name_size);
+
+  // vehicle name
+  vehicle.vehicleName.assign((char *)(buffer + index), name_size);
+  index += name_size;
+
+  // 4 bytes for the Node number
+  uint32_t poses_number;
+  memcpy(&poses_number, buffer + index, sizeof(poses_number));
+  index += sizeof(poses_number);
+
+  vehicle.poses.resize(poses_number);
+  memcpy(vehicle.poses.data(), buffer + index, poses_number * sizeof(Pose));
+
+  return true;
 }
