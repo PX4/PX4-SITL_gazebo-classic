@@ -3,7 +3,7 @@
   <model name="object">
     <link name="link">
       <pose>0 0 0 1.57079632679 0 0</pose>
-      <gravity>true</gravity>
+      <gravity>false</gravity>
       <inertial name="inertial">
         <pose>0 0 0 0 0 0</pose>
         <mass>0.00001</mass>
@@ -18,10 +18,15 @@
       </inertial>
 
       <collision name="collision">
+      <!-- <pose>0 0 -2 0 0 0</pose> -->
         <geometry>
-        <box>
+          <cylinder>
+            <length>0.4</length>
+            <radius>0.02</radius>
+          </cylinder>
+        <!-- <box>
           <size>0.02 0.2 0.3</size>
-        </box>
+        </box> -->
         </geometry>
         <surface>
           <contact>
@@ -43,9 +48,13 @@
         <cast_shadows>false</cast_shadows>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <box>
+          <cylinder>
+            <length>0.4</length>
+            <radius>0.02</radius>
+          </cylinder>
+          <!-- <box>
           <size>0.02 0.2 0.3</size>
-        </box>
+        </box> -->
         </geometry>
         <material>
           <script>
