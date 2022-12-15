@@ -228,133 +228,78 @@
       <pose>6.64902 -7.94627 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>101 121000000</sim_time>
-      <real_time>227 243469814</real_time>
-      <wall_time>1629811821 695929535</wall_time>
-      <iterations>101121</iterations>
       <model name='EuroPallet'>
         <pose>-1.72756 -8.87783 0.061865 0.001727 -0.004562 0.246745</pose>
-        <scale>1 1 1</scale>
         <link name='link'>
           <pose>-1.72756 -8.87783 0.061865 0.001727 -0.004562 0.246745</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.072978 0.257615 0.114679 -0.275638 0.073032 0.400516</acceleration>
-          <wrench>1.82444 6.44036 2.86699 0 -0 0</wrench>
         </link>
       </model>
       <model name='EuroPallet_0'>
-        <pose>-1.38113 -8.5102 0.073849 0.00101 0.0174 0.520475</pose>
-        <scale>1 1 1</scale>
+        <pose>-1.1 -9.0 0.2 0.00101 0.0174 0.520475</pose>
         <link name='link'>
-          <pose>-1.38113 -8.5102 0.073849 0.00101 0.0174 0.520475</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>-0.000456 0.345527 0.043047 -0.364335 0.018671 0.211824</acceleration>
-          <wrench>-0.011396 8.63819 1.07618 0 -0 0</wrench>
+          <pose>-1.1 -9.0 0.2 0.00101 0.0174 0.520475</pose>
         </link>
       </model>
       <model name='EuroPallet_1'>
-        <pose>-2.27651 -7.75114 0.0635 -3e-06 -1e-06 0.008197</pose>
-        <scale>1 1 1</scale>
+        <pose>-2.27651 -7.75114 0.0635 0.0 0.0 0.008197</pose>
         <link name='link'>
-          <pose>-2.27651 -7.75114 0.0635 -3e-06 -1e-06 0.008197</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>-0.079115 0.176793 0.057424 -2.56929 -1.19716 0.010425</acceleration>
-          <wrench>-1.97787 4.41981 1.4356 0 -0 0</wrench>
+          <pose>-2.27651 -7.75114 0.0635 0.0 0.0 0.008197</pose>
         </link>
       </model>
       <model name='EuroPallet_2'>
         <pose>-1.09738 -7.28374 0.062318 0.00028 -0.002704 -0.7038</pose>
-        <scale>1 1 1</scale>
         <link name='link'>
           <pose>-1.09738 -7.28374 0.062318 0.00028 -0.002704 -0.7038</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.981733 -0.591621 -10.4806 1.87051 -0.330603 -0.615939</acceleration>
-          <wrench>24.5433 -14.7905 -262.015 0 -0 0</wrench>
         </link>
       </model>
       <model name='EuroPallet_3'>
-        <pose>-2.0333 -7.09947 0.21689 3.07019 -0.179045 -0.720548</pose>
-        <scale>1 1 1</scale>
+        <pose>-2.0333 -7.09947 0.3 3.07019 -0.179045 -0.720548</pose>
         <link name='link'>
-          <pose>-2.0333 -7.09947 0.21689 3.07019 -0.179045 -0.720548</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>2.22739 -1.08619 -4.61492 -2.78222 0.332944 -2.41418</acceleration>
-          <wrench>55.6848 -27.1547 -115.373 0 -0 0</wrench>
+          <pose>-2.0333 -7.09947 0.3 3.07019 -0.179045 -0.720548</pose>
         </link>
       </model>
       <model name='Shelves high'>
         <pose>6.64902 -7.94627 0 0 -0 0</pose>
-        <scale>1 1 1</scale>
         <link name='link'>
           <pose>6.64902 -7.94627 0 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='ground_plane'>
         <pose>0 0 0 0 -0 0</pose>
-        <scale>1 1 1</scale>
         <link name='link'>
           <pose>0 0 0 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='oak_tree'>
         <pose>-9.08674 7.54965 0 0 -0 0</pose>
-        <scale>1 1 1</scale>
         <link name='link'>
           <pose>-9.08674 7.54965 0 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='ramp'>
         <pose>7.71205 7.95431 0.2 0 0.15 0</pose>
-        <scale>1 1 1</scale>
         <link name='link'>
           <pose>7.71205 7.95431 0.2 0 0.15 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='unit_box'>
-        <pose>6.9155 -2.903 0.499995 0 1e-05 0</pose>
-        <scale>1 1 1</scale>
+        <pose>6.9155 -2.903 0.5 0 0 0</pose>
         <link name='link'>
-          <pose>6.9155 -2.903 0.499995 0 1e-05 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0.010615 -0.006191 -9.78231 0.012424 0.021225 1.8e-05</acceleration>
-          <wrench>0.010615 -0.006191 -9.78231 0 -0 0</wrench>
+          <pose>6.9155 -2.903 0.5 0 0 0</pose>
         </link>
       </model>
       <model name='unit_cylinder'>
-        <pose>5.10526 -1.94042 0.499998 3e-06 -4e-06 0</pose>
-        <scale>1 1 1</scale>
+        <pose>5.10526 -1.94042 0.5 0 0 0</pose>
         <link name='link'>
-          <pose>5.10526 -1.94042 0.499998 3e-06 -4e-06 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 -9.8 0 -0 0</acceleration>
-          <wrench>0 0 -9.8 0 -0 0</wrench>
+          <pose>5.10526 -1.94042 0.5 0 0 0</pose>
         </link>
       </model>
       <model name='unit_cylinder_0'>
-        <pose>7.29937 -0.680724 0.499998 3e-06 -4e-06 0</pose>
-        <scale>1 1 1</scale>
+        <pose>7.29937 -0.680724 0.5 0 0 0</pose>
         <link name='link'>
-          <pose>7.29937 -0.680724 0.499998 3e-06 -4e-06 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 -9.8 0 -0 0</acceleration>
-          <wrench>0 0 -9.8 0 -0 0</wrench>
+          <pose>7.29937 -0.680724 0.5 0 0 0</pose>
         </link>
       </model>
-      <light name='sun'>
-        <pose>0 0 10 0 -0 0</pose>
-      </light>
     </state>
     <model name='unit_cylinder'>
       <pose>5.10526 -1.94042 0.5 0 -0 0</pose>
