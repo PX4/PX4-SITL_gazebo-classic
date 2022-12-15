@@ -143,7 +143,7 @@ void MavlinkInterface::Load()
         // TCP client mode
         local_simulator_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
         local_simulator_addr_.sin_port = htons(0);
-        remote_simulator_addr_.sin_addr.s_addr = htonl(mavlink_addr_);
+        remote_simulator_addr_.sin_addr.s_addr = mavlink_addr_;
         remote_simulator_addr_.sin_port = htons(mavlink_tcp_port_);
         memset(fds_, 0, sizeof(fds_));
       } else {
