@@ -108,7 +108,7 @@ void PoseSnifferPlugin::OnUpdate(common::UpdateInfo const &updateInfo) {
   }
   if (!_poses.empty()) {
     sendto(_fd, (const char *)&_poses.front(),
-           sizeof(_poses[0]) * _poses.size(), MSG_CONFIRM,
+           sizeof(_poses[0]) * _poses.size(), 0,
            (const struct sockaddr *)&_sockaddr, sizeof(_sockaddr));
   }
 }
