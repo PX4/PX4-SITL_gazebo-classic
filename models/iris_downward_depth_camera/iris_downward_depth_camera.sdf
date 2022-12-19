@@ -7,7 +7,7 @@
 
     <include>
       <uri>model://depth_camera</uri>
-      <pose>0.1 0 0 0 1.5708 0</pose>
+      <pose>0.108 0 -0.01 0 1.5708 0</pose>
     </include>
     <joint name="depth_camera_joint" type="revolute">
       <child>depth_camera::link</child>
