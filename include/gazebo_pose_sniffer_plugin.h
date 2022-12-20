@@ -34,7 +34,7 @@
 namespace gazebo {
 
 struct Pose {
-  unsigned int elementId;
+  uint32_t elementId;
   double x;
   double y;
   double z;
@@ -50,13 +50,14 @@ struct Vehicle {
 };
 
 class GAZEBO_VISIBLE PoseSnifferPlugin : public ModelPlugin {
+  constexpr static uint32_t BUFFERSIZE = 256; 
  private:
   int _fd = -1;
   struct sockaddr_in _sockaddr;
-  uint8_t _buff[1024];
+  uint8_t _buffer[BUFFERSIZE];
   std::string _pose_receiver_ip;
   int _pose_receiver_port;
-  std::string _vehicle_reference;
+  std::string _vehicle_name;
   event::ConnectionPtr _update_connection;
   
   std::vector<gazebo::physics::LinkPtr> _links;
@@ -67,8 +68,8 @@ class GAZEBO_VISIBLE PoseSnifferPlugin : public ModelPlugin {
   * @brief serialize the vehicle into a byte array ready to be sent over udp
   * return true if the serialization succeeded
   */
-  unsigned int SerializeVehicle(Vehicle const &vehicle, uint8_t  (&buffer)[256]);
-  bool DeserializeVehicle(Vehicle &vehicle, uint8_t const (&buffer)[256]);
+  unsigned int SerializeVehicle(Vehicle const &vehicle, uint8_t  (&buffer)[BUFFERSIZE]);
+  bool DeserializeVehicle(Vehicle &vehicle, uint8_t const (&buffer)[BUFFERSIZE]);
 
  public:
   PoseSnifferPlugin();

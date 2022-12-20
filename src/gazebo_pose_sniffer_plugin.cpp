@@ -26,7 +26,6 @@ PoseSnifferPlugin::PoseSnifferPlugin() {}
 PoseSnifferPlugin::~PoseSnifferPlugin() {}
 
 void PoseSnifferPlugin::InitializeUdpEndpoint(sdf::ElementPtr const &sdf) {
-    gzerr << "[gazebo_pose_sniffer_plugin] Load: " << sdf->GetName()   << std::endl;
   memset(&_sockaddr, 0, sizeof(_sockaddr));
 
   _sockaddr.sin_family = AF_INET; // IPv4
@@ -52,12 +51,11 @@ void PoseSnifferPlugin::InitializeUdpEndpoint(sdf::ElementPtr const &sdf) {
     gzmsg << "and port 7000" << std::endl;
   }
 
-  if (sdf->HasElement("vehicle_reference")) {
-    _vehicle_reference = sdf->GetElement("vehicle_reference")->Get<std::string>();
+  if (sdf->HasElement("vehicle_name")) {
+    _vehicle_name = sdf->GetElement("vehicle_name")->Get<std::string>();
   } else {
-    _vehicle_reference = "iris";
+    _vehicle_name = "iris";
   }
-
 
   // Creating socket file descriptor
   if ((_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -67,8 +65,6 @@ void PoseSnifferPlugin::InitializeUdpEndpoint(sdf::ElementPtr const &sdf) {
 }
 
 void PoseSnifferPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
- 
-
   InitializeUdpEndpoint(sdf);
 
   _update_connection = event::Events::ConnectWorldUpdateBegin(
@@ -92,7 +88,6 @@ void PoseSnifferPlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   _poses.resize(_links.size());
   int i = 0;
   for (auto &pose : _poses) {
-    // pose.systemId = 1;
     pose.elementId = i;
     ++i;
   }
@@ -113,29 +108,26 @@ void PoseSnifferPlugin::OnUpdate(common::UpdateInfo const &updateInfo) {
     pose_to_update.pitch = rotation.Pitch();
     pose_to_update.yaw = rotation.Yaw();
     pose_to_update.roll = rotation.Roll();
+    pose_to_update.elementId = i;
     ++i;
   }
 
-  uint8_t buffer[256];
   Vehicle v;
   v.vehicleId = 1;
-  v.vehicleName = _vehicle_reference;
+  v.vehicleName = _vehicle_name;
   v.poses = _poses;
 
-  Vehicle v2;
-
-  int r = SerializeVehicle(v, buffer);
-  DeserializeVehicle(v2, buffer);
+  int r = SerializeVehicle(v, _buffer);
 
   if (!_poses.empty()) {
-    sendto(_fd, buffer,
-           r, 0,
-           (const struct sockaddr *)&_sockaddr, sizeof(_sockaddr));
+    sendto(_fd, _buffer, r, 0, (const struct sockaddr *)&_sockaddr,
+           sizeof(_sockaddr));
   }
 }
 
-unsigned int PoseSnifferPlugin::SerializeVehicle(Vehicle const &vehicle,
-                                                 uint8_t (&buffer)[256]) {
+unsigned int
+PoseSnifferPlugin::SerializeVehicle(Vehicle const &vehicle,
+                                    uint8_t (&buffer)[BUFFERSIZE]) {
   uint32_t index = 0;
 
   // 4bytes byte for the vehicleId
@@ -155,15 +147,17 @@ unsigned int PoseSnifferPlugin::SerializeVehicle(Vehicle const &vehicle,
   // 4 bytes for the Node number
   uint32_t poses_number = vehicle.poses.size();
   memcpy(buffer + index, &poses_number, sizeof(poses_number));
-  index += sizeof(vehicle.poses.size());
+  index += sizeof(poses_number);
 
-  memcpy(buffer + index, vehicle.poses.data(), vehicle.poses.size() * sizeof(Pose));
-
+  // vector of transforms
+  memcpy(buffer + index, vehicle.poses.data(),
+         vehicle.poses.size() * sizeof(Pose));
+  index += vehicle.poses.size() * sizeof(Pose);
   return index;
 }
 
-bool PoseSnifferPlugin::DeserializeVehicle(Vehicle &vehicle,
-                                                 uint8_t const (&buffer)[256]) {
+bool PoseSnifferPlugin::DeserializeVehicle(
+    Vehicle &vehicle, uint8_t const (&buffer)[BUFFERSIZE]) {
   uint32_t index = 0;
 
   // 4bytes byte for the vehicleId
@@ -184,6 +178,7 @@ bool PoseSnifferPlugin::DeserializeVehicle(Vehicle &vehicle,
   memcpy(&poses_number, buffer + index, sizeof(poses_number));
   index += sizeof(poses_number);
 
+  // vector of transforms
   vehicle.poses.resize(poses_number);
   memcpy(vehicle.poses.data(), buffer + index, poses_number * sizeof(Pose));
 
