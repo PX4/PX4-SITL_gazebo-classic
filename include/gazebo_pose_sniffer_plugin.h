@@ -25,6 +25,9 @@
 #include <vector>
 #include <sys/socket.h>
 
+#include <gazebo/common/common.hh>
+#include <gazebo/util/system.hh>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/physics/physics.hh>
 

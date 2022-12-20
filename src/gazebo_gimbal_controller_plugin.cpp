@@ -348,7 +348,7 @@ void GimbalControllerPlugin::Load(physics::ModelPtr _model,
     gzerr << "GimbalControllerPlugin::Load ERROR! Can't get imu sensor '"
           << cameraImuSensorName << "' " << endl;
   }
-  
+
   const char *host_ip = std::getenv("PX4_VIDEO_HOST_IP");
   if (host_ip) {
     this->udp_gimbal_host_ip = std::string(host_ip);
@@ -734,7 +734,9 @@ void GimbalControllerPlugin::SendGimbalDeviceAttitudeStatus()
     angularVelocity.X(),
     angularVelocity.Y(),
     angularVelocity.Z(),
-    failureFlags);
+    failureFlags,
+    NAN, // per mavlink spec - NAN if unknown
+    NAN); // per mavlink spec - NAN if unknown
   SendMavlinkMessage(msg);
 }
 
