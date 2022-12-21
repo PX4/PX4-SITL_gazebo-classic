@@ -178,13 +178,6 @@ void MavlinkInterface::Load()
         abort();
       }
 
-      // set socket to non-blocking
-      int result = fcntl(simulator_socket_fd_, F_SETFL, O_NONBLOCK);
-      if (result == -1) {
-        std::cerr << "setting socket to non-blocking failed: " << strerror(errno) << ", aborting" << std::endl;
-        abort();
-      }
-
       if (bind(simulator_socket_fd_, (struct sockaddr *)&local_simulator_addr_, local_simulator_addr_len_) < 0) {
         std::cerr << "bind failed: " << strerror(errno) << ", aborting" << std::endl;
         abort();
