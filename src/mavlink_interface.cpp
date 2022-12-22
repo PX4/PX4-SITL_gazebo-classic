@@ -376,6 +376,7 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
 
   HILData* data = &hil_data;
   mavlink_hil_sensor_t sensor_msg;
+  sensor_msg.fields_updated = 0;
   sensor_msg.id = data->id;
   sensor_msg.time_usec = time_usec;
   if (data->imu_updated) {
