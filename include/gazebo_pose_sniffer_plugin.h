@@ -23,6 +23,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <boost/bind.hpp>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/physics/physics.hh>
@@ -48,7 +49,7 @@ class GAZEBO_VISIBLE PoseSnifferPlugin : public ModelPlugin {
   std::string _pose_receiver_ip;
   int _pose_receiver_port;
   event::ConnectionPtr _update_connection;
-  
+
   std::vector<gazebo::physics::LinkPtr> _links;
   std::vector<Pose> _poses;
   void InitializeUdpEndpoint(sdf::ElementPtr const &sdf);
