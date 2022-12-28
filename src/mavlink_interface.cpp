@@ -377,7 +377,12 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec, HILData &hil_data)
   HILData* data = &hil_data;
   mavlink_hil_sensor_t sensor_msg;
   sensor_msg.fields_updated = 0;
-  sensor_msg.id = data->id;
+  /* Workaround for mavlinkv2 zero-suppression bug
+     Set last byte of message to non-zero to avoid zero-suppression. PX4
+     assumes that sensor_id of hil_sensors message is always 0, so there
+     is similar workaround in receiver end to reset the field back to zero.
+  */
+  sensor_msg.id = 1;
   sensor_msg.time_usec = time_usec;
   if (data->imu_updated) {
     sensor_msg.xacc = data->accel_b[0];
