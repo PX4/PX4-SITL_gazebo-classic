@@ -1,4 +1,4 @@
-FROM ros:galactic-ros-base AS builder
+FROM ros:humble-ros-base AS builder
 
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
@@ -6,7 +6,7 @@ ENV LC_ALL C.UTF-8
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     build-essential git wget cmake lsb-core ninja-build \
-    ros-galactic-gazebo-ros \
+    ros-humble-gazebo-ros \
     libopencv-dev \
     libgstreamer-plugins-base1.0-dev \
     python3-jinja2 \
@@ -26,7 +26,7 @@ COPY . .
 
 SHELL ["/bin/bash", "-c"]
 
-RUN source /opt/ros/galactic/setup.bash && \
+RUN source /opt/ros/humble/setup.bash && \
     mkdir -p build && \
     cd build && \
     cmake .. && \

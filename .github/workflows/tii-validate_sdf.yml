@@ -2,7 +2,7 @@ name: TII Validate SDF files
 
 on:
   push:
-    branches: [ main, rebase_main ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -10,7 +10,7 @@ jobs:
   validate-sdf:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout mavlink-router
+      - name: Checkout PX4-SITL_gazebo
         uses: actions/checkout@v2
         with:
           submodules: recursive
