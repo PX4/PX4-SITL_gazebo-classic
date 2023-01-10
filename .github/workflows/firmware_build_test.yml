@@ -71,7 +71,7 @@ jobs:
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
-      run: make px4_sitl_default gazebo
+      run: make px4_sitl_default gazebo_iris
     - name: ccache post-run px4/firmware
       run: ccache -s
     - name: Build MAVSDK tests
@@ -79,7 +79,7 @@ jobs:
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
-      run: make px4_sitl_default gazebo mavsdk_tests
+      run: make px4_sitl_default gazebo_iris mavsdk_tests
     - name: ccache post-run mavsdk_tests
       run: ccache -s
     - name: Run SITL tests
