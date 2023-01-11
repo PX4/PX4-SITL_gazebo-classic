@@ -61,10 +61,19 @@ UserCameraPlugin::UserCameraPlugin()
   update_connection_ =
       event::Events::ConnectPreRender(
           boost::bind(&UserCameraPlugin::OnUpdate, this));
-  
+
   const char *model = std::getenv("PX4_SIM_MODEL");
   if (model) {
     model_name_ = std::string(model);
+
+    // Remove gazebo_ substring
+    // Model name in `PX4_SIM_MODEL` includes the gazebo substring after
+    // https://github.com/PX4/PX4-Autopilot/pull/20867
+    std:: string prefix = "gazebo_";
+    std::size_t ind = model_name_.find(prefix);
+    if(ind !=std::string::npos){
+        model_name_.erase(ind,prefix.length());
+    }
   }
 }
 
