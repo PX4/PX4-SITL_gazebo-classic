@@ -22,6 +22,7 @@
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <vector>
 #include <sys/socket.h>
 
 #include <gazebo/common/common.hh>
@@ -33,8 +34,7 @@
 namespace gazebo {
 
 struct Pose {
-  unsigned int systemId;
-  unsigned int elementId;
+  uint32_t elementId;
   double x;
   double y;
   double z;
@@ -43,18 +43,33 @@ struct Pose {
   double roll;
 };
 
+struct Vehicle {
+  uint32_t vehicleId;
+  std::string vehicleName;
+  std::vector<Pose> poses;
+};
+
 class GAZEBO_VISIBLE PoseSnifferPlugin : public ModelPlugin {
+  constexpr static uint32_t BUFFERSIZE = 256; 
  private:
   int _fd = -1;
   struct sockaddr_in _sockaddr;
-  uint8_t _buff[1024];
+  uint8_t _buffer[BUFFERSIZE];
   std::string _pose_receiver_ip;
   int _pose_receiver_port;
+  std::string _vehicle_name;
   event::ConnectionPtr _update_connection;
   
   std::vector<gazebo::physics::LinkPtr> _links;
   std::vector<Pose> _poses;
   void InitializeUdpEndpoint(sdf::ElementPtr const &sdf);
+
+  /* 
+  * @brief serialize the vehicle into a byte array ready to be sent over udp
+  * return true if the serialization succeeded
+  */
+  unsigned int SerializeVehicle(Vehicle const &vehicle, uint8_t  (&buffer)[BUFFERSIZE]);
+  bool DeserializeVehicle(Vehicle &vehicle, uint8_t const (&buffer)[BUFFERSIZE]);
 
  public:
   PoseSnifferPlugin();
