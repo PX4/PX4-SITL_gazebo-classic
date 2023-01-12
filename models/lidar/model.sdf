@@ -50,7 +50,7 @@
         <plugin name="LaserPlugin" filename="libgazebo_lidar_plugin.so">
           <robotNamespace></robotNamespace>
           <min_distance>0.2</min_distance>
-          <max_distance>15.0</max_distance>
+          <max_distance>100.0</max_distance>
         </plugin>
         <always_on>1</always_on>
         <update_rate>20</update_rate>
