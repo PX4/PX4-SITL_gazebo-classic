@@ -97,7 +97,7 @@ void IRLockPlugin::OnUpdated()
 
     gazebo::msgs::LogicalCameraImage_Model model = img.model(idx);
 
-    if (model.has_name() && model.name() == "irlock_beacon") {
+    if (model.has_name() && model.name() == "land_pad") {
 
       if (model.has_pose()) {
 

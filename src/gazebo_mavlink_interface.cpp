@@ -211,6 +211,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
       opticalFlow_sub_topic_, opticalFlow_sub_topic_);
   getSdfParam<std::string>(_sdf, "irlockSubTopic", irlock_sub_topic_, irlock_sub_topic_);
   getSdfParam<std::string>(_sdf, "magSubTopic", mag_sub_topic_, mag_sub_topic_);
+  getSdfParam<std::string>(_sdf, "targetGpsSubTopic", target_gps_sub_topic_, target_gps_sub_topic_);
+  getSdfParam<std::string>(_sdf, "arucoMarkerSubTopic", arucoMarker_sub_topic_, arucoMarker_sub_topic_);
   getSdfParam<std::string>(_sdf, "baroSubTopic", baro_sub_topic_, baro_sub_topic_);
   getSdfParam<std::string>(_sdf, "groundtruthSubTopic", groundtruth_sub_topic_, groundtruth_sub_topic_);
 
@@ -421,6 +423,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
+  target_gps_sub_ = node_handle_->Subscribe("~/" + target_gps_sub_topic_, &GazeboMavlinkInterface::TargetGpsCallback, this);
+  arucoMarker_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + arucoMarker_sub_topic_, &GazeboMavlinkInterface::ArucoMarkerCallback, this);
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
@@ -938,8 +942,9 @@ void GazeboMavlinkInterface::SonarCallback(SonarPtr& sonar_message, const int& i
 }
 
 void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
+
   mavlink_landing_target_t sensor_msg;
-  sensor_msg.time_usec = irlock_message->time_usec() / 1e3;
+  sensor_msg.time_usec = irlock_message->time_usec();
   sensor_msg.target_num = irlock_message->signature();
   sensor_msg.angle_x = irlock_message->pos_x();
   sensor_msg.angle_y = irlock_message->pos_y();
@@ -954,6 +959,44 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 
   mavlink_message_t msg;
   mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  mavlink_interface_->send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_message) {
+  
+  mavlink_landing_target_t sensor_msg;
+  sensor_msg.time_usec = arucoMarker_message->time_usec();
+  sensor_msg.x = arucoMarker_message->pos_x();
+  sensor_msg.y = arucoMarker_message->pos_y();
+  sensor_msg.z = arucoMarker_message->pos_z();
+  sensor_msg.position_valid = true;
+  sensor_msg.type = LANDING_TARGET_TYPE_VISION_FIDUCIAL;
+
+  mavlink_message_t msg;
+  mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  mavlink_interface_->send_mavlink_message(&msg);
+}
+
+void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
+
+  mavlink_follow_target_t gps_data;
+
+  gps_data.timestamp = gps_msg->time_usec();
+  gps_data.lat = gps_msg->latitude_deg() * 1e7;
+  gps_data.lon = gps_msg->longitude_deg() * 1e7;
+  gps_data.alt = gps_msg->altitude();
+  gps_data.position_cov[0] = gps_msg->eph() * 100.0;
+  gps_data.position_cov[1] = gps_msg->eph() * 100.0;
+  gps_data.position_cov[2] = gps_msg->epv() * 100.0;
+  gps_data.vel[0] = gps_msg->velocity_north();
+  gps_data.vel[1] = gps_msg->velocity_east();
+  gps_data.vel[2] = -gps_msg->velocity_up();
+
+  /* Velocity capabilities */
+  gps_data.est_capabilities = 2;
+
+  mavlink_message_t msg;
+  mavlink_msg_follow_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_data);
   mavlink_interface_->send_mavlink_message(&msg);
 }
 

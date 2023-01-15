@@ -37,5 +37,22 @@
       </axis>
     </joint>
 
+    <!--aruco camera-->
+    <include>
+      <uri>model://aruco_cam</uri>
+      <pose>0.0 0 0.0 0 0 0</pose>
+    </include>
+    <joint name="aruco_cam_joint" type="revolute">
+      <parent>iris::base_link</parent>
+      <child>aruco_cam::link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
+
   </model>
 </sdf>
