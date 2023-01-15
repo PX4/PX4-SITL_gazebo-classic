@@ -69,7 +69,7 @@ UserCameraPlugin::UserCameraPlugin()
     // Remove gazebo_ substring
     // Model name in `PX4_SIM_MODEL` includes the gazebo substring after
     // https://github.com/PX4/PX4-Autopilot/pull/20867
-    std:: string prefix = "gazebo_";
+    std:: string prefix = "gazebo-classic_";
     std::size_t ind = model_name_.find(prefix);
     if(ind !=std::string::npos){
         model_name_.erase(ind,prefix.length());
