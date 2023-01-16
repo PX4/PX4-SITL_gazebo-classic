@@ -7,4 +7,5 @@ message ArucoMarker
   required float pos_x		= 2;
   required float pos_y		= 3;
   required float pos_z    = 4;
+  required float yaw      = 5;
 }

@@ -969,6 +969,7 @@ void GazeboMavlinkInterface::ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_mes
   sensor_msg.x = arucoMarker_message->pos_x();
   sensor_msg.y = arucoMarker_message->pos_y();
   sensor_msg.z = arucoMarker_message->pos_z();
+  sensor_msg.angle_x = arucoMarker_message->yaw(); // TODO: modify MAVLINK msg to have a yaw field
   sensor_msg.position_valid = true;
   sensor_msg.type = LANDING_TARGET_TYPE_VISION_FIDUCIAL;
 
@@ -985,9 +986,9 @@ void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
   gps_data.lat = gps_msg->latitude_deg() * 1e7;
   gps_data.lon = gps_msg->longitude_deg() * 1e7;
   gps_data.alt = gps_msg->altitude();
-  gps_data.position_cov[0] = gps_msg->eph() * 100.0;
-  gps_data.position_cov[1] = gps_msg->eph() * 100.0;
-  gps_data.position_cov[2] = gps_msg->epv() * 100.0;
+  gps_data.position_cov[0] = gps_msg->eph();
+  gps_data.position_cov[1] = gps_msg->eph();
+  gps_data.position_cov[2] = gps_msg->epv();
   gps_data.vel[0] = gps_msg->velocity_north();
   gps_data.vel[1] = gps_msg->velocity_east();
   gps_data.vel[2] = -gps_msg->velocity_up();

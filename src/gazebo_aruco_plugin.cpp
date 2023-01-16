@@ -228,7 +228,51 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
       arucoMarker_message.set_pos_y(vcNED_pose[1]);
       arucoMarker_message.set_pos_z(vcNED_pose[2]);
 
+      /* Convert rvec to the target orientation with respect to the drone */
+      cv::Mat rotMat;
+      cv::Rodrigues(rvec[0], rotMat);
+      float yaw = computeYaw(rotMat);
+
+      /* Get the drone's heading (NED) */
+      ignition::math::Vector3d euler = q_nb.Euler();
+      float drone_yaw = wrap_2pi(euler.Z());
+
+      /* Target yaw [0,2pi], angle positive from north to east*/
+      float target_ned_yaw = wrap_2pi(yaw + drone_yaw);
+
+      arucoMarker_message.set_yaw(target_ned_yaw);
+
       arucoMarker_pub_->Publish(arucoMarker_message);
     }
   }
+}
+
+float arucoMarkerPlugin::wrap_2pi(float yaw)
+{
+    float yaw_2pi = yaw;
+
+    if (!(0.f <= yaw && yaw < M_TWOPI))
+    {
+        yaw_2pi = yaw - M_TWOPI * floor(yaw / M_TWOPI);
+    }
+
+    return yaw_2pi;
+}
+
+float arucoMarkerPlugin::computeYaw(cv::Mat R)
+{
+    // https://learnopencv.com/rotation-matrix-to-euler-angles/
+
+    // Check for singularity
+    float sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) + R.at<double>(1, 0) * R.at<double>(1, 0));
+
+    if (sy > 1e-6)
+    {
+        float z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
+        return wrap_2pi(z);
+    }
+    else
+    {
+        return 0;
+    }
 }
