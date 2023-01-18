@@ -13,4 +13,8 @@ message IRLock
   optional double q_x = 8;
   optional double q_y = 9;
   optional double q_z = 10;
+  optional double attitude_q_w = 11;
+  optional double attitude_q_x = 12;
+  optional double attitude_q_y = 13;
+  optional double attitude_q_z = 14;
 }

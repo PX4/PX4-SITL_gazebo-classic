@@ -58,7 +58,6 @@ arucoMarkerPlugin::~arucoMarkerPlugin()
 /////////////////////////////////////////////////
 void arucoMarkerPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 {
-  // model_ = GetParentModel(_sensor);
 
   if (!_sensor){
     gzerr << "Invalid sensor pointer.\n";
@@ -137,11 +136,11 @@ void arucoMarkerPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   // Store the pointer to the model.
   if (model_ == NULL)
-  #if GAZEBO_MAJOR_VERSION >= 9
-      model_ = world_->ModelByName(model_name_);
-  #else
-      model_ = world_->GetModel(model_name_);
-  #endif
+#if GAZEBO_MAJOR_VERSION >= 9
+    model_ = world_->ModelByName(model_name_);
+#else
+    model_ = world_->GetModel(model_name_);
+#endif
 
   /* Get the land pad size */
   auto mo = world_->ModelByName("land_pad");
@@ -188,7 +187,6 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
   #endif
 
   /* Get the attitude of the drone to convert observation from body to vehicle-carried NED frame */
-  ignition::math::Vector3d& pos_W_I = T_W_I.Pos();
   ignition::math::Quaterniond& att_W_I = T_W_I.Rot();
 
   /* Get camera frame */
@@ -209,11 +207,8 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
     
     if(rvec.size() > 0){
 
-      /* Convert tvec FRD [mm] to vc-NED [m] */
+      /* Convert tvec [mm] to body frame FRD [m] */
       ignition::math::Vector3d body_pose(tvec[0](0) / 1000, tvec[0](1) / 1000, tvec[0](2) / 1000);
-      ignition::math::Quaterniond q_FLU_to_NED = q_ENU_to_NED * att_W_I;
-      ignition::math::Quaterniond q_nb = q_FLU_to_NED * q_FLU_to_FRD.Inverse();
-      ignition::math::Vector3d vcNED_pose =  q_nb.RotateVector(body_pose);
 
       /* Get the current simulation time */
       #if GAZEBO_MAJOR_VERSION >= 9
@@ -224,23 +219,25 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
 
       /* Send the message */
       arucoMarker_message.set_time_usec(now.Double() * 1e6);
-      arucoMarker_message.set_pos_x(vcNED_pose[0]);
-      arucoMarker_message.set_pos_y(vcNED_pose[1]);
-      arucoMarker_message.set_pos_z(vcNED_pose[2]);
+      arucoMarker_message.set_pos_x(body_pose[0]);
+      arucoMarker_message.set_pos_y(body_pose[1]);
+      arucoMarker_message.set_pos_z(body_pose[2]);
 
-      /* Convert rvec to the target orientation with respect to the drone */
+      /* Save the attitude of the drone when the frame was grabbed, will allow to transform from FRD to vc-NED */
+      ignition::math::Quaterniond q_FLU_to_NED = q_ENU_to_NED * att_W_I;
+      ignition::math::Quaterniond q_nb = q_FLU_to_NED * q_FLU_to_FRD.Inverse();
+
+      arucoMarker_message.set_attitude_q_w(q_nb.W());
+      arucoMarker_message.set_attitude_q_x(q_nb.X());
+      arucoMarker_message.set_attitude_q_y(q_nb.Y());
+      arucoMarker_message.set_attitude_q_z(q_nb.Z());
+
+      /* Convert rvec to the target orientation with respect to the drone's body frame */
       cv::Mat rotMat;
       cv::Rodrigues(rvec[0], rotMat);
       float yaw = computeYaw(rotMat);
 
-      /* Get the drone's heading (NED) */
-      ignition::math::Vector3d euler = q_nb.Euler();
-      float drone_yaw = wrap_2pi(euler.Z());
-
-      /* Target yaw [0,2pi], angle positive from north to east*/
-      float target_ned_yaw = wrap_2pi(yaw + drone_yaw);
-
-      arucoMarker_message.set_yaw(target_ned_yaw);
+      arucoMarker_message.set_yaw(yaw);
 
       arucoMarker_pub_->Publish(arucoMarker_message);
     }

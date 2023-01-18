@@ -957,6 +957,11 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   sensor_msg.position_valid = false;
   sensor_msg.type = LANDING_TARGET_TYPE_LIGHT_BEACON;
 
+  sensor_msg.q[0] = irlock_message->attitude_q_w();
+  sensor_msg.q[1] = irlock_message->attitude_q_x();
+  sensor_msg.q[2] = irlock_message->attitude_q_y();
+  sensor_msg.q[3] = irlock_message->attitude_q_z();
+
   mavlink_message_t msg;
   mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
   mavlink_interface_->send_mavlink_message(&msg);
@@ -972,6 +977,11 @@ void GazeboMavlinkInterface::ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_mes
   sensor_msg.angle_x = arucoMarker_message->yaw(); // TODO: modify MAVLINK msg to have a yaw field
   sensor_msg.position_valid = true;
   sensor_msg.type = LANDING_TARGET_TYPE_VISION_FIDUCIAL;
+
+  sensor_msg.q[0] = arucoMarker_message->attitude_q_w();
+  sensor_msg.q[1] = arucoMarker_message->attitude_q_x();
+  sensor_msg.q[2] = arucoMarker_message->attitude_q_y();
+  sensor_msg.q[3] = arucoMarker_message->attitude_q_z();
 
   mavlink_message_t msg;
   mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);

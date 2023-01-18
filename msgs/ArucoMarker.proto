@@ -8,4 +8,8 @@ message ArucoMarker
   required float pos_y		= 3;
   required float pos_z    = 4;
   required float yaw      = 5;
+  optional double attitude_q_w  = 7;
+  optional double attitude_q_x  = 8;
+  optional double attitude_q_y  = 9;
+  optional double attitude_q_z  = 10;
 }
