@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="VideoCamera">
+
+    <plugin name="color_camera_plugin" filename="libVideoPlugin.so">
+      <fileName>"./myVideo.avi"</fileName>
+    </plugin>
+
+    <link name="VideoCamera_link">
+      <gravity>false</gravity>
+      <inertial>
+        <mass>0.0615752</mass>
+        <inertia>
+          <ixx>9.108e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.51e-06</iyy>
+          <iyz>0</iyz>
+          <izz>8.931e-05</izz>
+        </inertia>
+        <pose>0 0 0 0 -0 0</pose>
+      </inertial>
+      <self_collide>false</self_collide>
+      <kinematic>0</kinematic>
+      <gravity>1</gravity>
+      <visual name="visual">
+        <geometry>
+           <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+      </visual>
+      <collision name='collision'>
+        <laser_retro>0</laser_retro>
+        <max_contacts>10</max_contacts>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 0.1 0.1</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0</slip1>
+              <slip2>0</slip2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <sensor name="VideoCamera_color" type="camera">
+        <pose>0 0 0 0 0 0</pose>x
+        <camera name="__default__">
+          <horizontal_fov>1.1</horizontal_fov> <!--1.047-->
+          <image>
+            <width>1920</width>
+            <height>1080</height>
+            <format>RGB_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>500</update_rate>
+        <visualize>1</visualize>
+      </sensor>
+    </link>
+  </model>
+</sdf>

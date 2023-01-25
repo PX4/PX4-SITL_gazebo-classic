@@ -37,7 +37,8 @@ include(GNUInstallDirs)
 #######################
 
 option(BUILD_GSTREAMER_PLUGIN "enable gstreamer plugin" ON)
-option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" OFF)
+option(BUILD_ROS2_PLUGINS "Enable building ROS2 dependent plugins" ON)
+set(BUILD_ROS2_PLUGINS ON) #Enable ROS2
 option(GENERATE_ROS_MODELS "Generate model sdf for ROS environment" OFF)
 
 option(SEND_VISION_ESTIMATION_DATA "Send Mavlink VISION_POSITION_ESTIMATE msgs" OFF)
@@ -103,12 +104,16 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
+#add_subdirectory( external/CommunicationLib)
+
 # for ROS2 subscribers and publishers
 if (BUILD_ROS2_PLUGINS)
   find_package(ament_cmake REQUIRED)
   find_package(geometry_msgs REQUIRED)
   find_package(rclcpp REQUIRED)
   find_package(sensor_msgs REQUIRED)
+  find_package(std_srvs REQUIRED)
+  find_package(raptor_interface REQUIRED)
 endif()
 
 
@@ -371,6 +376,7 @@ add_library(gazebo_multirotor_base_plugin SHARED src/gazebo_multirotor_base_plug
 add_library(gazebo_wind_plugin SHARED src/gazebo_wind_plugin.cpp)
 add_library(gazebo_magnetometer_plugin SHARED src/gazebo_magnetometer_plugin.cpp src/geo_mag_declination.cpp)
 add_library(gazebo_barometer_plugin SHARED src/gazebo_barometer_plugin.cpp)
+add_library(gazebo_hello_world_plugin SHARED src/gazebo_hello_world_plugin.cpp)
 add_library(gazebo_catapult_plugin SHARED src/gazebo_catapult_plugin.cpp)
 add_library(gazebo_usv_dynamics_plugin SHARED src/gazebo_usv_dynamics_plugin.cpp)
 add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
@@ -399,6 +405,7 @@ set(plugins
   gazebo_wind_plugin
   gazebo_magnetometer_plugin
   gazebo_barometer_plugin
+  gazebo_hello_world_plugin
   gazebo_catapult_plugin
   gazebo_usv_dynamics_plugin
   gazebo_parachute_plugin
@@ -415,10 +422,29 @@ target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 # If BUILD_ROS2_PLUGINS set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
 if (BUILD_ROS2_PLUGINS)
-  add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
-  target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
-  list(APPEND plugins gazebo_motor_failure_plugin)
-  message(STATUS "adding gazebo_motor_failure_plugin to build")
+  # add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
+  # target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  # list(APPEND plugins gazebo_motor_failure_plugin)
+  # message(STATUS "adding gazebo_motor_failure_plugin to build")
+
+
+  add_library(RealSensePlugin SHARED src/RealSensePlugin.cc)
+  ament_target_dependencies(RealSensePlugin rclcpp std_msgs sensor_msgs)
+  target_link_libraries(RealSensePlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  list(APPEND plugins RealSensePlugin)
+  message(STATUS "adding RealSensePlugin to build")
+
+  add_library(VideoPlugin SHARED src/VideoPlugin.cc)
+  ament_target_dependencies(VideoPlugin rclcpp std_msgs std_srvs)
+  target_link_libraries(VideoPlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  list(APPEND plugins VideoPlugin)
+  message(STATUS "adding VideoPlugin to build")
+
+  add_library(ServoPlugin SHARED src/ServoPlugin.cc)
+  ament_target_dependencies(ServoPlugin rclcpp std_msgs sensor_msgs std_srvs raptor_interface)
+  target_link_libraries(ServoPlugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
+  list(APPEND plugins ServoPlugin)
+  message(STATUS "adding ServoPlugin to build")
 
   include_directories(
     include
@@ -427,7 +453,25 @@ if (BUILD_ROS2_PLUGINS)
     ${rclcpp_INCLUDE_DIRS}
   )
 
-  target_link_libraries(gazebo_motor_failure_plugin
+  # target_link_libraries(gazebo_motor_failure_plugin
+  #   ${ament_LIBRARIES}
+  #   ${rclcpp_LIBRARIES}
+  #   ${GAZEBO_libraries}
+  # )
+
+  target_link_libraries(RealSensePlugin
+    ${ament_LIBRARIES}
+    ${rclcpp_LIBRARIES}
+    ${GAZEBO_libraries}
+  )
+
+  target_link_libraries(VideoPlugin
+  ${ament_LIBRARIES}
+  ${rclcpp_LIBRARIES}
+  ${GAZEBO_libraries}
+)
+
+  target_link_libraries(ServoPlugin
     ${ament_LIBRARIES}
     ${rclcpp_LIBRARIES}
     ${GAZEBO_libraries}
@@ -477,7 +521,7 @@ set(plugins
 
   add_library(ForceVisual SHARED src/force_visual/force_visual.cpp)
   list(APPEND plugins ForceVisual)
-  
+
   add_library(AdvancedLiftDragPlugin SHARED src/liftdrag_plugin/advanced_liftdrag_plugin.cpp)
   list(APPEND plugins LiftDragPlugin)
 #endif()
@@ -517,9 +561,15 @@ file(GLOB models_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/models/*)
 file(REMOVE_RECURSE ${PROJECT_SOURCE_DIR}/worlds/.DS_Store)
 file(GLOB worlds_list LIST_DIRECTORIES true ${PROJECT_SOURCE_DIR}/worlds/*)
 
+
 install(TARGETS ${plugins} mav_msgs nav_msgs std_msgs sensor_msgs DESTINATION ${PLUGIN_PATH})
 install(DIRECTORY ${models_list} DESTINATION ${MODEL_PATH})
 install(FILES ${worlds_list} DESTINATION ${RESOURCE_PATH}/worlds)
+
+
+install(TARGETS RealSensePlugin DESTINATION ${GZRS_PLUGIN_PATH})
+install(TARGETS VideoPlugin DESTINATION ${GZRS_PLUGIN_PATH})
+install(TARGETS ServoPlugin DESTINATION ${GZRS_PLUGIN_PATH})
 
 configure_file(src/setup.sh.in "${CMAKE_CURRENT_BINARY_DIR}/setup.sh" @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${RESOURCE_PATH})
