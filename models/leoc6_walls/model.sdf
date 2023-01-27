@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+<sdf version='1.7'>
+  <model name='Walls'>
+    <static>true</static>
+    <link name='link_0'>
+
+      <visual name='visual'>
+        <geometry>
+          <mesh>
+            <uri>model://leoc6_walls/meshes/137493_00-M-LEO_Walls.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/PaintedWall</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+
+      <collision name='collision'>
+        <geometry>
+          <mesh>
+            <uri>model://leoc6_walls/meshes/137493_00-M-LEO_Walls.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+
+    </link>
+    
+  </model>
+</sdf>
