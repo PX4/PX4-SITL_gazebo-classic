@@ -1,0 +1,36 @@
+<sdf version='1.7'>
+  <model name='vtol_foot'>
+    <link name='base_link'>
+      <inertial>
+        <pose>0.159817 -5e-06 -0.056848 0 -0 0</pose>
+        <mass>4.62509</mass>
+        <inertia>
+          <ixx>0.0851081</ixx>
+          <ixy>-0.0776136</ixy>
+          <ixz>0.018046</ixz>
+          <iyy>0.246989</iyy>
+          <iyz>0.0111391</iyz>
+          <izz>0.303763</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.3 0.6 0.8</scale>
+            <uri>model://vtol_foot/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.3 0.6 0.8</scale>
+            <uri>model://vtol_foot/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
