@@ -48,7 +48,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>/home/tiger/PX4-Autopilot/Tools/sitl_gazebo/models/vtol_foot/meshes/base_link.STL</uri>
+            <uri>model://vtol_foot/meshes/base_link.STL</uri>
             <scale>0.3 0.6 0.8</scale>
           </mesh>
         </geometry>
