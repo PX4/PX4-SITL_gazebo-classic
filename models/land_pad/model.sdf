@@ -83,7 +83,7 @@
       <initial_velocity>0 0 0</initial_velocity>
 
       <!-- Scaling factor that is used to compute a new velocity -->
-      <velocity_factor>0.5</velocity_factor>
+      <velocity_factor>0.0</velocity_factor>
 
       <!-- Time, in seconds, between new velocities -->
       <update_period>20</update_period>

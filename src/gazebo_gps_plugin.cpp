@@ -316,6 +316,13 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
   gps_msg.set_velocity_north(velocity_current_W.Y() + noise_gps_vel_.X());
   gps_msg.set_velocity_up(velocity_current_W.Z() - noise_gps_vel_.Z());
 
+  gps_msg.set_gt_noise_gps_eph(noise_gps_pos_.X() + gps_bias_.X());
+  gps_msg.set_gt_noise_gps_epv(noise_gps_pos_.Z() + gps_bias_.Z());
+
+  gps_msg.set_gt_noise_gps_vel_x(noise_gps_vel_.X());
+  gps_msg.set_gt_noise_gps_vel_y(noise_gps_vel_.Y());
+  gps_msg.set_gt_noise_gps_vel_z(noise_gps_vel_.Z());
+
   {
     // protect shared variables
     std::lock_guard<std::mutex> lock(data_mutex_);

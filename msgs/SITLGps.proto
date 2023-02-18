@@ -14,4 +14,9 @@ message SITLGps
   optional double velocity_east         = 9;
   optional double velocity_north        = 10;
   optional double velocity_up           = 11;
+  optional double gt_noise_gps_eph      = 12;
+  optional double gt_noise_gps_epv      = 13;
+  optional double gt_noise_gps_vel_x    = 14;
+  optional double gt_noise_gps_vel_y    = 15;
+  optional double gt_noise_gps_vel_z    = 16;
 }

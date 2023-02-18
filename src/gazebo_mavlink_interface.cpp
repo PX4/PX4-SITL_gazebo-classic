@@ -957,11 +957,6 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   sensor_msg.position_valid = false;
   sensor_msg.type = LANDING_TARGET_TYPE_LIGHT_BEACON;
 
-  sensor_msg.q[0] = irlock_message->attitude_q_w();
-  sensor_msg.q[1] = irlock_message->attitude_q_x();
-  sensor_msg.q[2] = irlock_message->attitude_q_y();
-  sensor_msg.q[3] = irlock_message->attitude_q_z();
-
   mavlink_message_t msg;
   mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
   mavlink_interface_->send_mavlink_message(&msg);
@@ -969,45 +964,60 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
 
 void GazeboMavlinkInterface::ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_message) {
   
-  mavlink_landing_target_t sensor_msg;
-  sensor_msg.time_usec = arucoMarker_message->time_usec();
+  mavlink_target_relative_t sensor_msg;
+  sensor_msg.timestamp = arucoMarker_message->time_usec();
   sensor_msg.x = arucoMarker_message->pos_x();
   sensor_msg.y = arucoMarker_message->pos_y();
   sensor_msg.z = arucoMarker_message->pos_z();
-  sensor_msg.angle_x = arucoMarker_message->yaw(); // TODO: modify MAVLINK msg to have a yaw field
-  sensor_msg.position_valid = true;
-  sensor_msg.type = LANDING_TARGET_TYPE_VISION_FIDUCIAL;
 
-  sensor_msg.q[0] = arucoMarker_message->attitude_q_w();
-  sensor_msg.q[1] = arucoMarker_message->attitude_q_x();
-  sensor_msg.q[2] = arucoMarker_message->attitude_q_y();
-  sensor_msg.q[3] = arucoMarker_message->attitude_q_z();
+  sensor_msg.type = LANDING_TARGET_TYPE_VISION_FIDUCIAL;
+  sensor_msg.frame = TARGET_OBS_FRAME_BODY_FRD;
+
+  sensor_msg.q_sensor[0] = arucoMarker_message->attitude_q_w();
+  sensor_msg.q_sensor[1] = arucoMarker_message->attitude_q_x();
+  sensor_msg.q_sensor[2] = arucoMarker_message->attitude_q_y();
+  sensor_msg.q_sensor[3] = arucoMarker_message->attitude_q_z();
+
+  sensor_msg.pos_var[0] = arucoMarker_message->var_x();
+  sensor_msg.pos_var[1] = arucoMarker_message->var_y();
+  sensor_msg.pos_var[2] = arucoMarker_message->var_z();
+
+  sensor_msg.q_target[0] = arucoMarker_message->orientation_q_w();
+  sensor_msg.q_target[1] = arucoMarker_message->orientation_q_x();
+  sensor_msg.q_target[2] = arucoMarker_message->orientation_q_y();
+  sensor_msg.q_target[3] = arucoMarker_message->orientation_q_z();
+
+  sensor_msg.yaw_var = arucoMarker_message->yaw_var();
 
   mavlink_message_t msg;
-  mavlink_msg_landing_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  mavlink_msg_target_relative_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
   mavlink_interface_->send_mavlink_message(&msg);
 }
 
 void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
 
-  mavlink_follow_target_t gps_data;
+  mavlink_target_absolute_t gps_data;
 
   gps_data.timestamp = gps_msg->time_usec();
   gps_data.lat = gps_msg->latitude_deg() * 1e7;
   gps_data.lon = gps_msg->longitude_deg() * 1e7;
   gps_data.alt = gps_msg->altitude();
-  gps_data.position_cov[0] = gps_msg->eph();
-  gps_data.position_cov[1] = gps_msg->eph();
-  gps_data.position_cov[2] = gps_msg->epv();
+  gps_data.position_std[0] = gps_msg->gt_noise_gps_eph();
+  gps_data.position_std[1] = gps_msg->gt_noise_gps_epv();
   gps_data.vel[0] = gps_msg->velocity_north();
   gps_data.vel[1] = gps_msg->velocity_east();
   gps_data.vel[2] = -gps_msg->velocity_up();
 
-  /* Velocity capabilities */
-  gps_data.est_capabilities = 2;
+  // Convert std to var
+  gps_data.vel_std[0] = gps_msg->gt_noise_gps_vel_x();
+  gps_data.vel_std[1] = gps_msg->gt_noise_gps_vel_y();
+  gps_data.vel_std[2] = gps_msg->gt_noise_gps_vel_z();
+
+  // Position and velocity estimation
+  gps_data.est_capabilities = 3;
 
   mavlink_message_t msg;
-  mavlink_msg_follow_target_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_data);
+  mavlink_msg_target_absolute_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_data);
   mavlink_interface_->send_mavlink_message(&msg);
 }
 

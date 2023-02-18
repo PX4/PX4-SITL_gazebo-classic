@@ -91,7 +91,7 @@ namespace gazebo
       cv::Mat camMatrix = (cv::Mat_<double>(3, 3) << 3.9877559882561974e+02, 0., 3.2546639260681752e+02, 0., 3.9651789974056226e+02, 2.3906162259594086e+02, 0., 0., 1.);
       cv::Mat distCoeffs = (cv::Mat_<double>(1, 5) << -7.4500551440667862e-02, -1.5464660896318899e-01, -4.7134015104217627e-04, 3.6767321906851489e-03, 2.8738933210835571e-01);
 
-      float computeYaw(cv::Mat R);
+      void computeRPY(cv::Mat R, float &roll, float &pitch, float &yaw);
       float wrap_2pi(float yaw);
   };
 }

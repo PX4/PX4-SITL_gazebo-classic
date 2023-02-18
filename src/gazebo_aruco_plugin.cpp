@@ -232,12 +232,23 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
       arucoMarker_message.set_attitude_q_y(q_nb.Y());
       arucoMarker_message.set_attitude_q_z(q_nb.Z());
 
+      arucoMarker_message.set_var_x(0.0);
+      arucoMarker_message.set_var_y(0.0);
+      arucoMarker_message.set_var_z(0.0);
+      arucoMarker_message.set_yaw_var(0.0);
+
       /* Convert rvec to the target orientation with respect to the drone's body frame */
       cv::Mat rotMat;
       cv::Rodrigues(rvec[0], rotMat);
-      float yaw = computeYaw(rotMat);
+      float roll, pitch, yaw;
+      computeRPY(rotMat, roll, pitch, yaw);
 
-      arucoMarker_message.set_yaw(yaw);
+      ignition::math::Quaterniond q(roll, pitch, yaw);
+
+      arucoMarker_message.set_orientation_q_w(q.W());
+      arucoMarker_message.set_orientation_q_x(q.X());
+      arucoMarker_message.set_orientation_q_y(q.Y());
+      arucoMarker_message.set_orientation_q_z(q.Z());
 
       arucoMarker_pub_->Publish(arucoMarker_message);
     }
@@ -256,20 +267,35 @@ float arucoMarkerPlugin::wrap_2pi(float yaw)
     return yaw_2pi;
 }
 
-float arucoMarkerPlugin::computeYaw(cv::Mat R)
+void arucoMarkerPlugin::computeRPY(cv::Mat R, float &roll, float &pitch, float &yaw)
 {
     // https://learnopencv.com/rotation-matrix-to-euler-angles/
 
     // Check for singularity
     float sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) + R.at<double>(1, 0) * R.at<double>(1, 0));
 
-    if (sy > 1e-6)
+    bool singular = sy < 1e-6;
+ 
+    if (!singular)
     {
-        float z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
-        return wrap_2pi(z);
+        roll = atan2(R.at<double>(2,1) , R.at<double>(2,2));
+        pitch = atan2(-R.at<double>(2,0), sy);
+        yaw = atan2(R.at<double>(1,0), R.at<double>(0,0));
     }
     else
     {
-        return 0;
+        roll = atan2(-R.at<double>(1,2), R.at<double>(1,1));
+        pitch = atan2(-R.at<double>(2,0), sy);
+        yaw = 0;
     }
+
+    // if (sy > 1e-6)
+    // {
+    //     float z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
+    //     return wrap_2pi(z);
+    // }
+    // else
+    // {
+    //     return 0;
+    // }
 }
