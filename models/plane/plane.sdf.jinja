@@ -54,11 +54,6 @@
       <velocity_decay/>
       <self_collide>0</self_collide>
     </link>
-    <include>
-      <uri>model://imu</uri>
-      <pose>0 0 0 0 0 0</pose>
-      <name>imu</name>
-    </include>
     <joint name='imu_joint' type='revolute'>
       <child>imu::link</child>
       <parent>base_link</parent>
@@ -726,6 +721,11 @@
         </channel>
       </control_channels>
     </plugin>
+    <include>
+      <uri>model://imu</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>imu</name>
+    </include>
     <static>0</static>
   </model>
 </sdf>
