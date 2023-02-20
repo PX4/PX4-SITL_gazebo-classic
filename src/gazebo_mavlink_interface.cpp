@@ -1014,7 +1014,7 @@ void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
   gps_data.vel_std[2] = gps_msg->gt_noise_gps_vel_z();
 
   // Position and velocity estimation
-  gps_data.est_capabilities = 3;
+  gps_data.sensor_capabilities = 3;
 
   mavlink_message_t msg;
   mavlink_msg_target_absolute_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_data);
