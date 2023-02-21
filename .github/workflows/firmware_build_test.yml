@@ -35,10 +35,11 @@ jobs:
         git submodule update --init --recursive
       working-directory: PX4-Autopilot
     - name: Configure Firmware to include current sitl_gazebo version
-      working-directory: PX4-Autopilot/Tools/simulation/gazebo/sitl_gazebo
       run: |
+        cd Tools/simulation/gazebo/sitl_gazebo
         git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} || echo "Couldn't find the feature branch of the pull request, using default branch"
         git checkout ${{github.head_ref}}
+      working-directory: PX4-Autopilot
     - name: Download MAVSDK
       working-directory: PX4-Autopilot
       run: wget "https://github.com/mavlink/MAVSDK/releases/download/v$(cat test/mavsdk_tests/MAVSDK_VERSION)/libmavsdk-dev_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
@@ -75,7 +76,7 @@ jobs:
     - name: ccache post-run px4/firmware
       run: ccache -s
     - name: Build MAVSDK tests
-      working-directory: FirmPX4-Autopilotware
+      working-directory: PX4-Autopilot
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
