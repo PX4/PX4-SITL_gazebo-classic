@@ -21,29 +21,29 @@ jobs:
       image: px4io/px4-dev-simulation-focal:2021-05-31
       options: --privileged --ulimit core=-1 --security-opt seccomp=unconfined
     steps:
-    - name: Checkout Firmware main
+    - name: Checkout PX4-Autopilot main
       uses: actions/checkout@v2.3.1
       with:
-        repository: PX4/Firmware
+        repository: PX4/PX4-Autopilot
         ref: main
-        path: Firmware
+        path: PX4-Autopilot
         fetch-depth: 0
         submodules: recurvise
-    - name: Checkout matching branch on PX4/Firmware if possible
+    - name: Checkout matching branch on PX4/PX4-Autopilot if possible
       run: |
         git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using main instead"
         git submodule update --init --recursive
-      working-directory: Firmware
+      working-directory: PX4-Autopilot
     - name: Configure Firmware to include current sitl_gazebo version
-      working-directory: Firmware/Tools/simulation/gazebo/sitl_gazebo
+      working-directory: PX4-Autopilot/Tools/simulation/gazebo/sitl_gazebo
       run: |
         git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} || echo "Couldn't find the feature branch of the pull request, using default branch"
         git checkout ${{github.head_ref}}
     - name: Download MAVSDK
-      working-directory: Firmware
+      working-directory: PX4-Autopilot
       run: wget "https://github.com/mavlink/MAVSDK/releases/download/v$(cat test/mavsdk_tests/MAVSDK_VERSION)/libmavsdk-dev_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
     - name: Install MAVSDK
-      working-directory: Firmware
+      working-directory: PX4-Autopilot
       run: dpkg -i "libmavsdk-dev_$(cat test/mavsdk_tests/MAVSDK_VERSION)_ubuntu20.04_amd64.deb"
     - name: Prepare ccache timestamp
       id: ccache_cache_timestamp
@@ -67,7 +67,7 @@ jobs:
           ccache -s
           ccache -z
     - name: Build Firmware
-      working-directory: Firmware
+      working-directory: PX4-Autopilot
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
@@ -75,7 +75,7 @@ jobs:
     - name: ccache post-run px4/firmware
       run: ccache -s
     - name: Build MAVSDK tests
-      working-directory: Firmware
+      working-directory: FirmPX4-Autopilotware
       env:
         DONT_RUN: 1
         GIT_SUBMODULES_ARE_EVIL: 1
@@ -83,5 +83,5 @@ jobs:
     - name: ccache post-run mavsdk_tests
       run: ccache -s
     - name: Run SITL tests
-      working-directory: Firmware
+      working-directory: PX4-Autopilot
       run: test/mavsdk_tests/mavsdk_test_runner.py --speed-factor 20 --abort-early --model ${{matrix.model}} test/mavsdk_tests/configs/sitl.json
