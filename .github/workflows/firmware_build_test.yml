@@ -34,8 +34,20 @@ jobs:
         git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using main instead"
         git submodule update --init --recursive
       working-directory: Firmware
+     - name: testLS
+      working-directory: Firmware
+      run: |
+        ls
+      - name: testLS2
+      working-directory: Firmware/Tools
+      run: |
+        ls
+      - name: testLS2
+      working-directory: Firmware/Tools/simulation
+      run: |
+        ls
     - name: Configure Firmware to include current sitl_gazebo version
-      working-directory: Firmware/Tools/simulation/gazebo/sitl_gazebo
+      working-directory: Firmware/Tools/simulation/gazebo-classic/sitl_gazebo-classic
       run: |
         git fetch origin pull/${{github.event.pull_request.number}}/head:${{github.head_ref}} || echo "Couldn't find the feature branch of the pull request, using default branch"
         git checkout ${{github.head_ref}}
