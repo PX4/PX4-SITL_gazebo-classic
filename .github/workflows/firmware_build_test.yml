@@ -34,15 +34,15 @@ jobs:
         git checkout ${{github.head_ref}} || echo "Firmware branch: ${{github.head_ref}} not found, using main instead"
         git submodule update --init --recursive
       working-directory: Firmware
-     - name: testLS
+    - name: testLS
       working-directory: Firmware
       run: |
         ls
-      - name: testLS2
+    - name: testLS2
       working-directory: Firmware/Tools
       run: |
         ls
-      - name: testLS2
+    - name: testLS2
       working-directory: Firmware/Tools/simulation
       run: |
         ls
