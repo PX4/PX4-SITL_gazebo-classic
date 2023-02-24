@@ -37,6 +37,7 @@ if __name__ == "__main__":
     parser.add_argument('--cam_component_id', default=100, help="Mavlink camera component ID")
     parser.add_argument('--gst_udp_host', default="127.0.0.1", help="Gstreamer UDP host for SITL")
     parser.add_argument('--gst_udp_port', default=5600, help="Gstreamer UDP port for SITL")
+    parser.add_argument('--external_render_ip', default='', help="If set, allows to override sniffer's ip in jinja file")
     parser.add_argument('--video_uri', default="udp://127.0.0.1:5600", help="Mavlink camera URI for SITL")
     parser.add_argument('--mavlink_cam_udp_port', default=14530, help="Mavlink camera UDP port for SITL")
     parser.add_argument('--udp_onboard_gimbal_host_ip', default=13030, help="Mavlink Gimbal UDP for SITL")
@@ -70,6 +71,7 @@ if __name__ == "__main__":
          'cam_component_id': args.cam_component_id, \
          'gst_udp_host': args.gst_udp_host, \
          'gst_udp_port': args.gst_udp_port, \
+         'external_render_ip': args.external_render_ip, \
          'video_uri': args.video_uri, \
          'mavlink_cam_udp_port': args.mavlink_cam_udp_port, \
          'udp_onboard_gimbal_host_ip': args.udp_onboard_gimbal_host_ip, \
