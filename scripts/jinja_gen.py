@@ -6,6 +6,7 @@ import argparse
 import os
 import shutil
 import fnmatch
+import json
 import numpy as np
 
 
@@ -20,6 +21,14 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+
+def read_jinja_parameters_from_file(filepath):
+    if not filepath:
+        return {}
+    with open(filepath) as f:
+        data = json.load(f)
+        return data
+    return {}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -44,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument('--udp_onboard_gimbal_port_remote', default=13030, help="Mavlink Gimbal UDP for SITL")
     parser.add_argument('--generate_ros_models', default=False, dest='generate_ros_models', type=str2bool,
                     help="required if generating the agent for usage with ROS nodes, by default false")
+    parser.add_argument('--override_parameters_json_path', default='', help="json file with varaibles to override jinja parameters")
     args = parser.parse_args()
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.env_dir))
     template = env.get_template(os.path.relpath(args.filename, args.env_dir))
@@ -79,6 +89,8 @@ if __name__ == "__main__":
          'hil_mode': args.hil_mode, \
          'ros_version': ros_version}
 
+    parameters_from_json_file = read_jinja_parameters_from_file(args.override_parameters_json_path)
+    d.update(parameters_from_json_file)
     result = template.render(d)
 
     if args.stdout:
