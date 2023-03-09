@@ -10,7 +10,7 @@ This is a flight simulator for rovers, boats, multirotors, VTOL, fixed wing. It 
 # Installation
 
 This simulator is designed to be used with the PX4 Autopilot. Please follow the official developer toolchain installation instructions:
-http://docs.px4.io/master/en/simulation/gazebo.html
+http://docs.px4.io/main/en/sim_gazebo_classic/
 
 # Contributing and Testing
 
