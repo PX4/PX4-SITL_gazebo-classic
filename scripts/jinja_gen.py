@@ -25,6 +25,8 @@ def str2bool(v):
 def read_jinja_parameters_from_file(filepath):
     if not filepath:
         return {}
+    if not os.path.exists(filepath):
+        return {}
     with open(filepath) as f:
         data = json.load(f)
         return data
