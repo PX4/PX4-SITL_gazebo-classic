@@ -1,0 +1,10 @@
+{
+    "serial_enabled": 0,
+    "serial_device": "/dev/ttyACM0",
+    "serial_baudrate": 921600,
+    "hil_mode": 0,
+    "cam_component_id": 100,
+    "gst_udp_host": "127.0.0.1",
+    "udp_onboard_gimbal_host_ip": "127.0.0.1",
+    "generate_ros_models": false
+}
