@@ -734,9 +734,7 @@ void GimbalControllerPlugin::SendGimbalDeviceAttitudeStatus()
     angularVelocity.X(),
     angularVelocity.Y(),
     angularVelocity.Z(),
-    failureFlags,
-    NAN, // per mavlink spec - NAN if unknown
-    NAN); // per mavlink spec - NAN if unknown
+    failureFlags);
   SendMavlinkMessage(msg);
 }
 
