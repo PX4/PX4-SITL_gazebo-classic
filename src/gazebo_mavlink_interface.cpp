@@ -621,7 +621,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   SendSensorMessages();
 
   // Send groundtruth at full rate
-  SendGroundTruth();
+  //SendGroundTruth();
 
   handle_actuator_controls();
 
