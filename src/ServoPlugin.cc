@@ -21,7 +21,7 @@ ServoPlugin::ServoPlugin() : dataPtr(new ServoPluginPrivate) {}
 /////////////////////////////////////////////////
 ServoPlugin::~ServoPlugin() { delete joint_controller_; }
 
-void ServoPlugin::set_angle(const std_msgs::msg::Float64 &msg) {
+void ServoPlugin::set_angle(const std_msgs::msg::Float64::SharedPtr msg) {
   if (td_ == false) {
     angle_ = msg.data * M_PI / 180.0;
   } else {
