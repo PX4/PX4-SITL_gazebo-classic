@@ -30,7 +30,7 @@ void ServoPlugin::set_angle(const std_msgs::msg::Float64::SharedPtr msg) {
 }
 
 void ServoPlugin::set_servo(
-    std::shared_ptr<raptor_interface::srv::SetServo::Request> request,
+    const std::shared_ptr<raptor_interface::srv::SetServo::Request> request,
     std::shared_ptr<raptor_interface::srv::SetServo::Response> response) {
   if (td_ == false) {
     angle_ = request->angle * M_PI / 180.0;
