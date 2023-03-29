@@ -232,10 +232,10 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
       arucoMarker_message.set_attitude_q_y(q_nb.Y());
       arucoMarker_message.set_attitude_q_z(q_nb.Z());
 
-      arucoMarker_message.set_var_x(0.0);
-      arucoMarker_message.set_var_y(0.0);
-      arucoMarker_message.set_var_z(0.0);
-      arucoMarker_message.set_yaw_var(0.0);
+      arucoMarker_message.set_std_x(0.5);
+      arucoMarker_message.set_std_y(0.5);
+      arucoMarker_message.set_std_z(1.0);
+      arucoMarker_message.set_yaw_std(0.0);
 
       /* Convert rvec to the target orientation with respect to the drone's body frame */
       cv::Mat rotMat;

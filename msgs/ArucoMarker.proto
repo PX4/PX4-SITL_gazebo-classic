@@ -15,8 +15,8 @@ message ArucoMarker
   optional double orientation_q_x  = 10;
   optional double orientation_q_y  = 11;
   optional double orientation_q_z  = 12;
-  optional float yaw_var = 13;
-  optional float var_x = 14;
-  optional float var_y = 15;
-  optional float var_z = 16;
+  optional float yaw_std = 13;
+  optional float std_x = 14;
+  optional float std_y = 15;
+  optional float std_z = 16;
 }

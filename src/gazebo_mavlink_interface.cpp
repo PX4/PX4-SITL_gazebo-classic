@@ -978,16 +978,16 @@ void GazeboMavlinkInterface::ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_mes
   sensor_msg.q_sensor[2] = arucoMarker_message->attitude_q_y();
   sensor_msg.q_sensor[3] = arucoMarker_message->attitude_q_z();
 
-  sensor_msg.pos_var[0] = arucoMarker_message->var_x();
-  sensor_msg.pos_var[1] = arucoMarker_message->var_y();
-  sensor_msg.pos_var[2] = arucoMarker_message->var_z();
+  sensor_msg.pos_std[0] = arucoMarker_message->std_x();
+  sensor_msg.pos_std[1] = arucoMarker_message->std_y();
+  sensor_msg.pos_std[2] = arucoMarker_message->std_z();
 
   sensor_msg.q_target[0] = arucoMarker_message->orientation_q_w();
   sensor_msg.q_target[1] = arucoMarker_message->orientation_q_x();
   sensor_msg.q_target[2] = arucoMarker_message->orientation_q_y();
   sensor_msg.q_target[3] = arucoMarker_message->orientation_q_z();
 
-  sensor_msg.yaw_var = arucoMarker_message->yaw_var();
+  sensor_msg.yaw_std = arucoMarker_message->yaw_std();
 
   mavlink_message_t msg;
   mavlink_msg_target_relative_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
@@ -1002,16 +1002,15 @@ void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
   gps_data.lat = gps_msg->latitude_deg() * 1e7;
   gps_data.lon = gps_msg->longitude_deg() * 1e7;
   gps_data.alt = gps_msg->altitude();
-  gps_data.position_std[0] = gps_msg->gt_noise_gps_eph();
-  gps_data.position_std[1] = gps_msg->gt_noise_gps_epv();
+  gps_data.position_std[0] = gps_msg->eph();
+  gps_data.position_std[1] = gps_msg->epv();
   gps_data.vel[0] = gps_msg->velocity_north();
   gps_data.vel[1] = gps_msg->velocity_east();
   gps_data.vel[2] = -gps_msg->velocity_up();
 
-  // Convert std to var
-  gps_data.vel_std[0] = gps_msg->gt_noise_gps_vel_x();
-  gps_data.vel_std[1] = gps_msg->gt_noise_gps_vel_y();
-  gps_data.vel_std[2] = gps_msg->gt_noise_gps_vel_z();
+  gps_data.vel_std[0] = 0.2;
+  gps_data.vel_std[1] = 0.2;
+  gps_data.vel_std[2] = 0.5;
 
   // Position and velocity estimation
   gps_data.sensor_capabilities = 3;
