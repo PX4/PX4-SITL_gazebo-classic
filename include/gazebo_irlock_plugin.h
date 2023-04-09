@@ -41,6 +41,7 @@ namespace gazebo
       sensor_msgs::msgs::IRLock irlock_message;
       std::string namespace_;
       std::string model_name_;
+      std::string beacon_name_;
 
   };
 }

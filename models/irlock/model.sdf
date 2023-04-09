@@ -35,6 +35,7 @@
         </logical_camera>
         <plugin name="irlock_plugin" filename="libgazebo_irlock_plugin.so">
             <robotNamespace></robotNamespace>
+            <beaconName>land_pad</beaconName> <!-- name of the model we want to detect (as defined in the sdf)-->
         </plugin>
       </sensor>
     </link>

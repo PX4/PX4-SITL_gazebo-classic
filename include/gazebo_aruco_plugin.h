@@ -82,6 +82,7 @@ namespace gazebo
       sensor_msgs::msgs::TargetRelative targetRelative_message;
       std::string namespace_;
       std::string model_name_;
+      std::string land_pad_name_;
       
       float markerLength_mm; 
 

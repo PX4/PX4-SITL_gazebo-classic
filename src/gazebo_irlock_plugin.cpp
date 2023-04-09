@@ -68,6 +68,12 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     gzwarn << "[gazebo_irlock_plugin] Please specify a robotNamespace.\n";
   }
 
+  if (_sdf->HasElement("beaconName")) {
+    beacon_name_ = _sdf->GetElement("beaconName")->Get<std::string>();
+  } else {
+    gzwarn << "[gazebo_irlock_plugin] Please specify a beacon name.\n";
+  }
+
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -128,7 +134,7 @@ void IRLockPlugin::OnUpdated()
 
     gazebo::msgs::LogicalCameraImage_Model model = img.model(idx);
 
-    if (model.has_name() && model.name() == "land_pad") {
+    if (model.has_name() && model.name() == beacon_name_) {
 
       if (model.has_pose()) {
 

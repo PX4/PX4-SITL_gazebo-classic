@@ -93,6 +93,12 @@ void arucoMarkerPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   const string scopedName = _sensor->GetParentName();
 #endif
 
+  if (_sdf->HasElement("landPadName")) {
+    land_pad_name_ = _sdf->GetElement("landPadName")->Get<std::string>();
+  } else {
+    gzwarn << "[Gazebo Aruco Plugin] Please specify a land pad name (model on which the ArUco marker is attached).\n";
+  }
+
   if (_sdf->HasElement("update_rate")) {
     update_rate = _sdf->GetElement("update_rate")->Get<int>();
   }
@@ -143,7 +149,7 @@ void arucoMarkerPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 #endif
 
   /* Get the land pad size */
-  auto mo = world_->ModelByName("land_pad");
+  auto mo = world_->ModelByName(land_pad_name_);
   auto link = mo->GetLink("link"); 
   auto box = link->BoundingBox();
 

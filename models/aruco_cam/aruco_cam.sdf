@@ -75,6 +75,7 @@
 
         <plugin name="aruco_marker_plugin" filename="libgazebo_aruco_plugin.so">
             <robotNamespace></robotNamespace>
+            <landPadName>land_pad</landPadName> <!-- name of the model on which the ArUco marker is printed (as defined in the sdf)-->
         </plugin>
         
       </sensor>
