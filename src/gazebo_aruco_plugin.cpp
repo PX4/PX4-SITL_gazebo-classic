@@ -112,7 +112,7 @@ void arucoMarkerPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   string topicName = "~/" + scopedName + "/arucoMarker";
   boost::replace_all(topicName, "::", "/");
 
-  arucoMarker_pub_ = node_handle_->Advertise<sensor_msgs::msgs::ArucoMarker>(topicName, 100);
+  arucoMarker_pub_ = node_handle_->Advertise<sensor_msgs::msgs::TargetRelative>(topicName, 100);
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
       boost::bind(&arucoMarkerPlugin::OnNewFrame, this, _1, this->width, this->height, this->format));
@@ -218,24 +218,24 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
       #endif
 
       /* Send the message */
-      arucoMarker_message.set_time_usec(now.Double() * 1e6);
-      arucoMarker_message.set_pos_x(body_pose[0]);
-      arucoMarker_message.set_pos_y(body_pose[1]);
-      arucoMarker_message.set_pos_z(body_pose[2]);
+      targetRelative_message.set_time_usec(now.Double() * 1e6);
+      targetRelative_message.set_pos_x(body_pose[0]);
+      targetRelative_message.set_pos_y(body_pose[1]);
+      targetRelative_message.set_pos_z(body_pose[2]);
 
       /* Save the attitude of the drone when the frame was grabbed, will allow to transform from FRD to vc-NED */
       ignition::math::Quaterniond q_FLU_to_NED = q_ENU_to_NED * att_W_I;
       ignition::math::Quaterniond q_nb = q_FLU_to_NED * q_FLU_to_FRD.Inverse();
 
-      arucoMarker_message.set_attitude_q_w(q_nb.W());
-      arucoMarker_message.set_attitude_q_x(q_nb.X());
-      arucoMarker_message.set_attitude_q_y(q_nb.Y());
-      arucoMarker_message.set_attitude_q_z(q_nb.Z());
+      targetRelative_message.set_attitude_q_w(q_nb.W());
+      targetRelative_message.set_attitude_q_x(q_nb.X());
+      targetRelative_message.set_attitude_q_y(q_nb.Y());
+      targetRelative_message.set_attitude_q_z(q_nb.Z());
 
-      arucoMarker_message.set_std_x(0.5);
-      arucoMarker_message.set_std_y(0.5);
-      arucoMarker_message.set_std_z(1.0);
-      arucoMarker_message.set_yaw_std(0.0);
+      targetRelative_message.set_std_x(0.5);
+      targetRelative_message.set_std_y(0.5);
+      targetRelative_message.set_std_z(1.0);
+      targetRelative_message.set_yaw_std(0.0);
 
       /* Convert rvec to the target orientation with respect to the drone's body frame */
       cv::Mat rotMat;
@@ -245,17 +245,17 @@ void arucoMarkerPlugin::OnNewFrame(const unsigned char * _image,
 
       ignition::math::Quaterniond q(roll, pitch, yaw);
 
-      arucoMarker_message.set_orientation_q_w(q.W());
-      arucoMarker_message.set_orientation_q_x(q.X());
-      arucoMarker_message.set_orientation_q_y(q.Y());
-      arucoMarker_message.set_orientation_q_z(q.Z());
+      targetRelative_message.set_orientation_q_w(q.W());
+      targetRelative_message.set_orientation_q_x(q.X());
+      targetRelative_message.set_orientation_q_y(q.Y());
+      targetRelative_message.set_orientation_q_z(q.Z());
 
-      arucoMarker_pub_->Publish(arucoMarker_message);
+      arucoMarker_pub_->Publish(targetRelative_message);
     }
   }
 }
 
-float arucoMarkerPlugin::wrap_2pi(float yaw)
+float arucoMarkerPlugin::wrap_2pi(const float &yaw)
 {
     float yaw_2pi = yaw;
 
@@ -288,14 +288,4 @@ void arucoMarkerPlugin::computeRPY(cv::Mat R, float &roll, float &pitch, float &
         pitch = atan2(-R.at<double>(2,0), sy);
         yaw = 0;
     }
-
-    // if (sy > 1e-6)
-    // {
-    //     float z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
-    //     return wrap_2pi(z);
-    // }
-    // else
-    // {
-    //     return 0;
-    // }
 }

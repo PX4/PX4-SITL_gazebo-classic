@@ -323,7 +323,7 @@ set(sensor_msgs
   msgs/Airspeed.proto
   msgs/Imu.proto
   msgs/IRLock.proto
-  msgs/ArucoMarker.proto
+  msgs/TargetRelative.proto
   msgs/Float.proto
   msgs/Groundtruth.proto
   msgs/Range.proto

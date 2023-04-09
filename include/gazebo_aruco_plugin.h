@@ -35,7 +35,7 @@
 
 #include <common.h>
 
-#include "ArucoMarker.pb.h"
+#include "TargetRelative.pb.h"
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/aruco.hpp>
@@ -79,7 +79,7 @@ namespace gazebo
       event::ConnectionPtr newFrameConnection;
       transport::PublisherPtr arucoMarker_pub_;
       transport::NodePtr node_handle_;
-      sensor_msgs::msgs::ArucoMarker arucoMarker_message;
+      sensor_msgs::msgs::TargetRelative targetRelative_message;
       std::string namespace_;
       std::string model_name_;
       
@@ -92,7 +92,7 @@ namespace gazebo
       cv::Mat distCoeffs = (cv::Mat_<double>(1, 5) << -7.4500551440667862e-02, -1.5464660896318899e-01, -4.7134015104217627e-04, 3.6767321906851489e-03, 2.8738933210835571e-01);
 
       void computeRPY(cv::Mat R, float &roll, float &pitch, float &yaw);
-      float wrap_2pi(float yaw);
+      float wrap_2pi(const float &yaw);
   };
 }
 #endif

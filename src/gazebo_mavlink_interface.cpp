@@ -424,7 +424,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
   target_gps_sub_ = node_handle_->Subscribe("~/" + target_gps_sub_topic_, &GazeboMavlinkInterface::TargetGpsCallback, this);
-  arucoMarker_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + arucoMarker_sub_topic_, &GazeboMavlinkInterface::ArucoMarkerCallback, this);
+  arucoMarker_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + arucoMarker_sub_topic_, &GazeboMavlinkInterface::targetReleativeCallback, this);
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
@@ -962,32 +962,32 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   mavlink_interface_->send_mavlink_message(&msg);
 }
 
-void GazeboMavlinkInterface::ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_message) {
+void GazeboMavlinkInterface::targetReleativeCallback(TargetRelativePtr& targetRelative_message) {
   
   mavlink_target_relative_t sensor_msg;
-  sensor_msg.timestamp = arucoMarker_message->time_usec();
-  sensor_msg.x = arucoMarker_message->pos_x();
-  sensor_msg.y = arucoMarker_message->pos_y();
-  sensor_msg.z = arucoMarker_message->pos_z();
+  sensor_msg.timestamp = targetRelative_message->time_usec();
+  sensor_msg.x = targetRelative_message->pos_x();
+  sensor_msg.y = targetRelative_message->pos_y();
+  sensor_msg.z = targetRelative_message->pos_z();
 
   sensor_msg.type = LANDING_TARGET_TYPE_VISION_FIDUCIAL;
   sensor_msg.frame = TARGET_OBS_FRAME_BODY_FRD;
 
-  sensor_msg.q_sensor[0] = arucoMarker_message->attitude_q_w();
-  sensor_msg.q_sensor[1] = arucoMarker_message->attitude_q_x();
-  sensor_msg.q_sensor[2] = arucoMarker_message->attitude_q_y();
-  sensor_msg.q_sensor[3] = arucoMarker_message->attitude_q_z();
+  sensor_msg.q_sensor[0] = targetRelative_message->attitude_q_w();
+  sensor_msg.q_sensor[1] = targetRelative_message->attitude_q_x();
+  sensor_msg.q_sensor[2] = targetRelative_message->attitude_q_y();
+  sensor_msg.q_sensor[3] = targetRelative_message->attitude_q_z();
 
-  sensor_msg.pos_std[0] = arucoMarker_message->std_x();
-  sensor_msg.pos_std[1] = arucoMarker_message->std_y();
-  sensor_msg.pos_std[2] = arucoMarker_message->std_z();
+  sensor_msg.pos_std[0] = targetRelative_message->std_x();
+  sensor_msg.pos_std[1] = targetRelative_message->std_y();
+  sensor_msg.pos_std[2] = targetRelative_message->std_z();
 
-  sensor_msg.q_target[0] = arucoMarker_message->orientation_q_w();
-  sensor_msg.q_target[1] = arucoMarker_message->orientation_q_x();
-  sensor_msg.q_target[2] = arucoMarker_message->orientation_q_y();
-  sensor_msg.q_target[3] = arucoMarker_message->orientation_q_z();
+  sensor_msg.q_target[0] = targetRelative_message->orientation_q_w();
+  sensor_msg.q_target[1] = targetRelative_message->orientation_q_x();
+  sensor_msg.q_target[2] = targetRelative_message->orientation_q_y();
+  sensor_msg.q_target[3] = targetRelative_message->orientation_q_z();
 
-  sensor_msg.yaw_std = arucoMarker_message->yaw_std();
+  sensor_msg.yaw_std = targetRelative_message->yaw_std();
 
   mavlink_message_t msg;
   mavlink_msg_target_relative_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);

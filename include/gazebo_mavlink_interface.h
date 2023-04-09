@@ -64,7 +64,7 @@
 #include <Range.pb.h>
 #include <SITLGps.pb.h>
 #include <IRLock.pb.h>
-#include <ArucoMarker.pb.h>
+#include <TargetRelative.pb.h>
 #include <Groundtruth.pb.h>
 #include <Odometry.pb.h>
 #include <MagneticField.pb.h>
@@ -88,7 +88,7 @@ typedef const boost::shared_ptr<const sensor_msgs::msgs::Airspeed> AirspeedPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Imu> ImuPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::IRLock> IRLockPtr;
-typedef const boost::shared_ptr<const sensor_msgs::msgs::ArucoMarker> ArucoMarkerPtr;
+typedef const boost::shared_ptr<const sensor_msgs::msgs::TargetRelative> TargetRelativePtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::OpticalFlow> OpticalFlowPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> SonarPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Range> LidarPtr;
@@ -184,7 +184,7 @@ private:
   void AirspeedCallback(AirspeedPtr& airspeed_msg, const int& id);
   void OpticalFlowCallback(OpticalFlowPtr& opticalFlow_msg);
   void IRLockCallback(IRLockPtr& irlock_msg);
-  void ArucoMarkerCallback(ArucoMarkerPtr& arucoMarker_msg);
+  void targetReleativeCallback(TargetRelativePtr& targetRelative_msg);
   void VisionCallback(OdomPtr& odom_msg);
   void MagnetometerCallback(MagnetometerPtr& mag_msg);
   void BarometerCallback(BarometerPtr& baro_msg);
