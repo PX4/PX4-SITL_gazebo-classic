@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="land_pad">
+    <pose>0.0 0.0 0.06 0 0 0</pose>
+    <link name="link">
+        <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>10.0</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <kinematic>true</kinematic>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.01</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <kp>1e+12</kp>
+              <kd>1</kd>
+              <max_vel>10</max_vel>
+              <min_depth>0.003</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.5 0.5 0.02</size>
+          </box>
+        </geometry>
+        <!-- Aruco marker as the land pad structure -->
+        <material>
+          <script>
+            <uri>model://land_pad/materials/scripts</uri>
+            <uri>model://land_pad/materials/textures</uri>
+            <name>ArucoVisualMarker0/Marker</name>
+          </script>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <emissive>1 1 1 0</emissive>
+          <shader type='vertex'>
+            <normal_map>__default__</normal_map>
+          </shader>
+        </material>
+      </visual>
+    </link>
+    <!-- Add a GPS on the land pad -->
+    <include>
+      <uri>model://gps</uri>
+      <pose>0.1 0 0 0 0 0</pose>
+      <name>gps_target</name>
+    </include>
+    <joint name='gps_target_joint' type='fixed'>
+      <child>gps_target::link</child>
+      <parent>link</parent>
+    </joint>
+
+    <plugin name="random" filename="libgazebo_random_velocity_plugin.so">
+
+      <!-- Name of the link in this model that receives the velocity -->
+      <link>link</link>
+
+      <!-- Initial velocity that is applied to the link -->
+      <initial_velocity>0 0 0</initial_velocity>
+
+      <!-- Scaling factor that is used to compute a new velocity -->
+      <velocity_factor>0.0</velocity_factor>
+
+      <!-- Time, in seconds, between new velocities -->
+      <update_period>20</update_period>
+
+      <!-- Clamp the Z velocity value to zero. You can also clamp x and
+          y values -->
+      <min_z>0</min_z>
+      <max_z>0</max_z>
+    </plugin>
+  </model>
+</sdf>

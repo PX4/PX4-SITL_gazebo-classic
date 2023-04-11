@@ -11,6 +11,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
+#include <common.h>
 
 #include "IRLock.pb.h"
 
@@ -31,6 +32,7 @@ namespace gazebo
     protected:
       sensors::LogicalCameraSensorPtr camera;
       physics::WorldPtr world;
+      physics::ModelPtr model_;
 
     private:
       event::ConnectionPtr updateConnection;
@@ -38,6 +40,8 @@ namespace gazebo
       transport::NodePtr node_handle_;
       sensor_msgs::msgs::IRLock irlock_message;
       std::string namespace_;
+      std::string model_name_;
+      std::string beacon_name_;
 
   };
 }

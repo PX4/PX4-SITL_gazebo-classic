@@ -51,7 +51,7 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   if (!_sensor)
     gzerr << "Invalid sensor pointer.\n";
 
-  this->world = physics::get_world(_sensor->WorldName());
+
 
   this->camera = std::dynamic_pointer_cast<sensors::LogicalCameraSensor>(_sensor);
 
@@ -59,10 +59,19 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
     gzerr << "IRLockPlugin requires a CameraSensor.\n";
   }
 
+  // this->world = physics::get_world(_sensor->WorldName());
+  this->world = physics::get_world(this->camera->WorldName()); 
+
   if (_sdf->HasElement("robotNamespace")) {
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   } else {
     gzwarn << "[gazebo_irlock_plugin] Please specify a robotNamespace.\n";
+  }
+
+  if (_sdf->HasElement("beaconName")) {
+    beacon_name_ = _sdf->GetElement("beaconName")->Get<std::string>();
+  } else {
+    gzwarn << "[gazebo_irlock_plugin] Please specify a beacon name.\n";
   }
 
   node_handle_ = transport::NodePtr(new transport::Node());
@@ -80,16 +89,44 @@ void IRLockPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 
   this->camera->SetActive(true);
 
+  // Get the root model name
+  vector<std::string> names_splitted;
+  boost::split(names_splitted, scopedName, boost::is_any_of("::"));
+  names_splitted.erase(std::remove_if(begin(names_splitted), end(names_splitted),
+                            [](const string& name)
+                            { return name.size() == 0; }), end(names_splitted));
+
+  // get the root model name
+  const string rootModelName = names_splitted.front();
+
+  // store the model name
+  model_name_ = names_splitted.at(0);
+
+  std::cout << "[Gazebo Irlock Plugin] Irlock camera attached to: "<< model_name_ << std::endl; 
 }
 
 void IRLockPlugin::OnUpdated()
 {
+
+  // Store the pointer to the model.
+  if (model_ == NULL)
+#if GAZEBO_MAJOR_VERSION >= 9
+    model_ = this->world->ModelByName(model_name_);
+#else
+    model_ = this->world->GetModel(model_name_);
+#endif
+
   // Get the current simulation time.
 #if GAZEBO_MAJOR_VERSION >= 9
   common::Time now = world->SimTime();
+  ignition::math::Pose3d T_W_I = model_->WorldPose();
 #else
   common::Time now = world->GetSimTime();
+  ignition::math::Pose3d T_W_I = ignitionFromGazeboMath(model_->GetWorldPose());
 #endif
+
+  /* Get the attitude of the drone to convert observation from body to vehicle-carried NED frame */
+  ignition::math::Quaterniond& att_W_I = T_W_I.Rot();
 
   gazebo::msgs::LogicalCameraImage img = this->camera->Image();
 
@@ -97,9 +134,18 @@ void IRLockPlugin::OnUpdated()
 
     gazebo::msgs::LogicalCameraImage_Model model = img.model(idx);
 
-    if (model.has_name() && model.name() == "irlock_beacon") {
+    if (model.has_name() && model.name() == beacon_name_) {
 
       if (model.has_pose()) {
+
+        /* Save the attitude of the drone when the frame was grabbed, will allow to transform from FRD to vc-NED */
+        ignition::math::Quaterniond q_FLU_to_NED = q_ENU_to_NED * att_W_I;
+        ignition::math::Quaterniond q_nb = q_FLU_to_NED * q_FLU_to_FRD.Inverse();
+
+        irlock_message.set_attitude_q_w(q_nb.W());
+        irlock_message.set_attitude_q_x(q_nb.X());
+        irlock_message.set_attitude_q_y(q_nb.Y());
+        irlock_message.set_attitude_q_z(q_nb.Z());
 
         // position of the beacon in camera frame
         ignition::math::Vector3d pos;

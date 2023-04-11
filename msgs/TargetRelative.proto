@@ -1,0 +1,22 @@
+syntax = "proto2";
+package sensor_msgs.msgs;
+
+message TargetRelative
+{
+  required int64 time_usec	= 1;
+  required float pos_x		= 2;
+  required float pos_y		= 3;
+  required float pos_z    = 4;
+  optional double attitude_q_w  = 5;
+  optional double attitude_q_x  = 6;
+  optional double attitude_q_y  = 7;
+  optional double attitude_q_z  = 8;
+  optional double orientation_q_w  = 9;
+  optional double orientation_q_x  = 10;
+  optional double orientation_q_y  = 11;
+  optional double orientation_q_z  = 12;
+  optional float yaw_std = 13;
+  optional float std_x = 14;
+  optional float std_y = 15;
+  optional float std_z = 16;
+}
