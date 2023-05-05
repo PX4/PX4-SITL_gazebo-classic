@@ -5,7 +5,7 @@
     <link name='base_link'>
       <pose>0 0 0.0 0 0 0</pose>
       <inertial>
-        <pose>0 0 0.0 0 0 0</pose>
+        <pose>0.0 0 0.2 0 0 0</pose>
         <mass>1.6</mass>
         <inertia>
           <ixx>0.147563</ixx>
@@ -369,7 +369,7 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+    <plugin name="aerodynamics" filename="libglobal_aerodynamics_plugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -379,54 +379,13 @@
       <cda_stall>-0.9233984055</cda_stall>
       <cma_stall>0</cma_stall>
       <cm_delta>-0.3</cm_delta>
-      <cp>0 0.3 0.0</cp>
+      <cp>0 0.0 0.0</cp>
       <area>0.15</area>
       <air_density>1.2041</air_density>
       <forward>0 0 1</forward>
       <upward>-1 0 0</upward>
       <link_name>base_link</link_name>
       <!-- <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl> -->
-      <robotNamespace></robotNamespace>
-      <windSubTopic>world_wind</windSubTopic>
-    </plugin>
-    <plugin name="right_wing" filename="libLiftDragPlugin.so">
-      <a0>0.05984281113</a0>
-      <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
-      <alpha_stall>0.6391428111</alpha_stall>
-      <cla_stall>-3.85</cla_stall>
-      <cda_stall>-0.9233984055</cda_stall>
-      <cma_stall>0</cma_stall>
-      <cm_delta>-0.3</cm_delta>
-      <cp>0 -0.3 -0.0</cp>
-      <area>0.15</area>
-      <air_density>1.2041</air_density>
-      <forward>0 0 1</forward>
-      <upward>-1 0 0</upward>
-      <link_name>base_link</link_name>
-      <!-- <control_joint_name>
-        right_elevon_joint
-      </control_joint_name> -->
-      <!-- <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl> -->
-      <robotNamespace></robotNamespace>
-      <windSubTopic>world_wind</windSubTopic>
-    </plugin>
-    <plugin name="rudder_plugin" filename="libLiftDragPlugin.so">
-      <a0>0.0</a0>
-      <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
-      <alpha_stall>0.3391428111</alpha_stall>
-      <cla_stall>-3.85</cla_stall>
-      <cda_stall>-0.9233984055</cda_stall>
-      <cma_stall>0</cma_stall>
-      <cp>-0.1 0 -0.5</cp>
-      <area>0.05</area>
-      <air_density>1.2041</air_density>
-      <forward>0 0 1</forward>
-      <upward>0 1 0</upward>
-      <link_name>base_link</link_name>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
