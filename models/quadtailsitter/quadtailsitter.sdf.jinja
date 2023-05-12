@@ -374,64 +374,49 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name="left_wing" filename="libLiftDragPlugin.so">
-      <a0>0.05984281113</a0>
-      <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
-      <alpha_stall>0.6391428111</alpha_stall>
-      <cla_stall>-3.85</cla_stall>
-      <cda_stall>-0.9233984055</cda_stall>
-      <cma_stall>0</cma_stall>
-      <cm_delta>-0.0</cm_delta>
-      <cp>0 0.3 0.2</cp>
-      <area>0.15</area>
-      <air_density>1.2041</air_density>
-      <forward>0 0 1</forward>
-      <upward>-1 0 0</upward>
-      <link_name>base_link</link_name>
-      <!-- <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl> -->
-      <robotNamespace></robotNamespace>
-      <windSubTopic>world_wind</windSubTopic>
-    </plugin>
-    <plugin name="right_wing" filename="libLiftDragPlugin.so">
-      <a0>0.05984281113</a0>
-      <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
-      <alpha_stall>0.6391428111</alpha_stall>
-      <cla_stall>-3.85</cla_stall>
-      <cda_stall>-0.9233984055</cda_stall>
-      <cma_stall>0</cma_stall>
-      <cm_delta>-0.0</cm_delta>
-      <cp>0 -0.3 -0.2</cp>
-      <area>0.15</area>
-      <air_density>1.2041</air_density>
-      <forward>0 0 1</forward>
-      <upward>-1 0 0</upward>
-      <link_name>base_link</link_name>
-      <!-- <control_joint_name>
-        right_elevon_joint
-      </control_joint_name> -->
-      <!-- <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl> -->
-      <robotNamespace></robotNamespace>
-      <windSubTopic>world_wind</windSubTopic>
-    </plugin>
-    <plugin name="rudder_plugin" filename="libLiftDragPlugin.so">
+    <plugin name="aircraft" filename="libAdvancedLiftDragPlugin.so">
       <a0>0.0</a0>
-      <cla>4.752798721</cla>
-      <cda>0.6417112299</cda>
-      <cma>0.0</cma>
+      <CL0>0.15188</CL0>
+      <AR>6.5</AR>
+      <eff>0.97</eff>
+      <CLa>5.015</CLa>
+      <CD0>0.029</CD0>
+      <Cem0>0.075</Cem0>
+      <Cema>-0.463966</Cema>
+      <CYb>-0.258244</CYb>
+      <Cellb>-0.039250</Cellb>
+      <Cenb>0.100826</Cenb>
+      <CDp>0.0</CDp>
+      <CYp>0.065861</CYp>
+      <CLp>0.0</CLp>
+      <Cellp>-0.487407</Cellp>
+      <Cemp>0.0</Cemp>
+      <Cenp>-0.040416</Cenp>
+      <CDq>0.055166</CDq>
+      <CYq>0.0</CYq>
+      <CLq>7.971792</CLq>
+      <Cellq>0.0</Cellq>
+      <Cemq>-12.140140</Cemq>
+      <Cenq>0.0</Cenq>
+      <CDr>0.0</CDr>
+      <CYr>0.230299</CYr>
+      <CLr>0.0</CLr>
+      <Cellr>0.078165</Cellr>
+      <Cemr>0.0</Cemr>
+      <Cenr>-0.089947</Cenr>
       <alpha_stall>0.3391428111</alpha_stall>
-      <cla_stall>-3.85</cla_stall>
-      <cda_stall>-0.9233984055</cda_stall>
-      <cma_stall>0</cma_stall>
-      <cp>-0.1 0 -0.5</cp>
-      <area>0.05</area>
+      <CLa_stall>-3.85</CLa_stall>
+      <CDa_stall>-0.9233984055</CDa_stall>
+      <Cema_stall>0</Cema_stall>
+      <ref_pt>-0.12 0.0 0.0</ref_pt>
+      <area>0.15</area>
+      <mac>0.22</mac>
       <air_density>1.2041</air_density>
       <forward>0 0 1</forward>
-      <upward>0 1 0</upward>
+      <upward>-1 0 0</upward>
       <link_name>base_link</link_name>
+      <!--<topic_name>lift_force/left_elevon</topic_name> Uncomment to draw the force -->
+      <num_ctrl_surfaces>0</num_ctrl_surfaces>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
