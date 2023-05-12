@@ -3,24 +3,29 @@
 <sdf version='1.6'>
   <model name='quadtailsitter'>
     <link name='base_link'>
-      <pose>0 0 0.0 0 0 0</pose>
+      <pose>0 0 0.4 0 0 0</pose>
       <inertial>
-        <pose>0 0 0.2 0 0 0</pose>
+        <pose>0 0 0.05 0 0 0</pose>
         <mass>1.6</mass>
         <inertia>
-          <ixx>0.147563</ixx>
+          <!-- Rectangular cuboid:
+          Ixx = 1/12*(y^2+z^2)
+          Iyy = 1/12*(x^2+z^2)
+          Izz = 1/12*(x^2+y^2)
+          -->
+          <ixx>0.1133333333</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0458929</iyy>
+          <iyy>0.03020833333</iyy>
           <iyz>0</iyz>
-          <izz>0.1977</izz>
+          <izz>0.08354166667</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 -0.1 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.47 0.47 0.11</size>
+            <size>0.3 0.5 0.2</size>
           </box>
         </geometry>
         <surface>
@@ -36,7 +41,7 @@
         </surface>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0 0 0.15 0 0 1.57</pose>
+        <pose>-0.005 0 0 0 0 1.57</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
@@ -97,7 +102,7 @@
       <parent>base_link</parent>
     </joint>
     <link name='rotor_0'>
-      <pose>0.15 -0.23 0.2 0 0 0</pose>
+      <pose>0.145 -0.23 0.46 0.17 -0.17 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -163,7 +168,7 @@
       </axis>
     </joint>
     <link name='rotor_1'>
-      <pose>-0.15 0.23 0.2 0 0 0</pose>
+      <pose>-0.145 0.23 0.46 -0.17 0.17 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -229,7 +234,7 @@
       </axis>
     </joint>
     <link name='rotor_2'>
-      <pose>0.15 0.23 0.2 0 0 0</pose>
+      <pose>0.145 0.23 0.46 -0.17 -0.17  0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -295,7 +300,7 @@
       </axis>
     </joint>
     <link name='rotor_3'>
-      <pose>-0.15 -0.23 0.2 0 0 0</pose>
+      <pose>-0.145 -0.23 0.46 0.17 0.17 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
