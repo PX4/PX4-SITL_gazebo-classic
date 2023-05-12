@@ -16,10 +16,11 @@
         </inertia>
       </inertial>
       <visual name="visual">
+        <pose>0 0 0 0 1.57 0</pose>
         <geometry>
           <cylinder>
-            <radius>0.01</radius>
-            <length>0.1</length>
+            <radius>0.004</radius>
+            <length>0.08</length>
           </cylinder>
         </geometry>
         <material>
