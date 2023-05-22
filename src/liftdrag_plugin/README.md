@@ -55,34 +55,49 @@ For AVL derivatives, the current plan is to use the control derivatives at a sin
 Using the reference area of the aircraft, the derivatives from AVL, the control surface deflections, the angle of attack and sideslip angle, and the non-dimensionalized body rates, this simulator models the main forces of lift and drag on the vehicle. 
 Most of the above parameters are used to calculate the current coefficients of lift, drag, sideforce, and moment about all three axes. 
 To compute the aerodynamic coefficients, the code sums up the contributions from several different effects. The following equations hold in the linear, pre-stall flight regime:
+
 $$C_L  =  C_{L0} + C_{Lα} α + C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
 $$C_D  =  C_{D0} + \frac{{{C_L}} ^ {2}}{π ARe} + C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
 $$C_Y  =  C_{Y β} β + C_{Yp} p+ C_{Yq} q+ C_{Yr} r+ \sum_{x=1}^{CS} C_{Y,ctrl,x} \delta_{ctrl,x}$$
 $$C_ℓ  =  C_{ℓ β} β + C_{ℓp} p+ C_{ℓq} q+ C_{ℓr} r+ \sum_{x=1}^{CS} C_{ℓ,ctrl,x} \delta_{ctrl,x}$$
 $$C_m  =  C_{m α} α + C_{mp} p+ C_{mq} q+ C_{mr} r+ \sum_{x=1}^{CS} C_{m,ctrl,x} \delta_{ctrl,x}$$
 $$C_n  =  C_{n β} β + C_{np} p+ C_{nq} q+ C_{nr} r+ \sum_{x=1}^{CS} C_{n,ctrl,x} \delta_{ctrl,x}$$
+
 Here, the expression “CS” refers to the number of control surfaces on the aircraft. The summation adds up the effect of all the control surfaces.
 Post stall, most of these equations have been left unchanged. The ones that do change compute the coefficients of lift and drag, which change to the following:
+
 $$C_L = 2{sin} ^ {2} ( α )cos( α )+ C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
 $$C_D = C_{D,FP} (0.5-0.5cos(2 α ))+ C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
+
 $C_{D,FP}$ is the flat-plate coefficient of drag. Currently, this is computed as follows:
   $C_{D,FP} = \frac{2}{1+ e ^ {K1+K2 AR}}$
+
 K1 and K2 are empirical coefficients. Currently, K1 is equal to -0.224, and K2 is equal to -0.115. <br> A sigmoid function is used to blend the pre-stall and post-stall models together, with a blending parameter M used to determine how sharply the plane stalls. Currently, the default value of M is 15, which switches from pre-stall to post-stall over the course of about 1.8 degrees of angle of attack.
+
 $$\sigma = \frac{1+ e ^ {-M*( \alpha - \alpha_{stall} )} +e ^ {M*( \alpha - \alpha_{stall} )}}{(1+ e ^ {-M*( \alpha - \alpha_{stall} )} ) ( {1+e} ^ {M( α - α_{stall} )} )}$$
+
 As such, the actual equations for the coefficient of lift and drag are:
+
 $$C_L  =(1- \sigma )( C_{L0} + C_{L \alpha} \alpha )+ 2 \sigma {sin} ^ 2 ( α )cos( α )+ C_{Lp} p+ C_{Lq} q+ C_{Lr} r+ \sum_{x=1}^{CS} C_{L,ctrl,x} \delta_{ctrl,x}$$
 $$C_D = (1-\sigma)(C_{D0}+\frac{{{C_L}} ^ {2}}{π ARe})+ \sigma C_{D,FP}(0.5-0.5cos(2 α ))+ C_{Dp} p+ C_{Dq} q+ C_{Dr} r+ \sum_{x=1}^{CS} C_{D,ctrl,x} \delta_{ctrl,x}$$
+
 Given these coefficients, multiplying by the reference area of the aircraft (Sref) and the current dynamic pressure $(\overline{q})$ produces the forces.
+
 $$F =  C_F S_{ref} \overline{q}$$
 $$\overline{q}=\frac{1}{2} \rho v ^ {2}$$
+
 Here, $\rho$ refers to air density. The moments, however, need an additional term: either the span (b) or the mean aerodynamic chord $(\overline{c})$ of the aircraft.
+
 $$ℓ =  C_ℓ S_{ref} \overline{q}B$$
 $$m=  C_m S_{ref} \overline{q}\overline{c}$$
 $$n =  C_n S_{ref} \overline{q}B$$
+
 <h1>Post-Stall Models</h1>
 The plugin uses two post-stall models to compute the coefficient of lift and drag on the aircraft. The model for lift coefficient is a Newtonian model, based on the Third Law of Motion. 
 The post-stall drag model was constructed using two papers: one from Stringer et al (https://aip.scitation.org/doi/pdf/10.1063/1.5011207) which provides drag coefficients at angles of attack from zero to 360 degrees and the other from Ostowari and Naik (https://www.nrel.gov/docs/legosti/old/2559.pdf) which provides flat plate coefficients of drag at a variety of aspect ratios. The Stringer paper was used to relate drag to angle of attack, while Ostowari’s report was used to create a model of flat plate drag at a variety of aspect ratios. To create the latter model, a sigmoid function is fit to some of the numbers in the second paper, with the form below.
+
 $$C_{D,fp} = \frac{2}{1+ e ^ {K1+K2 AR}}$$
+
 The coefficients K1 and K2 are in the code, but might need some tuning.
 A sigmoid function was used because CD initially increases quickly as aspect ratio rises, but that increase would slow down as AR goes to infinity. Intuitively, it seemed like a good model for the drag vs. aspect ratio relation, and the fit seemed pretty good as well.
 Looking at the data from Stringer, one sees that the CD was approximately equal to 1-cos(2α). This has a maximum value of 2, so this expression was divided by 2 to make sure multiplying it by flat-plate drag would not produce unreasonable results. 
