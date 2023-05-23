@@ -574,9 +574,11 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
       force_center_msg->set_z(relative_center.Z());
 
       msgs::Vector3d* force_vector_msg = new msgs::Vector3d;
-      force_vector_msg->set_x(force.X());
-      force_vector_msg->set_y(force.Y());
-      force_vector_msg->set_z(force.Z());
+      ignition::math::Quaterniond veh_q_world_to_body = pose.Rot();
+      auto force_in_body = veh_q_world_to_body.RotateVectorReverse(force);
+      force_vector_msg->set_x(force_in_body.X());
+      force_vector_msg->set_y(force_in_body.Y());
+      force_vector_msg->set_z(force_in_body.Z());
 
       physics_msgs::msgs::Force force_msg;
       force_msg.set_allocated_center(force_center_msg);

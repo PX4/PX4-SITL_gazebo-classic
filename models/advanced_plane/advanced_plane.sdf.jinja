@@ -49,6 +49,10 @@
             <uri>__default__</uri>
           </script>
         </material>
+        <plugin name="left_elevon_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/lumped_force</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
@@ -190,10 +194,6 @@
             <uri>__default__</uri>
           </script>
         </material>
-        <plugin name="left_elevon_lift_visual" filename="libForceVisual.so">
-          <topic_name>lift_force/left_elevon</topic_name>
-          <color>Gazebo/Red</color>
-        </plugin>
       </visual>
     </link>
     <link name="right_elevon">
@@ -223,10 +223,6 @@
             <uri>__default__</uri>
           </script>
         </material>
-        <plugin name="right_elevon_lift_visual" filename="libForceVisual.so">
-          <topic_name>lift_force/right_elevon</topic_name>
-          <color>Gazebo/Green</color>
-        </plugin>
       </visual>
     </link>
     <link name="left_flap">
@@ -521,7 +517,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <!--<topic_name>lift_force/left_elevon</topic_name> Uncomment to draw the force -->
+      <topic_name>lift_force/lumped_force</topic_name> <!--Uncomment to draw the force-->
       <num_ctrl_surfaces>4</num_ctrl_surfaces>
       <control_surface>
         <name>left_elevon_joint</name>
