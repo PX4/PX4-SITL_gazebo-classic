@@ -54,6 +54,10 @@
             <uri>__default__</uri>
           </script>
         </material>
+        <plugin name="left_elevon_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/lumped_force</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
@@ -415,7 +419,7 @@
       <forward>0 0 1</forward>
       <upward>-1 0 0</upward>
       <link_name>base_link</link_name>
-      <!--<topic_name>lift_force/left_elevon</topic_name> Uncomment to draw the force -->
+      <topic_name>lift_force/lumped_force</topic_name> Uncomment to draw the force
       <num_ctrl_surfaces>0</num_ctrl_surfaces>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
