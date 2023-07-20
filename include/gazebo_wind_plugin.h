@@ -52,6 +52,10 @@ static const ignition::math::Vector3d kDefaultWindGustDirectionMean = ignition::
 static constexpr double kDefaultWindDirectionVariance = 0.0;
 static constexpr double kDefaultWindGustDirectionVariance = 0.0;
 
+static constexpr double kDefaultWindRampStart = 0.;
+static constexpr double kDefaultWindRampDuration = 0.;
+static const ignition::math::Vector3d kDefaultRampedWindVector = ignition::math::Vector3d(0, 0, 0);
+
 /// \brief This gazebo plugin simulates wind acting on a model.
 class GazeboWindPlugin : public WorldPlugin {
  public:
@@ -69,6 +73,7 @@ class GazeboWindPlugin : public WorldPlugin {
         wind_direction_variance_(kDefaultWindDirectionVariance),
         wind_gust_direction_mean_(kDefaultWindGustDirectionMean),
         wind_gust_direction_variance_(kDefaultWindGustDirectionVariance),
+        ramped_wind_vector(kDefaultRampedWindVector),
         frame_id_(kDefaultFrameId),
         pub_interval_(0.5),
         node_handle_(NULL) {}
@@ -124,6 +129,10 @@ class GazeboWindPlugin : public WorldPlugin {
   common::Time wind_gust_end_;
   common::Time wind_gust_start_;
   common::Time last_time_;
+
+  ignition::math::Vector3d ramped_wind_vector;
+  common::Time wind_ramp_start_;
+  common::Time wind_ramp_duration_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr wind_pub_;
