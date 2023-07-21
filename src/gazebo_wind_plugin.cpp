@@ -146,10 +146,9 @@ void GazeboWindPlugin::OnUpdate(const common::UpdateInfo& _info) {
   }
 
   // Calculate the wind with the added ramped up wind component
-  const double denominator = wind_ramp_start_.Double() + wind_ramp_duration_.Double();
   double ramp_factor = 0.;
-  if (denominator > 0) {
-    ramp_factor = constrain((now - wind_ramp_start_).Double() / denominator, 0., 1.);
+  if (wind_ramp_duration_.Double() > 0) {
+    ramp_factor = constrain((now - wind_ramp_start_).Double() / wind_ramp_duration_.Double(), 0., 1.);
   }
 
   wind += ramp_factor * ramped_wind_vector;
