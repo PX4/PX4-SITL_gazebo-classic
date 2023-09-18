@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <scene>
+        <ambient>0.95 0.95 0.95 1</ambient>
+        <background>0.3 0.3 0.3 1</background>
+        <shadows>true</shadows>
+      </scene>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -9,9 +14,9 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    <include>
+    <!-- <include>
       <uri>model://asphalt_plane</uri>
-    </include>
+    </include> -->
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
