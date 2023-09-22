@@ -585,7 +585,8 @@ void CameraManagerPlugin::_handle_camera_info(const mavlink_message_t *pMsg, str
         0,                         // lens_id
         camera_capabilities,       // CAP_FLAGS
         0,                         // Camera Definition Version
-        uri                        // URI
+        uri,                       // URI
+        0                          // uint8_t gimbal_device_id
     );
     _send_mavlink_message(&msg, srcaddr);
 }
