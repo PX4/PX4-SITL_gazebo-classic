@@ -355,6 +355,7 @@ link_libraries(physics_msgs)
 add_library(gazebo_airspeed_plugin SHARED src/gazebo_airspeed_plugin.cpp)
 add_library(gazebo_camera_manager_plugin SHARED src/gazebo_camera_manager_plugin.cpp)
 add_library(gazebo_gps_plugin SHARED src/gazebo_gps_plugin.cpp)
+add_library(gazebo_geocoordinate_gps_plugin SHARED src/gazebo_geocoordinate_gps_plugin.cpp)
 add_library(gazebo_groundtruth_plugin SHARED src/gazebo_groundtruth_plugin.cpp)
 add_library(gazebo_irlock_plugin SHARED src/gazebo_irlock_plugin.cpp)
 add_library(gazebo_random_velocity_plugin SHARED src/gazebo_random_velocity_plugin.cpp)
@@ -380,6 +381,7 @@ add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_pose_sniffer_plugin SHARED src/gazebo_pose_sniffer_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
+
 
 set(plugins
   gazebo_airspeed_plugin

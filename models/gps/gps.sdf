@@ -76,7 +76,7 @@
             </vertical>
           </velocity_sensing>
         </gps> -->
-        <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+        <plugin name="gps_plugin" filename="libgazebo_geocoordinate_gps_plugin.so">
           <robotNamespace></robotNamespace>
           <gpsNoise>true</gpsNoise>
           <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
