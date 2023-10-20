@@ -48,6 +48,7 @@
           <interval>1</interval>
           <width>3840</width>
           <height>2160</height>
+          <mavlink_cam_udp_port>14540</mavlink_cam_udp_port>
         </plugin>
       </sensor>
     </link>
