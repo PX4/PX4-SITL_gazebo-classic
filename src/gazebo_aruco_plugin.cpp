@@ -168,8 +168,8 @@ void arucoMarkerPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   int dict_id = 0; 
   // Check for OpenCV version 4.7 or later
   #if CV_VERSION_MAJOR >= 4 && CV_VERSION_MINOR >= 7
-    this->marker_dict = makePtr<aruco::Dictionary>(cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50)); //(cv::aruco::PREDEFINED_DICTIONARY_NAME(dict_id));  
-    this->detectorParams = makePtr<aruco::DetectorParameters>(cv::aruco::DetectorParameters()); //::create();
+    this->marker_dict = makePtr<aruco::Dictionary>(cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50)); 
+    this->detectorParams = makePtr<aruco::DetectorParameters>(cv::aruco::DetectorParameters());
   #else
     this->marker_dict = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(dict_id));  
     this->detectorParams = cv::aruco::DetectorParameters::create();
