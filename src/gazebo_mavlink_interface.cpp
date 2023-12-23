@@ -95,7 +95,7 @@ void GazeboMavlinkInterface::CreateSensorSubscription(
 #if GAZEBO_MAJOR_VERSION >= 9
     const auto sensor_orientation = nested_model->RelativePose().Rot();
 #else
-    const auto sensor_orientation = nested_model->GetChild()->GetRelativePose()).Rot();
+    const auto sensor_orientation = nested_model->GetChild()->GetRelativePose().Rot();
 #endif
 
     // One map will be created for each Gazebo message type
