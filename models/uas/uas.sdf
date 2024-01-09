@@ -417,6 +417,12 @@
             <cam_component_id>100</cam_component_id>
             <mavlink_cam_udp_port>14530</mavlink_cam_udp_port>
         </plugin>
+        <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
+            <ros>
+                <namespace>/</namespace>
+                <argument>image_raw:=/camera/image_raw</argument> <!-- ROS topic -->
+            </ros>
+        </plugin>
       </sensor>
     </link>
     <joint name='cgo3_camera_joint' type='revolute'>
