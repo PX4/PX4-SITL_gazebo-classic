@@ -184,15 +184,8 @@
     </model>
 
     <model name="DynamicObstacle1">
-       <pose>-10 -10 0.15 0 0 0</pose>
+       <pose>-5 -5 0.15 0 0 0</pose>
        <include>
-        <uri>model://dynamic_obstacle</uri>
-      </include>
-    </model>
-
-    <model name="DynamicObstacle2">
-      <pose>10 10 0.15 0 0 0</pose>
-      <include>
         <uri>model://dynamic_obstacle</uri>
       </include>
     </model>
