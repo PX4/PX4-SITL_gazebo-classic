@@ -6,47 +6,34 @@
       <uri>model://sun</uri>
     </include>
     <!-- A ground plane -->
-  <model name="sloped_plane">
-    <static>true</static>
-    <link name="links">
-      <pose>0.0 0.0 -10.0 0 0 0</pose>
-      <collision name="collision">
-        <geometry>
-          <plane>
-            <!-- Slope of 15 degrees -->
-            <normal>-0.25881158705 0 0.96592782463</normal> 
-            <size>100 100</size>
-          </plane>
-        </geometry>
-        <surface>
-          <contact>
-             <collide_bitmask>65535</collide_bitmask>
-          </contact>
-          <friction>
-            <ode>
-              <mu>100</mu>
-              <mu2>50</mu2>
-            </ode>
-          </friction>
-        </surface>
-      </collision>
-      <visual name="visual">
-        <cast_shadows>false</cast_shadows>
-        <geometry>
-          <plane>
-            <normal>-0.25881158705 0 0.96592782463</normal> 
-            <size>100 100</size>
-          </plane>
-        </geometry>
-        <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
-        </material>
-      </visual>
-    </link>
-  </model>
+    <model name="sloped_plane">
+      <static>true</static>
+      <link name="links">
+        <pose>0.0 0.0 -5.0 0.261 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>200 200 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <box>
+              <size>200 200 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://asphalt_plane/materials/scripts</uri>
+              <uri>model://asphalt_plane/materials/textures</uri>
+              <name>vrc/asphalt</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
     <include>
       <uri>model://asphalt_plane</uri>
     </include>
