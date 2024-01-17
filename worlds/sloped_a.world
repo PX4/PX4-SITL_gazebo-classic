@@ -8,7 +8,8 @@
     <!-- A ground plane -->
   <model name="sloped_plane">
     <static>true</static>
-    <link name="link">
+    <link name="links">
+      <pose>0.0 0.0 -10.0 0 0 0</pose>
       <collision name="collision">
         <geometry>
           <plane>
@@ -46,9 +47,9 @@
       </visual>
     </link>
   </model>
-    <!-- <include>
+    <include>
       <uri>model://asphalt_plane</uri>
-    </include> -->
+    </include>
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
