@@ -55,7 +55,7 @@
       <plugin name="random" filename="libRandomVelocityPlugin.so">
         <link>link</link>
         <initial_velocity>0 1 0</initial_velocity>
-        <velocity_factor>0.5</velocity_factor>
+        <velocity_factor>0.9</velocity_factor>
         <update_period>5</update_period>
         <min_z>-5</min_z>
         <max_z>0</max_z>
