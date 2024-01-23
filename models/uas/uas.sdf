@@ -420,7 +420,7 @@
         <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
             <ros>
                 <namespace>/</namespace>
-                <argument>image_raw:=/camera/image_raw</argument> <!-- ROS topic -->
+                <argument>--ros-args --remap image_raw:=/camera/image_raw</argument>
             </ros>
         </plugin>
       </sensor>
