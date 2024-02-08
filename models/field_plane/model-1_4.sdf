@@ -6,15 +6,27 @@
       <collision name="collision">
         <geometry>
           <box>
-            <size>20 20 .1</size>
+            <size>30 30 .1</size>
           </box>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0</mu> <!-- No friction -->
+              <mu2>0</mu2> <!-- No friction -->
+            </ode>
+          </friction>
+          <contact>
+            <ode/>
+          </contact>
+          <bounce/>
+        </surface>
       </collision>
       <visual name="visual">
         <cast_shadows>false</cast_shadows>
         <geometry>
           <box>
-            <size>20 20 .1</size>
+            <size>30 30 .1</size>
           </box>
         </geometry>
         <material>

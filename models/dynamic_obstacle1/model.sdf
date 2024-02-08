@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
-    <model name="DynamicObstacle">
+    <model name="DynamicObstacle1">
       <pose>0 0 0.15 0 0 0</pose>
       <link name="link">
-	<gravity>1</gravity>
+        <gravity>1</gravity>
         <inertial>
-	  <inertia>
-	    <ixx>0.17</ixx>
+          <inertia>
+            <ixx>0.17</ixx>
             <ixy>0.00</ixy>
             <ixz>0.00</ixz>
             <iyy>0.17</iyy>
@@ -23,7 +23,7 @@
               <size>0.3 0.3 0.3</size>
             </box>
           </geometry>
-	  <surface>
+          <surface>
             <friction>
               <ode>
                 <mu>0.0</mu>
@@ -33,15 +33,15 @@
             <bounce>
               <restitution_coefficient>0.0</restitution_coefficient>
               <threshold>0.0</threshold>
-      	  </bounce>
-	  <contact>
-            <ode>
-              <kp>2000000000</kp>
-	      <kd>1</kd>
-              <max_vel>2</max_vel>
-              <min_depth>0.00</min_depth>
-            </ode>
-          </contact>
+            </bounce>
+            <contact>
+              <ode>
+                <kp>2000000000</kp>
+                <kd>1</kd>
+                <max_vel>2</max_vel>
+                <min_depth>0.00</min_depth>
+              </ode>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -50,13 +50,20 @@
               <size>0.3 0.3 0.3</size>
             </box>
           </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+          </material>
         </visual>
       </link>
-      <plugin name="random" filename="libRandomVelocityPlugin.so">
+      <plugin name="rgv_movement_plugin" filename="libgazebo_rgv_movement_plugin.so">
         <link>link</link>
         <initial_velocity>0 1 0</initial_velocity>
-        <velocity_factor>0.9</velocity_factor>
+        <velocity_factor>1</velocity_factor>
         <update_period>5</update_period>
+        <move_duration>10</move_duration>
+        <stop_duration>5</stop_duration> <!-- Since the update_period is 5 seconds. Make the stop duration 5 seconds shorter than you want. -->
         <min_z>-5</min_z>
         <max_z>0</max_z>
       </plugin>

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.5">
+<sdf version="1.4">
   <model name="field_plane">
     <static>true</static>
     <link name="link">
@@ -9,6 +9,18 @@
             <size>30 30 .1</size>
           </box>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0</mu>
+              <mu2>0</mu2>
+            </ode>
+          </friction>
+          <contact>
+            <ode/>
+          </contact>
+          <bounce/>
+        </surface>
       </collision>
       <visual name="visual">
         <cast_shadows>false</cast_shadows>

@@ -157,7 +157,7 @@
         <collision name='Wall_4_Collision'>
           <geometry>
             <box>
-              <size>0 0.15 1</size>
+              <size>30 0.15 1</size>
             </box>
           </geometry>
           <pose>0 15 0.5 0 -0 0</pose>
@@ -184,9 +184,16 @@
     </model>
 
     <model name="DynamicObstacle1">
-       <pose>-5 -5 0.15 0 0 0</pose>
+       <pose>-5 -5 0.2 0 0 0</pose>
        <include>
-        <uri>model://dynamic_obstacle</uri>
+        <uri>model://dynamic_obstacle1</uri>
+      </include>
+    </model>
+
+    <model name="DynamicObstacle2">
+       <pose>5 5 0.2 0 0 0</pose>
+       <include>
+        <uri>model://dynamic_obstacle2</uri>
       </include>
     </model>
 
