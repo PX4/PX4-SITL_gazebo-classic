@@ -104,12 +104,13 @@ add_subdirectory( external/OpticalFlow OpticalFlow )
 set( OpticalFlow_LIBS "OpticalFlow" )
 
 # for ROS2 subscribers and publishers
-if (BUILD_ROS2_PLUGINS)
-  find_package(ament_cmake REQUIRED)
-  find_package(geometry_msgs REQUIRED)
-  find_package(rclcpp REQUIRED)
-  find_package(sensor_msgs REQUIRED)
-endif()
+# if (BUILD_ROS2_PLUGINS)
+find_package(ament_cmake REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+# endif()
 
 
 # find MAVLink
@@ -380,7 +381,6 @@ add_library(gazebo_parachute_plugin SHARED src/gazebo_parachute_plugin.cpp)
 add_library(gazebo_pose_sniffer_plugin SHARED src/gazebo_pose_sniffer_plugin.cpp)
 add_library(gazebo_airship_dynamics_plugin SHARED src/gazebo_airship_dynamics_plugin.cpp)
 add_library(gazebo_drop_plugin SHARED src/gazebo_drop_plugin.cpp)
-add_library(gazebo_rgv_movement_plugin SHARED src/gazebo_rgv_movement_plugin.cpp)
 
 set(plugins
   gazebo_airspeed_plugin
@@ -411,7 +411,6 @@ set(plugins
   gazebo_pose_sniffer_plugin
   gazebo_airship_dynamics_plugin
   gazebo_drop_plugin
-  gazebo_rgv_movement_plugin
   )
 
 foreach(plugin ${plugins})
@@ -421,25 +420,46 @@ target_link_libraries(gazebo_opticalflow_plugin ${OpticalFlow_LIBS})
 
 # If BUILD_ROS2_PLUGINS set to ON, build plugins that have ROS dependencies
 # Current plugins that can be used with ROS interface: gazebo_motor_failure_plugin
-if (BUILD_ROS2_PLUGINS)
-  add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
-  target_link_libraries(gazebo_motor_failure_plugin ${GAZEBO_libraries} ${rclcpp_LIBRARIES})
-  list(APPEND plugins gazebo_motor_failure_plugin)
-  message(STATUS "adding gazebo_motor_failure_plugin to build")
+# if (BUILD_ROS2_PLUGINS)
+  # Add gazebo_motor_failure_plugin
+# add_library(gazebo_motor_failure_plugin SHARED src/gazebo_motor_failure_plugin.cpp)
+# target_link_libraries(gazebo_motor_failure_plugin
+#   ${GAZEBO_libraries}
+#   ${rclcpp_LIBRARIES}
+# )
+# list(APPEND plugins gazebo_motor_failure_plugin)
+# message(STATUS "adding gazebo_motor_failure_plugin to build")
 
-  include_directories(
-    include
-    ${geometry_msgs_INCLUDE_DIRS}
-    ${sensor_msgs_INCLUDE_DIRS}
-    ${rclcpp_INCLUDE_DIRS}
-  )
+# Add gazebo_rgv_movement_plugin
+add_library(gazebo_rgv_movement_plugin SHARED src/gazebo_rgv_movement_plugin.cpp)
+target_link_libraries(gazebo_rgv_movement_plugin
+  ${GAZEBO_libraries}
+  ${rclcpp_LIBRARIES}
+)
+list(APPEND plugins gazebo_rgv_movement_plugin)
+message(STATUS "adding gazebo_rgv_movement_plugin to build")
 
-  target_link_libraries(gazebo_motor_failure_plugin
-    ${ament_LIBRARIES}
-    ${rclcpp_LIBRARIES}
-    ${GAZEBO_libraries}
-  )
-endif()
+# Include directories for ROS 2 and Gazebo
+include_directories(
+  include
+  ${geometry_msgs_INCLUDE_DIRS}
+  ${sensor_msgs_INCLUDE_DIRS}
+  ${rclcpp_INCLUDE_DIRS}
+)
+
+# Ensure all plugins link against ROS 2 and Gazebo libraries
+# target_link_libraries(gazebo_motor_failure_plugin
+#   ${ament_LIBRARIES}
+#   ${rclcpp_LIBRARIES}
+#   ${GAZEBO_libraries}
+# )
+
+target_link_libraries(gazebo_rgv_movement_plugin
+  ${ament_LIBRARIES}
+  ${rclcpp_LIBRARIES}
+  ${GAZEBO_libraries}
+)
+# endif()
 
 if (GSTREAMER_FOUND)
   add_library(gazebo_gst_camera_plugin SHARED src/gazebo_gst_camera_plugin.cpp)

@@ -1,26 +1,13 @@
-/*
- * Copyright (C) 2015 Open Source Robotics Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
-*/
 #include <ignition/math/Rand.hh>
+#include <ignition/math/Vector3.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/Link.hh>
 #include "gazebo_rgv_movement_plugin_private.h"
 #include "gazebo_rgv_movement_plugin.h"
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 using namespace gazebo;
 
@@ -67,26 +54,6 @@ void RgvMovementPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("max_x"))
     this->dataPtr->xRange.Y(_sdf->Get<double>("max_x"));
 
-  // Make sure min <= max
-  //
-  // Analysis:
-  //     min_x   max_x  | result_X  result_Y
-  //    ----------------------------------
-  // 0:   0       0     |   0         0
-  // 1:   1       0     |   0         1
-  // 2:   0       1     |   0         1
-  //
-  // Line 1 above is the error case, and can be handled different ways:
-  //   a: Throw an exception
-  //   b: Set both min and max values to the same value (either min_x or
-  //   max_x)
-  //   c: Fix it by swapping the values
-  //   d: Do nothing, which would:
-  //        i. First clamp the value to <= max_x
-  //        ii. Second clamp the value to >= min_x
-  //        iii. The result would always be the value of min_x
-  //
-  // We've opted for option c, which seems the most resonable.
   ignition::math::Vector2d tmp = this->dataPtr->xRange;
   this->dataPtr->xRange.X(std::min(tmp.X(), tmp.Y()));
   this->dataPtr->xRange.Y(std::max(tmp.X(), tmp.Y()));
@@ -136,8 +103,26 @@ void RgvMovementPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // set the stop duration
   if (_sdf->HasElement("stop_duration"))
     this->dataPtr->stopDuration = _sdf->Get<double>("stop_duration");
+    
+  // Initialize ROS 2 if not already done
+  if (!rclcpp::ok()) {
+      rclcpp::init(0, nullptr);
+  }
 
-  // Connect to the world update signal
+  // Create a ROS 2 node
+  if(_sdf->HasElement("ros_node_name")) {
+    this->dataPtr->rosNodeName = _sdf->Get<std::string>("ros_node_name");
+    this->dataPtr->rosNode = rclcpp::Node::make_shared(this->dataPtr->rosNodeName);
+  }
+
+
+  // Create a publisher
+  if(_sdf->HasElement("ros_topic")){
+    this->dataPtr->rosTopic = _sdf->Get<std::string>("ros_topic");
+    this->dataPtr->publisher = this->dataPtr->rosNode->create_publisher<std_msgs::msg::Float64MultiArray>(this->dataPtr->rosTopic, 10);
+  }
+
+  // Connect to the world update signal for continuous operation
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       std::bind(&RgvMovementPlugin::Update, this, std::placeholders::_1));
 }
@@ -157,6 +142,17 @@ void RgvMovementPlugin::Update(const common::UpdateInfo &_info)
   // Short-circuit in case the link is invalid.
   if (!this->dataPtr->link)
     return;
+  
+  // Publishing logic
+  if (this->dataPtr->rosNode && this->dataPtr->publisher) {
+    ignition::math::Pose3d pose = this->dataPtr->link->WorldPose();
+    ignition::math::Vector3d position = pose.Pos();
+    auto message = std_msgs::msg::Float64MultiArray();
+    message.data.push_back(position.X());
+    message.data.push_back(position.Y());
+    message.data.push_back(position.Z());
+    this->dataPtr->publisher->publish(message);
+  }
 
   // Stop the movement if the stop time has been reached`````````````````
   if(_info.simTime > this->dataPtr->stopTime &&

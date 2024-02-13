@@ -63,7 +63,9 @@
         <velocity_factor>1</velocity_factor>
         <update_period>5</update_period>
         <move_duration>10</move_duration>
-        <stop_duration>5</stop_duration> <!-- Since the update_period is 5 seconds. Make the stop duration 5 seconds shorter than you want. -->
+        <stop_duration>5</stop_duration>
+        <ros_topic>rgv1_truth/pose</ros_topic>
+        <ros_node_name>rgv1</ros_node_name>
         <min_z>-5</min_z>
         <max_z>0</max_z>
       </plugin>

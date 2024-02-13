@@ -7,6 +7,10 @@
 #include <gazebo/physics/Link.hh>
 #include <gazebo/common/Time.hh>
 
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
+
+
 namespace gazebo
 {
   /// \internal
@@ -29,6 +33,10 @@ namespace gazebo
     public: common::Time moveDuration;
     public: common::Time stopDuration;
     public: common::Time stopTime;
+    public: std::string rosTopic;
+    public: std::string rosNodeName;
+    public: rclcpp::Node::SharedPtr rosNode;
+    public: rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher;
 
 
     /// \brief Time between recomputing a new velocity vector
