@@ -529,7 +529,7 @@ void CameraManagerPlugin::_handle_take_photo(const mavlink_message_t *pMsg, stru
     } else {
         gzerr << "Bad Start Capture argments: " << cmd.param2 << " " << cmd.param3 << endl;
         _send_cmd_ack(pMsg->sysid, pMsg->compid,
-                      MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_UNSUPPORTED, srcaddr);
+                      MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_DENIED, srcaddr);
     }
 }
 
@@ -561,7 +561,7 @@ void CameraManagerPlugin::_handle_start_video_capture(const mavlink_message_t *p
 
     if (cmd.param1 != 0 || cmd.param2 != 0) {
         gzerr << "VIDEO_START_CAPTURE: param1 and param2 must be 0\n";
-        _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_VIDEO_START_CAPTURE, MAV_RESULT_UNSUPPORTED, srcaddr);
+        _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_VIDEO_START_CAPTURE, MAV_RESULT_DENIED, srcaddr);
         return;
     }
 
@@ -580,7 +580,7 @@ void CameraManagerPlugin::_handle_stop_video_capture(const mavlink_message_t *pM
 
     if (cmd.param1 != 0) {
         gzerr << "VIDEO_STOP_CAPTURE: param1 must be 0\n";
-        _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_VIDEO_START_CAPTURE, MAV_RESULT_UNSUPPORTED, srcaddr);
+        _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_VIDEO_START_CAPTURE, MAV_RESULT_DENIED, srcaddr);
         return;
     }
 
