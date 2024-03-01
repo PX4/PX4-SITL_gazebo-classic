@@ -31,6 +31,7 @@
 #include <gazebo/rendering/rendering.hh>
 #include <SITLGps.pb.h>
 #include <ignition/math.hh>
+#include <chrono>
 
 namespace gazebo
 {
@@ -61,6 +62,8 @@ private:
     void _handle_storage_info(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_stop_take_photo(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_start_video_capture(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
+    void _handle_stop_video_capture(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_request_camera_settings(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_request_video_stream_information(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
     void _handle_request_video_stream_status(const mavlink_message_t *pMsg, struct sockaddr* srcaddr);
@@ -90,7 +93,8 @@ private:
     enum {
         CAPTURE_DISABLED,
         CAPTURE_SINGLE,
-        CAPTURE_ELAPSED
+        CAPTURE_ELAPSED,
+        CAPTURE_VIDEO
     };
 
     int         _captureMode{CAPTURE_DISABLED};
@@ -117,6 +121,8 @@ private:
     int                         _systemID{1};
     int                         _componentID{MAV_COMP_ID_CAMERA};
     int                         _mavlinkCamPort{14530};
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> _start_video_capture_time;
 };
 
 } /* namespace gazebo */
