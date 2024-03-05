@@ -21,6 +21,7 @@ set(_MAVLINK_EXTRA_SEARCH_HINTS
     ../mavlink/
     ${CATKIN_DEVEL_PREFIX}/
     ${CMAKE_CURRENT_BINARY_DIR}/../mavlink/
+    ${CMAKE_PREFIX_PATH}/include/mavlink/
     )
 
 set(_MAVLINK_EXTRA_SEARCH_PATHS
