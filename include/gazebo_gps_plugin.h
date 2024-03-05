@@ -110,7 +110,7 @@ private:
   double world_altitude_ = 0.0;
 
   // gps delay related
-  static constexpr double gps_delay_ = 0.12;           // 120 ms
+  static constexpr double gps_delay_ = 0.120;           // 120 ms
   static constexpr int gps_buffer_size_max_ = 1000;
   std::queue<sensor_msgs::msgs::SITLGps> gps_delay_buffer_;
 

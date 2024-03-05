@@ -53,6 +53,7 @@
 
 #include <development/mavlink.h>
 #include "msgbuffer.h"
+#include "gps_status.h"
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 static const uint32_t kDefaultMavlinkTcpPort = 4560;
@@ -122,6 +123,17 @@ namespace SensorData {
         double satellites_visible;
         int id;
     };
+
+    struct GpsStatus
+    {
+        uint8_t satellites_visible;
+        uint8_t satellite_prn[20];
+        uint8_t satellite_used[20];
+        uint8_t satellite_elevation[20];
+        uint8_t satellite_azimuth[20];
+        uint8_t satellite_snr[20];
+    };
+
 }
 
 struct HILData {
@@ -156,6 +168,7 @@ public:
     void SendSensorMessages(const uint64_t time_usec);
     void SendSensorMessages(const uint64_t time_usec, HILData &hil_data);
     void SendGpsMessages(const SensorData::Gps &data);
+    void SendGpsStatusMessages(const SensorData::GpsStatus &data);
     void UpdateBarometer(const SensorData::Barometer &data, const int id = 0);
     void UpdateAirspeed(const SensorData::Airspeed &data, const int id = 0);
     void UpdateIMU(const SensorData::Imu &data, const int id = 0);
@@ -253,6 +266,7 @@ private:
     // Serial interface
     boost::asio::io_service io_service_{};
     boost::asio::serial_port serial_dev_;
+    SerialPort nmea_gps_port;
     bool serial_enabled_{false};
 
     mavlink_status_t m_status_{};
@@ -276,4 +290,8 @@ private:
     std::atomic<bool> gotSigInt_ {false};
 
     bool received_heartbeats_ {false};
+
+    // Gps Status
+    SensorData::GpsStatus gps_status;
+    size_t gps_status_itr;
 };
