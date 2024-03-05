@@ -11,6 +11,8 @@ MavlinkInterface::~MavlinkInterface() {
 
 void MavlinkInterface::Load()
 {
+
+
   mavlink_addr_ = htonl(INADDR_ANY);
   if (mavlink_addr_str_ != "INADDR_ANY") {
     mavlink_addr_ = inet_addr(mavlink_addr_str_.c_str());
@@ -200,6 +202,57 @@ void MavlinkInterface::Load()
     }
   }
   // hil_data_.resize(1);
+  std::memset(&gps_status, 0x00, sizeof(gps_status));
+  gps_status_itr = 0;
+
+  auto gps_status_cb = [this] (const std::string &sentence)
+  {
+    gsv_sentence gsv(sentence);
+
+    if (!gsv.valid)
+        return;
+
+    // New cycle of gsv strings
+    if (gsv.msg_num == 1)
+    {
+        std::memset(&gps_status, 0x00, sizeof(gps_status));
+        gps_status_itr = 0;
+    }
+
+    if (gsv.satellite_info.size() > 0)
+    {
+        gps_status.satellites_visible = gsv.sat_count;
+
+        for (const satellite &sat : gsv.satellite_info)
+        {
+            // PRN
+            gps_status.satellite_prn[gps_status_itr] = sat.prn;
+
+            // SATELLITES USED
+            gps_status.satellite_used[gps_status_itr] = 1;
+
+            // ELEVATION
+            gps_status.satellite_elevation[gps_status_itr] = sat.elevation;
+
+            // AZIMUTH
+            gps_status.satellite_azimuth[gps_status_itr] = sat.azimuth;
+
+            // SNR
+            gps_status.satellite_snr[gps_status_itr] = sat.snr;
+
+
+            ++gps_status_itr;
+        }
+
+        if (gsv.msg_num == gsv.tot_msg_num)
+        {
+            SendGpsStatusMessages(gps_status);
+        }
+    }
+  };
+
+  nmea_gps_port.setCallback(std::move(gps_status_cb));
+  nmea_gps_port.start("/dev/ttyACM0");
 }
 
 void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
@@ -305,6 +358,43 @@ void MavlinkInterface::SendGpsMessages(const SensorData::Gps &data) {
     mavlink_msg_hil_gps_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_gps_msg);
     send_mavlink_message(&msg);
   }
+}
+
+void MavlinkInterface::SendGpsStatusMessages(const SensorData::GpsStatus &data)
+{
+    mavlink_gps_status_t gps_status;
+
+    // Copy over sensor data
+    std::memcpy(&gps_status.satellites_visible,
+                &data.satellites_visible,
+                sizeof(gps_status.satellites_visible));
+
+    std::memcpy(&gps_status.satellite_prn,
+                &data.satellite_prn,
+                sizeof(gps_status.satellite_prn));
+
+    std::memcpy(&gps_status.satellite_used,
+                &data.satellite_used,
+                sizeof(gps_status.satellite_used));
+
+    std::memcpy(&gps_status.satellite_elevation,
+                &data.satellite_elevation,
+                sizeof(gps_status.satellite_elevation));
+
+    std::memcpy(&gps_status.satellite_azimuth,
+                &data.satellite_azimuth,
+                sizeof(gps_status.satellite_azimuth));
+
+    std::memcpy(&gps_status.satellite_snr,
+                &data.satellite_snr,
+                sizeof(gps_status.satellite_snr));
+
+    if (!hil_mode_ || (hil_mode_ && !hil_state_level_))
+    {
+        mavlink_message_t msg;
+        mavlink_msg_gps_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_status);
+        send_mavlink_message(&msg);
+    }
 }
 
 void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data, int id) {

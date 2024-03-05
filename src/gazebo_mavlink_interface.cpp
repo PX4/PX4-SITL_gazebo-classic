@@ -25,7 +25,6 @@ GZ_REGISTER_MODEL_PLUGIN(GazeboMavlinkInterface);
 
 GazeboMavlinkInterface::GazeboMavlinkInterface() : ModelPlugin(){
       mavlink_interface_ = std::make_unique<MavlinkInterface>();
-
 }
 
 GazeboMavlinkInterface::~GazeboMavlinkInterface() {
