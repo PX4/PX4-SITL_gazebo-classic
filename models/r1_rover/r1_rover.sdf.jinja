@@ -154,16 +154,16 @@
         <surface>
           <friction>
             <torsional>
-              <coefficient>0.25</coefficient>
+              <coefficient>1.0</coefficient>
               <use_patch_radius>1</use_patch_radius>
-              <surface_radius>0.0686</surface_radius>
+              <surface_radius>0.0617</surface_radius>
             </torsional>
             <ode>
               <mu>1.0</mu>
               <mu2>0.45</mu2>
-              <fdir1>1 0 0</fdir1>
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
+              <fdir1>1 1 0</fdir1>
+              <slip1>0.01</slip1>
+              <slip2>0.005</slip2>
             </ode>
           </friction>
           <bounce>
@@ -240,16 +240,16 @@
         <surface>
           <friction>
             <torsional>
-              <coefficient>0.25</coefficient>
+              <coefficient>1.0</coefficient>
               <use_patch_radius>1</use_patch_radius>
-              <surface_radius>0.0686</surface_radius>
+              <surface_radius>0.0617</surface_radius>
             </torsional>
             <ode>
               <mu>1.0</mu>
               <mu2>0.45</mu2>
-              <fdir1>1 0 0</fdir1>
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
+              <fdir1>1 1 0</fdir1>
+              <slip1>0.01</slip1>
+              <slip2>0.005</slip2>
             </ode>
           </friction>
           <bounce>
@@ -326,16 +326,16 @@
         <surface>
           <friction>
             <torsional>
-              <coefficient>0.25</coefficient>
+              <coefficient>1.0</coefficient>
               <use_patch_radius>1</use_patch_radius>
-              <surface_radius>0.0686</surface_radius>
+              <surface_radius>0.0617</surface_radius>
             </torsional>
             <ode>
               <mu>1.0</mu>
               <mu2>0.45</mu2>
-              <fdir1>1 0 0</fdir1>
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
+              <fdir1>1 1 0</fdir1>
+              <slip1>0.01</slip1>
+              <slip2>0.005</slip2>
             </ode>
           </friction>
           <bounce>
@@ -410,16 +410,16 @@
         <surface>
           <friction>
             <torsional>
-              <coefficient>0.25</coefficient>
+              <coefficient>1.0</coefficient>
               <use_patch_radius>1</use_patch_radius>
-              <surface_radius>0.0686</surface_radius>
+              <surface_radius>0.0617</surface_radius>
             </torsional>
             <ode>
               <mu>1.0</mu>
               <mu2>0.45</mu2>
-              <fdir1>1 0 0</fdir1>
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
+              <fdir1>1 1 0</fdir1>
+              <slip1>0.01</slip1>
+              <slip2>0.005</slip2>
             </ode>
           </friction>
           <bounce>
@@ -570,7 +570,7 @@
       <sdk_udp_port>14540</sdk_udp_port>
       <hil_mode>false</hil_mode>
       <hil_state_level>false</hil_state_level>
-      <enable_lockstep>true</enable_lockstep>
+      <enable_lockstep>false</enable_lockstep>
       <use_tcp>true</use_tcp>
       <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
       <control_channels>
