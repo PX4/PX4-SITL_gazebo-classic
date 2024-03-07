@@ -492,7 +492,7 @@
       <mavlink_tcp_port>4560</mavlink_tcp_port>
       <mavlink_udp_port>14560</mavlink_udp_port>
       <serialEnabled>1</serialEnabled>
-      <serialDevice>/dev/ttyACM0</serialDevice>
+      <serialDevice>/dev/ttyUSB0</serialDevice>
       <baudRate>921600</baudRate>
       <qgc_addr>INADDR_ANY</qgc_addr>
       <qgc_udp_port>14550</qgc_udp_port>

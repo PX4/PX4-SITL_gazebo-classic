@@ -11,8 +11,6 @@ MavlinkInterface::~MavlinkInterface() {
 
 void MavlinkInterface::Load()
 {
-
-
   mavlink_addr_ = htonl(INADDR_ANY);
   if (mavlink_addr_str_ != "INADDR_ANY") {
     mavlink_addr_ = inet_addr(mavlink_addr_str_.c_str());
@@ -246,12 +244,17 @@ void MavlinkInterface::Load()
 
         if (gsv.msg_num == gsv.tot_msg_num)
         {
+            std::cout << "sending " << gps_status_itr << " gps status" << std::endl;
             SendGpsStatusMessages(gps_status);
+
+            std::memset(&gps_status, 0x00, sizeof(gps_status));
+            gps_status_itr = 0;
         }
     }
   };
 
   nmea_gps_port.setCallback(std::move(gps_status_cb));
+  std::cout << "reading nmea gsv data at /dev/ttyACM0" << std::endl;
   nmea_gps_port.start("/dev/ttyACM0");
 }
 
@@ -393,7 +396,8 @@ void MavlinkInterface::SendGpsStatusMessages(const SensorData::GpsStatus &data)
     {
         mavlink_message_t msg;
         mavlink_msg_gps_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_status);
-        send_mavlink_message(&msg);
+        forward_mavlink_message(&msg);
+        //send_mavlink_message(&msg);
     }
 }
 
