@@ -252,7 +252,7 @@ void MavlinkInterface::Load()
     }
   };
 
-  std::string gps_receiver_port = "/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_GNS_receiver-if00";
+  std::string gps_receiver_port = "/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_GNSS_receiver-if00";
   nmea_gps_port.setCallback(std::move(gps_status_cb));
   std::cout << "reading nmea gsv data at " << gps_receiver_port << std::endl;
   nmea_gps_port.start(gps_receiver_port.c_str());
