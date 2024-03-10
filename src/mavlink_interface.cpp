@@ -244,7 +244,6 @@ void MavlinkInterface::Load()
 
         if (gsv.msg_num == gsv.tot_msg_num)
         {
-            std::cout << "sending " << gps_status_itr << " gps status" << std::endl;
             SendGpsStatusMessages(gps_status);
 
             std::memset(&gps_status, 0x00, sizeof(gps_status));
@@ -253,9 +252,10 @@ void MavlinkInterface::Load()
     }
   };
 
+  std::string gps_receiver_port = "/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_GNS_receiver-if00";
   nmea_gps_port.setCallback(std::move(gps_status_cb));
-  std::cout << "reading nmea gsv data at /dev/ttyACM0" << std::endl;
-  nmea_gps_port.start("/dev/ttyACM0");
+  std::cout << "reading nmea gsv data at " << gps_receiver_port << std::endl;
+  nmea_gps_port.start(gps_receiver_port.c_str());
 }
 
 void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
@@ -397,7 +397,6 @@ void MavlinkInterface::SendGpsStatusMessages(const SensorData::GpsStatus &data)
         mavlink_message_t msg;
         mavlink_msg_gps_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_status);
         forward_mavlink_message(&msg);
-        //send_mavlink_message(&msg);
     }
 }
 
