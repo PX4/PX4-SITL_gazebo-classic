@@ -186,8 +186,10 @@ struct gsv_sentence : nmea_sentence
 
                     field = fields[4*i + 6];
                     if (field == "NULL")
-                        continue;
-                    sat.snr = std::stoul(field);
+                        sat.snr = 0.0;
+                    else
+                        sat.snr = std::stoul(field);
+
 
                     satellite_info.emplace_back(sat);
             }
