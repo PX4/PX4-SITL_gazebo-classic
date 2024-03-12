@@ -1,0 +1,559 @@
+<sdf version='1.7'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <model name='launch_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <transparency>1</transparency>
+          <visibility_flags>0</visibility_flags>
+          <geometry>
+            <empty/>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <grid>0</grid>
+      <origin_visual>0</origin_visual>
+      <shadows>0</shadows>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <ambient>0.95 0.95 0.95 1</ambient>
+      <background>0.3 0.3 0.3 1</background>
+    </scene>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>36.71208681957684</latitude_deg>
+      <longitude_deg>-111.70164945544009</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='TERRAIN'>
+      <pose>0.061847 0.010434 0.5 0 -0 0</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://DIP/meshes/DIP.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://DIP/meshes/DIP.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_tent'>
+      <pose>-10.8563 -27.0911 0.5 0 -0 0</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_tent_clone'>
+      <pose>-1416.5 -193.042 69.413 -0.115128 0.122251 1.57608</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_tent_clone_0'>
+      <pose>-1411.47 -182.396 69.413 -0.115128 0.122251 1.57608</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_tent_clone_clone'>
+      <pose>-1439.28 -190.572 69.0514 -0.115128 0.122251 1.57608</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_tent/meshes/army_tent.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_container'>
+      <pose>-0.265372 0.54321 0.5 0 -0 0</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_container/meshes/army_container.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_container/meshes/army_container.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_container_clone'>
+      <pose>-1425.44 -180.209 67.0657 0 -0 0</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_container/meshes/army_container.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_container/meshes/army_container.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='army_container_clone_0'>
+      <pose>-1425.88 -185.939 67.0657 0 -0 0</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://army_container/meshes/army_container.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://army_container/meshes/army_container.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='PALM'>
+      <pose>-1310.33 -31.0487 0.5 0 -0 0</pose>
+      <static>1</static>
+      <link name='link1'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://TRUCK/meshes/TRUCK.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://TRUCK/meshes/TRUCK.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <state world_name='default'>
+      <sim_time>842 954000000</sim_time>
+      <real_time>851 547765138</real_time>
+      <wall_time>1710265378 45290072</wall_time>
+      <iterations>842954</iterations>
+      <model name='PALM'>
+        <pose>-1416.43 -162.248 67.1683 0 -0 1.64246</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1416.43 -162.248 67.1683 0 -0 1.64246</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='TERRAIN'>
+        <pose>0.061847 0.010434 0.5 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>0.061847 0.010434 0.5 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_container'>
+        <pose>-1424.93 -174.455 67.0657 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1424.93 -174.455 67.0657 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_container_clone'>
+        <pose>-1425.44 -180.209 67.0657 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1425.44 -180.209 67.0657 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_container_clone_0'>
+        <pose>-1425.88 -185.939 67.0657 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1425.88 -185.939 67.0657 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_tent'>
+        <pose>-1423 -204.755 69.413 -0.115128 0.122251 1.57608</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1423 -204.755 69.413 -0.115128 0.122251 1.57608</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_tent_clone'>
+        <pose>-1416.46 -193.086 69.0514 -0.115128 0.122251 1.57608</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1416.46 -193.086 69.0514 -0.115128 0.122251 1.57608</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_tent_clone_0'>
+        <pose>-1411.24 -182.64 67.4173 -0.115128 0.122251 1.57608</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1411.24 -182.64 67.4173 -0.115128 0.122251 1.57608</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='army_tent_clone_clone'>
+        <pose>-1410.23 -204.905 71.3969 0.210578 0.131391 3.0103</pose>
+        <scale>1 1 1</scale>
+        <link name='link1'>
+          <pose>-1410.23 -204.905 71.3969 0.210578 0.131391 3.0103</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <projection_type>perspective</projection_type>
+        <track_visual>
+          <static>1</static>
+          <use_model_frame>1</use_model_frame>
+          <inherit_yaw>1</inherit_yaw>
+          <xyz>-14 0 4</xyz>
+        </track_visual>
+        <pose>-23.1263 353.169 15.7081 0 0.425798 0.019192</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>
