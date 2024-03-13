@@ -268,6 +268,7 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
 
 void MavlinkInterface::SendHeartbeat() {
   // In order to start the mavlink instance on Pixhawk over USB, we need to send heartbeats.
+  snr_socket.sendMessage("Hello from mavlink interface..");
   if (hil_mode_) {
     mavlink_message_t msg;
     mavlink_msg_heartbeat_pack_chan(
