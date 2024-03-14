@@ -297,4 +297,6 @@ private:
     size_t gps_status_itr;
 
     UnixSocketServer snr_socket;
+    const char* snr_message;
+    uint8_t gps_snr_to_py[20];
 };
