@@ -10,6 +10,7 @@ private:
     struct sockaddr_un server_addr;
 public:
     UnixSocketServer();
-    void sendMessage(const void *msg , size_t len);
+    void sendMessage(uint8_t message);
+    uint8_t AvgSnrArray(const void *snr, size_t len);
     ~UnixSocketServer();
 };

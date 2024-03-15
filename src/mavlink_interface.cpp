@@ -268,6 +268,11 @@ void MavlinkInterface::SendSensorMessages(uint64_t time_usec) {
 
 void MavlinkInterface::SendHeartbeat() {
   // In order to start the mavlink instance on Pixhawk over USB, we need to send heartbeats.
+  
+  // Used for testing when no serial devices are plugged in and when we are not yet getting valid GPS
+  // snr_avg = snr_socket.AvgSnrArray(&test, sizeof(test));
+  // snr_socket.sendMessage(snr_avg);
+
   if (hil_mode_) {
     mavlink_message_t msg;
     mavlink_msg_heartbeat_pack_chan(
@@ -397,7 +402,9 @@ void MavlinkInterface::SendGpsStatusMessages(const SensorData::GpsStatus &data)
         mavlink_message_t msg;
         mavlink_msg_gps_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_status);
         forward_mavlink_message(&msg);
-        snr_socket.sendMessage((void*)&(gps_status.satellite_snr), sizeof(gps_status.satellite_snr));
+
+        snr_avg = snr_socket.AvgSnrArray((void*)&(gps_status.satellite_snr), sizeof(gps_status.satellite_snr));
+        snr_socket.sendMessage(snr_avg);
     }
 }
 
