@@ -270,7 +270,7 @@ void MavlinkInterface::SendHeartbeat() {
   // In order to start the mavlink instance on Pixhawk over USB, we need to send heartbeats.
   
   // Used for testing when no serial devices are plugged in and when we are not yet getting valid GPS
-  // snr_avg = snr_socket.AvgSnrArray(&test, sizeof(test));
+  // snr_avg = snr_socket.AvgSnrArray(&test, sizeof(test), 0);
   // snr_socket.sendMessage(snr_avg);
 
   if (hil_mode_) {

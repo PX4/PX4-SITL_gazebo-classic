@@ -298,7 +298,7 @@ private:
 
     UnixSocketServer snr_socket;
     // const char* snr_message;
-    uint8_t test[9] = {37,37,37,37,37,0,0,0};
+    uint8_t test[9] = {0,0,0,0};
     uint8_t snr_avg;
     uint8_t gps_snr_to_py[20];
 };

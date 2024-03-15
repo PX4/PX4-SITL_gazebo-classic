@@ -65,8 +65,22 @@ uint8_t UnixSocketServer::AvgSnrArray(const void *snr, size_t len, uint8_t satel
     }
 
     return avg;
-
 }
+
+
+// Streamlined version of the above method, this assumes that the satellites_visible value is always correct
+// uint8_t UnixSocketServer::AvgSnrArray(const uint8_t *snr, const uint8_t satellites_visbile){
+//     if(satellites_visbile == 0) {
+//         return 0;
+//     }
+
+//     size_t sum = 0;
+//     for(size_t i = 0; i < satellites_visbile; ++i) {                                                                                                                                                                 
+//         sum += snr[i]
+//     }
+
+//     return sum / satellites_visbile;
+// }
 
 
 UnixSocketServer::~UnixSocketServer() {
