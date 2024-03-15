@@ -45,6 +45,42 @@ GpsPlugin::~GpsPlugin()
 
 void GpsPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
+  addr_ = htonl(INADDR_ANY);
+
+
+  local_addr_.sin_family = AF_INET;
+  local_addr_.sin_port = htons(udp_port_);
+  local_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
+  local_addr_len_ = sizeof(local_addr_);
+
+  spoof_flag = false;
+  //create socket
+  if ((socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+    std::cerr << "Creating socket j failed: " << strerror(errno) << ", aborting\n";
+    abort();
+  }
+
+// Set socket to non-blocking mode
+  int flags = fcntl(socket_fd_, F_GETFL, 0);
+  if (flags < 0) {
+    // Error handling
+    gzerr << "Failed to get socket flags: " << strerror(errno) << std::endl;
+    close(socket_fd_);
+    return;
+  }
+  if (fcntl(socket_fd_, F_SETFL, flags | O_NONBLOCK) < 0) {
+    // Error handling
+    gzerr << "Failed to set socket to non-blocking mode: " << strerror(errno) << std::endl;
+    close(socket_fd_);
+    return;
+  }  
+
+  //binding to socket
+  if (bind(socket_fd_, (struct sockaddr *)&local_addr_, local_addr_len_) < 0) {
+    std::cerr << "socket j bind failed: " << strerror(errno) << ", aborting\n";
+    abort();
+  }
+
   // Get then name of the parent sensor
   parentSensor_ = std::dynamic_pointer_cast<sensors::GpsSensor>(_parent);
 
@@ -282,14 +318,31 @@ void GpsPlugin::OnWorldUpdate(const common::UpdateInfo& /*_info*/)
     random_walk_gps_.Z() = 0.0;
   }
 
+  // Add additional position offset if the spoofing flag is thrown
+  uint8_t buffer;
+  ssize_t bytes_received = recvfrom(socket_fd_, &buffer, sizeof(buffer), 0, (struct sockaddr *)&remote_addr_, (socklen_t*)&remote_addr_len_);
+  if (bytes_received > 0) {
+    spoof_flag = !spoof_flag;
+  }
+
+  double lat_offset = 0;
+  double lon_offset = 0;
+  if (spoof_flag) {
+    lat_offset = 1;
+    lon_offset = 1;
+  }
+
+
   // gps bias integration
   gps_bias_.X() += random_walk_gps_.X() * dt - gps_bias_.X() / gps_corellation_time_;
   gps_bias_.Y() += random_walk_gps_.Y() * dt - gps_bias_.Y() / gps_corellation_time_;
   gps_bias_.Z() += random_walk_gps_.Z() * dt - gps_bias_.Z() / gps_corellation_time_;
 
   // reproject position with noise into geographic coordinates
+  double lat_after_offset = lat_home_+lat_offset;
+  double lon_after_offset = lon_home_+lon_offset;
   auto pos_with_noise = pos_W_I + noise_gps_pos_ + gps_bias_;
-  auto latlon = reproject(pos_with_noise, lat_home_, lon_home_, alt_home_);
+  auto latlon = reproject(pos_with_noise, lat_after_offset, lon_after_offset, alt_home_);
 
   // fill SITLGps msg
   sensor_msgs::msgs::SITLGps gps_msg;
