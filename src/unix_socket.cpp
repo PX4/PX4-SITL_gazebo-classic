@@ -20,9 +20,8 @@ UnixSocketServer::UnixSocketServer() {
         exit(EXIT_FAILURE);
     }
 }
-void UnixSocketServer::sendMessage(const char *message) {
-    int len = strlen(message) + 1;
-    int bytes_sent = sendto(sock, message, len, 0, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_un));
+void UnixSocketServer::sendMessage(const void *msg , size_t len) {
+    int bytes_sent = sendto(sock, msg, len, 0, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_un));
     
     if(bytes_sent != len) {
         perror("sendto");

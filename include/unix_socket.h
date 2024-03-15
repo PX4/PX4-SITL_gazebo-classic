@@ -10,6 +10,6 @@ private:
     struct sockaddr_un server_addr;
 public:
     UnixSocketServer();
-    void sendMessage(const char *message);
+    void sendMessage(const void *msg , size_t len);
     ~UnixSocketServer();
 };
