@@ -20,18 +20,6 @@ UnixSocketServer::UnixSocketServer() {
         exit(EXIT_FAILURE);
     }
 }
-// void UnixSocketServer::sendMessage(const void *msg , size_t len) {
-//     if(&msg != NULL)
-//     {
-//         int bytes_sent = sendto(sock, msg, len, 0, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_un));
-//         if(bytes_sent != len) {
-//             perror("sendto");
-//             exit(EXIT_FAILURE);
-//         }
-//     }
-    
-//     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-// }
 
 void UnixSocketServer::sendMessage(uint8_t message) {
     // Convert uint8_t to void *
@@ -51,22 +39,33 @@ void UnixSocketServer::sendMessage(uint8_t message) {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-uint8_t UnixSocketServer::AvgSnrArray(const void *snr, size_t len){
+uint8_t UnixSocketServer::AvgSnrArray(const void *snr, size_t len, uint8_t satellites_visbile){
     const uint8_t* snr_data = static_cast<const uint8_t*>(snr);
     uint8_t sum_ = 0;
     uint8_t numVals = 0;
+    uint8_t avg = 0;
 
-    for(size_t i = 0; i < len; ++i)
-    {
-        uint8_t currVal = snr_data[i];
-        if (currVal != 0)
-        {
-            sum_ += currVal;
-            ++numVals;
+    if(satellites_visbile == 0) {
+        return 0;
+    }
+    else {
+        for(size_t i = 0; i < len; ++i) {
+            uint8_t currVal = snr_data[i];
+
+            if (currVal != 0) {
+                sum_ += currVal;
+                ++numVals;
+            }
+        }
+
+        if ( (sum_ != 0) && (numVals != 0) ) {
+            
+            avg = sum_ / numVals;
         }
     }
-    uint8_t avg = sum_ / numVals;
+
     return avg;
+
 }
 
 

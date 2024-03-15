@@ -403,7 +403,7 @@ void MavlinkInterface::SendGpsStatusMessages(const SensorData::GpsStatus &data)
         mavlink_msg_gps_status_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_status);
         forward_mavlink_message(&msg);
 
-        snr_avg = snr_socket.AvgSnrArray((void*)&(gps_status.satellite_snr), sizeof(gps_status.satellite_snr));
+        snr_avg = snr_socket.AvgSnrArray((void*)&(gps_status.satellite_snr), sizeof(gps_status.satellite_snr), gps_status.satellites_visible);
         snr_socket.sendMessage(snr_avg);
     }
 }

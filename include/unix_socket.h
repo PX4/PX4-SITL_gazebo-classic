@@ -11,6 +11,6 @@ private:
 public:
     UnixSocketServer();
     void sendMessage(uint8_t message);
-    uint8_t AvgSnrArray(const void *snr, size_t len);
+    uint8_t AvgSnrArray(const void *snr, size_t len, uint8_t satellites_visbile);
     ~UnixSocketServer();
 };
