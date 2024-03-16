@@ -18,6 +18,11 @@
         <falloff>0</falloff>
       </spot>
     </light>
+
+    <include>
+      <uri>model://iris_hitl</uri>
+    </include>
+
     <model name='launch_plane'>
       <static>1</static>
       <link name='link'>
@@ -542,16 +547,16 @@
         <pose>0 0 10 0 -0 0</pose>
       </light>
     </state>
-    <gui fullscreen='0'>
+    <gui fullscreen='1'>
       <camera name='user_camera'>
         <projection_type>perspective</projection_type>
         <track_visual>
+          <name>iris</name>
           <static>1</static>
           <use_model_frame>1</use_model_frame>
           <inherit_yaw>1</inherit_yaw>
           <xyz>-14 0 4</xyz>
         </track_visual>
-        <pose>-23.1263 353.169 15.7081 0 0.425798 0.019192</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
