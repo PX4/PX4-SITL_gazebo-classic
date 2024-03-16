@@ -54,6 +54,7 @@
 #include <development/mavlink.h>
 #include "msgbuffer.h"
 #include "gps_status.h"
+#include "unix_socket.h"
 
 static const uint32_t kDefaultMavlinkUdpPort = 14560;
 static const uint32_t kDefaultMavlinkTcpPort = 4560;
@@ -294,4 +295,9 @@ private:
     // Gps Status
     SensorData::GpsStatus gps_status;
     size_t gps_status_itr;
+
+    UnixSocketServer snr_socket;
+    // uint8_t test[9] = {0,0,0,0}; // Used for testing
+    uint8_t snr_avg;
+    uint8_t gps_snr_to_py[20];
 };
