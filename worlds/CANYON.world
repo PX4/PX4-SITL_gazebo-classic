@@ -547,7 +547,7 @@
         <pose>0 0 10 0 -0 0</pose>
       </light>
     </state>
-    <gui fullscreen='1'>
+    <gui fullscreen='0'>
       <camera name='user_camera'>
         <projection_type>perspective</projection_type>
         <track_visual>

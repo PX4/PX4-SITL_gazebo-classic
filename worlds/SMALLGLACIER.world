@@ -10230,7 +10230,7 @@
       </link>
     </model>
 
-    <gui fullscreen='1'>
+    <gui fullscreen='0'>
       <camera name='user_camera'>
         <projection_type>perspective</projection_type>
         <track_visual>
