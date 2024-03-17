@@ -226,18 +226,17 @@ void MavlinkInterface::Load()
             // PRN
             gps_status.satellite_prn[gps_status_itr] = sat.prn;
 
+            // SNR
+            gps_status.satellite_snr[gps_status_itr] = sat.snr;
+
             // SATELLITES USED
-            gps_status.satellite_used[gps_status_itr] = 1;
+            gps_status.satellite_used[gps_status_itr] = (sat.snr > 0 ? 1 : 0);
 
             // ELEVATION
             gps_status.satellite_elevation[gps_status_itr] = sat.elevation;
 
             // AZIMUTH
             gps_status.satellite_azimuth[gps_status_itr] = sat.azimuth;
-
-            // SNR
-            gps_status.satellite_snr[gps_status_itr] = sat.snr;
-
 
             ++gps_status_itr;
         }
