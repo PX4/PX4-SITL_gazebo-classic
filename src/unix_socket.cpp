@@ -41,15 +41,18 @@ void UnixSocketServer::sendMessage(uint8_t message) {
 
 uint8_t UnixSocketServer::AvgSnrArray(const void *snr, size_t len, uint8_t satellites_visbile){
     const uint8_t* snr_data = static_cast<const uint8_t*>(snr);
-    uint8_t sum_ = 0;
-    uint8_t numVals = 0;
-    uint8_t avg = 0;
+    uint16_t sum_ = 0;
+    uint16_t numVals = 0;
+    uint16_t avg = 0;
+
+    // Use list of satellites in use to determine the values of the satellites_visible the we should use.
+
 
     if(satellites_visbile == 0) {
         return 0;
     }
     else {
-        for(size_t i = 0; i < len; ++i) {
+        for(size_t i = 0; i < len; ++i) { 
             uint8_t currVal = snr_data[i];
 
             if (currVal != 0) {
