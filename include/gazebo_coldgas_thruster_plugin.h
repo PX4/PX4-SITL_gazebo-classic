@@ -53,7 +53,7 @@
 namespace gazebo {
 // Default values
 static const std::string kDefaultNamespace = "";
-static const std::string kDefaultCommandSubTopic = "/gazebo/command/motor_speed";
+static const std::string kDefaultCommandSubTopic = "/gazebo/command/actuator_outputs";
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
 

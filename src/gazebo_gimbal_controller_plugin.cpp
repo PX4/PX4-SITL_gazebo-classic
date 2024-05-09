@@ -682,8 +682,7 @@ void GimbalControllerPlugin::SendGimbalDeviceInformation()
     pitchMin,
     pitchMax,
     yawMin,
-    yawMax,
-    0 /*gimbal_device_id*/);
+    yawMax);
   SendMavlinkMessage(msg);
 }
 
@@ -737,8 +736,7 @@ void GimbalControllerPlugin::SendGimbalDeviceAttitudeStatus()
     angularVelocity.Z(),
     failureFlags,
     NAN, // per mavlink spec - NAN if unknown
-    NAN, // per mavlink spec - NAN if unknown
-    0 /*gimbal_device_id*/);
+    NAN);
   SendMavlinkMessage(msg);
 }
 

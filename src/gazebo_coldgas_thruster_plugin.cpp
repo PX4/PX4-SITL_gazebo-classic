@@ -52,26 +52,36 @@ void GazeboColdGasThrusterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr
   if (_sdf->HasElement("robotNamespace"))
     namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
   else
-    gzerr << "[gazebo_motor_model] Please specify a robotNamespace.\n";
+    gzerr << "[gazebo_thruster_model] Please specify a robotNamespace.\n";
+  
+  std::cout << "Robot namespace: " << namespace_ << std::endl;
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
   if (_sdf->HasElement("linkName"))
     link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
   else
-    gzerr << "[gazebo_motor_model] Please specify a linkName of the rotor.\n";
+    gzerr << "[gazebo_thruster_model] Please specify a linkName of the thruster.\n";
+  
+  // removing this for loop breaks it - maybe race condition?
+  for (auto link : model_->GetLinks()) {
+    std::cout << "Link name: " << link->GetName() << std::endl;
+  }
+
   link_ = model_->GetLink(link_name_);
+  std::cout << "Parsed link name: " << link_name_ << std::endl;
   if (link_ == NULL)
-    gzthrow("[gazebo_motor_model] Couldn't find specified link \"" << link_name_ << "\".");
+    gzthrow("[gazebo_thruster_model] Couldn't find specified link \"" << link_name_ << "\".");
 
 
-  if (_sdf->HasElement("motorNumber"))
-    motor_number_ = _sdf->GetElement("motorNumber")->Get<int>();
+  if (_sdf->HasElement("thrusterNumber"))
+    motor_number_ = _sdf->GetElement("thrusterNumber")->Get<int>();
   else
-    gzerr << "[gazebo_motor_model] Please specify a motorNumber.\n";
+    gzerr << "[gazebo_thruster_model] Please specify a thrusterNumber.\n";
   getSdfParam<std::string>(_sdf, "commandSubTopic", command_sub_topic_, command_sub_topic_);
   getSdfParam<double>(_sdf, "pwmFrequency", pwm_frequency_, 10.0);
   getSdfParam<double>(_sdf, "maxThrust", max_thrust_, 1.4);
+
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -102,7 +112,6 @@ void GazeboColdGasThrusterPlugin::VelocityCallback(CommandMotorSpeedPtr &rot_vel
 void GazeboColdGasThrusterPlugin::UpdateForcesAndMoments(const double &duty_cycle, const double &period) {
   // Thrust is only generated uring the duty cycle
   double force = duty_cycle > period ? max_thrust_ : 0.0;
-  // std::cout << "duty cycle: " << duty_cycle << " period: " << period << " thrust: " << force << std::endl;
   link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force));
 }
 
