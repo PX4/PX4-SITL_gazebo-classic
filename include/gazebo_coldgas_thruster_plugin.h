@@ -69,7 +69,7 @@ class GazeboColdGasThrusterPlugin : public ModelPlugin {
 
   virtual void InitializeParams();
  protected:
-  virtual void UpdateForcesAndMoments(const double &duty_cycle, const double &period);
+  virtual void UpdateForcesAndMoments(const double &ref_duty_cycle_, const double &sampling_time_);
   virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
   virtual void OnUpdate(const common::UpdateInfo & /*_info*/);
 

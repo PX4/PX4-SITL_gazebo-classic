@@ -36,6 +36,8 @@
 #include "gazebo_coldgas_thruster_plugin.h"
 #include <ignition/math.hh>
 
+#define DEBUG 0
+
 namespace gazebo {
 
 GazeboColdGasThrusterPlugin::~GazeboColdGasThrusterPlugin() {
@@ -88,30 +90,36 @@ void GazeboColdGasThrusterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboColdGasThrusterPlugin::OnUpdate, this, _1));
 
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboColdGasThrusterPlugin::VelocityCallback, this);
+  std::cout << "Topic: " << "~/" + model_->GetName() + command_sub_topic_ << std::endl;
 }
 
 // This gets called by the world update start event.
 void GazeboColdGasThrusterPlugin::OnUpdate(const common::UpdateInfo& _info) {
-  ///TODO: Compute duty cycle time
+  // Calculate cycle start time
   if (sampling_time_ >= 1.0/pwm_frequency_) {
     cycle_start_time_ = _info.simTime.Double();
   }
+
+  // Calculate sampling time instant within the cycle
   sampling_time_ = _info.simTime.Double() - cycle_start_time_;
-  double period = sampling_time_ *pwm_frequency_;
-  ///TODO: Get duty cycle from control input
-  UpdateForcesAndMoments(ref_duty_cycle_, period);
+  if (motor_number_ == 0 & DEBUG) std::cout << "PWM Period: " << 1.0/pwm_frequency_ << " Cycle Start time: " << cycle_start_time_ << " Sampling time: " << sampling_time_;
+  UpdateForcesAndMoments(ref_duty_cycle_ * (1.0 / pwm_frequency_), sampling_time_);
 }
 
 void GazeboColdGasThrusterPlugin::VelocityCallback(CommandMotorSpeedPtr &rot_velocities) {
   if(rot_velocities->motor_speed_size() < motor_number_) {
     std::cout  << "You tried to access index " << motor_number_
       << " of the MotorSpeed message array which is of size " << rot_velocities->motor_speed_size() << "." << std::endl;
-  } else ref_duty_cycle_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), 1.0);
+  } else {
+    ref_duty_cycle_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), 1.0);
+    if (motor_number_ == 0 && DEBUG) std::cout << "Processed ref duty cycle: " << ref_duty_cycle_ << " Received value: " << rot_velocities->motor_speed(motor_number_) <<  std::endl;
+  } 
 }
 
-void GazeboColdGasThrusterPlugin::UpdateForcesAndMoments(const double &duty_cycle, const double &period) {
+void GazeboColdGasThrusterPlugin::UpdateForcesAndMoments(const double &ref_duty_cycle_, const double &sampling_time_) {
   // Thrust is only generated uring the duty cycle
-  double force = duty_cycle > period ? max_thrust_ : 0.0;
+  double force = sampling_time_ <= ref_duty_cycle_ ? max_thrust_ : 0.0;
+  if (motor_number_ == 0 && DEBUG) std::cout << "Force: " << force << "  Sampling time: " << sampling_time_ << "  Ref duty cycle: " << ref_duty_cycle_ << std::endl;
   link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force));
 }
 
