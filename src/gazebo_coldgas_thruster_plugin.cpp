@@ -56,7 +56,6 @@ void GazeboColdGasThrusterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr
   else
     gzerr << "[gazebo_thruster_model] Please specify a robotNamespace.\n";
   
-  std::cout << "Robot namespace: " << namespace_ << std::endl;
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -64,14 +63,8 @@ void GazeboColdGasThrusterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr
     link_name_ = _sdf->GetElement("linkName")->Get<std::string>();
   else
     gzerr << "[gazebo_thruster_model] Please specify a linkName of the thruster.\n";
-  
-  // removing this for loop breaks it - maybe race condition?
-  for (auto link : model_->GetLinks()) {
-    std::cout << "Link name: " << link->GetName() << std::endl;
-  }
 
   link_ = model_->GetLink(link_name_);
-  std::cout << "Parsed link name: " << link_name_ << std::endl;
   if (link_ == NULL)
     gzthrow("[gazebo_thruster_model] Couldn't find specified link \"" << link_name_ << "\".");
 
@@ -90,7 +83,6 @@ void GazeboColdGasThrusterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboColdGasThrusterPlugin::OnUpdate, this, _1));
 
   command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboColdGasThrusterPlugin::VelocityCallback, this);
-  std::cout << "Topic: " << "~/" + model_->GetName() + command_sub_topic_ << std::endl;
 }
 
 // This gets called by the world update start event.
