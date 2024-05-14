@@ -42,13 +42,13 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://discower_platforms/meshes/proto.dae</uri>
+            <uri>model://2d_spacecraft/meshes/proto.dae</uri>
           </mesh>
         </geometry>
       </visual>
     </link>
     <joint name='thruster_0_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>-0.12 0.12 0.2 3.14159 1.57079 3.14159</pose>
       <parent>body</parent>
       <child>thruster_0</child>
       <axis>
@@ -74,7 +74,7 @@
     <link name='thruster_0'>
       <pose relative_to='thruster_0_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>-0.12 0.12 0.2 3.14159 1.57079 3.14159</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -87,7 +87,7 @@
       </inertial>
     </link>
     <joint name='thruster_1_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>0.12 0.12 0.2 3.14159 -1.57079 3.14159</pose>
       <parent>body</parent>
       <child>thruster_1</child>
       <axis>
@@ -113,7 +113,7 @@
     <link name='thruster_1'>
       <pose relative_to='thruster_1_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>0.12 0.12 0.2 3.14159 -1.57079 3.14159</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -126,7 +126,7 @@
       </inertial>
     </link>
     <joint name='thruster_2_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>-0.12 -0.12 0.2 3.14159 1.57079 3.14159</pose>
       <parent>body</parent>
       <child>thruster_2</child>
       <axis>
@@ -152,7 +152,7 @@
     <link name='thruster_2'>
       <pose relative_to='thruster_2_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>-0.12 -0.12 0.2 3.14159 1.57079 3.14159</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -165,7 +165,7 @@
       </inertial>
     </link>
     <joint name='thruster_3_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>0.12 -0.12 0.2 3.14159 -1.57079 3.14159</pose>
       <parent>body</parent>
       <child>thruster_3</child>
       <axis>
@@ -191,7 +191,7 @@
     <link name='thruster_3'>
       <pose relative_to='thruster_3_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>0.12 -0.12 0.2 3.14159 -1.57079 3.14159</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -204,7 +204,7 @@
       </inertial>
     </link>
     <joint name='thruster_4_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>0.12 0.12 0.2 1.5708 -0 0</pose>
       <parent>body</parent>
       <child>thruster_4</child>
       <axis>
@@ -230,7 +230,7 @@
     <link name='thruster_4'>
       <pose relative_to='thruster_4_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>0.12 0.12 0.2 1.5708 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -243,7 +243,7 @@
       </inertial>
     </link>
     <joint name='thruster_5_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>0.12 -0.12 0.2 -1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_5</child>
       <axis>
@@ -269,7 +269,7 @@
     <link name='thruster_5'>
       <pose relative_to='thruster_5_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>0.12 -0.12 0.2 -1.5708 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -282,7 +282,7 @@
       </inertial>
     </link>
     <joint name='thruster_6_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>-0.12 0.12 0.2 1.5708 -0 0</pose>
       <parent>body</parent>
       <child>thruster_6</child>
       <axis>
@@ -308,7 +308,7 @@
     <link name='thruster_6'>
       <pose relative_to='thruster_6_joint'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose>-0.12 0.12 0.2 1.5708 -0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
@@ -321,7 +321,7 @@
       </inertial>
     </link>
     <joint name='thruster_7_joint' type='fixed'>
-      <pose relative_to='body'>0 0 0 0 -0 0</pose>
+      <pose relative_to='body'>-0.12 -0.12 0.2 -1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_7</child>
       <axis>
@@ -345,9 +345,9 @@
       </physics>
     </joint>
     <link name='thruster_7'>
-      <pose relative_to='thruster_7_joint'>0 0 0 0 -0 0</pose>
+      <pose relative_to='thruster_7_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>-0.12 -0.12 0.2 -1.5708 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <mass>0.001</mass>
         <inertia>
           <ixx>1e-05</ixx>
