@@ -2,19 +2,19 @@
   <model name='dart'>
     <link name='body'>
       <inertial>
-        <pose>0 0 0.2 0 -0 0</pose>
-        <mass>12.5</mass>
+        <pose>0 0 0 0 -0 0</pose>
+        <mass>648</mass>
         <inertia>
-          <ixx>0.1454</ixx>
+          <ixx>1024</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.1366</iyy>
+          <iyy>1024</iyy>
           <iyz>0</iyz>
-          <izz>0.1594</izz>
+          <izz>1024</izz>
         </inertia>
       </inertial>
       <collision name='body_collision'>
-        <pose>0 0 0.25 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -49,7 +49,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_0_joint' type='fixed'>
-      <pose relative_to='body'>-0.12 0.12 0.2 3.14159 1.57079 3.14159</pose>
+      <pose relative_to='body'>-0.50 -0.50 0 -1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_0</child>
       <axis>
@@ -89,7 +89,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_1_joint' type='fixed'>
-      <pose relative_to='body'>0.12 0.12 0.2 3.14159 -1.57079 3.14159</pose>
+      <pose relative_to='body'>0.50 -0.50 0 -1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_1</child>
       <axis>
@@ -129,7 +129,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_2_joint' type='fixed'>
-      <pose relative_to='body'>-0.12 -0.12 0.2 3.14159 1.57079 3.14159</pose>
+      <pose relative_to='body'>0.50 0.50 0 1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_2</child>
       <axis>
@@ -169,7 +169,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_3_joint' type='fixed'>
-      <pose relative_to='body'>0.12 -0.12 0.2 3.14159 -1.57079 3.14159</pose>
+      <pose relative_to='body'>-0.50 0.50 0 1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_3</child>
       <axis>
@@ -209,7 +209,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_4_joint' type='fixed'>
-      <pose relative_to='body'>0.12 0.12 0.2 1.5708 -0 0</pose>
+      <pose relative_to='body'>-0.50 0.0 0.50 0 1.5708 0</pose>
       <parent>body</parent>
       <child>thruster_4</child>
       <axis>
@@ -249,7 +249,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_5_joint' type='fixed'>
-      <pose relative_to='body'>0.12 -0.12 0.2 -1.5708 0 0</pose>
+      <pose relative_to='body'>0.50 0.0 0.50 0 -1.5708 0</pose>
       <parent>body</parent>
       <child>thruster_5</child>
       <axis>
@@ -289,7 +289,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_6_joint' type='fixed'>
-      <pose relative_to='body'>-0.12 0.12 0.2 1.5708 -0 0</pose>
+      <pose relative_to='body'>0.50 0.0 -0.50 0 -1.5708 0</pose>
       <parent>body</parent>
       <child>thruster_6</child>
       <axis>
@@ -329,7 +329,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_7_joint' type='fixed'>
-      <pose relative_to='body'>-0.12 -0.12 0.2 -1.5708 0 0</pose>
+      <pose relative_to='body'>-0.50 0.0 -0.50 0 1.5708 0</pose>
       <parent>body</parent>
       <child>thruster_7</child>
       <axis>
@@ -368,9 +368,8 @@
       </inertial>
       <gravity>0</gravity>
     </link>
-
     <joint name='thruster_8_joint' type='fixed'>
-      <pose relative_to='body'>0.12 0 0.4 3.1415 0 0</pose>
+      <pose relative_to='body'>0.0 0.50 0.50 1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_8</child>
       <axis>
@@ -410,7 +409,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_9_joint' type='fixed'>
-      <pose relative_to='body'>0.12 0 0.0 0 0 0</pose>
+      <pose relative_to='body'>0.0 -0.50 0.50 -1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_9</child>
       <axis>
@@ -450,7 +449,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_10_joint' type='fixed'>
-      <pose relative_to='body'>-0.12 0 0.4 3.1415 0 0</pose>
+      <pose relative_to='body'>0.0 -0.50 -0.50 -1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_10</child>
       <axis>
@@ -490,7 +489,7 @@
       <gravity>0</gravity>
     </link>
     <joint name='thruster_11_joint' type='fixed'>
-      <pose relative_to='body'>-0.12 0 0.0 0 0 0</pose>
+      <pose relative_to='body'>0.0 0.50 -0.50 1.5708 0 0</pose>
       <parent>body</parent>
       <child>thruster_11</child>
       <axis>
@@ -535,7 +534,7 @@
       <thrusterNumber>0</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_1_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -543,7 +542,7 @@
       <thrusterNumber>1</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_2_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -551,7 +550,7 @@
       <thrusterNumber>2</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_3_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -559,7 +558,7 @@
       <thrusterNumber>3</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_4_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -567,7 +566,7 @@
       <thrusterNumber>4</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_5_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -575,7 +574,7 @@
       <thrusterNumber>5</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_6_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -583,7 +582,7 @@
       <thrusterNumber>6</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_7_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -591,7 +590,7 @@
       <thrusterNumber>7</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_8_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -599,7 +598,7 @@
       <thrusterNumber>8</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_9_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -607,7 +606,7 @@
       <thrusterNumber>9</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_10_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -615,7 +614,7 @@
       <thrusterNumber>10</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <plugin name='thruster_11_model' filename='libgazebo_coldgas_thruster_plugin.so'>
       <robotNamespace/>
@@ -623,7 +622,7 @@
       <thrusterNumber>11</thrusterNumber>
       <commandSubTopic>/gazebo/command/actuator_outputs</commandSubTopic>
       <pwmFrequency>10</pwmFrequency>
-      <maxThrust>1.4</maxThrust>
+      <maxThrust>0.237</maxThrust>
     </plugin>
     <static>0</static>
     <plugin name='rotors_gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
