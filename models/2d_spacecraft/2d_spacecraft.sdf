@@ -454,6 +454,12 @@
       <baroTopic>/baro</baroTopic>
       <baroDriftPaPerSec>0</baroDriftPaPerSec>
     </plugin>
+    <plugin name="vision_plugin" filename="libgazebo_vision_plugin.so">
+      <robotNamespace></robotNamespace>
+      <randomWalk>0.1</randomWalk>
+      <noiseDensity>0.01</noiseDensity>
+      <corellationTime>60.0</corellationTime>
+    </plugin>
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace/>
       <imuSubTopic>/imu</imuSubTopic>
