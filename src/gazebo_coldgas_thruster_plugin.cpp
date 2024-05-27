@@ -94,7 +94,7 @@ void GazeboColdGasThrusterPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
   // Calculate sampling time instant within the cycle
   sampling_time_ = _info.simTime.Double() - cycle_start_time_;
-  if (motor_number_ == 0 & DEBUG) std::cout << "PWM Period: " << 1.0/pwm_frequency_ << " Cycle Start time: " << cycle_start_time_ << " Sampling time: " << sampling_time_;
+  if (DEBUG) std::cout << motor_number_ << ": PWM Period: " << 1.0/pwm_frequency_ << " Cycle Start time: " << cycle_start_time_ << " Sampling time: " << sampling_time_ << std::endl;
   UpdateForcesAndMoments(ref_duty_cycle_ * (1.0 / pwm_frequency_), sampling_time_);
 }
 
@@ -103,15 +103,15 @@ void GazeboColdGasThrusterPlugin::VelocityCallback(CommandMotorSpeedPtr &rot_vel
     std::cout  << "You tried to access index " << motor_number_
       << " of the MotorSpeed message array which is of size " << rot_velocities->motor_speed_size() << "." << std::endl;
   } else {
-    ref_duty_cycle_ = std::min(static_cast<double>(rot_velocities->motor_speed(motor_number_)), 1.0);
-    if (motor_number_ == 0 && DEBUG) std::cout << "Processed ref duty cycle: " << ref_duty_cycle_ << " Received value: " << rot_velocities->motor_speed(motor_number_) <<  std::endl;
+    ref_duty_cycle_ = std::min(static_cast<double>((rot_velocities->motor_speed(motor_number_))), 1.0);
+    if (DEBUG) std::cout << motor_number_ << ": Processed ref duty cycle: " << ref_duty_cycle_ << " Received value: " << rot_velocities->motor_speed(motor_number_) <<  std::endl;
   } 
 }
 
 void GazeboColdGasThrusterPlugin::UpdateForcesAndMoments(const double &ref_duty_cycle_, const double &sampling_time_) {
   // Thrust is only generated uring the duty cycle
   double force = sampling_time_ <= ref_duty_cycle_ ? max_thrust_ : 0.0;
-  if (motor_number_ == 0 && DEBUG) std::cout << "Force: " << force << "  Sampling time: " << sampling_time_ << "  Ref duty cycle: " << ref_duty_cycle_ << std::endl;
+  if (DEBUG) std::cout << motor_number_ << ": Force: " << force << "  Sampling time: " << sampling_time_ << "  Ref duty cycle: " << ref_duty_cycle_ << std::endl;
   link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force));
 }
 

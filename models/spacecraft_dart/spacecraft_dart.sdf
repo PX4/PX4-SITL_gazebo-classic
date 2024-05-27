@@ -42,7 +42,7 @@
         <geometry>
           <mesh>
             <scale>0.5 0.5 0.5</scale>
-            <uri>model://3d_spacecraft/meshes/dart.dae</uri>
+            <uri>model://spacecraft_dart/meshes/dart.dae</uri>
           </mesh>
         </geometry>
       </visual>

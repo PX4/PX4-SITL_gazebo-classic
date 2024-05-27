@@ -38,7 +38,7 @@
         </surface>
       </collision>
       <visual name='body_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 0 -1.57079</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
