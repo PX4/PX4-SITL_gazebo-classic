@@ -695,17 +695,10 @@ void GimbalControllerPlugin::SendGimbalDeviceAttitudeStatus()
   const uint16_t flags =
     GIMBAL_DEVICE_FLAGS_ROLL_LOCK |
     GIMBAL_DEVICE_FLAGS_PITCH_LOCK |
-    (this->yawLock ? GIMBAL_DEVICE_FLAGS_YAW_LOCK : 0);
+    (this->yawLock ? GIMBAL_DEVICE_FLAGS_YAW_LOCK : 0) |
+    GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME;
 
   auto q = q_ENU_to_NED * this->cameraImuSensor->Orientation() * q_FLU_to_FRD.Inverse();
-
-  if (!this->yawLock) {
-    // In follow mode we need to transform the absolute camera orientation to an orientation
-    // relative to the vehicle because that's what the gimbal protocol suggests.
-    const auto q_vehicle = q_ENU_to_NED * ignition::math::Quaterniond(0.0, 0.0, this->vehicleYawRad) * q_FLU_to_FRD.Inverse();
-    const auto e = q.Euler();
-    q.Euler(e[0], e[1], e[2] - q_vehicle.Euler()[2]);
-  }
 
   const float qArr[4] = {
     static_cast<float>(q.W()),

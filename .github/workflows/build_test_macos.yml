@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11.0]
+        os: [macos-13]
     steps:
     - uses: actions/checkout@v1
     - name: submodule update

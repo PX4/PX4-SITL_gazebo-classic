@@ -38,8 +38,15 @@
 #include "TargetRelative.pb.h"
 
 #include <opencv2/opencv.hpp>
+
 #include <opencv2/aruco.hpp>
+// Check for OpenCV version 4.7 or later
+#if CV_VERSION_MAJOR >= 4 && CV_VERSION_MINOR >= 7
+#include <opencv2/objdetect/aruco_dictionary.hpp>
+#else
 #include <opencv2/aruco/dictionary.hpp>
+#endif
+
 #include <opencv2/core.hpp>
 
 #include <vector>
