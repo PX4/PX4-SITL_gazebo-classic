@@ -205,6 +205,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
       motor_velocity_reference_pub_topic_);
+  if (_sdf->HasElement("actuatorOutputsCommandPubTopic")) {
+    getSdfParam<std::string>(_sdf, "actuatorOutputsCommandPubTopic", actuator_outputs_pub_topic_,
+    actuator_outputs_pub_topic_);
+    pub_actuator_outputs_ = true;
+  }
   getSdfParam<std::string>(_sdf, "imuSubTopic", imu_sub_topic_, imu_sub_topic_);
   getSdfParam<std::string>(_sdf, "visionSubTopic", vision_sub_topic_, vision_sub_topic_);
   getSdfParam<std::string>(_sdf, "opticalFlowSubTopic",
@@ -237,10 +242,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
         int index = channel->Get<int>("input_index");
         if (index < n_out_max)
         {
-          input_offset_[index] = channel->Get<double>("input_offset");
-          input_scaling_[index] = channel->Get<double>("input_scaling");
-          zero_position_disarmed_[index] = channel->Get<double>("zero_position_disarmed");
-          zero_position_armed_[index] = channel->Get<double>("zero_position_armed");
           if (channel->HasElement("joint_control_type"))
           {
             joint_control_type_[index] = channel->Get<std::string>("joint_control_type");
@@ -251,6 +252,17 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
             joint_control_type_[index] = "velocity";
           }
 
+          if (joint_control_type_[index] == "bypass") {
+            channel = channel->GetNextElement("channel");
+            continue;
+          }
+
+          // handle velocity/position/... types
+          input_offset_[index] = channel->Get<double>("input_offset");
+          input_scaling_[index] = channel->Get<double>("input_scaling");
+          zero_position_disarmed_[index] = channel->Get<double>("zero_position_disarmed");
+          zero_position_armed_[index] = channel->Get<double>("zero_position_armed");
+        
           // start gz transport node handle
           if (joint_control_type_[index] == "position_gztopic")
           {
@@ -453,6 +465,9 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   // Publish gazebo's motor_speed message
   motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
+  
+  // Publish unalduterated actuator outputs
+  actuator_outputs_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + actuator_outputs_pub_topic_, 1);
 
 #if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
@@ -1183,19 +1198,28 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
   // Read Input References
   input_reference_.resize(n_out_max);
 
+  // Parse received actuator controls
+  mav_msgs::msgs::CommandMotorSpeed actuator_outputs_msg;
   Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
   if (actuator_controls.size() < n_out_max) return; //TODO: Handle this properly
   for (int i = 0; i < input_reference_.size(); i++) {
+    // do usual joint control
     if (armed) {
       input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
           * input_scaling_[i] + zero_position_armed_[i];
-      // std::cout << input_reference_ << ", ";
     } else {
       input_reference_[i] = zero_position_disarmed_[i];
-      // std::cout << input_reference_ << ", ";
+    }
+
+    // additional actions for bypass joint mode
+    if (pub_actuator_outputs_) {
+      actuator_outputs_msg.add_motor_speed(actuator_controls[input_index_[i]]);
     }
   }
-  // std::cout << "Input Reference: " << input_reference_.transpose() << std::endl;
+
+  // publish if timestamp is good
+  actuator_outputs_reference_pub_->Publish(actuator_outputs_msg);
+  
   received_first_actuator_ = mavlink_interface_->GetReceivedFirstActuator();
 }
 

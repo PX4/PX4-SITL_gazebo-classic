@@ -106,6 +106,7 @@ static const std::string kDefaultNamespace = "";
 // This just proxies the motor commands from command/motor_speed to the single motors via internal
 // ConsPtr passing, such that the original commands don't have to go n_motors-times over the wire.
 static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
+static const std::string kDefaultActuatorOutputsReferencePubTopic = "/gazebo/command/actuator_outputs";
 
 static const std::string kDefaultImuTopic = "/imu";
 static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
@@ -145,6 +146,7 @@ protected:
   void OnUpdate(const common::UpdateInfo&  /*_info*/);
 
 private:
+  bool pub_actuator_outputs_{false};
   bool received_first_actuator_{false};
   Eigen::VectorXd input_reference_;
 
@@ -154,11 +156,13 @@ private:
 
   std::string namespace_{kDefaultNamespace};
   std::string motor_velocity_reference_pub_topic_{kDefaultMotorVelocityReferencePubTopic};
+  std::string actuator_outputs_pub_topic_{kDefaultMotorVelocityReferencePubTopic};
   std::string mavlink_control_sub_topic_;
   std::string link_name_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_reference_pub_;
+  transport::PublisherPtr actuator_outputs_reference_pub_;
   transport::SubscriberPtr mav_control_sub_;
 
   physics::ModelPtr model_{};
