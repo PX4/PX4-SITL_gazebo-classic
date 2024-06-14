@@ -20,7 +20,7 @@
       <windVelocityVariance>0</windVelocityVariance>
       <windDirectionMean>0 1 0</windDirectionMean>
       <windDirectionVariance>0</windDirectionVariance>
-      <windRampStart>60</windRampStart>
+      <windRampStart>90</windRampStart>
       <windRampWindVectorComponents>0 15 0</windRampWindVectorComponents>
       <windChangeRampDuration>30</windChangeRampDuration>
       <windGustStart>0</windGustStart>
