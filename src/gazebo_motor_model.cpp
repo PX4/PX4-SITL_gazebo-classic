@@ -129,6 +129,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   getSdfParam<double>(_sdf, "rollingMomentCoefficient", rolling_moment_coefficient_,
                       rolling_moment_coefficient_);
   getSdfParam<double>(_sdf, "maxRotVelocity", max_rot_velocity_, max_rot_velocity_);
+  getSdfParam<double>(_sdf, "maxRelativeAirspeed", max_relative_airspeed_, max_relative_airspeed_);
   getSdfParam<double>(_sdf, "motorConstant", motor_constant_, motor_constant_);
   getSdfParam<double>(_sdf, "momentConstant", moment_constant_, moment_constant_);
 
