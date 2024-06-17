@@ -129,6 +129,7 @@ void GazeboMotorModel::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   getSdfParam<double>(_sdf, "rollingMomentCoefficient", rolling_moment_coefficient_,
                       rolling_moment_coefficient_);
   getSdfParam<double>(_sdf, "maxRotVelocity", max_rot_velocity_, max_rot_velocity_);
+  getSdfParam<double>(_sdf, "maxRelativeAirspeed", max_relative_airspeed_, max_relative_airspeed_);
   getSdfParam<double>(_sdf, "motorConstant", motor_constant_, motor_constant_);
   getSdfParam<double>(_sdf, "momentConstant", moment_constant_, moment_constant_);
 
@@ -217,8 +218,7 @@ void GazeboMotorModel::UpdateForcesAndMoments() {
 
   ignition::math::Vector3d relative_wind_velocity = body_velocity - wind_vel_;
   ignition::math::Vector3d velocity_parallel_to_rotor_axis = (relative_wind_velocity.Dot(joint_axis)) * joint_axis;
-  double vel = velocity_parallel_to_rotor_axis.Length();
-  double scalar = 1 - vel / 25.0; // at 25 m/s the rotor will not produce any force anymore
+  double scalar = 1 - velocity_parallel_to_rotor_axis.Length() / max_relative_airspeed_; // at 25 m/s the rotor will not produce any force anymore
   scalar = ignition::math::clamp(scalar, 0.0, 1.0);
   // Apply a force to the link.
   link_->AddRelativeForce(ignition::math::Vector3d(0, 0, force * scalar));
