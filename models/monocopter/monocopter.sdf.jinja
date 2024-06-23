@@ -36,16 +36,16 @@
         </surface>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0.07 0 -0.08 0 0 0</pose>
+        <pose>-0.1 0.42 -0.04 0 0 -1.571</pose>
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
-            <uri>model://plane/meshes/body.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://monocopter/meshes/wing.stl</uri>
           </mesh>
         </geometry>
         <material>
           <script>
-            <name>Gazebo/DarkGrey</name>
+            <name>Gazebo/Yellow</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -97,7 +97,7 @@
       <parent>base_link</parent>
     </joint>
     <link name='rotor_puller'>
-      <pose>0.0 0.3 0.0 0 1.57 0</pose>
+      <pose>0.02 0.305 0.0 0 1.57 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -128,10 +128,10 @@
         </surface>
       </collision>
       <visual name='rotor_puller_visual'>
-        <pose>0 0 -0.09 0 0 0</pose>
+        <pose>0 0 -0.0 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>1 1 1</scale>
+            <scale>0.3 0.3 0.3</scale>
             <uri>model://plane/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
@@ -177,11 +177,11 @@
         <pose>0 0.3 0 0.00 0 0.0</pose>
       </inertial>
       <visual name='left_elevon_visual'>
-        <pose>0.07 0.0 -0.08 0.00 0 0.0</pose>
+        <pose>-0.15 0.377 -0.01 0.00 0 -1.571</pose>
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
-            <uri>model://plane/meshes/left_aileron.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://monocopter/meshes/flap.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -199,7 +199,7 @@
     <joint name='left_elevon_joint' type='revolute'>
       <parent>base_link</parent>
       <child>left_elevon</child>
-      <pose>-0.07 0.4 0.08 0.00 0 0.0</pose>
+      <pose>-0.1 0.4 0.0 0.00 0 0.0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
