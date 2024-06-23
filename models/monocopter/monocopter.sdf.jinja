@@ -251,6 +251,14 @@
     </plugin> -->
     <plugin name='dynamics' filename='libgazebo_monocopter_dyanmics_plugin.so'>
         <linkName>base_link</linkName>
+        <cp>-0.05 0.45 0.05</cp>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <control_joint_name>
+          left_elevon_joint
+        </control_joint_name>
+        <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
     </plugin>
     <plugin name='puller' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
