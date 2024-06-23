@@ -226,7 +226,7 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+    <!-- <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -241,13 +241,16 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/left_elevon</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/left_elevon</topic_name>
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
       <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
+    </plugin> -->
+    <plugin name='dynamics' filename='libgazebo_monocopter_dyanmics_plugin.so'>
+        <linkName>base_link</linkName>
     </plugin>
     <plugin name='puller' filename='libgazebo_motor_model.so'>
       <robotNamespace></robotNamespace>
