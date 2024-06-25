@@ -226,8 +226,8 @@
       <child>gps::link</child>
       <parent>base_link</parent>
     </joint>
-    <!-- <plugin name="left_wing" filename="libLiftDragPlugin.so">
-      <a0>0.05984281113</a0>
+    <plugin name="left_wing" filename="libLiftDragPlugin.so">
+      <a0>0.0</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
       <cma>0.0</cma>
@@ -235,7 +235,7 @@
       <cla_stall>-3.85</cla_stall>
       <cda_stall>-0.9233984055</cda_stall>
       <cma_stall>0</cma_stall>
-      <cp>-0.05 0.45 0.05</cp>
+      <cp>-0.05 0.25 0.05</cp>
       <area>0.6</area>
       <air_density>1.2041</air_density>
       <forward>1 0 0</forward>
@@ -248,13 +248,13 @@
       <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
-    </plugin> -->
+    </plugin>
     <plugin name='dynamics' filename='libgazebo_monocopter_dyanmics_plugin.so'>
         <linkName>base_link</linkName>
-        <cp>-0.05 0.45 0.05</cp>
+        <!-- <cp>-0.05 0.45 0.05</cp>
         <cla>4.752798721</cla>
         <cda>0.6417112299</cda>
-        <cma>0.0</cma>
+        <cma>0.0</cma> -->
         <control_joint_name>
           left_elevon_joint
         </control_joint_name>

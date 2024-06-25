@@ -114,10 +114,10 @@ void MonocopterDynamicsPlugin::OnUpdate(const common::UpdateInfo&){
     ignition::math::Vector3d linear_velocity = ignitionFromGazeboMath(link_->GetRelativeLinearVel());
     ignition::math::Vector3d angular_velocity = ignitionFromGazeboMath(link_->GetRelativeAngularVel());
   #endif
-  ///TODO: Get moment of inertia
-  ignition::math::Matrix3d I_;
+  /// Get moment of inertia
+  ignition::math::Matrix3d I_ = link_->GetInertial()->MOI();
 
-  ignition::math::Vector3d torque_coriolis = angular_velocity.Cross(I_ * angular_velocity);
+  ignition::math::Vector3d torque_coriolis = -angular_velocity.Cross(I_ * angular_velocity);
 
   ///TODO: Compute motor torque
   ignition::math::Vector3d torque_motor;
