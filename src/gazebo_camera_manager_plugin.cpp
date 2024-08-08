@@ -631,7 +631,7 @@ void CameraManagerPlugin::_handle_camera_info(const mavlink_message_t *pMsg, str
                                 | CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM;;
 
     mavlink_message_t msg;
-    mavlink_msg_camera_information_encode(_systemID, _componentID, &msg, &camera_information);
+    mavlink_msg_camera_information_encode_chan(_systemID, _componentID, MAVLINK_COMM_1, &msg, &camera_information);
     _send_mavlink_message(&msg, srcaddr);
 }
 
@@ -723,7 +723,7 @@ void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink
     video_stream_information.encoding = VIDEO_STREAM_ENCODING_H264;
 
     mavlink_message_t msg;
-    mavlink_msg_video_stream_information_encode(_systemID, _componentID, &msg, &video_stream_information);
+    mavlink_msg_video_stream_information_encode_chan(_systemID, _componentID, MAVLINK_COMM_1, &msg, &video_stream_information);
     _send_mavlink_message(&msg, srcaddr);
 }
 
