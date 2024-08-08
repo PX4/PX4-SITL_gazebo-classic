@@ -616,25 +616,19 @@ void CameraManagerPlugin::_handle_camera_info(const mavlink_message_t *pMsg, str
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
 
     mavlink_camera_information_t camera_information{};
-    camera_information.time_boot_ms = 0;
-    std::strcpy((char *)camera_information.vendor_name, "PX4.io");
-    std::strcpy((char *)camera_information.model_name, "Gazebo");
+    std::strncpy((char *)camera_information.vendor_name, "PX4.io", sizeof(camera_information.vendor_name));
+    std::strncpy((char *)camera_information.model_name, "Gazebo", sizeof(camera_information.model_name));
     camera_information.firmware_version = 0x01;
     camera_information.focal_length = 50.f;
     camera_information.sensor_size_h = 35.f;
     camera_information.sensor_size_v = 24.f;
     camera_information.resolution_h = _width;
     camera_information.resolution_v = _height;
-    camera_information.lens_id = 0;
     camera_information.flags = CAMERA_CAP_FLAGS_CAPTURE_IMAGE
                                 | CAMERA_CAP_FLAGS_CAPTURE_VIDEO
                                 | CAMERA_CAP_FLAGS_HAS_MODES
                                 | CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM
                                 | CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM;;
-    camera_information.cam_definition_version = 0;
-    std::strcpy(camera_information.cam_definition_uri, "");
-    camera_information.gimbal_device_id = 0;
-    camera_information.camera_device_id = 0;
 
     mavlink_message_t msg;
     mavlink_msg_camera_information_encode(_systemID, _componentID, &msg, &camera_information);
@@ -723,10 +717,10 @@ void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink
     video_stream_information.resolution_h = _width;
     video_stream_information.resolution_v = _height;
     video_stream_information.bitrate = 2048;
-    video_stream_information.rotation = 0; // none
     video_stream_information.hfov = 90; // made up
-    std::strcpy(video_stream_information.name, "Visual Spectrum");
-    std::strcpy(video_stream_information.uri, _videoURI.c_str());
+    std::strncpy(video_stream_information.name, "Visual Spectrum", sizeof(video_stream_information.name));
+    std::strncpy(video_stream_information.uri, _videoURI.c_str(), sizeof(video_stream_information.uri));
+    video_stream_information.encoding = VIDEO_STREAM_ENCODING_H264;
 
     mavlink_message_t msg;
     mavlink_msg_video_stream_information_encode(_systemID, _componentID, &msg, &video_stream_information);
