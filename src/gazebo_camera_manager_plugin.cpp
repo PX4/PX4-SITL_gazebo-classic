@@ -614,34 +614,24 @@ void CameraManagerPlugin::_handle_camera_info(const mavlink_message_t *pMsg, str
 {
     gzdbg << "Send camera info" << endl;
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_CAMERA_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
-    static const char vendor[MAVLINK_MSG_CAMERA_INFORMATION_FIELD_VENDOR_NAME_LEN] = "PX4.io";
-    static const char model[MAVLINK_MSG_CAMERA_INFORMATION_FIELD_MODEL_NAME_LEN] = "Gazebo";
-    static const char uri[MAVLINK_MSG_CAMERA_INFORMATION_FIELD_CAM_DEFINITION_URI_LEN] = {};
-    uint32_t camera_capabilities = CAMERA_CAP_FLAGS_CAPTURE_IMAGE | CAMERA_CAP_FLAGS_CAPTURE_VIDEO |
-            CAMERA_CAP_FLAGS_HAS_MODES | CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM |
-            CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM;
+
+    mavlink_camera_information_t camera_information{};
+    std::strncpy((char *)camera_information.vendor_name, "PX4.io", sizeof(camera_information.vendor_name));
+    std::strncpy((char *)camera_information.model_name, "Gazebo", sizeof(camera_information.model_name));
+    camera_information.firmware_version = 0x01;
+    camera_information.focal_length = 50.f;
+    camera_information.sensor_size_h = 35.f;
+    camera_information.sensor_size_v = 24.f;
+    camera_information.resolution_h = _width;
+    camera_information.resolution_v = _height;
+    camera_information.flags = CAMERA_CAP_FLAGS_CAPTURE_IMAGE
+                                | CAMERA_CAP_FLAGS_CAPTURE_VIDEO
+                                | CAMERA_CAP_FLAGS_HAS_MODES
+                                | CAMERA_CAP_FLAGS_HAS_BASIC_ZOOM
+                                | CAMERA_CAP_FLAGS_HAS_VIDEO_STREAM;;
 
     mavlink_message_t msg;
-    mavlink_msg_camera_information_pack_chan(
-        _systemID,
-        _componentID,
-        MAVLINK_COMM_1,
-        &msg,
-        0,                         // time_boot_ms
-        (const uint8_t *)vendor,   // const uint8_t * vendor_name
-        (const uint8_t *)model,    // const uint8_t * model_name
-        0x01,                      // uint32_t firmware_version
-        50.0f,                     // float focal_lenth
-        35.0f,                     // float  sensor_size_h
-        24.0f,                     // float  sensor_size_v
-        _width,                    // resolution_h
-        _height,                   // resolution_v
-        0,                         // lens_id
-        camera_capabilities,       // CAP_FLAGS
-        0,                         // Camera Definition Version
-        uri,                       // URI
-        0                          // uint8_t gimbal_device_id
-    );
+    mavlink_msg_camera_information_encode_chan(_systemID, _componentID, MAVLINK_COMM_1, &msg, &camera_information);
     _send_mavlink_message(&msg, srcaddr);
 }
 
@@ -706,8 +696,6 @@ void CameraManagerPlugin::_handle_request_video_stream_status(const mavlink_mess
 void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink_message_t *pMsg, struct sockaddr* srcaddr)
 {
     gzdbg << "Send videostream information" << endl;
-    char name[MAVLINK_MSG_VIDEO_STREAM_INFORMATION_FIELD_NAME_LEN] = {};
-    snprintf(name, MAVLINK_MSG_VIDEO_STREAM_INFORMATION_FIELD_NAME_LEN, "Visual Spectrum");
     mavlink_command_long_t cmd;
     mavlink_msg_command_long_decode(pMsg, &cmd);
     //-- Should we execute the command
@@ -720,25 +708,21 @@ void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink
     // ACK command received and accepted
     _send_cmd_ack(pMsg->sysid, pMsg->compid, MAV_CMD_REQUEST_VIDEO_STREAM_INFORMATION, MAV_RESULT_ACCEPTED, srcaddr);
 
+    mavlink_video_stream_information_t video_stream_information{};
+    video_stream_information.stream_id = 1;
+    video_stream_information.count = 1;
+    video_stream_information.type = VIDEO_STREAM_TYPE_RTPUDP;
+    video_stream_information.flags = VIDEO_STREAM_STATUS_FLAGS_RUNNING; // It's always running
+    video_stream_information.framerate = 30;
+    video_stream_information.resolution_h = _width;
+    video_stream_information.resolution_v = _height;
+    video_stream_information.bitrate = 2048;
+    video_stream_information.hfov = 90; // made up
+    std::strncpy(video_stream_information.name, "Visual Spectrum", sizeof(video_stream_information.name));
+    std::strncpy(video_stream_information.uri, _videoURI.c_str(), sizeof(video_stream_information.uri));
+
     mavlink_message_t msg;
-    mavlink_msg_video_stream_information_pack_chan(
-        _systemID,
-        _componentID,                         // Component ID
-        MAVLINK_COMM_1,
-        &msg,
-        1,                                          // Stream ID
-        1,                                          // Stream count
-        VIDEO_STREAM_TYPE_RTPUDP,                   // Stream type
-        VIDEO_STREAM_STATUS_FLAGS_RUNNING,          // Flags (It's always running)
-        30,                                         // Frame rate
-        _width,                                     // Horizontal resolution
-        _height,                                    // Vertical resolution
-        2048,                                       // Bit rate
-        0,                                          // Rotation (none)
-        90,                                         // FOV (made up)
-        name,
-        _videoURI.c_str()
-    );
+    mavlink_msg_video_stream_information_encode_chan(_systemID, _componentID, MAVLINK_COMM_1, &msg, &video_stream_information);
     _send_mavlink_message(&msg, srcaddr);
 }
 
