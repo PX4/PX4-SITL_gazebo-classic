@@ -720,7 +720,6 @@ void CameraManagerPlugin::_handle_request_video_stream_information(const mavlink
     video_stream_information.hfov = 90; // made up
     std::strncpy(video_stream_information.name, "Visual Spectrum", sizeof(video_stream_information.name));
     std::strncpy(video_stream_information.uri, _videoURI.c_str(), sizeof(video_stream_information.uri));
-    video_stream_information.encoding = VIDEO_STREAM_ENCODING_H264;
 
     mavlink_message_t msg;
     mavlink_msg_video_stream_information_encode_chan(_systemID, _componentID, MAVLINK_COMM_1, &msg, &video_stream_information);
