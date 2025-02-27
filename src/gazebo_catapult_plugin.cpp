@@ -77,13 +77,6 @@ void CatapultPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gzerr << "[gazebo_catapult_plugin] link_name needs to be provided";
   }
 
-  if (_sdf->HasElement("direction")) {
-    direction_ = _sdf->Get<ignition::math::Vector3d>("direction");
-  } else {
-    direction_ = ignition::math::Vector3d(1.0, 0.0, 2.0);
-  }
-  direction_.Normalize();
-
   if (_sdf->HasElement("motorNumber"))
     motor_number_ = _sdf->GetElement("motorNumber")->Get<int>();
   else
@@ -92,6 +85,7 @@ void CatapultPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   getSdfParam<std::string>(_sdf, "commandSubTopic", trigger_sub_topic_, trigger_sub_topic_);
   getSdfParam<double>(_sdf, "force", force_magnitude_, force_magnitude_);
   getSdfParam<double>(_sdf, "duration", launch_duration_, launch_duration_);
+  getSdfParam<ignition::math::Vector3d>(_sdf, "direction", direction_, direction_);
 
   // Listen to the update event. This event is broadcast every simulation iteration.
   _updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&CatapultPlugin::OnUpdate, this, _1));
@@ -116,6 +110,8 @@ void CatapultPlugin::OnUpdate(const common::UpdateInfo&){
         std::cout << "[gazebo_catapult_plugin] Catapult armed " << std::endl;
       
       } else { // launch_status = VEHICLE_INLAUNCH
+        direction_.Normalize();
+        
         //Apply force to the vehicle
         ignition::math::Vector3d force = force_magnitude_ * direction_;
         this->link_->AddForce(force);     
