@@ -25,7 +25,7 @@ jobs:
         git clone https://github.com/mavlink/c_library_v2.git /usr/local/include/mavlink
     - name: Install
       run: |
-        rm '/usr/local/bin/2to3*'
+        rm '/usr/local/bin/2to3'
         rm '/usr/local/bin/idle3'
         rm '/usr/local/bin/pydoc3'
         rm '/usr/local/bin/python3'
@@ -42,8 +42,8 @@ jobs:
         brew install --overwrite python
         brew install --cask xquartz
         brew tap PX4/px4
-        brew install px4-dev
-        brew install px4-sim
+        brew install --overwrite px4-dev
+        brew install --overwrite px4-sim
         pip3 install --user --upgrade setuptools
         pip3 install --user --upgrade rospkg pyserial empy toml numpy pandas jinja2
     - name: Cmake Build
