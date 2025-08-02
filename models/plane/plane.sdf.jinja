@@ -511,11 +511,11 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/left_elevon</topic_name> <!--Uncomment to draw the force-->
+      <!--<topic_name>lift_force/left_elevon</topic_name> Uncomment to draw the force -->
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -534,11 +534,11 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/right_elevon</topic_name> <!--Uncomment to draw the force-->
+      <!--<topic_name>lift_force/right_elevon</topic_name> Uncomment to draw the force -->
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -557,11 +557,10 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/left_flap</topic_name> <!--Uncomment to draw the force-->
       <control_joint_name>
         left_flap_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.1</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -580,11 +579,10 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/right_flap</topic_name> <!--Uncomment to draw the force-->
       <control_joint_name>
         right_flap_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.1</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-0.5</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
@@ -603,7 +601,6 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/elevator</topic_name> <!--Uncomment to draw the force-->
       <control_joint_name>
         elevator_joint
       </control_joint_name>
@@ -626,7 +623,6 @@
       <forward>1 0 0</forward>
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/rudder</topic_name> <!--Uncomment to draw the force-->
       <control_joint_name>
          rudder_joint
       </control_joint_name>
@@ -760,6 +756,14 @@
       <robotNamespace></robotNamespace>
       <linkName>plane/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
   </model>
 </sdf>
