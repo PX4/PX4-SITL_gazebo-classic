@@ -148,8 +148,6 @@ private:
   bool received_first_actuator_{false};
   Eigen::VectorXd input_reference_;
 
-  float protocol_version_{2.0};
-
   std::unique_ptr<MavlinkInterface> mavlink_interface_;
 
   std::string namespace_{kDefaultNamespace};
