@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <scene>
+        <ambient>0.95 0.95 0.95 1</ambient>
+        <background>0.98 0.98 0.98 1</background>
+        <shadows>true</shadows>
+      </scene>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -33,5 +38,15 @@
       <real_time_update_rate>250</real_time_update_rate>
       <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
     </physics>
+    <gui>
+      <camera name="user_camera">
+        <track_visual>
+          <static>true</static>
+          <use_model_frame>true</use_model_frame>
+          <xyz>-2 -2 1.5</xyz>
+          <inherit_yaw>true</inherit_yaw>
+        </track_visual>
+    </camera>
+    </gui>
   </world>
 </sdf>
