@@ -192,7 +192,9 @@
         </material>
         <plugin name="left_elevon_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/left_elevon</topic_name>
-          <color>Gazebo/Green</color>
+          <color>Gazebo/Red</color>
+          <link_name>base_link</link_name>  <!--This is the link that is actually subjected to force, depending on the libLiftDragPlugin settings. -->
+          <scale>0.1</scale>  <!-- Scale of the force visual, Adjust the appropriate value according to the model. -->
         </plugin>
       </visual>
     </link>
@@ -225,7 +227,9 @@
         </material>
         <plugin name="right_elevon_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/right_elevon</topic_name>
-          <color>Gazebo/Green</color>
+          <color>Gazebo/Red</color>
+          <link_name>base_link</link_name>  <!--This is the link that is actually subjected to force, depending on the libLiftDragPlugin settings. -->
+          <scale>0.1</scale>  <!-- Scale of the force visual, Adjust the appropriate value according to the model. -->
         </plugin>
       </visual>
     </link>
@@ -258,7 +262,9 @@
         </material>
         <plugin name="left_flap_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/left_flap</topic_name>
-          <color>Gazebo/Green</color>
+          <color>Gazebo/Red</color>
+          <link_name>base_link</link_name>  <!--This is the link that is actually subjected to force, depending on the libLiftDragPlugin settings. -->
+          <scale>0.1</scale>  <!-- Scale of the force visual, Adjust the appropriate value according to the model. -->
         </plugin>
       </visual>
     </link>
@@ -291,7 +297,9 @@
         </material>
         <plugin name="right_elevon_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/right_flap</topic_name>
-          <color>Gazebo/Green</color>
+          <color>Gazebo/Red</color>
+          <link_name>base_link</link_name>  <!--This is the link that is actually subjected to force, depending on the libLiftDragPlugin settings. -->
+          <scale>0.1</scale>  <!-- Scale of the force visual, Adjust the appropriate value according to the model. -->
         </plugin>
       </visual>
     </link>
@@ -324,7 +332,9 @@
         </material>
         <plugin name="elevator_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/elevator</topic_name>
-          <color>Gazebo/Green</color>
+          <color>Gazebo/Red</color>
+          <link_name>base_link</link_name>  <!--This is the link that is actually subjected to force, depending on the libLiftDragPlugin settings. -->
+          <scale>0.1</scale>  <!-- Scale of the force visual, Adjust the appropriate value according to the model. -->
         </plugin>
       </visual>
     </link>
@@ -357,7 +367,9 @@
         </material>
         <plugin name="rudder_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/rudder</topic_name>
-          <color>Gazebo/Green</color>
+          <color>Gazebo/Red</color>
+          <link_name>base_link</link_name>  <!--This is the link that is actually subjected to force, depending on the libLiftDragPlugin settings. -->
+          <scale>0.1</scale>  <!-- Scale of the force visual, Adjust the appropriate value according to the model. -->
         </plugin>
       </visual>
     </link>
@@ -511,7 +523,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/left_elevon</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/left_elevon</topic_name> <!--The origin of force will be the value set by the <cp> tag.-->
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
@@ -534,7 +546,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/right_elevon</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/right_elevon</topic_name> <!--The origin of force will be the value set by the <cp> tag.-->
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
@@ -557,7 +569,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/left_flap</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/left_flap</topic_name> <!--The origin of force will be the value set by the <cp> tag.-->
       <control_joint_name>
         left_flap_joint
       </control_joint_name>
@@ -580,7 +592,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/right_flap</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/right_flap</topic_name> <!--The origin of force will be the value set by the <cp> tag.-->
       <control_joint_name>
         right_flap_joint
       </control_joint_name>
@@ -603,7 +615,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/elevator</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/elevator</topic_name> <!--The origin of force will be the value set by the <cp> tag.-->
       <control_joint_name>
         elevator_joint
       </control_joint_name>
@@ -626,7 +638,7 @@
       <forward>1 0 0</forward>
       <upward>0 1 0</upward>
       <link_name>base_link</link_name>
-      <topic_name>lift_force/rudder</topic_name> <!--Uncomment to draw the force-->
+      <topic_name>lift_force/rudder</topic_name> <!--The origin of force will be the value set by the <cp> tag.-->
       <control_joint_name>
          rudder_joint
       </control_joint_name>
