@@ -24,8 +24,6 @@
 #include <boost/algorithm/string.hpp>
 #include <opencv2/opencv.hpp>
 
-#include <development/mavlink.h>
-
 using namespace std;
 using namespace gazebo;
 using namespace cv;
