@@ -515,7 +515,17 @@ void CameraManagerPlugin::_handle_take_photo(const mavlink_message_t *pMsg, stru
     }
     //-- Single capture?
     if (cmd.param3 == 1) {
-        _captureMode = CAPTURE_SINGLE;
+        auto current_time = std::chrono::high_resolution_clock::now();
+        auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - _last_single_capture_cmd_time).count();
+        if(cmd.param4 == _last_single_capture_cmd_seq_num && elapsed_ms < 2000) {
+            gzdbg << "Single capture: Ignoring repeated command. Sequence number: " << (int)cmd.param4 << ".\n";
+        }
+        else {
+            gzdbg << "Single capture commanded. Sequence number: " << (int)cmd.param4 << ".\n";
+            _last_single_capture_cmd_time = current_time;
+            _last_single_capture_cmd_seq_num = cmd.param4;
+            _captureMode = CAPTURE_SINGLE;
+        }
         _send_cmd_ack(pMsg->sysid, pMsg->compid,
                       MAV_CMD_IMAGE_START_CAPTURE, MAV_RESULT_ACCEPTED, srcaddr);
         //-- Time lapse?
