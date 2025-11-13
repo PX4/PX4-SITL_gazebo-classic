@@ -122,6 +122,9 @@ private:
     int                         _componentID{MAV_COMP_ID_CAMERA};
     int                         _mavlinkCamPort{14530};
 
+    double                      _last_single_capture_cmd_seq_num{NAN};
+    std::chrono::time_point<std::chrono::high_resolution_clock> _last_single_capture_cmd_time;
+
     std::chrono::time_point<std::chrono::high_resolution_clock> _start_video_capture_time;
 };
 
