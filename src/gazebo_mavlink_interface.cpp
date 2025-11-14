@@ -419,8 +419,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
+
+#ifdef MAVLINK_DEVELOPMENT
   target_gps_sub_ = node_handle_->Subscribe("~/" + target_gps_sub_topic_, &GazeboMavlinkInterface::TargetGpsCallback, this);
   arucoMarker_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + arucoMarker_sub_topic_, &GazeboMavlinkInterface::targetReleativeCallback, this);
+#endif // MAVLINK_DEVELOPMENT
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
@@ -948,6 +951,7 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   mavlink_interface_->send_mavlink_message(&msg);
 }
 
+#ifdef MAVLINK_DEVELOPMENT
 void GazeboMavlinkInterface::targetReleativeCallback(TargetRelativePtr& targetRelative_message) {
 
   mavlink_target_relative_t sensor_msg;
@@ -1005,6 +1009,7 @@ void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
   mavlink_msg_target_absolute_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_data);
   mavlink_interface_->send_mavlink_message(&msg);
 }
+#endif // MAVLINK_DEVELOPMENT
 
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   mavlink_message_t msg;

@@ -36,7 +36,8 @@
 #include <gazebo/util/system.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <ignition/math.hh>
-#include <development/mavlink.h>
+
+#include "mavlink_include.h"
 
 namespace gazebo
 {

@@ -18,7 +18,6 @@
 
 #include <string>
 #include <opencv2/opencv.hpp>
-#include <development/mavlink.h>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/CameraSensor.hh>
 #include <gazebo/gazebo.hh>
@@ -32,6 +31,8 @@
 #include <SITLGps.pb.h>
 #include <ignition/math.hh>
 #include <chrono>
+
+#include "mavlink_include.h"
 
 namespace gazebo
 {
