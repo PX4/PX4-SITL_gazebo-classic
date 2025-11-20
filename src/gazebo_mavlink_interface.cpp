@@ -1186,7 +1186,7 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
   Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
   if (actuator_controls.size() < n_out_max) return; //TODO: Handle this properly
   for (int i = 0; i < input_reference_.size(); i++) {
-    if (armed) {
+    if (true) {
       input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
           * input_scaling_[i] + zero_position_armed_[i];
       // std::cout << input_reference_ << ", ";
