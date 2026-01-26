@@ -50,8 +50,10 @@
           </script>
         </material>
         <plugin name="left_elevon_lift_visual" filename="libForceVisual.so">
+          <link_name>base_link</link_name>
           <topic_name>lift_force/lumped_force</topic_name>
           <color>Gazebo/Green</color>
+          <scale>0.2</scale>
         </plugin>
       </visual>
       <gravity>1</gravity>
