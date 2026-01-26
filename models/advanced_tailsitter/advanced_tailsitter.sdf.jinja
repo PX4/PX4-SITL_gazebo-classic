@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version='1.6'>
-  <model name='tailsitter'>
+  <model name='advanced_tailsitter.sdf'>
     <pose>0 0 0.5 0 0 0</pose>
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
@@ -24,7 +24,7 @@
           </box>
         </geometry>
       </collision>
-      <!-- The settings of this meshes file will reduce the real-time performance of the simulation (real-time factor) -->
+      <!-- Visualization of forces will reduce the real-time performance of the simulation (real-time factor) -->
       <visual name='base_link_visual'>
         <pose>0 0 0.2 0 -1.57075 3.14</pose>
         <geometry>
@@ -39,12 +39,18 @@
             <uri>__default__</uri>
           </script>
         </material>
+        <plugin name="adv_liftdrag_visual" filename="libForceVisual.so">
+          <link_name>base_link</link_name>
+          <topic_name>force/adv_liftdrag</topic_name>
+          <color>Gazebo/Red</color>
+          <scale>0.2</scale>
+        </plugin>
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
       <self_collide>0</self_collide>
     </link>
-    <link name='tailsitter/imu_link'>
+    <link name='advanced_tailsitter/imu_link'>
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -59,8 +65,8 @@
         </inertia>
       </inertial>
     </link>
-    <joint name='tailsitter/imu_joint' type='revolute'>
-      <child>tailsitter/imu_link</child>
+    <joint name='advanced_tailsitter/imu_joint' type='revolute'>
+      <child>advanced_tailsitter/imu_link</child>
       <parent>base_link</parent>
       <axis>
         <xyz>1 0 0</xyz>
@@ -239,7 +245,7 @@
         </geometry>
         <material>
           <script>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Red</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -248,7 +254,7 @@
         <plugin name="left_wing_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/left_wing</topic_name>
           <link_name>base_link</link_name>
-          <color>Gazebo/Red</color>
+          <color>Gazebo/Green</color>
           <scale>0.2</scale>
         </plugin>
       </visual>
@@ -274,7 +280,7 @@
         </geometry>
         <material>
           <script>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Red</name>
             <uri>__default__</uri>
           </script>
         </material>
@@ -283,7 +289,7 @@
         <plugin name="right_wing_lift_visual" filename="libForceVisual.so">
           <topic_name>lift_force/right_wing</topic_name>
           <link_name>base_link</link_name>
-          <color>Gazebo/Red</color>
+          <color>Gazebo/Green</color>
           <scale>0.2</scale>
         </plugin>
       </visual>
@@ -344,18 +350,14 @@
     <plugin name="left_wing" filename="libLiftDragPlugin.so">
       <propeller_wind_map>
         <propeller joint="rotor_0_joint" k_v="0.01" rotorVelocitySlowdownSim="10" />
-        <wash_only>false</wash_only>
+        <wash_only>true</wash_only>
       </propeller_wind_map>
-      <a0>0.05984281113</a0>
-      <cla>4.0</cla>
-      <cda>0.2</cda>
-      <cma>0.0</cma>
       <alpha_stall>0.6391428111</alpha_stall>
       <cla_stall>-1.7</cla_stall>
       <cda_stall>-0.45</cda_stall>
       <cma_stall>0</cma_stall>
-      <cm_delta>0.1</cm_delta>
-      <cp>0 0.3 0.0</cp>
+      <cm_delta>0</cm_delta>
+      <cp>0 0.3 -0.3</cp>
       <area>0.15</area>
       <air_density>1.2041</air_density>
       <forward>0 0 1</forward>
@@ -366,25 +368,21 @@
       <control_joint_name>
         left_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-1</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
     <plugin name="right_wing" filename="libLiftDragPlugin.so">
       <propeller_wind_map>
         <propeller joint="rotor_1_joint" k_v="0.01" rotorVelocitySlowdownSim="10" />
-        <wash_only>false</wash_only>
+        <wash_only>true</wash_only>
       </propeller_wind_map>
-      <a0>0.05984281113</a0>
-      <cla>4.0</cla>
-      <cda>0.2</cda>
-      <cma>0.0</cma>
       <alpha_stall>0.6391428111</alpha_stall>
       <cla_stall>-1.7</cla_stall>
       <cda_stall>-0.45</cda_stall>
       <cma_stall>0</cma_stall>
-      <cm_delta>0.1</cm_delta>
-      <cp>0 -0.3 -0.0</cp>
+      <cm_delta>0</cm_delta>
+      <cp>0 -0.3 -0.3</cp>
       <area>0.15</area>
       <air_density>1.2041</air_density>
       <forward>0 0 1</forward>
@@ -395,11 +393,79 @@
       <control_joint_name>
         right_elevon_joint
       </control_joint_name>
-      <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
+      <control_joint_rad_to_cl>-1</control_joint_rad_to_cl>
       <robotNamespace></robotNamespace>
       <windSubTopic>world_wind</windSubTopic>
     </plugin>
-
+    <plugin name="aircraft" filename="libAdvancedLiftDragPlugin.so">
+      <a0>0.0</a0>
+      <CL0>0.15188</CL0>
+      <AR>6.5</AR>
+      <eff>0.97</eff>
+      <CLa>5.015</CLa>
+      <CD0>0.029</CD0>
+      <Cem0>0.075</Cem0>
+      <Cema>-0.463966</Cema>
+      <CYb>-0.258244</CYb>
+      <Cellb>-0.039250</Cellb>
+      <Cenb>0.100826</Cenb>
+      <CDp>0.0</CDp>
+      <CYp>0.065861</CYp>
+      <CLp>0.0</CLp>
+      <Cellp>-0.487407</Cellp>
+      <Cemp>0.0</Cemp>
+      <Cenp>-0.040416</Cenp>
+      <CDq>0.055166</CDq>
+      <CYq>0.0</CYq>
+      <CLq>7.971792</CLq>
+      <Cellq>0.0</Cellq>
+      <Cemq>-12.140140</Cemq>
+      <Cenq>0.0</Cenq>
+      <CDr>0.0</CDr>
+      <CYr>0.230299</CYr>
+      <CLr>0.0</CLr>
+      <Cellr>0.078165</Cellr>
+      <Cemr>0.0</Cemr>
+      <Cenr>-0.089947</Cenr>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <CLa_stall>-3.85</CLa_stall>
+      <CDa_stall>-0.9233984055</CDa_stall>
+      <Cema_stall>0</Cema_stall>
+      <ref_pt>0 0 0</ref_pt>
+      <area>0.34</area>
+      <mac>0.22</mac>
+      <air_density>1.2041</air_density>
+      <forward>0 0 1</forward>
+      <upward>-1 0 0</upward>
+      <link_name>base_link</link_name>
+      <!-- Visualization of forces will reduce the real-time performance of the simulation (real-time factor) -->
+      <!-- <topic_name>force/adv_liftdrag</topic_name> -->
+      <num_ctrl_surfaces>2</num_ctrl_surfaces>
+      <control_surface>
+        <name>left_elevon_joint</name>
+        <index>0</index>
+        <direction>1</direction>
+        <CD_ctrl>-0.000059</CD_ctrl>
+        <CY_ctrl>0.000171</CY_ctrl>
+        <CL_ctrl>-0.011940</CL_ctrl>
+        <Cell_ctrl>-0.003331</Cell_ctrl>
+        <Cem_ctrl>0.001498</Cem_ctrl>
+        <Cen_ctrl>-0.000057</Cen_ctrl>
+      </control_surface>
+      <control_surface>
+        <name>right_elevon_joint</name>
+        <index>1</index>
+        <direction>1</direction>
+        <CD_ctrl>-0.000059</CD_ctrl>
+        <CY_ctrl>-0.000171</CY_ctrl>
+        <CL_ctrl>-0.011940</CL_ctrl>
+        <Cell_ctrl>0.003331</Cell_ctrl>
+        <Cem_ctrl>0.001498</Cem_ctrl>
+        <Cen_ctrl>0.000057</Cen_ctrl>
+      </control_surface>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
+    </plugin>
     <plugin name='rosbag' filename='libgazebo_multirotor_base_plugin.so'>
       <robotNamespace></robotNamespace>
       <linkName>base_link</linkName>
@@ -413,7 +479,7 @@
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>1500</maxRotVelocity>
-      <motorConstant>1.0e-05</motorConstant>
+      <motorConstant>1e-05</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>0</motorNumber>
@@ -430,7 +496,7 @@
       <timeConstantUp>0.0125</timeConstantUp>
       <timeConstantDown>0.025</timeConstantDown>
       <maxRotVelocity>1500</maxRotVelocity>
-      <motorConstant>1.0e-05</motorConstant>
+      <motorConstant>1e-05</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
       <motorNumber>1</motorNumber>
@@ -441,7 +507,7 @@
     </plugin>
     <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace></robotNamespace>
-      <linkName>tailsitter/imu_link</linkName>
+      <linkName>advanced_tailsitter/imu_link</linkName>
       <imuTopic>/imu</imuTopic>
     </plugin>
     <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
