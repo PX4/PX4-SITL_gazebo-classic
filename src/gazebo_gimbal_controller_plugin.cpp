@@ -659,8 +659,8 @@ void GimbalControllerPlugin::SendGimbalDeviceInformation()
   const float rollMin = this->rollJoint->LowerLimit(0);
   const float pitchMax = this->pitchJoint->UpperLimit(0);
   const float pitchMin = this->pitchJoint->LowerLimit(0);
-  const float yawMax = this->yawJoint->LowerLimit(0);
-  const float yawMin = this->yawJoint->UpperLimit(0);
+  const float yawMax = this->yawJoint->UpperLimit(0);
+  const float yawMin = this->yawJoint->LowerLimit(0);
 
   mavlink_message_t msg;
   mavlink_msg_gimbal_device_information_pack_chan(

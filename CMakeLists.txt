@@ -115,6 +115,12 @@ endif()
 # find MAVLink
 find_package(MAVLink)
 
+# Check if MAVLINK_DEVELOPMENT should be defined
+if(MAVLINK_DEVELOPMENT)
+  message(STATUS "MAVLink development dialect enabled")
+  add_definitions(-DMAVLINK_DEVELOPMENT)
+endif()
+
 # see if catkin was invoked to build this
 if (CATKIN_DEVEL_PREFIX)
   message(STATUS "catkin ENABLED")

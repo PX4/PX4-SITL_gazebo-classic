@@ -196,10 +196,6 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
     gzerr << "[gazebo_mavlink_interface] Please specify a robotNamespace.\n";
   }
 
-  if (_sdf->HasElement("protocol_version")) {
-    protocol_version_ = _sdf->GetElement("protocol_version")->Get<float>();
-  }
-
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
@@ -423,8 +419,11 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   imu_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + imu_sub_topic_, &GazeboMavlinkInterface::ImuCallback, this);
   opticalFlow_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + opticalFlow_sub_topic_, &GazeboMavlinkInterface::OpticalFlowCallback, this);
   irlock_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + irlock_sub_topic_, &GazeboMavlinkInterface::IRLockCallback, this);
+
+#ifdef MAVLINK_DEVELOPMENT
   target_gps_sub_ = node_handle_->Subscribe("~/" + target_gps_sub_topic_, &GazeboMavlinkInterface::TargetGpsCallback, this);
   arucoMarker_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + arucoMarker_sub_topic_, &GazeboMavlinkInterface::targetReleativeCallback, this);
+#endif // MAVLINK_DEVELOPMENT
   groundtruth_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + groundtruth_sub_topic_, &GazeboMavlinkInterface::GroundtruthCallback, this);
   vision_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + vision_sub_topic_, &GazeboMavlinkInterface::VisionCallback, this);
   mag_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + mag_sub_topic_, &GazeboMavlinkInterface::MagnetometerCallback, this);
@@ -539,18 +538,8 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   mavlink_status_t* chan_state = mavlink_get_channel_status(MAVLINK_COMM_0);
 
-  // set the Mavlink protocol version to use on the link
-  if (protocol_version_ == 2.0) {
-    chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
-    gzmsg << "Using MAVLink protocol v2.0\n";
-  }
-  else if (protocol_version_ == 1.0) {
-    chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
-    gzmsg << "Using MAVLink protocol v1.0\n";
-  }
-  else {
-    gzerr << "Unkown protocol version! Using v" << protocol_version_ << "by default \n";
-  }
+  chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+  gzmsg << "Using MAVLink protocol v2.0\n";
 
   mavlink_interface_->Load();
 }
@@ -962,8 +951,9 @@ void GazeboMavlinkInterface::IRLockCallback(IRLockPtr& irlock_message) {
   mavlink_interface_->send_mavlink_message(&msg);
 }
 
+#ifdef MAVLINK_DEVELOPMENT
 void GazeboMavlinkInterface::targetReleativeCallback(TargetRelativePtr& targetRelative_message) {
-  
+
   mavlink_target_relative_t sensor_msg;
   sensor_msg.timestamp = targetRelative_message->time_usec();
   sensor_msg.x = targetRelative_message->pos_x();
@@ -1019,6 +1009,7 @@ void GazeboMavlinkInterface::TargetGpsCallback(GpsPtr& gps_msg) {
   mavlink_msg_target_absolute_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &gps_data);
   mavlink_interface_->send_mavlink_message(&msg);
 }
+#endif // MAVLINK_DEVELOPMENT
 
 void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
   mavlink_message_t msg;
@@ -1056,7 +1047,7 @@ void GazeboMavlinkInterface::VisionCallback(OdomPtr& odom_message) {
     odom_message->angular_velocity().z()));
 
   // Only sends ODOMETRY msgs if send_odometry is set and the protocol version is 2.0
-  if (send_odometry_ && protocol_version_ == 2.0) {
+  if (send_odometry_) {
     // send ODOMETRY Mavlink msg
     mavlink_odometry_t odom;
 

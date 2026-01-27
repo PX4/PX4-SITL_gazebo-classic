@@ -99,6 +99,7 @@ private:
   double launch_duration_ = 0.01;
   double force_magnitude_ = 1.0;
   int motor_number_;
+  ignition::math::Vector3d direction_ {ignition::math::Vector3d(1.0, 0.0, 2.0)};
 
   std::string trigger_sub_topic_ = "/gazebo/command/motor_speed";
 

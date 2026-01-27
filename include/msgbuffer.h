@@ -23,7 +23,7 @@
 #pragma once
 
 #include <cassert>
-#include <development/mavlink.h>
+#include "mavlink_include.h"
 
 namespace gazebo {
 /**

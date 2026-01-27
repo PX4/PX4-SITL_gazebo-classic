@@ -71,6 +71,7 @@
 #include <Pressure.pb.h>
 #include <Wind.pb.h>
 
+#include "mavlink_include.h"
 #include "mavlink_interface.h"
 #include "msgbuffer.h"
 
@@ -147,8 +148,6 @@ protected:
 private:
   bool received_first_actuator_{false};
   Eigen::VectorXd input_reference_;
-
-  float protocol_version_{2.0};
 
   std::unique_ptr<MavlinkInterface> mavlink_interface_;
 
@@ -232,8 +231,11 @@ private:
   transport::SubscriberPtr imu_sub_{nullptr};
   transport::SubscriberPtr opticalFlow_sub_{nullptr};
   transport::SubscriberPtr irlock_sub_{nullptr};
+
+#ifdef MAVLINK_DEVELOPMENT
   transport::SubscriberPtr target_gps_sub_{nullptr};
   transport::SubscriberPtr arucoMarker_sub_{nullptr};
+#endif // MAVLINK_DEVELOPMENT
   transport::SubscriberPtr groundtruth_sub_{nullptr};
   transport::SubscriberPtr vision_sub_{nullptr};
   transport::SubscriberPtr mag_sub_{nullptr};

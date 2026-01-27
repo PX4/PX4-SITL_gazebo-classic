@@ -318,8 +318,12 @@ void MavlinkInterface::UpdateBarometer(const SensorData::Barometer &data, int id
       return;
     }
   }
-  //Register new HIL instance if we have never seen the id
+  // Register new HIL instance and update it with the data
   RegisterNewHILSensorInstance(id);
+  hil_data_.back().temperature = data.temperature;
+  hil_data_.back().abs_pressure = data.abs_pressure;
+  hil_data_.back().pressure_alt = data.pressure_alt;
+  hil_data_.back().baro_updated = true;
 }
 
 void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) {
@@ -331,8 +335,10 @@ void MavlinkInterface::UpdateAirspeed(const SensorData::Airspeed &data, int id) 
       return;
     }
   }
-  //Register new HIL instance if we have never seen the id
+  // Register new HIL instance and update it with the data
   RegisterNewHILSensorInstance(id);
+  hil_data_.back().diff_pressure = data.diff_pressure;
+  hil_data_.back().diff_press_updated = true;
 }
 
 void MavlinkInterface::UpdateIMU(const SensorData::Imu &data, int id) {
@@ -345,8 +351,11 @@ void MavlinkInterface::UpdateIMU(const SensorData::Imu &data, int id) {
       return;
     }
   }
-  //Register new HIL instance if we have never seen the id
+  // Register new HIL instance and update it with the data
   RegisterNewHILSensorInstance(id);
+  hil_data_.back().accel_b = data.accel_b;
+  hil_data_.back().gyro_b = data.gyro_b;
+  hil_data_.back().imu_updated = true;
 }
 
 void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data, int id) {
@@ -358,8 +367,10 @@ void MavlinkInterface::UpdateMag(const SensorData::Magnetometer &data, int id) {
       return;
     }
   }
-  //Register new HIL instance if we have never seen the id
+  // Register new HIL instance and update it with the data
   RegisterNewHILSensorInstance(id);
+  hil_data_.back().mag_b = data.mag_b;
+  hil_data_.back().mag_updated = true;
 }
 
 void MavlinkInterface::RegisterNewHILSensorInstance(int id) {

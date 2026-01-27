@@ -435,7 +435,7 @@ void LiftDragPlugin::OnUpdate()
   this->link->AddForceAtRelativePosition(force, this->cp);
   this->link->AddTorque(moment);
 
-  auto relative_center = this->link->RelativePose().Pos() + this->cp;
+  auto relative_center = this->cp;
 
   // Publish force and center of pressure for potential visual plugin.
   // - dt is used to control the rate at which the force is published
