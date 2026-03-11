@@ -1,5 +1,3 @@
-<!-- DO NOT EDIT: Generated from tileis.sdf.jinja -->
-
 <sdf version='1.6'>
   <model name='omniquad'>
     <link name='base_link'>
@@ -88,14 +86,14 @@
       </axis>
     </joint>
 
-
-     <link name='tilt_arm_1'>
-      <pose>0.05 -0.05 0.015 0 0 -0.786</pose>
+    <!-- arm -->
+    <link name='tilt_arm_1'>
+      <pose>0.06 -0.05 0.0085 3.1415 0 -0.786</pose>
       <inertial>
         <pose>0.0 0.0 0.0 0 0 0</pose>
         <mass>0.2031180930624021</mass>
         <inertia>
-          <ixx>0.001829</ixx>
+          <ixx>0.00164</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
           <iyy>0.0001829</iyy>
@@ -107,7 +105,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <surface>
@@ -123,7 +121,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -139,11 +137,10 @@
     </link>
 
     <joint name='tilt_arm_1_joint' type='revolute'>
-      <pose>0 0 0 0 0 0 0.0</pose>
       <child>tilt_arm_1</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0.785 -0.785 0</xyz>
+        <xyz expressed_in="__model__">0.785 -0.785 0</xyz>
         <limit>
           <lower>-2</lower>
           <upper>2</upper>
@@ -158,12 +155,12 @@
     </joint>
 
     <link name='tilt_arm_2'>
-      <pose>0.05 0.05 0.015 0 0 0.785</pose>
+      <pose>-0.04 0.05 0.0085 3.1415 0 2.35619</pose>
       <inertial>
         <pose>0.0 0.0 0.0 0 0 0</pose>
         <mass>0.2031180930624021</mass>
         <inertia>
-          <ixx>0.001829</ixx>
+          <ixx>0.00164</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
           <iyy>0.0001829</iyy>
@@ -175,7 +172,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <surface>
@@ -191,7 +188,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -207,11 +204,10 @@
     </link>
 
     <joint name='tilt_arm_2_joint' type='revolute'>
-      <pose>0 0 0 0 0 0.0</pose>
       <child>tilt_arm_2</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>0.785 0.785 0</xyz>
+        <xyz expressed_in="__model__">-0.785 0.785 0</xyz>
         <limit>
           <lower>-2</lower>
           <upper>2</upper>
@@ -226,15 +222,15 @@
     </joint>
 
     <link name='tilt_arm_3'>
-      <pose>-0.05 0.05 0.015 0 0 2.356</pose>
+      <pose>0.06 0.05 0.0085 3.1415 0 0.785398</pose>
       <inertial>
         <pose>0.0 0.0 0.0 0 0 0</pose>
         <mass>0.2031180930624021</mass>
         <inertia>
-          <ixx>0.001829</ixx>
+          <ixx>0.00164</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0001829</iyy> 
+          <iyy>0.0001829</iyy>
           <iyz>0</iyz>
           <izz>0.001461</izz>
         </inertia>
@@ -243,7 +239,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <surface>
@@ -259,7 +255,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -275,11 +271,10 @@
     </link>
 
     <joint name='tilt_arm_3_joint' type='revolute'>
-      <pose>0 0 0 0 0 0</pose>
       <child>tilt_arm_3</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>-0.785 0.785 0</xyz>
+        <xyz expressed_in="__model__">0.785 0.785 0</xyz>
         <limit>
           <lower>-2</lower>
           <upper>2</upper>
@@ -294,15 +289,15 @@
     </joint>
 
     <link name='tilt_arm_4'>
-      <pose>-0.05 -0.05 0.015 0 0 3.925</pose>
+      <pose>-0.04 -0.05 0.0085 3.1415 0 3.925</pose>
       <inertial>
         <pose>0.0 0.0 0.0 0 0 0</pose>
         <mass>0.2031180930624021</mass>
         <inertia>
-          <ixx>0.001829</ixx>
+          <ixx>0.00164</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0001829</iyy> <!-- .000448-->
+          <iyy>0.0001829</iyy>
           <iyz>0</iyz>
           <izz>0.001461</izz>
         </inertia>
@@ -311,7 +306,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <surface>
@@ -327,7 +322,7 @@
         <geometry>
           <mesh>
             <scale>1e-3 1e-3 1e-3</scale>
-            <uri>model://omniquad/meshes/arm_new.stl</uri>
+            <uri>model://omniquad/meshes/arm.stl</uri>
           </mesh>
         </geometry>
         <material>
@@ -343,11 +338,10 @@
     </link>
 
     <joint name='tilt_arm_4_joint' type='revolute'>
-      <pose>0 0 0 0 0 0.0</pose>
       <child>tilt_arm_4</child>
       <parent>base_link</parent>
       <axis>
-        <xyz>-0.785 -0.785 0</xyz>
+        <xyz expressed_in="__model__">-0.785 -0.785 0</xyz>
         <limit>
           <lower>-2</lower>
           <upper>2</upper>
@@ -361,8 +355,12 @@
       </axis>
     </joint>
 
-    <link name='rotor_1'>
-      <pose>0.175 -0.175 0.045 0 0 0</pose>
+    <!-- rotors -->
+    <link name="rotor_1">
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>0.175 -0.175 -0.005 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
@@ -375,6 +373,21 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
+      <visual name='rotor_1_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.75 0.75 0.75</scale>
+            <uri>model://omniquad_base/meshes/iris_prop_ccw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Green</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
       <collision name='rotor_1_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
@@ -392,23 +405,6 @@
           </friction>
         </surface>
       </collision>
-      <visual name='rotor_1_visual'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.75 0.75 0.75</scale>
-            <uri>model://iris/meshes/iris_prop_ccw.dae</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Green</name>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-          </script>
-        </material>
-      </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
     </link>
     <joint name='rotor_1_joint' type='revolute'>
       <child>rotor_1</child>
@@ -423,14 +419,15 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
-    <link name='rotor_2'>
-      <pose>0.175 0.175 0.045 0 0 0</pose>
+    <link name="rotor_2">
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>-0.175 0.175 -0.005 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -441,29 +438,12 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
-      <collision name='rotor_2_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.096</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='rotor_2_visual'>
+      <visual name="rotor_2_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.75 0.75 0.75</scale>
-            <uri>model://iris/meshes/iris_prop_cw.dae</uri>
+            <uri>model://omniquad_base/meshes/iris_prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -473,10 +453,28 @@
           </script>
         </material>
       </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
+      <collision name="rotor_2_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.005</length>
+            <radius>0.096</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
     </link>
-    <joint name='rotor_2_joint' type='revolute'>
+    <joint name="rotor_2_joint" type="revolute">
       <child>rotor_2</child>
       <parent>tilt_arm_2</parent>
       <axis>
@@ -489,14 +487,15 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
-    <link name='rotor_3'>
-      <pose>-0.175 0.175 0.045 0 0 0</pose>
+    <link name="rotor_3">
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>0.175 0.175 -0.005 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -507,29 +506,12 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
-      <collision name='rotor_3_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.096</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='rotor_3_visual'>
+      <visual name="rotor_3_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.75 0.75 0.75</scale>
-            <uri>model://iris/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://omniquad_base/meshes/iris_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -539,10 +521,28 @@
           </script>
         </material>
       </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
+      <collision name="rotor_3_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.005</length>
+            <radius>0.096</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
     </link>
-    <joint name='rotor_3_joint' type='revolute'>
+    <joint name="rotor_3_joint" type="revolute">
       <child>rotor_3</child>
       <parent>tilt_arm_3</parent>
       <axis>
@@ -555,14 +555,15 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
-    <link name='rotor_4'>
-      <pose>-0.175 -0.175 0.045 0 0 0</pose>
+    <link name="rotor_4">
+      <gravity>true</gravity>
+      <self_collide>false</self_collide>
+      <velocity_decay />
+      <pose>-0.175 -0.175 -0.005 0 0 0</pose>
       <inertial>
-        <pose>0 0 0 0 0 0</pose>
         <mass>0.005</mass>
         <inertia>
           <ixx>9.75e-07</ixx>
@@ -573,29 +574,12 @@
           <izz>0.000274004</izz>
         </inertia>
       </inertial>
-      <collision name='rotor_4_collision'>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.005</length>
-            <radius>0.096</radius>
-          </cylinder>
-        </geometry>
-        <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode/>
-          </friction>
-        </surface>
-      </collision>
-      <visual name='rotor_4_visual'>
+      <visual name="rotor_4_visual">
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.75 0.75 0.75</scale>
-            <uri>model://iris/meshes/iris_prop_cw.dae</uri>
+            <uri>model://omniquad_base/meshes/iris_prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -605,10 +589,28 @@
           </script>
         </material>
       </visual>
-      <gravity>1</gravity>
-      <velocity_decay/>
+      <collision name="rotor_4_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.005</length>
+            <radius>0.096</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
     </link>
-    <joint name='rotor_4_joint' type='revolute'>
+    <joint name="rotor_4_joint" type="revolute">
       <child>rotor_4</child>
       <parent>tilt_arm_4</parent>
       <axis>
@@ -621,7 +623,6 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
