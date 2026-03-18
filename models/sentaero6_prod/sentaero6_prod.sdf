@@ -1,0 +1,1326 @@
+<?xml version="1.0"?>
+<!-- This was manually edited after being generated from URDF -->
+<sdf version='1.5'>
+  <model name='sentaero6_prod'>
+    <pose>0 0 0 0 0 0</pose>
+
+    <link name='base_link'>
+      <pose>0 0 0 0 0 1.57</pose>
+      <inertial>
+        <pose>0 0.739251 0.291891 0 -0 0</pose>  <!-- -1e-06 0.739226 0.291889 0 -0 0 -->
+        <mass>17.08456</mass>  <!-- 17.608456 -->
+        <inertia>
+          <ixx>3</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>5</iyy>
+          <iyz>0</iyz>
+          <izz>6.754</izz>
+          <!--
+          <ixx>2.230</ixx>
+          <ixy>-1.387e-04</ixy>
+          <ixz>2.0694e-05</ixz>
+          <iyy>4.68</iyy>
+          <iyz>-9.823e-02</iyz>
+          <izz>6.754</izz>
+          -->
+          <!--
+          <ixx>1.804</ixx>
+          <ixy>-0.0001122</ixy>
+          <ixz>0.000016735263</ixz>
+          <iyy>3.785</iyy>
+          <iyz>-0.07944</iyz>
+          <izz>5.462</izz>
+          -->
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0.9 -0.01 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>3 1.7 0.05</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp>100000</kp>
+              <kd>1.0</kd>
+              <max_vel>0.1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/base_link.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <!-- flat white -->
+          <ambient>0.85 0.85 0.85 1.0</ambient>
+          <diffuse>1.0 1.0 1.0 1.0</diffuse>
+          <!-- high‐gloss highlight -->
+          <specular>0.8 0.8 0.8 1.0</specular>
+          <!-- no self‐illumination -->
+          <emissive>0.0 0.0 0.0 1.0</emissive>
+        </material>
+        <transparency>0</transparency>
+      </visual>
+      <self_collide>0</self_collide>
+      <velocity_decay/>
+      <gravity>1</gravity>
+    </link>
+
+    <link name='sentaero6_prod/imu_link'>
+      <pose relative_to='sentaero6_prod/imu_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='imu_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>0.1 0.01 0.01</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='sentaero6_prod/imu_joint' type='revolute'>
+      <pose relative_to='base_link'>-1e-06 0.739226 0.291889 0 -0 -1.57079632679</pose>
+      <child>sentaero6_prod/imu_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <include>
+      <uri>model://airspeed</uri>
+      <pose relative_to='base_link'>-1e-06 0.739226 0.291889 0 -0 -1.57079632679</pose>
+      <name>airspeed</name>
+    </include>
+    <joint name='airspeed_joint' type='fixed'>
+      <child>airspeed::link</child>
+      <parent>base_link</parent>
+    </joint>
+
+    <include>
+      <uri>model://gps</uri>
+      <pose relative_to='base_link'>-1e-06 0.739226 0.291889 0 -0 -1.57</pose>
+      <name>gps</name>
+    </include>
+    <joint name='gps_joint' type='fixed'>
+      <child>gps::link</child>
+      <parent>base_link</parent>
+    </joint>
+
+    <link name="camera_link">
+      <pose>-0.6 0 0.15 0 1.57 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0</iyz>
+          <izz>0.001</izz>
+        </inertia>
+      </inertial>
+      <collision name='camera_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.035</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <kp>1e+8</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='camera_visual'>
+        <pose>0 0 0 0 0 3.141592</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+      <sensor name="camera_imu" type="imu">
+        <always_on>1</always_on>
+      </sensor>
+      <sensor name="camera" type="camera">
+        <pose>0 0 0 0 0 0</pose>
+        <camera>
+          <horizontal_fov>2.0</horizontal_fov>
+          <image>
+            <format>R8G8B8</format>
+            <width>640</width>
+            <height>360</height>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>15000</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>false</visualize>
+        <plugin name="GstCameraPlugin" filename="libgazebo_gst_camera_plugin.so">
+            <robotNamespace></robotNamespace>
+            <udpHost>127.0.0.1</udpHost>
+            <udpPort>5600</udpPort>
+        </plugin>
+        <plugin name="GstCameraPlugin2" filename="libgazebo_gst_camera_plugin.so">
+            <robotNamespace></robotNamespace>
+            <udpHost>127.0.0.1</udpHost>
+            <udpPort>5601</udpPort>
+        </plugin>
+        <plugin name="CameraManagerPlugin" filename="libgazebo_camera_manager_plugin.so">
+            <robotNamespace>sentaero6_prod</robotNamespace>
+            <interval>1</interval>
+            <width>3840</width>
+            <height>2160</height>
+            <maximum_zoom>8.0</maximum_zoom>
+            <video_uri>udp://127.0.0.1:5600</video_uri>
+            <system_id>1</system_id>
+            <cam_component_id>100</cam_component_id>
+            <mavlink_cam_udp_port>14530</mavlink_cam_udp_port>
+        </plugin>
+      </sensor>
+    </link>
+    <joint name='camera_joint' type='fixed'>
+      <child>camera_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 -1 0</xyz>
+        <limit>
+          <lower>-1.5708</lower>
+          <upper>0.7854</upper>
+          <effort>100</effort>
+          <velocity>-1</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+          <limit>
+            <cfm>0.1</cfm>
+            <erp>0.2</erp>
+          </limit>
+        </ode>
+      </physics>
+    </joint>
+
+    <joint name='front_left_prop_rev' type='revolute'>
+      <pose relative_to='base_link'>0.500381 0.16 0.223364 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>front_left_prop_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+      <sensor name="front_left_prop_force_sensor" type="force_torque">
+        <always_on>1</always_on>
+        <update_rate>200</update_rate>          <!-- must be > 0 -->
+        <visualize>false</visualize>             <!-- will also draw arrows in GUI -->
+        <topic>front_left_prop_force/wrench</topic>               <!-- choose a simple topic name -->
+        <force_torque>
+          <frame>child</frame>
+          <measure_direction>child_to_parent</measure_direction>
+        </force_torque>
+      </sensor>
+    </joint>
+    <link name='front_left_prop_1'>
+      <pose relative_to='front_left_prop_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0 -0 -0.00365 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_prop_1_collision'>
+        <pose>-0.500381 -0.16 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/front_left_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='front_left_prop_1_visual'>
+        <pose>-0.500381 -0.16 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/front_left_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>.175 .175 .175 1.0</ambient>
+          <diffuse>.175 .175 .175 1.0</diffuse>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+
+    <joint name='front_right_prop_rev' type='revolute'>
+      <pose relative_to='base_link'>-0.500381 0.16 0.223364 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>front_right_prop_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='front_right_prop_1'>
+      <pose relative_to='front_right_prop_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0 -0 -0.00365 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_prop_1_collision'>
+        <pose>0.500381 -0.16 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/front_right_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='front_right_prop_1_visual'>
+        <pose>0.500381 -0.16 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/front_right_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>.175 .175 .175 1.0</ambient>
+          <diffuse>.175 .175 .175 1.0</diffuse>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+
+    <joint name='rear_left_prop_rev' type='revolute'>
+      <pose relative_to='base_link'>0.500381 1.26 0.223364 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>rear_left_prop_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_left_prop_1'>
+      <pose relative_to='rear_left_prop_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0 0 -0.00365 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_left_prop_1_collision'>
+        <pose>-0.500381 -1.26 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/rear_left_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rear_left_prop_1_visual'>
+        <pose>-0.500381 -1.26 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/rear_left_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>.175 .175 .175 1.0</ambient>
+          <diffuse>.175 .175 .175 1.0</diffuse>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+
+    <joint name='rear_right_prop_rev' type='revolute'>
+      <pose relative_to='base_link'>-0.500381 1.26 0.223364 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>rear_right_prop_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rear_right_prop_1'>
+      <pose relative_to='rear_right_prop_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0 0 -0.00365 0 -0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_right_prop_1_collision'>
+        <pose>0.500381 -1.26 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/rear_right_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rear_right_prop_1_visual'>
+        <pose>0.500381 -1.26 -0.223364 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/rear_right_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>.175 .175 .175 1.0</ambient>
+          <diffuse>.175 .175 .175 1.0</diffuse>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+
+    <joint name='pusher_prop_rev' type='revolute'>
+      <pose relative_to='base_link'>-1e-06 1.66832 0.291889 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>pusher_prop_1</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+      <sensor name="pusher_force_sensor" type="force_torque">
+        <always_on>1</always_on>
+        <update_rate>200</update_rate>          <!-- must be > 0 -->
+        <visualize>false</visualize>             <!-- will also draw arrows in GUI -->
+        <topic>pusher_prop_1/wrench</topic>      <!-- choose a simple topic name -->
+        <force_torque>
+          <frame>child</frame>
+          <measure_direction>child_to_parent</measure_direction>
+        </force_torque>
+      </sensor>
+    </joint>
+    <link name='pusher_prop_1'>
+      <pose relative_to='pusher_prop_rev'>0 0 0 1.57 0 0</pose>
+      <inertial>
+        <pose>0 0 -0.00365 0 0 0</pose>
+        <mass>0.005</mass>
+        <inertia>
+          <ixx>9.75e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='pusher_prop_1_collision'>
+        <pose>0 -0.293122 1.66832 -1.57 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/pusher_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='pusher_prop_1_visual'>
+        <pose>0 -0.293122 1.66832 -1.57 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/pusher_prop_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>.175 .175 .175 1.0</ambient>
+          <diffuse>.175 .175 .175 1.0</diffuse>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+
+    <joint name='left_aileron_rev' type='revolute'>
+      <pose relative_to='base_link'>1.13918 0.815681 0.308045 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>left_aileron_1</child>
+      <axis>
+        <xyz>0.999982 -0.000405 -0.005981</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='left_aileron_1'>
+      <pose relative_to='left_aileron_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0.021196 0.02562 0.002048 0 -0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <!--
+      <collision name='left_aileron_1_collision'>
+        <pose>-1.13918 -0.815681 -0.308045 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/left_aileron_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.2</mu>
+              <mu2>0.2</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      -->
+      <visual name='left_aileron_1_visual'>
+        <pose>-1.13918 -0.815681 -0.308045 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/left_aileron_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>1.0 0.647 0.0 1.0</ambient>
+          <diffuse>1.0 0.647 0.0 1.0</diffuse>
+        </material>
+        <plugin name="left_aileron_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/left_aileron</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
+      </visual>
+    </link>
+
+    <joint name='right_aileron_rev' type='revolute'>
+      <pose relative_to='base_link'>-1.13918 0.815681 0.308045 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>right_aileron_1</child>
+      <axis>
+        <xyz>0.999982 0.000405 0.005981</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <link name='right_aileron_1'>
+      <pose relative_to='right_aileron_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.021196 0.02562 0.002048 0 -0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <!--
+      <collision name='right_aileron_1_collision'>
+        <pose>1.13918 -0.815681 -0.308045 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/right_aileron_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.2</mu>
+              <mu2>0.2</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      -->
+      <visual name='right_aileron_1_visual'>
+        <pose>1.13918 -0.815681 -0.308045 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/right_aileron_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>1.0 0.647 0.0 1.0</ambient>
+          <diffuse>1.0 0.647 0.0 1.0</diffuse>
+        </material>
+        <plugin name="right_aileron_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/right_aileron</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
+      </visual>
+    </link>
+
+    <joint name='left_elevator_rev' type='revolute'>
+      <pose relative_to='base_link'>0.250728 1.55498 0.443305 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>left_elevator_1</child>
+      <axis>
+        <xyz>0.86631 8.7e-05 0.499507</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <link name='left_elevator_1'>
+      <pose relative_to='left_elevator_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.002057 0.024244 -0.005466 0 -0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <!--
+      <collision name='left_elevator_1_collision'>
+        <pose>-0.250728 -1.55498 -0.443305 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/left_elevator_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.2</mu>
+              <mu2>0.2</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      -->
+      <visual name='left_elevator_1_visual'>
+        <pose>-0.250728 -1.55498 -0.443305 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/left_elevator_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>1.0 0.647 0.0 1.0</ambient>
+          <diffuse>1.0 0.647 0.0 1.0</diffuse>
+        </material>
+        <plugin name="left_elevator_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/left_elevator</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
+      </visual>
+    </link>
+
+    <joint name='right_elevator_rev' type='revolute'>
+      <pose relative_to='base_link'>-0.250728 1.55498 0.443305 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>right_elevator_1</child>
+      <axis>
+        <xyz>0.86631 -8.7e-05 -0.499507</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.53</lower>
+          <upper>0.53</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <link name='right_elevator_1'>
+      <pose relative_to='right_elevator_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>-0.002057 0.024244 -0.005466 0 -0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <!--
+      <collision name='right_elevator_1_collision'>
+        <pose>0.250728 -1.55498 -0.443305 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/right_elevator_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.2</mu>
+              <mu2>0.2</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      -->
+      <visual name='right_elevator_1_visual'>
+        <pose>0.250728 -1.55498 -0.443305 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/right_elevator_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>1.0 0.647 0.0 1.0</ambient>
+          <diffuse>1.0 0.647 0.0 1.0</diffuse>
+        </material>
+        <plugin name="right_elevator_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/right_elevator</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
+      </visual>
+    </link>
+
+    <joint name='rudder_rev' type='revolute'>
+      <pose relative_to='base_link'>-0.00911 1.55496 0.151147 0 -0 0</pose>
+      <parent>base_link</parent>
+      <child>rudder_1</child>
+      <axis>
+        <xyz>0.001775 0.000111 -0.999998</xyz>
+        <limit>
+          <!-- -30/+30 deg. -->
+          <lower>-0.1</lower>
+          <upper>0.1</upper>
+        </limit>
+        <dynamics>
+          <damping>1.000</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <link name='rudder_1'>
+      <pose relative_to='rudder_rev'>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.009021 0.024 -9.4e-05 0 -0 0</pose>
+        <mass>0.00000001</mass>
+        <inertia>
+          <ixx>0.000001</ixx>
+          <ixy>0.0</ixy>
+          <iyy>0.000001</iyy>
+          <ixz>0.0</ixz>
+          <iyz>0.0</iyz>
+          <izz>0.000001</izz>
+        </inertia>
+      </inertial>
+      <!--
+      <collision name='rudder_1_collision'>
+        <pose>0.00911 -1.55496 -0.151147 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/rudder_1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode>
+              <mu>0.2</mu>
+              <mu2>0.2</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      -->
+      <visual name='rudder_1_visual'>
+        <pose>0.00911 -1.55496 -0.151147 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://sentaero6_prod/meshes/rudder_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>1.0 0.647 0.0 1.0</ambient>
+          <diffuse>1.0 0.647 0.0 1.0</diffuse>
+        </material>
+        <plugin name="rudder_lift_visual" filename="libForceVisual.so">
+          <topic_name>lift_force/rudder</topic_name>
+          <color>Gazebo/Green</color>
+        </plugin>
+      </visual>
+    </link>
+
+    <plugin filename="libLiftDragPlugin.so" name="left_aileron_lift">
+      <a0>0.052</a0>  <!-- 0.12 -->
+      <cla>5.51</cla>   <!-- 5.3 -->
+      <cda>0.32</cda>
+      <cma>0.8</cma>  <!--0.77-->
+      <alpha_stall>0.19</alpha_stall>
+      <cla_stall>-5.51</cla_stall>
+      <cda_stall>-0.32</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0.75 0.7 0.308045</cp>  <!-- 1.13918 0.7 0.308045 -->
+      <area>1.096</area>
+      <air_density>1.14</air_density>
+      <forward>0 -1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>base_link</link_name>
+      <topic_name>lift_force/left_aileron</topic_name>
+      <control_joint_name>left_aileron_rev</control_joint_name>
+      <control_joint_rad_to_cl>-1</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
+    </plugin>
+    <plugin filename="libLiftDragPlugin.so" name="right_aileron_lift">
+      <a0>0.052</a0>
+      <cla>5.51</cla>   <!-- 5.3 -->
+      <cda>0.32</cda>
+      <cma>0.8</cma>  <!--0.77-->
+      <alpha_stall>0.19</alpha_stall>
+      <cla_stall>-5.51</cla_stall>
+      <cda_stall>-0.32</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>-0.75 0.7 0.308045</cp>
+      <area>1.096</area>
+      <air_density>1.14</air_density>
+      <forward>0 -1 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>base_link</link_name>
+      <topic_name>lift_force/right_aileron</topic_name>
+      <control_joint_name>right_aileron_rev</control_joint_name>
+      <control_joint_rad_to_cl>-1</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
+    </plugin>
+    <plugin filename="libLiftDragPlugin.so" name="right_elevator_lift">
+      <a0>0.1</a0>  <!-- 0.052 -->
+      <cla>5.51</cla>   <!-- 5.3 -->
+      <cda>0.32</cda>
+      <cma>0.8</cma>  <!--0.77-->
+      <alpha_stall>0.19</alpha_stall>
+      <cla_stall>-5.51</cla_stall>
+      <cda_stall>-0.32</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>-0.250728 1.45 0.443305</cp>
+      <area>0.28</area>
+      <air_density>1.14</air_density>
+      <forward>0 -1 0</forward>
+      <upward>-0.5 0 -0.866</upward>
+      <link_name>base_link</link_name>
+      <topic_name>lift_force/right_elevator</topic_name>
+      <control_joint_name>right_elevator_rev</control_joint_name>
+      <control_joint_rad_to_cl>2</control_joint_rad_to_cl>  <!--6-->
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
+    </plugin>
+    <plugin filename="libLiftDragPlugin.so" name="left_elevator_lift">
+      <a0>0.1</a0>
+      <cla>5.51</cla>   <!-- 5.3 -->
+      <cda>0.32</cda>
+      <cma>0.8</cma>  <!--0.77-->
+      <alpha_stall>0.19</alpha_stall>
+      <cla_stall>-5.51</cla_stall>
+      <cda_stall>-0.32</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0.250728 1.45 0.443305</cp>
+      <area>0.28</area>
+      <air_density>1.14</air_density>
+      <forward>0 -1 0</forward>
+      <!-- <upward>-0.5 0 0.866</upward> -->
+      <upward>0.5 0 -0.866</upward>
+      <link_name>base_link</link_name>
+      <topic_name>lift_force/left_elevator</topic_name>
+      <control_joint_name>left_elevator_rev</control_joint_name>
+      <control_joint_rad_to_cl>2</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
+    </plugin>
+    <plugin filename="libLiftDragPlugin.so" name="rudder_lift">
+      <a0>0.0</a0>
+      <cla>5.6</cla>   <!-- 4.752798721 -->
+      <cda>0.16</cda> <!-- 0.6417112299 -->
+      <cma>0.0</cma>
+      <alpha_stall>0.3391428111</alpha_stall>
+      <cla_stall>-3.85</cla_stall>
+      <cda_stall>-0.9233984055</cda_stall>
+      <cma_stall>0</cma_stall>
+      <cp>0 1.55496 0.151147</cp>
+      <area>0.05</area>
+      <air_density>1.2041</air_density>
+      <forward>0 -1 0</forward>
+      <upward>1 0 0</upward>
+      <link_name>base_link</link_name>
+      <topic_name>lift_force/rudder</topic_name>
+      <control_joint_name>rudder_rev</control_joint_name>
+      <control_joint_rad_to_cl>-2</control_joint_rad_to_cl>
+      <robotNamespace></robotNamespace>
+      <windSubTopic>world_wind</windSubTopic>
+    </plugin>
+
+    <plugin filename="libgazebo_motor_model.so" name="front_right_motor_model">
+      <robotNamespace></robotNamespace>
+      <jointName>front_right_prop_rev</jointName>
+      <linkName>front_right_prop_1</linkName>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>0</motorNumber>
+      <motorSpeedPubTopic>/motor_speed/0</motorSpeedPubTopic>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>600</maxRotVelocity>
+      <motorConstant>4.2e-04</motorConstant>  <!-- 3.2e-04 -->
+      <momentConstant>0.1</momentConstant>  <!-- 0.08 -->
+      <rotorDragCoefficient>0.0006</rotorDragCoefficient>  <!-- 0.0006 -->
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin filename="libgazebo_motor_model.so" name="rear_left_motor_model">
+      <robotNamespace></robotNamespace>
+      <jointName>rear_left_prop_rev</jointName>
+      <linkName>rear_left_prop_1</linkName>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>1</motorNumber>
+      <motorSpeedPubTopic>/motor_speed/1</motorSpeedPubTopic>
+      <turningDirection>ccw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>600</maxRotVelocity>
+      <motorConstant>4.2e-04</motorConstant>
+      <momentConstant>0.1</momentConstant>
+      <rotorDragCoefficient>0.0006</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin filename="libgazebo_motor_model.so" name="front_left_motor_model">
+      <robotNamespace></robotNamespace>
+      <jointName>front_left_prop_rev</jointName>
+      <linkName>front_left_prop_1</linkName>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>2</motorNumber>
+      <motorSpeedPubTopic>/motor_speed/2</motorSpeedPubTopic>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>600</maxRotVelocity>
+      <motorConstant>4.2e-04</motorConstant>
+      <momentConstant>0.1</momentConstant>
+      <rotorDragCoefficient>0.0006</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin filename="libgazebo_motor_model.so" name="rear_right_motor_model">
+      <robotNamespace></robotNamespace>
+      <jointName>rear_right_prop_rev</jointName>
+      <linkName>rear_right_prop_1</linkName>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>3</motorNumber>
+      <motorSpeedPubTopic>/motor_speed/3</motorSpeedPubTopic>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>600</maxRotVelocity>
+      <motorConstant>4.2e-04</motorConstant>
+      <momentConstant>0.1</momentConstant>
+      <rotorDragCoefficient>0.0006</rotorDragCoefficient>
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
+    </plugin>
+    <plugin filename="libgazebo_motor_model.so" name="pusher_motor_model">
+      <robotNamespace></robotNamespace>
+      <jointName>pusher_prop_rev</jointName>
+      <linkName>pusher_prop_1</linkName>
+      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+      <motorNumber>4</motorNumber>
+      <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+      <turningDirection>cw</turningDirection>
+      <timeConstantUp>0.0125</timeConstantUp>
+      <timeConstantDown>0.025</timeConstantDown>
+      <maxRotVelocity>1500</maxRotVelocity>  <!--523  1500-->
+      <motorConstant>4.2e-04</motorConstant> <!-- 3.2e-04 -->
+      <momentConstant>0.01</momentConstant>
+      <rotorDragCoefficient>3.05748265265996e-08</rotorDragCoefficient>  <!-- was 3.05748265265996e-08 -->
+      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>  <!-- was 1e-08 -->
+      <rotorVelocitySlowdownSim>20</rotorVelocitySlowdownSim>
+      <!--<maxRelativeAirspeed>20</maxRelativeAirspeed>-->
+    </plugin>
+
+    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
+    </plugin>
+    <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>100</pubRate>
+      <noiseDensity>0.0004</noiseDensity>
+      <randomWalk>6.4e-06</randomWalk>
+      <biasCorrelationTime>600</biasCorrelationTime>
+      <magTopic>/mag</magTopic>
+    </plugin>
+    <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+      <robotNamespace/>
+      <pubRate>50</pubRate>
+      <baroTopic>/baro</baroTopic>
+    </plugin>
+    <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+      <robotNamespace></robotNamespace>
+      <imuSubTopic>/imu</imuSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_tcp_port>4560</mavlink_tcp_port>
+      <mavlink_udp_port>14560</mavlink_udp_port>
+      <serialEnabled>0</serialEnabled>
+      <serialDevice>/dev/ttyACM0</serialDevice>
+      <baudRate>921600</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <sdk_addr>INADDR_ANY</sdk_addr>
+      <sdk_udp_port>14540</sdk_udp_port>
+      <hil_mode>0</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+      <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      <control_channels>
+        <channel name="rotor0">
+          <input_index>0</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>500</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>front_right_prop_rev</joint_name>
+        </channel>
+        <channel name="rotor1">
+          <input_index>1</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>500</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rear_left_prop_rev</joint_name>
+        </channel>
+        <channel name="rotor2">
+          <input_index>2</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>500</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>front_left_prop_rev</joint_name>
+        </channel>
+        <channel name="rotor3">
+          <input_index>3</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>500</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>rear_right_prop_rev</joint_name>
+        </channel>
+        <channel name="rotor4">
+          <input_index>4</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1000</input_scaling>   <!-- was 2500 -->
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>velocity</joint_control_type>
+          <joint_name>pusher_prop_rev</joint_name>
+        </channel>
+        <channel name="left_aileron">
+          <input_index>5</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>left_aileron_rev</joint_name>
+        </channel>
+        <channel name="right_aileron">
+          <input_index>6</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>right_aileron_rev</joint_name>
+        </channel>
+        <!-- <channel name="rudder">
+          <input_index>7</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>rudder_rev</joint_name>
+        </channel> -->
+        <channel name="left_elevator">
+          <input_index>7</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>left_elevator_rev</joint_name>
+        </channel>
+        <channel name="right_elevator">
+          <input_index>8</input_index>
+          <input_offset>0</input_offset>
+          <input_scaling>1</input_scaling>
+          <zero_position_disarmed>0</zero_position_disarmed>
+          <zero_position_armed>0</zero_position_armed>
+          <joint_control_type>position_kinematic</joint_control_type>
+          <joint_name>right_elevator_rev</joint_name>
+        </channel>
+      </control_channels>
+    </plugin>
+    <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+      <robotNamespace></robotNamespace>
+      <linkName>sentaero6_prod/imu_link</linkName>
+      <imuTopic>/imu</imuTopic>
+      <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+      <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+      <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+      <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+      <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+      <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+      <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+      <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+    </plugin>
+    <static>0</static>
+  </model>
+</sdf>
