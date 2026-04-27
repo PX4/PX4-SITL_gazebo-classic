@@ -388,8 +388,11 @@ void MavlinkInterface::pollForMAVLinkMessages()
   received_actuator_ = false;
 
   do {
-    const bool needs_to_wait_for_actuator = received_first_actuator_ && enable_lockstep_;
-    int timeout_ms = needs_to_wait_for_actuator ? 1000 : 0;
+    const bool needs_to_wait_for_actuator = received_first_actuator_ && enable_lockstep_ && armed_;
+    // Keep this below PX4's simulator_mavlink receive timeout. If Gazebo waits
+    // a full second here while PX4 is waiting for the next sensor tick, arming
+    // can turn lockstep into a two-sided timeout loop, especially with gzclient.
+    const int timeout_ms = needs_to_wait_for_actuator ? 10 : 0;
     int ret = ::poll(&fds_[0], N_FDS, timeout_ms);
 
     if (ret < 0) {
@@ -398,9 +401,10 @@ void MavlinkInterface::pollForMAVLinkMessages()
     }
 
     if (ret == 0) {
-      if (needs_to_wait_for_actuator) {
-        std::cerr << "poll timeout\n";
-      }
+      // Missing an actuator packet inside this short wait is expected during
+      // arming mode changes and under gzclient load. Continue the update so
+      // PX4 receives the next sensor tick instead of turning this into a
+      // two-sided lockstep timeout.
       return;
     }
 
