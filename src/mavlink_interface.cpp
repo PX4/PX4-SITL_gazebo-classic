@@ -431,9 +431,9 @@ void MavlinkInterface::pollForMAVLinkMessages()
 
         // client closed the connection orderly, only makes sense on tcp
         if (use_tcp_ && ret == 0) {
-          std::cerr << "Connection closed by client." << "\n";
-          close_conn_ = true;
-          continue;
+          this->close();
+          close_conn_ = false;
+          return;
         }
 
         // data received
