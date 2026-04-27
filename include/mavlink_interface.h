@@ -185,7 +185,7 @@ public:
 private:
     bool received_actuator_{false};
     bool received_first_actuator_{false};
-    bool armed_;
+    bool armed_{false};
     Eigen::VectorXd input_reference_;
 
     void handle_message(mavlink_message_t *msg);
