@@ -525,7 +525,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
     Cem = this->Cem0 + this->Cema * this->alpha;
   }
   // Add sideslip effect, if any
-  Cem = this->Cemb * this->beta;
+  Cem += this->Cemb * this->beta;
 
   // Take into account the effect of control surface deflection angle to Cm
   Cem += Cem_ctrl_tot;
