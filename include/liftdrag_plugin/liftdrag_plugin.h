@@ -149,6 +149,23 @@ namespace gazebo
     private: std::string namespace_;
     private: std::string wind_sub_topic_ = "world_wind";
     private: ignition::math::Vector3d wind_vel_;
+    /// \brief Propeller Slipstream flag
+    private: bool HasPropellerWind_ = false;
+
+    /// \brief List of pointers to propeller joints
+    private: std::vector<physics::JointPtr> propeller_joint_;
+
+    /// \brief List of wind speed constants k_v corresponding to each propeller
+    private: std::vector<double> propeller_wind_constant_;
+
+    /// \brief Total number of propellers affecting this plugin
+    private: int num_of_propeller_ = 0;
+
+    /// \brief Whether to only consider the wash velocity from propellers
+    private: bool wash_only_ = false;
+
+    /// \brief List of rotor velocity slowdown factors for simulation
+    private: std::vector<double> rotor_velocity_slowdown_sim_;
   };
 }
 #endif
