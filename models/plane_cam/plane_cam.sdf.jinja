@@ -1,0 +1,983 @@
+<?xml version="1.0"?>
+<sdf version='1.5'>
+  <model name='plane_cam'>
+      <frame name='plane::__model__' attached_to='plane::base_link'>
+        <pose relative_to='__model__'>0 0 0.246 0 -0 0</pose>
+      </frame>
+      <link name='plane::base_link'>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>1.5</mass>
+          <inertia>
+            <ixx>0.197563</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.145893</iyy>
+            <iyz>0</iyz>
+            <izz>0.1477</izz>
+          </inertia>
+        </inertial>
+        <collision name='base_link_collision'>
+          <pose>0 0 -0.07 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.47 0.47 0.11</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>10</max_vel>
+                <min_depth>0.01</min_depth>
+              </ode>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='base_link_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/body.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/DarkGrey</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <gravity>1</gravity>
+        <velocity_decay/>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='plane::plane/imu_link'>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.015</mass>
+          <inertia>
+            <ixx>1e-05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1e-05</iyy>
+            <iyz>0</iyz>
+            <izz>1e-05</izz>
+          </inertia>
+        </inertial>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='plane::plane/imu_joint' type='revolute'>
+        <child>plane::plane/imu_link</child>
+        <parent>plane::base_link</parent>
+        <axis>
+          <xyz expressed_in='plane::__model__'>1 0 0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>0</effort>
+            <velocity>0</velocity>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <frame name='plane::airspeed::__model__' attached_to='plane::airspeed::link'>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+      </frame>
+      <link name='plane::airspeed::link'>
+        <pose relative_to='plane::airspeed::__model__'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.015</mass>
+          <inertia>
+            <ixx>1e-05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1e-05</iyy>
+            <iyz>0</iyz>
+            <izz>1e-05</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <pose>0 0 0 0 1.57 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.004</radius>
+              <length>0.08</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <sensor name='airspeed' type='gps'>
+          <pose>0 0 0 0 -0 0</pose>
+          <update_rate>5</update_rate>
+          <always_on>1</always_on>
+          <visualize>0</visualize>
+          <plugin name='airspeed_plugin' filename='libgazebo_airspeed_plugin.so'>
+            <robotNamespace/>
+          </plugin>
+          <gps/>
+        </sensor>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='plane::airspeed_joint' type='fixed'>
+        <child>plane::airspeed::link</child>
+        <parent>plane::base_link</parent>
+      </joint>
+      <link name='plane::rotor_puller'>
+        <pose relative_to='plane::__model__'>0.3 0 0 0 1.57 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>9.75e-07</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.000166704</iyy>
+            <iyz>0</iyz>
+            <izz>0.000167604</izz>
+          </inertia>
+        </inertial>
+        <collision name='rotor_puller_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <length>0.005</length>
+              <radius>0.1</radius>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='rotor_puller_visual'>
+          <pose>0 0 -0.09 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>model://plane/meshes/iris_prop_ccw.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <gravity>1</gravity>
+        <velocity_decay/>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='plane::rotor_puller_joint' type='revolute'>
+        <child>plane::rotor_puller</child>
+        <parent>plane::base_link</parent>
+        <axis>
+          <xyz expressed_in='plane::__model__'>1 0 0</xyz>
+          <limit>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='plane::left_elevon'>
+        <inertial>
+          <mass>1e-08</mass>
+          <inertia>
+            <ixx>1e-06</ixx>
+            <ixy>0</ixy>
+            <iyy>1e-06</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>1e-06</izz>
+          </inertia>
+          <pose>0 0.3 0 0 -0 0</pose>
+        </inertial>
+        <visual name='left_elevon_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/left_aileron.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+          <plugin name='left_elevon_lift_visual' filename='libForceVisual.so'>
+            <topic_name>lift_force/left_elevon</topic_name>
+            <color>Gazebo/Green</color>
+          </plugin>
+        </visual>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='plane::right_elevon'>
+        <inertial>
+          <mass>1e-08</mass>
+          <inertia>
+            <ixx>1e-06</ixx>
+            <ixy>0</ixy>
+            <iyy>1e-06</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>1e-06</izz>
+          </inertia>
+          <pose>0 -0.3 0 0 -0 0</pose>
+        </inertial>
+        <visual name='right_elevon_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/right_aileron.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+          <plugin name='right_elevon_lift_visual' filename='libForceVisual.so'>
+            <topic_name>lift_force/right_elevon</topic_name>
+            <color>Gazebo/Green</color>
+          </plugin>
+        </visual>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='plane::left_flap'>
+        <inertial>
+          <mass>1e-08</mass>
+          <inertia>
+            <ixx>1e-06</ixx>
+            <ixy>0</ixy>
+            <iyy>1e-06</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>1e-06</izz>
+          </inertia>
+          <pose>0 0.15 0 0 -0 0</pose>
+        </inertial>
+        <visual name='left_flap_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/left_flap.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+          <plugin name='left_flap_lift_visual' filename='libForceVisual.so'>
+            <topic_name>lift_force/left_flap</topic_name>
+            <color>Gazebo/Green</color>
+          </plugin>
+        </visual>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='plane::right_flap'>
+        <inertial>
+          <mass>1e-08</mass>
+          <inertia>
+            <ixx>1e-06</ixx>
+            <ixy>0</ixy>
+            <iyy>1e-06</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>1e-06</izz>
+          </inertia>
+          <pose>0 -0.15 0 0 -0 0</pose>
+        </inertial>
+        <visual name='right_flap_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/right_flap.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+          <plugin name='right_elevon_lift_visual' filename='libForceVisual.so'>
+            <topic_name>lift_force/right_flap</topic_name>
+            <color>Gazebo/Green</color>
+          </plugin>
+        </visual>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='plane::elevator'>
+        <inertial>
+          <mass>1e-08</mass>
+          <inertia>
+            <ixx>1e-06</ixx>
+            <ixy>0</ixy>
+            <iyy>1e-06</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>1e-06</izz>
+          </inertia>
+          <pose>-0.5 0 0 0 -0 0</pose>
+        </inertial>
+        <visual name='elevator_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/elevators.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+          <plugin name='elevator_lift_visual' filename='libForceVisual.so'>
+            <topic_name>lift_force/elevator</topic_name>
+            <color>Gazebo/Green</color>
+          </plugin>
+        </visual>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <link name='plane::rudder'>
+        <inertial>
+          <mass>1e-08</mass>
+          <inertia>
+            <ixx>1e-06</ixx>
+            <ixy>0</ixy>
+            <iyy>1e-06</iyy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+            <izz>1e-06</izz>
+          </inertia>
+          <pose>-0.5 0 0.05 0 -0 0</pose>
+        </inertial>
+        <visual name='rudder_visual'>
+          <pose>0.07 0 -0.08 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.1 0.1 0.1</scale>
+              <uri>model://plane/meshes/rudder.dae</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+          <plugin name='rudder_lift_visual' filename='libForceVisual.so'>
+            <topic_name>lift_force/rudder</topic_name>
+            <color>Gazebo/Green</color>
+          </plugin>
+        </visual>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='plane::left_elevon_joint' type='revolute'>
+        <parent>plane::base_link</parent>
+        <child>plane::left_elevon</child>
+        <pose>-0.07 0.4 0.08 0 -0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-0.53</lower>
+            <upper>0.53</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <joint name='plane::right_elevon_joint' type='revolute'>
+        <parent>plane::base_link</parent>
+        <child>plane::right_elevon</child>
+        <pose>-0.07 -0.4 0.08 0 -0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-0.53</lower>
+            <upper>0.53</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <joint name='plane::left_flap_joint' type='revolute'>
+        <parent>plane::base_link</parent>
+        <child>plane::left_flap</child>
+        <pose>-0.07 0.2 0.08 0 -0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-0.53</lower>
+            <upper>0.53</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <joint name='plane::right_flap_joint' type='revolute'>
+        <parent>plane::base_link</parent>
+        <child>plane::right_flap</child>
+        <pose>-0.07 -0.2 0.08 0 -0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-0.53</lower>
+            <upper>0.53</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <joint name='plane::elevator_joint' type='revolute'>
+        <parent>plane::base_link</parent>
+        <child>plane::elevator</child>
+        <pose>-0.5 0 0 0 -0 0</pose>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-0.53</lower>
+            <upper>0.53</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <joint name='plane::rudder_joint' type='revolute'>
+        <parent>plane::base_link</parent>
+        <child>plane::rudder</child>
+        <pose>-0.5 0 0.05 0 -0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.53</lower>
+            <upper>0.53</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <frame name='plane::gps::__model__' attached_to='plane::gps::link'>
+        <pose relative_to='plane::__model__'>0 0 0 0 -0 0</pose>
+      </frame>
+      <link name='plane::gps::link'>
+        <pose relative_to='plane::gps::__model__'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.015</mass>
+          <inertia>
+            <ixx>1e-05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1e-05</iyy>
+            <iyz>0</iyz>
+            <izz>1e-05</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.01</radius>
+              <length>0.002</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Black</name>
+              <uri>__default__</uri>
+            </script>
+          </material>
+        </visual>
+        <sensor name='gps' type='gps'>
+          <pose>0 0 0 0 -0 0</pose>
+          <update_rate>5</update_rate>
+          <always_on>1</always_on>
+          <visualize>0</visualize>
+          <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
+            <robotNamespace/>
+            <gpsNoise>1</gpsNoise>
+            <gpsXYRandomWalk>2.0</gpsXYRandomWalk>
+            <gpsZRandomWalk>4.0</gpsZRandomWalk>
+            <gpsXYNoiseDensity>2.0e-4</gpsXYNoiseDensity>
+            <gpsZNoiseDensity>4.0e-4</gpsZNoiseDensity>
+            <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
+            <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+          </plugin>
+          <gps/>
+        </sensor>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='plane::gps_joint' type='fixed'>
+        <child>plane::gps::link</child>
+        <parent>plane::base_link</parent>
+      </joint>
+      <plugin name='left_wing' filename='libLiftDragPlugin.so'>
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.05 0.45 0.05</cp>
+        <area>0.6</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>plane::base_link</link_name>
+        <topic_name>lift_force/left_elevon</topic_name>
+        <control_joint_name>plane::left_elevon_joint</control_joint_name>
+        <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='right_wing' filename='libLiftDragPlugin.so'>
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.05 -0.45 0.05</cp>
+        <area>0.6</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>plane::base_link</link_name>
+        <topic_name>lift_force/right_elevon</topic_name>
+        <control_joint_name>plane::right_elevon_joint</control_joint_name>
+        <control_joint_rad_to_cl>-0.3</control_joint_rad_to_cl>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='plane::left_flap' filename='libLiftDragPlugin.so'>
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.05 0.15 0.05</cp>
+        <area>0.6</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>plane::base_link</link_name>
+        <topic_name>lift_force/left_flap</topic_name>
+        <control_joint_name>plane::left_flap_joint</control_joint_name>
+        <control_joint_rad_to_cl>-0.1</control_joint_rad_to_cl>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='plane::right_flap' filename='libLiftDragPlugin.so'>
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.05 -0.15 0.05</cp>
+        <area>0.6</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>plane::base_link</link_name>
+        <topic_name>lift_force/right_flap</topic_name>
+        <control_joint_name>plane::right_flap_joint</control_joint_name>
+        <control_joint_rad_to_cl>-0.1</control_joint_rad_to_cl>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='plane::elevator' filename='libLiftDragPlugin.so'>
+        <a0>-0.2</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.5 0 0</cp>
+        <area>0.01</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>plane::base_link</link_name>
+        <topic_name>lift_force/elevator</topic_name>
+        <control_joint_name>plane::elevator_joint</control_joint_name>
+        <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='plane::rudder' filename='libLiftDragPlugin.so'>
+        <a0>0.0</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0.0</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.5 0 0.05</cp>
+        <area>0.02</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 1 0</upward>
+        <link_name>plane::base_link</link_name>
+        <topic_name>lift_force/rudder</topic_name>
+        <control_joint_name>plane::rudder_joint</control_joint_name>
+        <control_joint_rad_to_cl>0.8</control_joint_rad_to_cl>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='puller' filename='libgazebo_motor_model.so'>
+        <robotNamespace/>
+        <jointName>plane::rotor_puller_joint</jointName>
+        <linkName>plane::rotor_puller</linkName>
+        <turningDirection>cw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>3500</maxRotVelocity>
+        <motorConstant>8.54858e-06</motorConstant>
+        <momentConstant>0.01</momentConstant>
+        <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+        <motorNumber>4</motorNumber>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <motorSpeedPubTopic>/motor_speed/4</motorSpeedPubTopic>
+        <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        <robotNamespace/>
+        <windSubTopic>world_wind</windSubTopic>
+      </plugin>
+      <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+        <robotNamespace/>
+      </plugin>
+      <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
+        <robotNamespace/>
+        <pubRate>100</pubRate>
+        <noiseDensity>0.0004</noiseDensity>
+        <randomWalk>6.4e-06</randomWalk>
+        <biasCorrelationTime>600</biasCorrelationTime>
+        <magTopic>/mag</magTopic>
+      </plugin>
+      <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
+        <robotNamespace/>
+        <pubRate>50</pubRate>
+        <baroTopic>/baro</baroTopic>
+      </plugin>
+      <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
+        <robotNamespace></robotNamespace>
+      <imuSubTopic>/imu</imuSubTopic>
+      <magSubTopic>/mag</magSubTopic>
+      <baroSubTopic>/baro</baroSubTopic>
+      <mavlink_addr>INADDR_ANY</mavlink_addr>
+      <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
+      <mavlink_udp_port>{{ mavlink_udp_port }}</mavlink_udp_port>
+      <serialEnabled>{{ serial_enabled }}</serialEnabled>
+      <serialDevice>{{ serial_device }}</serialDevice>
+      <baudRate>{{ serial_baudrate }}</baudRate>
+      <qgc_addr>INADDR_ANY</qgc_addr>
+      <qgc_udp_port>14550</qgc_udp_port>
+      <sdk_addr>INADDR_ANY</sdk_addr>
+      <sdk_udp_port>14540</sdk_udp_port>
+      <hil_mode>{{ hil_mode }}</hil_mode>
+      <hil_state_level>false</hil_state_level>
+      <enable_lockstep>true</enable_lockstep>
+      <use_tcp>true</use_tcp>
+        <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+        <control_channels>
+          <channel name='plane::rudder'>
+            <input_index>2</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_kinematic</joint_control_type>
+            <joint_name>plane::rudder_joint</joint_name>
+          </channel>
+          <channel name='rotor4'>
+            <input_index>4</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>3500</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+            <joint_name>plane::rotor_puller_joint</joint_name>
+          </channel>
+          <channel name='plane::left_elevon'>
+            <input_index>5</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_kinematic</joint_control_type>
+            <joint_name>plane::left_elevon_joint</joint_name>
+          </channel>
+          <channel name='plane::right_elevon'>
+            <input_index>6</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_kinematic</joint_control_type>
+            <joint_name>plane::right_elevon_joint</joint_name>
+          </channel>
+          <channel name='plane::elevator'>
+            <input_index>7</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_kinematic</joint_control_type>
+            <joint_name>plane::elevator_joint</joint_name>
+          </channel>
+          <channel name='plane::left_flap'>
+            <input_index>3</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>-1</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_kinematic</joint_control_type>
+            <joint_name>plane::left_flap_joint</joint_name>
+          </channel>
+          <channel name='plane::right_flap'>
+            <input_index>8</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>-1</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>0</zero_position_armed>
+            <joint_control_type>position_kinematic</joint_control_type>
+            <joint_name>plane::right_flap_joint</joint_name>
+          </channel>
+        </control_channels>
+      </plugin>
+      <static>0</static>
+      <plugin name='gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
+        <robotNamespace/>
+        <linkName>plane::plane/imu_link</linkName>
+        <imuTopic>/imu</imuTopic>
+        <gyroscopeNoiseDensity>0.0003394</gyroscopeNoiseDensity>
+        <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
+        <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
+        <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
+        <accelerometerNoiseDensity>0.004</accelerometerNoiseDensity>
+        <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
+        <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
+        <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+      </plugin>
+      <frame name='geotagged_cam::__model__' attached_to='geotagged_cam::camera_link'>
+        <pose relative_to='__model__'>0.3 0 0.35 -3e-06 3e-06 3.14159</pose>
+      </frame>
+      <link name='geotagged_cam::camera_link'>
+        <inertial>
+          <pose>-0.041 0 -0.162 0 -0 0</pose>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <sensor name='camera_imu' type='imu'>
+          <always_on>1</always_on>
+          <imu/>
+        </sensor>
+        <sensor name='camera' type='camera'>
+          <pose>-0.051 0 -0.162 0 -0 3.14159</pose>
+          <camera>
+            <horizontal_fov>1</horizontal_fov>
+            <image>
+              <format>R8G8B8</format>
+              <width>1920</width>
+              <height>1080</height>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>15000</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>5</update_rate>
+          <visualize>1</visualize>
+          <plugin name='GstCameraPlugin' filename='libgazebo_gst_camera_plugin.so'>
+            <robotNamespace></robotNamespace>
+            <udpHost>127.0.0.1</udpHost>
+            <udpPort>{{ gst_udp_port }}</udpPort>
+          </plugin>
+          <plugin name='CameraManagerPlugin' filename='libgazebo_camera_manager_plugin.so'>
+            <robotNamespace/>
+            <interval>1</interval>
+            <width>3840</width>
+            <height>2160</height>
+            <maximum_zoom>8.0</maximum_zoom>
+            <video_uri>{{ video_uri }}</video_uri>
+            <system_id>{{ mavlink_id }}</system_id>
+            <cam_component_id>{{ cam_component_id }}</cam_component_id>
+            <mavlink_cam_udp_port>{{ mavlink_cam_udp_port }}</mavlink_cam_udp_port>
+          </plugin>
+        </sensor>
+        <pose relative_to='geotagged_cam::__model__'>0 0 0 0 -0 0</pose>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='geotagged_cam_joint' type='fixed'>
+        <parent>plane::base_link</parent>
+        <child>geotagged_cam::camera_link</child>
+      </joint>
+      <pose>1.01 0.98 0.83 0 -0 0</pose>
+    </model>
+</sdf>
