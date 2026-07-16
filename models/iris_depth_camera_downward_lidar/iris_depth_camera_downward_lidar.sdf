@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name='iris_depth_camera_downward_lidar'>
+    <include>
+      <uri>model://iris_depth_camera</uri>
+    </include>
+
+    <!--downward-facing lidar-->
+    <include>
+      <uri>model://lidar</uri>
+      <pose>-0.1 0 -0.01 0 0 0</pose>
+    </include>
+    <joint name="lidar_joint" type="fixed">
+      <parent>iris_depth_camera::iris::base_link</parent>
+      <child>lidar::link</child>
+    </joint>
+
+  </model>
+</sdf>
