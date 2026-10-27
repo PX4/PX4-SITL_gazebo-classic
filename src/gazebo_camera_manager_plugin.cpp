@@ -688,7 +688,8 @@ void CameraManagerPlugin::_handle_request_video_stream_status(const mavlink_mess
         2048,                                                   // Bit rate (made up)
         0,                                                      // Rotation (none)
         90,                                                     // FOV (made up)
-	0);                                                     // MAVLink camera with its own component ID
+	0,                                                      // MAVLink camera with its own component ID
+	0);                                                     // Vertical FOV (unknown)
 
     _send_mavlink_message(&msg, srcaddr);
 }
