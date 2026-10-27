@@ -51,7 +51,7 @@ void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
   // ROS2 Topic subscriber
   // Initialize ROS2, if it has not already been initialized.
-  if (!rclcpp::is_initialized()) {
+  if (!rclcpp::ok()) {
     int argc = 0;
     char **argv = NULL;
     rclcpp::init(argc, argv);
@@ -63,7 +63,7 @@ void GazeboMotorFailure::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // Create a named topic, and subscribe to it.
   subscription = this->ros_node_->create_subscription<std_msgs::msg::Int32>(
 		  this->ROS_motor_num_sub_topic_, 10, 
-		  boost::bind(&GazeboMotorFailure::motorFailNumCallBack, this, boost::placeholders::_1));
+		  std::bind(&GazeboMotorFailure::motorFailNumCallBack, this, std::placeholders::_1));
   std::cout << "[gazebo_motor_failure_plugin]: Subscribe to ROS topic: "<< ROS_motor_num_sub_topic_ << std::endl;
 
   // Listen to the update event. This event is broadcast every
