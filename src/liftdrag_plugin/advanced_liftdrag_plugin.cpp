@@ -562,7 +562,7 @@ CL_poststall = 2*(this->alpha/abs(this->alpha))*pow(sinAlpha,2.0)*cosAlpha
   this->link->AddForceAtRelativePosition(force, this->ref_pt);
   this->link->AddTorque(moment);
 
-  auto relative_center = this->link->RelativePose().Pos() + this->ref_pt;
+  auto relative_center = this->link->GetInertial()->Pose().Pos() + this->ref_pt;
 
   // Publish force and center of pressure for potential visual plugin.
   // - dt is used to control the rate at which the force is published
