@@ -232,10 +232,10 @@ private:
   transport::SubscriberPtr opticalFlow_sub_{nullptr};
   transport::SubscriberPtr irlock_sub_{nullptr};
 
-#ifdef MAVLINK_DEVELOPMENT
+#ifdef MAVLINK_MSG_ID_TARGET_RELATIVE
   transport::SubscriberPtr target_gps_sub_{nullptr};
   transport::SubscriberPtr arucoMarker_sub_{nullptr};
-#endif // MAVLINK_DEVELOPMENT
+#endif // MAVLINK_MSG_ID_TARGET_RELATIVE
   transport::SubscriberPtr groundtruth_sub_{nullptr};
   transport::SubscriberPtr vision_sub_{nullptr};
   transport::SubscriberPtr mag_sub_{nullptr};
